@@ -658,23 +658,23 @@ void GuiInspector::refresh()
             
             if( !group && !isGroupFiltered( itr->pGroupname ) )
             {
-               GuiInspectorGroup *group = new GuiInspectorGroup( itr->pGroupname, this );
+               GuiInspectorGroup *newGroup = new GuiInspectorGroup( itr->pGroupname, this );
 
-               group->registerObject();
-               if( !group->getNumFields() )
+			   newGroup->registerObject();
+               if( !newGroup->getNumFields() )
                {
                   #ifdef DEBUG_SPEW
                   Platform::outputDebugString( "[GuiInspector] Removing empty group '%s'",
-                     group->getCaption().c_str() );
+					  newGroup->getCaption().c_str() );
                   #endif
                      
                   // The group ended up having no fields.  Remove it.
-                  group->deleteObject();
+				  newGroup->deleteObject();
                }
                else
                {
-                  mGroups.push_back( group );
-                  addObject( group );
+                  mGroups.push_back(newGroup);
+                  addObject(newGroup);
                }
             }
          }

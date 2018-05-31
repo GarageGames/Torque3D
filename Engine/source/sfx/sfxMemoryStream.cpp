@@ -80,13 +80,13 @@ U32 SFXMemoryStream::read( U8* buffer, U32 length )
          
          if( numBytesLeftInCurrentPacket )
          {
-            const U32 numBytesToCopy = getMin( numBytesLeftInCurrentPacket, numBytesLeftToCopy );
-            dMemcpy( &buffer[ bufferOffset ], &mCurrentPacket->data[ mCurrentPacketOffset ], numBytesToCopy );
+            const U32 remainingNumBytesToCopy = getMin( numBytesLeftInCurrentPacket, numBytesLeftToCopy );
+            dMemcpy( &buffer[ bufferOffset ], &mCurrentPacket->data[ mCurrentPacketOffset ], remainingNumBytesToCopy);
             
-            bufferOffset                  += numBytesToCopy;
-            mCurrentPacketOffset          += numBytesToCopy;
-            numBytesLeftInCurrentPacket   -= numBytesToCopy;
-            numBytesLeftToCopy            -= numBytesToCopy;
+            bufferOffset                  += remainingNumBytesToCopy;
+            mCurrentPacketOffset          += remainingNumBytesToCopy;
+            numBytesLeftInCurrentPacket   -= remainingNumBytesToCopy;
+            numBytesLeftToCopy            -= remainingNumBytesToCopy;
          }
          
          // Discard the packet if there's no data left.

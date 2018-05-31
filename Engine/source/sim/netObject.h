@@ -411,17 +411,17 @@ public:
 
    /// @}
 protected:
-   U16           scope_id;
-   U16           scope_refs;
-   bool          scope_registered;
+   U16           mScope_id;
+   U16           mScope_refs;
+   bool          mScope_registered;
    virtual void  onScopeIdChange() { }
 public:
    enum { SCOPE_ID_BITS = 14 };
-   U16           getScopeId() const { return scope_id; }
+   U16           getScopeId() const { return mScope_id; }
    U16           addScopeRef();
    void          removeScopeRef();
-   void          setScopeRegistered(bool flag) { scope_registered = flag; }
-   bool          getScopeRegistered() const { return scope_registered; }
+   void          setScopeRegistered(bool flag) { mScope_registered = flag; }
+   bool          getScopeRegistered() const { return mScope_registered; }
 
 protected:
    /// Add a networked field

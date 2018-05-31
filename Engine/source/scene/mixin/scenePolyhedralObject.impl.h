@@ -215,27 +215,27 @@ void ScenePolyhedralObject< Base, P >::unpackUpdate( NetConnection* connection, 
       // Read planes.
 
       const U32 numPlanes = stream->readInt( 8 );
-      mPolyhedron.planeList.setSize( numPlanes );
+      mPolyhedron.mPlaneList.setSize( numPlanes );
 
       for( U32 i = 0; i < numPlanes; ++ i )
-         mathRead( *stream, &mPolyhedron.planeList[ i ] );
+         mathRead( *stream, &mPolyhedron.mPlaneList[ i ] );
 
       // Read points.
 
       const U32 numPoints = stream->readInt( 8 );
-      mPolyhedron.pointList.setSize( numPoints );
+      mPolyhedron.mPointList.setSize( numPoints );
 
       for( U32 i = 0; i < numPoints; ++ i )
-         mathRead( *stream, &mPolyhedron.pointList[ i ] );
+         mathRead( *stream, &mPolyhedron.mPointList[ i ] );
 
       // Read edges.
 
       const U32 numEdges = stream->readInt( 8 );
-      mPolyhedron.edgeList.setSize( numEdges );
+      mPolyhedron.mEdgeList.setSize( numEdges );
 
       for( U32 i = 0; i < numEdges; ++ i )
       {
-         typename PolyhedronType::EdgeType& edge = mPolyhedron.edgeList[ i ];
+         typename PolyhedronType::EdgeType& edge = mPolyhedron.mEdgeList[ i ];
 
          edge.face[ 0 ] = stream->readInt( 8 );
          edge.face[ 1 ] = stream->readInt( 8 );
@@ -344,7 +344,7 @@ bool ScenePolyhedralObject< Base, P >::_setPlane( void* object, const char* inde
       &plane.d
    );
 
-   obj->mPolyhedron.planeList.push_back( plane );
+   obj->mPolyhedron.mPlaneList.push_back( plane );
    obj->setMaskBits( PolyMask );
    obj->mIsBox = false;
 
@@ -366,7 +366,7 @@ bool ScenePolyhedralObject< Base, P >::_setPoint( void* object, const char* inde
       &point[ 2 ]
    );
 
-   obj->mPolyhedron.pointList.push_back( point );
+   obj->mPolyhedron.mPointList.push_back( point );
    obj->setMaskBits( PolyMask );
    obj->mIsBox = false;
 
@@ -389,7 +389,7 @@ bool ScenePolyhedralObject< Base, P >::_setEdge( void* object, const char* index
       &edge.vertex[ 1 ]
    );
 
-   obj->mPolyhedron.edgeList.push_back( edge );
+   obj->mPolyhedron.mEdgeList.push_back( edge );
    obj->setMaskBits( PolyMask );
    obj->mIsBox = false;
 

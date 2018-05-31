@@ -251,7 +251,7 @@ public:
 
 protected:
 
-   U32 meshType;
+   U32 mMeshType;
    Box3F mBounds;
    Point3F mCenter;
    F32 mRadius;
@@ -259,7 +259,7 @@ protected:
 
    const GFXVertexFormat *mVertexFormat;
 
-   TSMesh *parentMeshObject; ///< Current parent object instance
+   TSMesh *mParentMeshObject; ///< Current parent object instance
 
    U32 mPrimBufferOffset;
 
@@ -268,7 +268,7 @@ protected:
 
 public:
 
-   S32 parentMesh; ///< index into shapes mesh list
+   S32 mParentMesh; ///< index into shapes mesh list
    S32 numFrames;
    S32 numMatFrames;
    S32 vertsPerFrame;
@@ -299,12 +299,12 @@ protected:
       FlagMask = Billboard|BillboardZAxis|HasDetailTexture|UseEncodedNormals|HasColor|HasTVert2
    };
 
-   U32 getMeshType() const { return meshType & TypeMask; }
-   U32 getHasColor() const { return colors.size() > 0 || meshType & HasColor; }
-   U32 getHasTVert2() const { return tverts2.size() > 0 || meshType & HasTVert2; }
-   void setFlags(U32 flag) { meshType |= flag; }
-   void clearFlags(U32 flag) { meshType &= ~flag; }
-   U32 getFlags( U32 flag = 0xFFFFFFFF ) const { return meshType & flag; }
+   U32 getMeshType() const { return mMeshType & TypeMask; }
+   U32 getHasColor() const { return mColors.size() > 0 || mMeshType & HasColor; }
+   U32 getHasTVert2() const { return mTverts2.size() > 0 || mMeshType & HasTVert2; }
+   void setFlags(U32 flag) { mMeshType |= flag; }
+   void clearFlags(U32 flag) { mMeshType &= ~flag; }
+   U32 getFlags( U32 flag = 0xFFFFFFFF ) const { return mMeshType & flag; }
 
    const Point3F* getNormals( S32 firstVert );
 
@@ -319,34 +319,34 @@ protected:
    /// @name Vertex data
    /// @{
 
-   FreeableVector<Point3F> verts;
-   FreeableVector<Point3F> norms;
-   FreeableVector<Point2F> tverts;
-   FreeableVector<Point4F> tangents;
+   FreeableVector<Point3F> mVerts;
+   FreeableVector<Point3F> mNorms;
+   FreeableVector<Point2F> mTverts;
+   FreeableVector<Point4F> mTangents;
    
    // Optional second texture uvs.
-   FreeableVector<Point2F> tverts2;
+   FreeableVector<Point2F> mTverts2;
 
    // Optional vertex colors data.
-   FreeableVector<ColorI> colors;
+   FreeableVector<ColorI> mColors;
    /// @}
 
-   Vector<TSDrawPrimitive> primitives;
-   Vector<U8> encodedNorms;
-   Vector<U32> indices;
+   Vector<TSDrawPrimitive> mPrimitives;
+   Vector<U8> mEncodedNorms;
+   Vector<U32> mIndices;
 
    /// billboard data
-   Point3F billboardAxis;
+   Point3F mBillboardAxis;
 
    /// @name Convex Hull Data
    /// Convex hulls are convex (no angles >= 180º) meshes used for collision
    /// @{
 
-   Vector<Point3F> planeNormals;
-   Vector<F32>     planeConstants;
-   Vector<U32>     planeMaterials;
-   S32 planesPerFrame;
-   U32 mergeBufferStart;
+   Vector<Point3F> mPlaneNormals;
+   Vector<F32>     mPlaneConstants;
+   Vector<U32>     mPlaneMaterials;
+   S32 mPlanesPerFrame;
+   U32 mMergeBufferStart;
    /// @}
 
    /// @name Render Methods

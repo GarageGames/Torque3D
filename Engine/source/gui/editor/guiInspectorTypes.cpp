@@ -1035,7 +1035,6 @@ GuiControl* GuiInspectorTypeEaseF::constructEditControl()
    mBrowseButton = new GuiButtonCtrl();
    {
       RectI browseRect( Point2I( ( getLeft() + getWidth()) - 26, getTop() + 2), Point2I(20, getHeight() - 4) );
-      char szBuffer[512];
       dSprintf( szBuffer, sizeof( szBuffer ), "GetEaseF(%d.getText(), \"%d.apply\", %d.getRoot());", retCtrl->getId(), getId(), getId() );
       mBrowseButton->setField( "Command", szBuffer );
       mBrowseButton->setField( "text", "E" );

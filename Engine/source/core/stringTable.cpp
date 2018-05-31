@@ -233,7 +233,7 @@ void _StringTable::resize(const U32 _newSize)
    walk = head;
    while(walk) {
       U32 key;
-      Node *temp = walk;
+      temp = walk;
 
       walk = walk->next;
       key = hashString(temp->val);

@@ -373,7 +373,7 @@ bool TSStatic::_createShape()
          NetConnection::filesWereDownloaded() )
       return false;
 
-   mObjBox = mShape->bounds;
+   mObjBox = mShape->mBounds;
    resetWorldBox();
 
    mShapeInstance = new TSShapeInstance( mShape, isClientObject() );

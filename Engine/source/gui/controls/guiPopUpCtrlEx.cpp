@@ -1211,9 +1211,9 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
       if ( drawbox )
       {
          Point2I coloredboxsize( 15, 10 );
-         RectI r( offset.x + mProfile->mTextOffset.x, offset.y + ( (getHeight() - coloredboxsize.y ) / 2 ), coloredboxsize.x, coloredboxsize.y );
-         drawUtil->drawRectFill( r, boxColor);
-         drawUtil->drawRect( r, ColorI(0,0,0));
+         RectI boxBounds( offset.x + mProfile->mTextOffset.x, offset.y + ( (getHeight() - coloredboxsize.y ) / 2 ), coloredboxsize.x, coloredboxsize.y );
+         drawUtil->drawRectFill(boxBounds, boxColor);
+         drawUtil->drawRect(boxBounds, ColorI(0,0,0));
 
          localStart.x += coloredboxsize.x + mProfile->mTextOffset.x;
       }
@@ -1237,18 +1237,18 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
 
          // Draw the second column to the right
          getColumn( mText, buff, 1, "\t" );
-         S32 txt_w = mProfile->mFont->getStrWidth( buff );
+         S32 colTxt_w = mProfile->mFont->getStrWidth( buff );
          if ( mProfile->getChildrenProfile() && mProfile->mBitmapArrayRects.size() )
          {
             // We're making use of a bitmap border, so take into account the
             // right cap of the border.
             RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
-            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - bitmapBounds[2].extent.x, localStart.y ) );
+            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - colTxt_w - bitmapBounds[2].extent.x, localStart.y ) );
             drawUtil->drawText( mProfile->mFont, textpos, buff, mProfile->mFontColors );
 
          } else
          {
-            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - 12, localStart.y ) );
+            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - colTxt_w - 12, localStart.y ) );
             drawUtil->drawText( mProfile->mFont, textpos, buff, mProfile->mFontColors );
          }
 

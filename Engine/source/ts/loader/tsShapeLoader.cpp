@@ -1172,7 +1172,7 @@ void TSShapeLoader::install()
       {
          TSMesh *mesh = shape->meshes[obj.startMeshIndex + iMesh];
 
-         if (mesh && !mesh->primitives.size())
+         if (mesh && !mesh->mPrimitives.size())
          {
             S32 oldMeshCount = obj.numMeshes;
             destructInPlace(mesh);
@@ -1220,13 +1220,13 @@ void TSShapeLoader::install()
       }
    }
 
-   computeBounds(shape->bounds);
-   if (!shape->bounds.isValidBox())
-      shape->bounds = Box3F(1.0f);
+   computeBounds(shape->mBounds);
+   if (!shape->mBounds.isValidBox())
+      shape->mBounds = Box3F(1.0f);
 
-   shape->bounds.getCenter(&shape->center);
-   shape->radius = (shape->bounds.maxExtents - shape->center).len();
-   shape->tubeRadius = shape->radius;
+   shape->mBounds.getCenter(&shape->center);
+   shape->mRadius = (shape->mBounds.maxExtents - shape->center).len();
+   shape->tubeRadius = shape->mRadius;
 
    shape->init();
    shape->finalizeEditable();

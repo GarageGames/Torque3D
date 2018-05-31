@@ -28,9 +28,9 @@ void SignalBase::DelegateLink::insert(DelegateLink* node, F32 order)
 {
    // Note: can only legitimately be called on list head
    DelegateLink * walk = next;
-   while (order >= walk->order && walk->next != this)
+   while (order >= walk->mOrder && walk->next != this)
       walk = walk->next;
-   if (order >= walk->order)
+   if (order >= walk->mOrder)
    {
       // insert after walk
       node->prev = walk;
@@ -46,7 +46,7 @@ void SignalBase::DelegateLink::insert(DelegateLink* node, F32 order)
       walk->prev->next = node;
       walk->prev = node;
    }
-   node->order = order;
+   node->mOrder = order;
 }
 
 void SignalBase::DelegateLink::unlink()

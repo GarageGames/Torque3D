@@ -91,7 +91,7 @@ bool afxEA_CameraShake::ea_start()
 
   if (aim_constraint && pos_constraint)
   {
-    if (full_lifetime <= 0 || full_lifetime == INFINITE_LIFETIME)
+    if (mFull_lifetime <= 0 || mFull_lifetime == INFINITE_LIFETIME)
     {
       Con::errorf("afxEA_CameraShake::ea_start() --  effect requires a finite lifetime.");
       return false;
@@ -106,7 +106,7 @@ bool afxEA_CameraShake::ea_start()
       if (dist < shake_data->camShakeRadius)
       {
         camera_shake = new CameraShake;
-        camera_shake->setDuration(full_lifetime);
+        camera_shake->setDuration(mFull_lifetime);
         camera_shake->setFrequency(shake_data->camShakeFreq);
 
         F32 falloff =  dist/shake_data->camShakeRadius;
@@ -161,7 +161,7 @@ void afxEA_CameraShake::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxCameraShakeData* orig_db = shake_data;
     shake_data = new afxCameraShakeData(*orig_db, true);
-    orig_db->performSubstitutions(shake_data, choreographer, group_index);
+    orig_db->performSubstitutions(shake_data, mChoreographer, mGroup_index);
   }
 }
 

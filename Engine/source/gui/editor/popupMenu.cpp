@@ -46,14 +46,20 @@ public:
 //-----------------------------------------------------------------------------
 PopupMenu::PopupMenu()
 {
-   bitmapIndex = -1;
+	mMenuItems = NULL;
+	mMenuBarCtrl = nullptr;
 
-   barTitle = StringTable->EmptyString();
+	mBarTitle = StringTable->EmptyString();
+	mBounds = RectI(0, 0, 64, 64);
+	mVisible = true;
 
-   mMenuBarCtrl = nullptr;
-   mTextList = nullptr;
+	mBitmapIndex = -1;
+	mDrawBitmapOnly = false;
+	mDrawBorder = false;
 
-   isSubmenu = false;
+	mTextList = nullptr;
+
+	mIsSubmenu = false;
 }
 
 PopupMenu::~PopupMenu()
@@ -76,7 +82,7 @@ void PopupMenu::initPersistFields()
 {
    Parent::initPersistFields();
 
-   addField("barTitle", TypeCaseString, Offset(barTitle, PopupMenu), "");
+   addField("barTitle", TypeCaseString, Offset(mBarTitle, PopupMenu), "");
 }
 
 //-----------------------------------------------------------------------------
@@ -134,28 +140,28 @@ S32 PopupMenu::insertItem(S32 pos, const char *title, const char* accelerator, c
    String titleString = title;
 
    MenuItem newItem;
-   newItem.id = pos;
-   newItem.text = titleString;
-   newItem.cmd = cmd;
+   newItem.mID = pos;
+   newItem.mText = titleString;
+   newItem.mCMD = cmd;
 
    if (titleString.isEmpty() || titleString == String("-"))
-      newItem.isSpacer = true;
+      newItem.mIsSpacer = true;
    else
-      newItem.isSpacer = false;
+      newItem.mIsSpacer = false;
 
    if (accelerator[0])
-      newItem.accelerator = dStrdup(accelerator);
+      newItem.mAccelerator = dStrdup(accelerator);
    else
-      newItem.accelerator = NULL;
+      newItem.mAccelerator = NULL;
 
-   newItem.visible = true;
-   newItem.isChecked = false;
-   newItem.acceleratorIndex = 0;
-   newItem.enabled = !newItem.isSpacer;
+   newItem.mVisible = true;
+   newItem.mIsChecked = false;
+   newItem.mAcceleratorIndex = 0;
+   newItem.mEnabled = !newItem.mIsSpacer;
 
-   newItem.isSubmenu = false;
-   newItem.subMenu = nullptr;
-   newItem.subMenuParentMenu = nullptr;
+   newItem.mIsSubmenu = false;
+   newItem.mSubMenu = nullptr;
+   newItem.mSubMenuParentMenu = nullptr;
 
    mMenuItems.push_back(newItem);
 
@@ -166,11 +172,11 @@ S32 PopupMenu::insertSubMenu(S32 pos, const char *title, PopupMenu *submenu)
 {
    S32 itemPos = insertItem(pos, title, "", "");
 
-   mMenuItems[itemPos].isSubmenu = true;
-   mMenuItems[itemPos].subMenu = submenu;
-   mMenuItems[itemPos].subMenuParentMenu = this;
+   mMenuItems[itemPos].mIsSubmenu = true;
+   mMenuItems[itemPos].mSubMenu = submenu;
+   mMenuItems[itemPos].mSubMenuParentMenu = this;
 
-   submenu->isSubmenu = true;
+   submenu->mIsSubmenu = true;
 
    return itemPos;
 }
@@ -181,15 +187,15 @@ bool PopupMenu::setItem(S32 pos, const char *title, const char* accelerator, con
 
    for (U32 i = 0; i < mMenuItems.size(); i++)
    {
-      if (mMenuItems[i].text == titleString)
+      if (mMenuItems[i].mText == titleString)
       {
-         mMenuItems[i].id = pos;
-         mMenuItems[i].cmd = cmd;
+         mMenuItems[i].mID = pos;
+         mMenuItems[i].mCMD = cmd;
          
          if (accelerator && accelerator[0])
-            mMenuItems[i].accelerator = dStrdup(accelerator);
+            mMenuItems[i].mAccelerator = dStrdup(accelerator);
          else
-            mMenuItems[i].accelerator = NULL;
+            mMenuItems[i].mAccelerator = NULL;
          return true;
       }
    }
@@ -211,7 +217,7 @@ void PopupMenu::enableItem(S32 pos, bool enable)
    if (mMenuItems.size() < pos || pos < 0)
       return;
 
-   mMenuItems[pos].enabled = enable;
+   mMenuItems[pos].mEnabled = enable;
 }
 
 void PopupMenu::checkItem(S32 pos, bool checked)
@@ -219,24 +225,24 @@ void PopupMenu::checkItem(S32 pos, bool checked)
    if (mMenuItems.size() < pos || pos < 0)
       return;
 
-   if (checked && mMenuItems[pos].checkGroup != -1)
+   if (checked && mMenuItems[pos].mCheckGroup != -1)
    {
       // first, uncheck everything in the group:
       for (U32 i = 0; i < mMenuItems.size(); i++)
-         if (mMenuItems[i].checkGroup == mMenuItems[pos].checkGroup && mMenuItems[i].isChecked)
-            mMenuItems[i].isChecked = false;
+         if (mMenuItems[i].mCheckGroup == mMenuItems[pos].mCheckGroup && mMenuItems[i].mIsChecked)
+            mMenuItems[i].mIsChecked = false;
    }
 
-   mMenuItems[pos].isChecked;
+   mMenuItems[pos].mIsChecked = checked;
 }
 
 void PopupMenu::checkRadioItem(S32 firstPos, S32 lastPos, S32 checkPos)
 {
    for (U32 i = 0; i < mMenuItems.size(); i++)
    {
-      if (mMenuItems[i].id >= firstPos && mMenuItems[i].id <= lastPos)
+      if (mMenuItems[i].mID >= firstPos && mMenuItems[i].mID <= lastPos)
       {
-         mMenuItems[i].isChecked = false;
+         mMenuItems[i].mIsChecked = false;
       }
    }
 }
@@ -246,7 +252,7 @@ bool PopupMenu::isItemChecked(S32 pos)
    if (mMenuItems.size() < pos || pos < 0)
       return false;
 
-   return mMenuItems[pos].isChecked;
+   return mMenuItems[pos].mIsChecked;
 }
 
 U32 PopupMenu::getItemCount()
@@ -305,7 +311,7 @@ void PopupMenu::showPopup(GuiCanvas *owner, S32 x /* = -1 */, S32 y /* = -1 */)
       if (!backgroundCtrl || !mTextList)
          return;
 
-      if (!isSubmenu)
+      if (!mIsSubmenu)
       {
          //if we're a 'parent' menu, then tell the background to clear out all existing other popups
 
@@ -354,11 +360,11 @@ void PopupMenu::showPopup(GuiCanvas *owner, S32 x /* = -1 */, S32 y /* = -1 */)
 
       for (U32 i = 0; i < mMenuItems.size(); i++)
       {
-         if (!mMenuItems[i].visible)
+         if (!mMenuItems[i].mVisible)
             continue;
 
-         S32 iTextWidth = font->getStrWidth(mMenuItems[i].text.c_str());
-         S32 iAcceleratorWidth = mMenuItems[i].accelerator ? font->getStrWidth(mMenuItems[i].accelerator) : 0;
+         S32 iTextWidth = font->getStrWidth(mMenuItems[i].mText.c_str());
+         S32 iAcceleratorWidth = mMenuItems[i].mAccelerator ? font->getStrWidth(mMenuItems[i].mAccelerator) : 0;
 
          if (iTextWidth > textWidth)
             textWidth = iTextWidth;
@@ -378,7 +384,7 @@ void PopupMenu::showPopup(GuiCanvas *owner, S32 x /* = -1 */, S32 y /* = -1 */)
 
       for (U32 i = 0; i < mMenuItems.size(); i++)
       {
-         if (!mMenuItems[i].visible)
+         if (!mMenuItems[i].mVisible)
             continue;
 
          char buf[512];
@@ -386,17 +392,17 @@ void PopupMenu::showPopup(GuiCanvas *owner, S32 x /* = -1 */, S32 y /* = -1 */)
          //  If this menu item is a submenu, then set the isSubmenu to 2 to indicate
          // an arrow should be drawn.  Otherwise set the isSubmenu normally.
          char isSubmenu = 1;
-         if (mMenuItems[i].isSubmenu)
+         if (mMenuItems[i].mIsSubmenu)
             isSubmenu = 2;
 
          char bitmapIndex = 1;
-         if (mMenuItems[i].bitmapIndex >= 0 && (mMenuItems[i].bitmapIndex * 3 <= profile->mBitmapArrayRects.size()))
-            bitmapIndex = mMenuItems[i].bitmapIndex + 2;
+         if (mMenuItems[i].mBitmapIndex >= 0 && (mMenuItems[i].mBitmapIndex * 3 <= profile->mBitmapArrayRects.size()))
+            bitmapIndex = mMenuItems[i].mBitmapIndex + 2;
 
-         dSprintf(buf, sizeof(buf), "%c%c\t%s\t%s", bitmapIndex, isSubmenu, mMenuItems[i].text.c_str(), mMenuItems[i].accelerator ? mMenuItems[i].accelerator : "");
+         dSprintf(buf, sizeof(buf), "%c%c\t%s\t%s", bitmapIndex, isSubmenu, mMenuItems[i].mText.c_str(), mMenuItems[i].mAccelerator ? mMenuItems[i].mAccelerator : "");
          mTextList->addEntry(entryCount, buf);
 
-         if (!mMenuItems[i].enabled)
+         if (!mMenuItems[i].mEnabled)
             mTextList->setEntryActive(entryCount, false);
 
          entryCount++;
@@ -437,8 +443,8 @@ void PopupMenu::hidePopupSubmenus()
 {
    for (U32 i = 0; i < mMenuItems.size(); i++)
    {
-      if (mMenuItems[i].subMenu != nullptr)
-         mMenuItems[i].subMenu->hidePopup();
+      if (mMenuItems[i].mSubMenu != nullptr)
+         mMenuItems[i].mSubMenu->hidePopup();
    }
 }
 

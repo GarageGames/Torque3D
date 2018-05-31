@@ -108,18 +108,18 @@ bool afxEA_Billboard::ea_update(F32 dt)
     deleteNotify(bb);
 
     ///bb->setSequenceRateFactor(datablock->rate_factor/prop_time_factor);
-    bb->setSortPriority(datablock->sort_priority);
+    bb->setSortPriority(mDatablock->sort_priority);
   }
 
   if (bb)
   {
-    bb->live_color = updated_color;
-    if (do_fades)
+    bb->live_color = mUpdated_color;
+    if (mDo_fades)
     {
-      bb->setFadeAmount(fade_value);
+      bb->setFadeAmount(mFade_value);
     }
-    bb->setTransform(updated_xfm);
-    bb->setScale(updated_scale);
+    bb->setTransform(mUpdated_xfm);
+    bb->setScale(mUpdated_scale);
   }
 
   return true;
@@ -162,7 +162,7 @@ void afxEA_Billboard::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxBillboardData* orig_db = bb_data;
     bb_data = new afxBillboardData(*orig_db, true);
-    orig_db->performSubstitutions(bb_data, choreographer, group_index);
+    orig_db->performSubstitutions(bb_data, mChoreographer, mGroup_index);
   }
 }
 

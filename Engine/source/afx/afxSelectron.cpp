@@ -230,9 +230,9 @@ void afxSelectronData::packData(BitStream* stream)
   stream->write(obj_type_style);
   stream->write(obj_type_mask);
 
-  pack_fx(stream, main_fx_list, packed);
-  pack_fx(stream, select_fx_list, packed);
-  pack_fx(stream, deselect_fx_list, packed);
+  pack_fx(stream, main_fx_list, mPacked);
+  pack_fx(stream, select_fx_list, mPacked);
+  pack_fx(stream, deselect_fx_list, mPacked);
 }
 
 void afxSelectronData::unpackData(BitStream* stream)

@@ -38,23 +38,23 @@ class afxEffectVector;
 class afxPhrase
 {
 protected:
-  afxEffectList*    init_fx_list;
-  F32               init_dur;
-  afxChoreographer* init_chor;
-  F32               init_time_factor;
-  F32               extra_time;
+  afxEffectList*    mInit_fx_list;
+  F32               mInit_dur;
+  afxChoreographer* mInit_chor;
+  F32               mInit_time_factor;
+  F32               mExtra_time;
 
-  afxEffectVector*  fx;
-  afxEffectVector*  fx2;
+  afxEffectVector*  mFX;
+  afxEffectVector*  mFX2;
 
-  bool              on_server;
-  bool              will_stop;
+  bool              mOn_server;
+  bool              mWill_stop;
 
-  F32               starttime;
-  F32               dur;
-  S32               n_loops;
-  S32               loop_cnt;
-  F32               extra_stoptime;
+  F32               mStartTime;
+  F32               mDur;
+  S32               mNum_loops;
+  S32               mLoop_cnt;
+  F32               mExtra_stoptime;
 
   void              init_fx(S32 group_index=0);
 
@@ -73,13 +73,13 @@ public:
   virtual bool      recycle(F32 timestamp);
   virtual F32       elapsed(F32 timestamp);
 
-  bool              isEmpty() { return fx->empty(); }
-  bool              isInfinite() { return (init_dur < 0); }
+  bool              isEmpty() { return mFX->empty(); }
+  bool              isInfinite() { return (mInit_dur < 0); }
   F32               calcDoneTime();
   F32               calcAfterLife();
-  bool              willStop() { return will_stop; }
-  bool              onServer() { return on_server; }
-  S32               count() { return fx->count(); }
+  bool              willStop() { return mWill_stop; }
+  bool              onServer() { return mOn_server; }
+  S32               count() { return mFX->count(); }
 };
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//

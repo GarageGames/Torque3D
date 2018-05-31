@@ -91,8 +91,8 @@ private:
 
 public:
 
-   bool packed;
-   StringTableEntry category;
+   bool mPacked;
+   StringTableEntry mCategory;
 
    // Signal triggered when this datablock is modified.
    // GameBase objects referencing this datablock notify with this signal.

@@ -266,10 +266,10 @@ void AnimData::parseTargetString(const char* target, S32 fullCount, const char* 
          targetValueCount = 1;
       }
    }
-   else if (const char* p = dStrrchr(target, '.')) {
+   else if (const char* p2 = dStrrchr(target, '.')) {
       // Check for named elements
       for (S32 iElem = 0; elements[iElem][0] != 0; iElem++) {
-         if (!dStrcmp(p, elements[iElem])) {
+         if (!dStrcmp(p2, elements[iElem])) {
             targetValueOffset = iElem;
             targetValueCount = 1;
             break;
@@ -2948,7 +2948,7 @@ void ColladaUtils::ExportData::processData()
    detailLevels.clear();
    detailLevels.setSize(numDetailLevels);
 
-   for (U32 m = 0; m < meshData.size(); ++m)
+   for (U32 meshNum = 0; meshNum < meshData.size(); ++meshNum)
    {
       for (U32 i = 0; i < numDetailLevels; ++i)
       {
@@ -2967,7 +2967,7 @@ void ColladaUtils::ExportData::processData()
          {
             //walk backwards as needed to find our first valid detail level for this mesh. if we find none, just move on
             S32 testDetailLevelSize = getDetailLevelSize(mdl);
-            detailLevelIdx = meshData[m].hasDetailLevel(testDetailLevelSize);
+            detailLevelIdx = meshData[meshNum].hasDetailLevel(testDetailLevelSize);
 
             if (detailLevelIdx != -1)
                break;
@@ -2983,7 +2983,7 @@ void ColladaUtils::ExportData::processData()
                {
                   //walk backwards as needed to find our first valid detail level for this mesh. if we find none, just move on
                   S32 testDetailLevelSize = getDetailLevelSize(mdl);
-                  detailLevelIdx = meshData[m].hasDetailLevel(testDetailLevelSize);
+                  detailLevelIdx = meshData[meshNum].hasDetailLevel(testDetailLevelSize);
 
                   if (detailLevelIdx != -1)
                      break;
@@ -2994,13 +2994,13 @@ void ColladaUtils::ExportData::processData()
          //If we found the detail level index, go ahead and build out the data for it
          if (detailLevelIdx != -1)
          {
-            curDetail->mesh.setTransform(&meshData[m].meshTransform, meshData[m].scale);
-            curDetail->mesh.setObject(meshData[m].originatingObject);
+            curDetail->mesh.setTransform(&meshData[meshNum].meshTransform, meshData[meshNum].scale);
+            curDetail->mesh.setObject(meshData[meshNum].originatingObject);
 
-            if (meshData[m].shapeInst != nullptr)
+            if (meshData[meshNum].shapeInst != nullptr)
             {
 
-               if (!meshData[m].shapeInst->buildPolyList(&curDetail->mesh, detailLevelIdx))
+               if (!meshData[meshNum].shapeInst->buildPolyList(&curDetail->mesh, detailLevelIdx))
                {
                   Con::errorf("TSStatic::buildExportPolyList - failed to build polylist for LOD %i", i);
                   continue;
@@ -3009,10 +3009,10 @@ void ColladaUtils::ExportData::processData()
             else
             {
                //special handling classes
-               ConvexShape* convexShp = dynamic_cast<ConvexShape*>(meshData[m].originatingObject);
+               ConvexShape* convexShp = dynamic_cast<ConvexShape*>(meshData[meshNum].originatingObject);
                if (convexShp != nullptr)
                {
-                  if (!convexShp->buildPolyList(PLC_Export, &curDetail->mesh, meshData[m].originatingObject->getWorldBox(), meshData[m].originatingObject->getWorldSphere()))
+                  if (!convexShp->buildPolyList(PLC_Export, &curDetail->mesh, meshData[meshNum].originatingObject->getWorldBox(), meshData[meshNum].originatingObject->getWorldSphere()))
                   {
                      Con::errorf("TSStatic::buildExportPolyList - failed to build ConvexShape polylist for LOD %i", i);
                      continue;
@@ -3021,19 +3021,19 @@ void ColladaUtils::ExportData::processData()
             }
 
             //lastly, get material
-            for (U32 m = 0; m < curDetail->mesh.mMaterialList.size(); m++)
+            for (U32 matNum = 0; matNum < curDetail->mesh.mMaterialList.size(); matNum++)
             {
-               S32 matIdx = hasMaterialInstance(curDetail->mesh.mMaterialList[m]);
+               S32 matIdx = hasMaterialInstance(curDetail->mesh.mMaterialList[matNum]);
 
                if (matIdx == -1)
                {
                   //cool, haven't already got this material, so lets store it out
-                  materials.push_back(curDetail->mesh.mMaterialList[m]);
-                  curDetail->materialRefList.insert(m, materials.size() - 1);
+                  materials.push_back(curDetail->mesh.mMaterialList[matNum]);
+                  curDetail->materialRefList.insert(matNum, materials.size() - 1);
                }
                else
                {
-                  curDetail->materialRefList.insert(m, matIdx);
+                  curDetail->materialRefList.insert(matNum, matIdx);
                }
             }
          }

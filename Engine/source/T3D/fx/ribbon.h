@@ -99,8 +99,8 @@ class Ribbon : public GameBase
    BaseMatInstance *mRibbonMat;
    MaterialParameterHandle* mRadiusSC;
    MaterialParameterHandle* mRibbonProjSC;
-   GFXPrimitiveBufferHandle primBuffer;
-   GFXVertexBufferHandle<GFXVertexPCNTT> verts;
+   GFXPrimitiveBufferHandle mPrimBuffer;
+   GFXVertexBufferHandle<GFXVertexPCNTT> mVerts;
 
 protected:
 

@@ -111,7 +111,7 @@ bool WheeledVehicleTire::preload(bool server, String &errorStr)
       // Determinw wheel radius from the shape's bounding box.
       // The tire should be built with it's hub axis along the
       // object's Y axis.
-      radius = shape->bounds.len_z() / 2;
+      radius = shape->mBounds.len_z() / 2;
    }
 
    return true;
@@ -400,7 +400,7 @@ bool WheeledVehicleData::preload(bool server, String &errorStr)
       MatrixF imat(1);
       SphereF sphere;
       sphere.center = mShape->center;
-      sphere.radius = mShape->radius;
+      sphere.radius = mShape->mRadius;
       PlaneExtractorPolyList polyList;
       polyList.mPlaneList = &rigidBody.mPlaneList;
       polyList.setTransform(&imat, Point3F(1,1,1));
@@ -477,7 +477,7 @@ void WheeledVehicleData::packData(BitStream* stream)
    Parent::packData(stream);
 
    if (stream->writeFlag(tireEmitter))
-      stream->writeRangedU32(packed? SimObjectId((uintptr_t)tireEmitter):
+      stream->writeRangedU32(mPacked ? SimObjectId((uintptr_t)tireEmitter):
          tireEmitter->getId(),DataBlockObjectIdFirst,DataBlockObjectIdLast);
 
    for (S32 i = 0; i < MaxSounds; i++)

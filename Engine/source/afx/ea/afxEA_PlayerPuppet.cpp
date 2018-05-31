@@ -80,8 +80,8 @@ bool afxEA_PlayerPuppet::ea_start()
 
   do_runtime_substitutions();
 
-  afxConstraintID obj_id = cons_mgr->getConstraintId(mover_data->obj_def);
-  obj_cons = cons_mgr->getConstraint(obj_id);
+  afxConstraintID obj_id = mCons_mgr->getConstraintId(mover_data->obj_def);
+  obj_cons = mCons_mgr->getConstraint(obj_id);
 
   Player* player = dynamic_cast<Player*>((obj_cons) ? obj_cons->getSceneObject() : 0);
   if (player)
@@ -94,9 +94,9 @@ bool afxEA_PlayerPuppet::ea_update(F32 dt)
 {
   SceneObject* obj = (obj_cons) ? obj_cons->getSceneObject() : 0;
 
-  if (obj && in_scope)
+  if (obj && mIn_scope)
   {
-    obj->setTransform(updated_xfm);
+    obj->setTransform(mUpdated_xfm);
   }
 
   return true;
@@ -138,7 +138,7 @@ void afxEA_PlayerPuppet::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxPlayerPuppetData* orig_db = mover_data;
     mover_data = new afxPlayerPuppetData(*orig_db, true);
-    orig_db->performSubstitutions(mover_data, choreographer, group_index);
+    orig_db->performSubstitutions(mover_data, mChoreographer, mGroup_index);
   }
 }
 

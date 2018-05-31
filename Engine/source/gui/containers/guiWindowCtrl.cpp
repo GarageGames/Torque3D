@@ -357,7 +357,7 @@ void GuiWindowCtrl::moveToCollapseGroup(GuiWindowCtrl* hitWindow, bool orientati
       }
       else
       {
-         S32 groupVec = hitWindow->mCollapseGroup;
+         groupVec = hitWindow->mCollapseGroup;
          
          if(orientation == 0)
             parent->mCollapseGroupVec[groupVec].push_front(this);

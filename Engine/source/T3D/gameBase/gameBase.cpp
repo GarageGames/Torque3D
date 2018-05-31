@@ -127,13 +127,13 @@ IMPLEMENT_CALLBACK( GameBase, setControl, void, ( bool controlled ), ( controlle
 
 GameBaseData::GameBaseData()
 {
-   category = "";
-   packed = false;
+   mCategory = "";
+   mPacked = false;
 }
 GameBaseData::GameBaseData(const GameBaseData& other, bool temp_clone) : SimDataBlock(other, temp_clone)
 {
-   packed = other.packed;
-   category = other.category;
+   mPacked = other.mPacked;
+   mCategory = other.mCategory;
    //mReloadSignal = other.mReloadSignal; // DO NOT copy the mReloadSignal member. 
 }
 
@@ -158,7 +158,7 @@ void GameBaseData::initPersistFields()
 {
    addGroup("Scripting");
 
-      addField( "category", TypeCaseString, Offset( category, GameBaseData ),
+      addField( "category", TypeCaseString, Offset(mCategory, GameBaseData ),
          "The group that this datablock will show up in under the \"Scripted\" "
          "tab in the World Editor Library." );
 
@@ -171,14 +171,14 @@ bool GameBaseData::preload(bool server, String &errorStr)
 {
    if (!Parent::preload(server, errorStr))
       return false;
-   packed = false;
+   mPacked = false;
    return true;
 }
 
 void GameBaseData::unpackData(BitStream* stream)
 {
    Parent::unpackData(stream);
-   packed = true;
+   mPacked = true;
 }
 
 //----------------------------------------------------------------------------
@@ -259,7 +259,7 @@ GameBase::GameBase()
 GameBase::~GameBase()
 {
 #ifdef TORQUE_AFX_ENABLED
-   if (scope_registered)
+   if (mScope_registered)
       arcaneFX::unregisterScopedObject(this);
 #endif
 }
@@ -277,7 +277,7 @@ bool GameBase::onAdd()
 #ifdef TORQUE_AFX_ENABLED
    if (isClientObject())
    {
-      if (scope_id > 0 && !scope_registered)
+      if (mScope_id > 0 && !mScope_registered)
          arcaneFX::registerScopedObject(this);
    }
    else
@@ -298,7 +298,7 @@ bool GameBase::onAdd()
 void GameBase::onRemove()
 {
 #ifdef TORQUE_AFX_ENABLED
-   if (scope_registered)
+   if (mScope_registered)
       arcaneFX::unregisterScopedObject(this);
 #endif
    // EDITOR FEATURE: Remove us from the reload signal of our datablock.
@@ -455,7 +455,7 @@ F32 GameBase::getUpdatePriority(CameraScopeQuery *camInfo, U32 updateMask, S32 u
       // Projectiles are more interesting if they
       // are heading for us.
       wInterest = 0.30f;
-      F32 dot = -mDot(pos,getVelocity());
+      dot = -mDot(pos,getVelocity());
       if (dot > 0.0f)
          wInterest += 0.20 * dot;
    }
@@ -586,8 +586,8 @@ U32 GameBase::packUpdate( NetConnection *connection, U32 mask, BitStream *stream
 #ifdef TORQUE_AFX_ENABLED
    if (stream->writeFlag(mask & ScopeIdMask))
    {
-      if (stream->writeFlag(scope_refs > 0))
-         stream->writeInt(scope_id, SCOPE_ID_BITS);
+      if (stream->writeFlag(mScope_refs > 0))
+         stream->writeInt(mScope_id, SCOPE_ID_BITS);
    }
 #endif
    return retMask;
@@ -631,8 +631,8 @@ void GameBase::unpackUpdate(NetConnection *con, BitStream *stream)
 #ifdef TORQUE_AFX_ENABLED
    if (stream->readFlag())
    {
-      scope_id = (stream->readFlag()) ? (U16) stream->readInt(SCOPE_ID_BITS) : 0;
-      scope_refs = 0;
+      mScope_id = (stream->readFlag()) ? (U16) stream->readInt(SCOPE_ID_BITS) : 0;
+	  mScope_refs = 0;
    }
 #endif
 }

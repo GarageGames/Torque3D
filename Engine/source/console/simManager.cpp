@@ -612,6 +612,6 @@ void SimDataBlockGroup::sort()
    if(mLastModifiedKey != SimDataBlock::getNextModifiedKey())
    {
       mLastModifiedKey = SimDataBlock::getNextModifiedKey();
-      dQsort(objectList.address(),objectList.size(),sizeof(SimObject *),compareModifiedKey);
+      dQsort(mObjectList.address(), mObjectList.size(),sizeof(SimObject *),compareModifiedKey);
    }
 }

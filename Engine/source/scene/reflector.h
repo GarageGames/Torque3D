@@ -153,16 +153,16 @@ public:
    virtual void unregisterReflector();
    virtual void updateReflection( const ReflectParams &params );   
 
-   GFXCubemap* getCubemap() const { return cubemap; }
+   GFXCubemap* getCubemap() const { return mCubemap; }
 
    void updateFace( const ReflectParams &params, U32 faceidx );
    F32 calcFaceScore( const ReflectParams &params, U32 faceidx );
 
 protected:
 
-   GFXTexHandle depthBuff;
-   GFXTextureTargetRef renderTarget;   
-   GFXCubemapHandle  cubemap;
+   GFXTexHandle mDepthBuff;
+   GFXTextureTargetRef mRenderTarget;   
+   GFXCubemapHandle  mCubemap;
    U32 mLastTexSize;
 
    class CubeFaceReflector : public ReflectorBase

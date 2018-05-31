@@ -1842,8 +1842,6 @@ void Net::addressToString(const NetAddress *address, char  addressString[256])
       {
          char buffer[256];
          buffer[0] = '\0';
-         sockaddr_in ipAddr;
-         NetAddressToIPSocket(address, &ipAddr);
          inet_ntop(AF_INET, &(ipAddr.sin_addr), buffer, sizeof(buffer));
          if (ipAddr.sin_port == 0)
             dSprintf(addressString, 256, "IP:%s", buffer);

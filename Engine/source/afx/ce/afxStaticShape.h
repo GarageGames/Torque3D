@@ -66,11 +66,11 @@ class afxStaticShape : public StaticShape
 
 private:
   StaticShapeData*      mDataBlock;
-  afxStaticShapeData*   afx_data;
-  bool                  is_visible;
-  U32                   chor_id;
-  bool                  hookup_with_chor;
-  StringTableEntry      ghost_cons_name;
+  afxStaticShapeData*   mAFX_data;
+  bool                  mIs_visible;
+  U32                   mChor_id;
+  bool                  mHookup_with_chor;
+  StringTableEntry      mGhost_cons_name;
 
 protected:
   virtual void          prepRenderImage(SceneRenderState*);
@@ -87,7 +87,7 @@ public:
   virtual void          unpackUpdate(NetConnection*, BitStream*);
 
   const char*           getShapeFileName() const { return mDataBlock->shapeName; }
-  void                  setVisibility(bool flag) { is_visible = flag; }
+  void                  setVisibility(bool flag) { mIs_visible = flag; }
 
   DECLARE_CONOBJECT(afxStaticShape);
   DECLARE_CATEGORY("AFX");

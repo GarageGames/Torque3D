@@ -99,11 +99,11 @@ afxCamera::afxCamera()
 {
   mNetFlags.clear(Ghostable);
   mTypeMask |= CameraObjectType;
-  delta.pos = Point3F(0,0,100);
-  delta.rot = Point3F(0,0,0);
-  delta.posVec = delta.rotVec = VectorF(0,0,0);
-  mObjToWorld.setColumn(3,delta.pos);
-  mRot = delta.rot;
+  mDelta.pos = Point3F(0,0,100);
+  mDelta.rot = Point3F(0,0,0);
+  mDelta.posVec = mDelta.rotVec = VectorF(0,0,0);
+  mObjToWorld.setColumn(3, mDelta.pos);
+  mRot = mDelta.rot;
   
   mMinOrbitDist = 0;
   mMaxOrbitDist = 0;
@@ -111,19 +111,19 @@ afxCamera::afxCamera()
   mOrbitObject = NULL;
   mPosition.set(0.f, 0.f, 0.f);
   mObservingClientObject = false;
-  mode = FlyMode;
+  mMode = FlyMode;
   
-  cam_subject = NULL;
-  coi_offset.set(0, 0, 2);
-  cam_offset.set(0, 0, 0);
-  cam_distance = 0.0f;
-  cam_angle = 0.0f;
-  cam_dirty = false;
+  mCam_subject = NULL;
+  mCoi_offset.set(0, 0, 2);
+  mCam_offset.set(0, 0, 0);
+  mCam_distance = 0.0f;
+  mCam_angle = 0.0f;
+  mCam_dirty = false;
       
-  flymode_saved = false;
-  third_person_snap_s = 1;
-  third_person_snap_c = 1;
-  flymode_saved_pos.zero();
+  mFlymode_saved = false;
+  mThird_person_snap_s = 1;
+  mThird_person_snap_c = 1;
+  mFlymode_saved_pos.zero();
 
   mDamageState = Disabled;
 }
@@ -136,7 +136,7 @@ afxCamera::~afxCamera()
 
 void afxCamera::cam_update(F32 dt, bool on_server) 
 {
-  if (mode == ThirdPersonMode && cam_subject)
+  if (mMode == ThirdPersonMode && mCam_subject)
     cam_update_3pov(dt, on_server);
 }
 
@@ -176,9 +176,9 @@ Point3F &afxCamera::getPosition()
 //----------------------------------------------------------------------------
 void afxCamera::setFlyMode()
 {
-  mode = FlyMode;
-  if (flymode_saved)
-    snapToPosition(flymode_saved_pos);
+  mMode = FlyMode;
+  if (mFlymode_saved)
+    snapToPosition(mFlymode_saved_pos);
   
   if (bool(mOrbitObject)) 
   {
@@ -202,11 +202,11 @@ void afxCamera::setOrbitMode(GameBase *obj, Point3F &pos, AngAxisF &rot, F32 min
       processAfter(mOrbitObject);
       deleteNotify(mOrbitObject);
       mOrbitObject->getWorldBox().getCenter(&mPosition);
-      mode = OrbitObjectMode;
+	  mMode = OrbitObjectMode;
    }
    else
    {
-      mode = OrbitPointMode;
+      mMode = OrbitPointMode;
       mPosition = pos;
    }
 
@@ -278,14 +278,14 @@ void afxCamera::snapToPosition(const Point3F& tPos)
 {
   MatrixF transMat;
 
-  if (cam_subject) 
+  if (mCam_subject)
   {
     // get the subject's transform
-    MatrixF objToWorld = cam_subject->getRenderTransform();
+    MatrixF objToWorld = mCam_subject->getRenderTransform();
 
     // transform the center-of-interest to world-space
     Point3F objPos;
-    objToWorld.mulP(coi_offset, &objPos);
+    objToWorld.mulP(mCoi_offset, &objPos);
 
     // find normalized direction vector looking from camera to coi
     VectorF dirVec = objPos - tPos;
@@ -308,31 +308,31 @@ void afxCamera::snapToPosition(const Point3F& tPos)
 void afxCamera::setCameraSubject(SceneObject* new_subject)
 {
   // cleanup any existing chase subject
-  if (cam_subject) 
+  if (mCam_subject)
   {
-    if (dynamic_cast<GameBase*>(cam_subject))
+    if (dynamic_cast<GameBase*>(mCam_subject))
       clearProcessAfter();
-    clearNotify(cam_subject);
+    clearNotify(mCam_subject);
   }
   
-  cam_subject = new_subject;
+  mCam_subject = new_subject;
   
   // set associations with new chase subject 
-  if (cam_subject) 
+  if (mCam_subject)
   {
-    if (dynamic_cast<GameBase*>(cam_subject))
-      processAfter((GameBase*)cam_subject);
-    deleteNotify(cam_subject);
+    if (dynamic_cast<GameBase*>(mCam_subject))
+      processAfter((GameBase*)mCam_subject);
+    deleteNotify(mCam_subject);
   }
 
-  mode = (cam_subject) ? ThirdPersonMode : FlyMode;
+  mMode = (mCam_subject) ? ThirdPersonMode : FlyMode;
   setMaskBits(SubjectMask);
 }
 
 void afxCamera::setThirdPersonOffset(const Point3F& offset) 
 {
   // new method
-  if (cam_distance > 0.0f)
+  if (mCam_distance > 0.0f)
   {
     if (isClientObject())
     {
@@ -342,25 +342,25 @@ void afxCamera::setThirdPersonOffset(const Point3F& offset)
         // this auto switches to/from first person 
         if (conn->isFirstPerson())
         {
-          if (cam_distance >= 1.0f)
+          if (mCam_distance >= 1.0f)
             conn->setFirstPerson(false);
         }
         else
         {
-          if (cam_distance < 1.0f)
+          if (mCam_distance < 1.0f)
             conn->setFirstPerson(true);
         }
       }
     }
 
-    cam_offset = offset;
-    cam_dirty = true;
+	mCam_offset = offset;
+	mCam_dirty = true;
 
     return;
   }
 
   // old backwards-compatible method
-  if (offset.y != cam_offset.y && isClientObject())
+  if (offset.y != mCam_offset.y && isClientObject())
   {
     GameConnection* conn = GameConnection::getConnectionToServer();
     if (conn)
@@ -379,62 +379,62 @@ void afxCamera::setThirdPersonOffset(const Point3F& offset)
     }
   }
 
-  cam_offset = offset;
-  cam_dirty = true;
+  mCam_offset = offset;
+  mCam_dirty = true;
 }
 
 void afxCamera::setThirdPersonOffset(const Point3F& offset, const Point3F& coi_offset) 
 {
-  this->coi_offset = coi_offset;
+  mCoi_offset = coi_offset;
   setThirdPersonOffset(offset);
 }
 
 void afxCamera::setThirdPersonDistance(F32 distance) 
 {
-  cam_distance = distance;
-  cam_dirty = true;
+  mCam_distance = distance;
+  mCam_dirty = true;
 }
 
 F32 afxCamera::getThirdPersonDistance() 
 {
-  return cam_distance;
+  return mCam_distance;
 }
 
 void afxCamera::setThirdPersonAngle(F32 angle) 
 {
-  cam_angle = angle;
-  cam_dirty = true;
+  mCam_angle = angle;
+  mCam_dirty = true;
 }
 
 F32 afxCamera::getThirdPersonAngle() 
 {
-  return cam_angle;
+  return mCam_angle;
 }
 
 void afxCamera::setThirdPersonMode()
 {
-  mode = ThirdPersonMode;
-  flymode_saved_pos = getPosition();
-  flymode_saved = true;
-  cam_dirty = true;
-  third_person_snap_s++;
+  mMode = ThirdPersonMode;
+  mFlymode_saved_pos = getPosition();
+  mFlymode_saved = true;
+  mCam_dirty = true;
+  mThird_person_snap_s++;
 }
 
 void afxCamera::setThirdPersonSnap()
 {
-  if (mode == ThirdPersonMode)
-    third_person_snap_s += 2;
+  if (mMode == ThirdPersonMode)
+    mThird_person_snap_s += 2;
 }
 
 void afxCamera::setThirdPersonSnapClient()
 {
-  if (mode == ThirdPersonMode)
-    third_person_snap_c++;
+  if (mMode == ThirdPersonMode)
+    mThird_person_snap_c++;
 }
 
 const char* afxCamera::getMode()
 {
-  switch (mode)
+  switch (mMode)
   {
   case ThirdPersonMode:
     return "ThirdPerson";
@@ -449,8 +449,6 @@ const char* afxCamera::getMode()
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 // Console Methods
-
-static char buffer[100];
 
 ConsoleMethod(afxCamera, setOrbitMode, void, 7, 8, 
   "(GameBase orbitObject, TransformF mat, float minDistance, float maxDistance, float curDistance, bool ownClientObject)"
@@ -493,6 +491,7 @@ ConsoleMethod( afxCamera, getPosition, const char *, 2, 2, "()"
               "@returns A string of form \"x y z\".")
 { 
   Point3F& pos = object->getPosition();
+  char buffer[100];
   dSprintf(buffer, sizeof(buffer),"%f %f %f",pos.x,pos.y,pos.z);
   return buffer;
 }
@@ -558,6 +557,7 @@ ConsoleMethod(afxCamera, setThirdPersonOffset, void, 3, 4, "(Point3F offset [, P
 ConsoleMethod(afxCamera, getThirdPersonOffset, const char *, 2, 2, "()")
 {
   const Point3F& pos = object->getThirdPersonOffset();
+  char buffer[100];
   dSprintf(buffer, sizeof(buffer),"%f %f %f",pos.x,pos.y,pos.z);
   return buffer;
 }
@@ -565,6 +565,7 @@ ConsoleMethod(afxCamera, getThirdPersonOffset, const char *, 2, 2, "()")
 ConsoleMethod(afxCamera, getThirdPersonCOIOffset, const char *, 2, 2, "()")
 {
   const Point3F& pos = object->getThirdPersonCOIOffset();
+  char buffer[100];
   dSprintf(buffer, sizeof(buffer),"%f %f %f",pos.x,pos.y,pos.z);
   return buffer;
 }
@@ -592,17 +593,17 @@ void afxCamera::cam_update_3pov(F32 dt, bool on_server)
 {
   Point3F	goal_pos;
   Point3F curr_pos = getRenderPosition();
-  MatrixF	xfm = cam_subject->getRenderTransform();
-  Point3F coi = cam_subject->getRenderPosition() + coi_offset;
+  MatrixF	xfm = mCam_subject->getRenderTransform();
+  Point3F coi = mCam_subject->getRenderPosition() + mCoi_offset;
 
   // for player subjects, pitch is adjusted
-  Player*	player_subj =	dynamic_cast<Player*>(cam_subject);
+  Player*	player_subj =	dynamic_cast<Player*>(mCam_subject);
   if (player_subj) 
   {
-    if (cam_distance > 0.0f)
+    if (mCam_distance > 0.0f)
     {
       // rotate xfm by amount of cam_angle
-      F32	look_yaw = player_subj->getHeadRotation().z + mDegToRad(-cam_angle);
+      F32	look_yaw = player_subj->getHeadRotation().z + mDegToRad(-mCam_angle);
       MatrixF	look_yaw_mtx(EulerF(0,0,look_yaw));
       xfm.mul(look_yaw_mtx);
 
@@ -611,9 +612,9 @@ void afxCamera::cam_update_3pov(F32 dt, bool on_server)
       MatrixF	head_pitch_mtx(EulerF(head_pitch,0,0));
       xfm.mul(head_pitch_mtx);
 
-      VectorF	behind_vec(0, -cam_distance, 0);
+      VectorF	behind_vec(0, -mCam_distance, 0);
       xfm.mulP(behind_vec, &goal_pos);
-      goal_pos += cam_offset;
+      goal_pos += mCam_offset;
     }
     else // old backwards-compatible method
     {
@@ -622,15 +623,15 @@ void afxCamera::cam_update_3pov(F32 dt, bool on_server)
       MatrixF	head_pitch_mtx(EulerF(head_pitch,0,0));
       xfm.mul(head_pitch_mtx);
 
-      VectorF	behind_vec(0, cam_offset.y, 0);
+      VectorF	behind_vec(0, mCam_offset.y, 0);
       xfm.mulP(behind_vec, &goal_pos);
-      goal_pos.z += cam_offset.z;
+      goal_pos.z += mCam_offset.z;
     }
   }
   // for non-player subjects, camera will follow, but pitch won't adjust.
   else 
   {
-    xfm.mulP(cam_offset, &goal_pos);
+    xfm.mulP(mCam_offset, &goal_pos);
   }
 
   // avoid view occlusion
@@ -638,7 +639,7 @@ void afxCamera::cam_update_3pov(F32 dt, bool on_server)
   {
     // snap to final position if path to goal is blocked
     if (test_blocked_line(curr_pos, goal_pos))
-      third_person_snap_c++;
+      mThird_person_snap_c++;
   }
 
   // place camera into its final position	
@@ -652,11 +653,11 @@ void afxCamera::cam_update_3pov(F32 dt, bool on_server)
   F32 time_inc = 1.0f/speed_factor;
 
   // snap to final position
-  if (on_server || (third_person_snap_c > 0 || dt > time_inc))
+  if (on_server || (mThird_person_snap_c > 0 || dt > time_inc))
   {
     snapToPosition(goal_pos);
-    if (!on_server && third_person_snap_c > 0)
-      third_person_snap_c--;
+    if (!on_server && mThird_person_snap_c > 0)
+      mThird_person_snap_c--;
     return;
   }
   // interpolate to final position
@@ -731,13 +732,13 @@ void afxCamera::onDeleteNotify(SimObject *obj)
   if (obj == (SimObject*)mOrbitObject)
   {
     mOrbitObject = NULL;
-    if (mode == OrbitObjectMode)
-      mode = OrbitPointMode;
+    if (mMode == OrbitObjectMode)
+      mMode = OrbitPointMode;
   }
 
-  if (obj == cam_subject)
+  if (obj == mCam_subject)
   {
-    cam_subject = NULL;
+    mCam_subject = NULL;
   }
 }
 
@@ -747,12 +748,12 @@ void afxCamera::advanceTime(F32 dt)
 
   if (gSFX3DWorld)
   {
-     if (mode == ThirdPersonMode && cam_subject)
+     if (mMode == ThirdPersonMode && mCam_subject)
      {
-        if (gSFX3DWorld->getListener() != cam_subject)
-           gSFX3DWorld->setListener(cam_subject);
+        if (gSFX3DWorld->getListener() != mCam_subject)
+           gSFX3DWorld->setListener(mCam_subject);
      }
-     else if (mode == FlyMode)
+     else if (mMode == FlyMode)
      {
         if (gSFX3DWorld->getListener() != this)
            gSFX3DWorld->setListener(this);
@@ -771,15 +772,15 @@ void afxCamera::processTick(const Move* move)
   if (move) 
   {
     // UPDATE ORIENTATION //
-    delta.rotVec = mRot;
-    mObjToWorld.getColumn(3, &delta.posVec);
+	  mDelta.rotVec = mRot;
+    mObjToWorld.getColumn(3, &mDelta.posVec);
     mRot.x = mClampF(mRot.x + move->pitch, -MaxPitch, MaxPitch);
     mRot.z += move->yaw;
 
     // ORBIT MODE // 
-    if (mode == OrbitObjectMode || mode == OrbitPointMode)
+    if (mMode == OrbitObjectMode || mMode == OrbitPointMode)
     {
-      if(mode == OrbitObjectMode && bool(mOrbitObject)) 
+      if(mMode == OrbitObjectMode && bool(mOrbitObject))
       {
         // If this is a shapebase, use its render eye transform
         // to avoid jittering.
@@ -822,10 +823,10 @@ void afxCamera::processTick(const Move* move)
     // If on the client, calc delta for backstepping
     if (isClientObject()) 
     {
-      delta.pos = pos;
-      delta.rot = mRot;
-      delta.posVec = delta.posVec - delta.pos;
-      delta.rotVec = delta.rotVec - delta.rot;
+      mDelta.pos = pos;
+	  mDelta.rot = mRot;
+	  mDelta.posVec = mDelta.posVec - mDelta.pos;
+	  mDelta.rotVec = mDelta.rotVec - mDelta.rot;
     }
     else
     {
@@ -846,14 +847,14 @@ void afxCamera::interpolateTick(F32 dt)
 {
   Parent::interpolateTick(dt);
 
-  if (mode == ThirdPersonMode)
+  if (mMode == ThirdPersonMode)
     return;
 
-  Point3F rot = delta.rot + delta.rotVec * dt;
+  Point3F rot = mDelta.rot + mDelta.rotVec * dt;
 
-  if(mode == OrbitObjectMode || mode == OrbitPointMode)
+  if(mMode == OrbitObjectMode || mMode == OrbitPointMode)
   {
-    if(mode == OrbitObjectMode && bool(mOrbitObject))
+    if(mMode == OrbitObjectMode && bool(mOrbitObject))
     {
       // If this is a shapebase, use its render eye transform
       // to avoid jittering.
@@ -879,7 +880,7 @@ void afxCamera::interpolateTick(F32 dt)
   {
     // NOTE - posVec is 0,0,0 unless cam is control-object and process tick is
     // updating the delta
-    Point3F pos = delta.pos + delta.posVec * dt;
+    Point3F pos = mDelta.pos + mDelta.posVec * dt;
     set_cam_pos(pos,rot);
   }
 }
@@ -895,19 +896,19 @@ void afxCamera::writePacketData(GameConnection *connection, BitStream *bstream)
   bstream->write(mRot.x);                                                 // SND X ROT
   bstream->write(mRot.z);                                                 // SND Z ROT
 
-  if (bstream->writeFlag(cam_dirty))
+  if (bstream->writeFlag(mCam_dirty))
   {
-    mathWrite(*bstream, cam_offset);                                        // SND CAM_OFFSET
-    mathWrite(*bstream, coi_offset);                                        // SND COI_OFFSET
-    bstream->write(cam_distance); 
-    bstream->write(cam_angle);
-    cam_dirty = false;
+    mathWrite(*bstream, mCam_offset);                                        // SND CAM_OFFSET
+    mathWrite(*bstream, mCoi_offset);                                        // SND COI_OFFSET
+    bstream->write(mCam_distance);
+    bstream->write(mCam_angle);
+	mCam_dirty = false;
   }
 
-  U32 writeMode = mode;
+  U32 writeMode = mMode;
   Point3F writePos = mPosition;
   S32 gIndex = -1;
-  if (mode == OrbitObjectMode)
+  if (mMode == OrbitObjectMode)
   {
     gIndex = bool(mOrbitObject) ? connection->getGhostIndex(mOrbitObject): -1;
     if(gIndex == -1)
@@ -920,9 +921,9 @@ void afxCamera::writePacketData(GameConnection *connection, BitStream *bstream)
   bstream->writeRangedU32(writeMode, CameraFirstMode, CameraLastMode);    // SND MODE
   if (writeMode == ThirdPersonMode)
   {
-    bstream->write(third_person_snap_s > 0);                              // SND SNAP
-    if (third_person_snap_s > 0)
-      third_person_snap_s--;
+    bstream->write(mThird_person_snap_s > 0);                              // SND SNAP
+    if (mThird_person_snap_s > 0)
+      mThird_person_snap_s--;
   }
 
   if (writeMode == OrbitObjectMode || writeMode == OrbitPointMode)
@@ -955,34 +956,34 @@ void afxCamera::readPacketData(GameConnection *connection, BitStream *bstream)
     Point3F new_cam_offset, new_coi_offset;
     mathRead(*bstream, &new_cam_offset);                                    // RCV CAM_OFFSET
     mathRead(*bstream, &new_coi_offset);                                    // RCV COI_OFFSET
-    bstream->read(&cam_distance);
-    bstream->read(&cam_angle);
+    bstream->read(&mCam_distance);
+    bstream->read(&mCam_angle);
     setThirdPersonOffset(new_cam_offset, new_coi_offset);
   }
 
   GameBase* obj = 0;
-  mode = bstream->readRangedU32(CameraFirstMode,                          // RCV MODE
+  mMode = bstream->readRangedU32(CameraFirstMode,                          // RCV MODE
     CameraLastMode);
-  if (mode == ThirdPersonMode)
+  if (mMode == ThirdPersonMode)
   {
     bool snap; bstream->read(&snap);
     if (snap)
-      third_person_snap_c++;
+      mThird_person_snap_c++;
   }
 
   mObservingClientObject = false;
-  if (mode == OrbitObjectMode || mode == OrbitPointMode) {
+  if (mMode == OrbitObjectMode || mMode == OrbitPointMode) {
     bstream->read(&mMinOrbitDist);
     bstream->read(&mMaxOrbitDist);
     bstream->read(&mCurOrbitDist);
 
-    if(mode == OrbitObjectMode)
+    if(mMode == OrbitObjectMode)
     {
       mObservingClientObject = bstream->readFlag();
       S32 gIndex = bstream->readInt(NetConnection::GhostIdBitSize);
       obj = static_cast<GameBase*>(connection->resolveGhost(gIndex));
     }
-    if (mode == OrbitPointMode)
+    if (mMode == OrbitPointMode)
       bstream->readCompressedPoint(&mPosition);
   }
   if (obj != (GameBase*)mOrbitObject) {
@@ -997,14 +998,14 @@ void afxCamera::readPacketData(GameConnection *connection, BitStream *bstream)
     }
   }
 
-  if (mode == ThirdPersonMode)
+  if (mMode == ThirdPersonMode)
     return;
 
   set_cam_pos(pos,rot);
-  delta.pos = pos;
-  delta.rot = rot;
-  delta.rotVec.set(0,0,0);
-  delta.posVec.set(0,0,0);
+  mDelta.pos = pos;
+  mDelta.rot = rot;
+  mDelta.rotVec.set(0,0,0);
+  mDelta.posVec.set(0,0,0);
 }
 
 U32 afxCamera::packUpdate(NetConnection* conn, U32 mask, BitStream *bstream)
@@ -1028,10 +1029,10 @@ U32 afxCamera::packUpdate(NetConnection* conn, U32 mask, BitStream *bstream)
 
   if (bstream->writeFlag(mask & SubjectMask)) 
   {
-    S32 ghost_id = (cam_subject) ? conn->getGhostIndex(cam_subject) : -1;
+    S32 ghost_id = (mCam_subject) ? conn->getGhostIndex(mCam_subject) : -1;
     if (bstream->writeFlag(ghost_id != -1))
       bstream->writeRangedU32(U32(ghost_id), 0, NetConnection::MaxGhostCount);
-    else if (cam_subject)
+    else if (mCam_subject)
       retMask |= SubjectMask;
   }
 
@@ -1056,9 +1057,9 @@ void afxCamera::unpackUpdate(NetConnection *conn, BitStream *bstream)
     set_cam_pos(pos,rot);
 
     // New delta for client side interpolation
-    delta.pos = pos;
-    delta.rot = rot;
-    delta.posVec = delta.rotVec = VectorF(0,0,0);
+	mDelta.pos = pos;
+	mDelta.rot = rot;
+	mDelta.posVec = mDelta.rotVec = VectorF(0,0,0);
   }
 
   if (bstream->readFlag()) 
@@ -1066,18 +1067,18 @@ void afxCamera::unpackUpdate(NetConnection *conn, BitStream *bstream)
     if (bstream->readFlag())
     {
       S32 ghost_id = bstream->readRangedU32(0, NetConnection::MaxGhostCount);
-      cam_subject = dynamic_cast<GameBase*>(conn->resolveGhost(ghost_id));
+	  mCam_subject = dynamic_cast<GameBase*>(conn->resolveGhost(ghost_id));
     }
     else
-      cam_subject = NULL;
+      mCam_subject = NULL;
   }
 }
 
 // Override to ensure both are kept in scope
 void afxCamera::onCameraScopeQuery(NetConnection* conn, CameraScopeQuery* query) 
 {
-  if (cam_subject)
-    conn->objectInScope(cam_subject);
+  if (mCam_subject)
+    conn->objectInScope(mCam_subject);
   Parent::onCameraScopeQuery(conn, query);
 }
 
@@ -1155,7 +1156,7 @@ void afxCamera::setCameraFov(F32 fov)
 
 F32 afxCamera::getDamageFlash() const
 {
-  if (mode == OrbitObjectMode && isServerObject() && bool(mOrbitObject))
+  if (mMode == OrbitObjectMode && isServerObject() && bool(mOrbitObject))
   {
     const GameBase *castObj = mOrbitObject;
     const ShapeBase* psb = dynamic_cast<const ShapeBase*>(castObj);
@@ -1168,7 +1169,7 @@ F32 afxCamera::getDamageFlash() const
 
 F32 afxCamera::getWhiteOut() const
 {
-  if (mode == OrbitObjectMode && isServerObject() && bool(mOrbitObject))
+  if (mMode == OrbitObjectMode && isServerObject() && bool(mOrbitObject))
   {
     const GameBase *castObj = mOrbitObject;
     const ShapeBase* psb = dynamic_cast<const ShapeBase*>(castObj);

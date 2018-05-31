@@ -269,7 +269,7 @@ void GuiMaterialPreview::setObjectModel(const char* modelName)
 
    // Initialize camera values:
    mOrbitPos = mModel->getShape()->center;
-   mMinOrbitDist = mModel->getShape()->radius;
+   mMinOrbitDist = mModel->getShape()->mRadius;
 
    lastRenderTime = Platform::getVirtualMilliseconds();
 }

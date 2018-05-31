@@ -342,17 +342,17 @@ U32 PhysicalZone::packUpdate(NetConnection* con, U32 mask, BitStream* stream)
    if (stream->writeFlag(mask & PolyhedronMask)) 
    {
       // Write the polyhedron
-      stream->write(mPolyhedron.pointList.size());
-      for (i = 0; i < mPolyhedron.pointList.size(); i++)
-         mathWrite(*stream, mPolyhedron.pointList[i]);
+      stream->write(mPolyhedron.mPointList.size());
+      for (i = 0; i < mPolyhedron.mPointList.size(); i++)
+         mathWrite(*stream, mPolyhedron.mPointList[i]);
 
-      stream->write(mPolyhedron.planeList.size());
-      for (i = 0; i < mPolyhedron.planeList.size(); i++)
-         mathWrite(*stream, mPolyhedron.planeList[i]);
+      stream->write(mPolyhedron.mPlaneList.size());
+      for (i = 0; i < mPolyhedron.mPlaneList.size(); i++)
+         mathWrite(*stream, mPolyhedron.mPlaneList[i]);
 
-      stream->write(mPolyhedron.edgeList.size());
-      for (i = 0; i < mPolyhedron.edgeList.size(); i++) {
-         const Polyhedron::Edge& rEdge = mPolyhedron.edgeList[i];
+      stream->write(mPolyhedron.mEdgeList.size());
+      for (i = 0; i < mPolyhedron.mEdgeList.size(); i++) {
+         const Polyhedron::Edge& rEdge = mPolyhedron.mEdgeList[i];
 
          stream->write(rEdge.face[0]);
          stream->write(rEdge.face[1]);
@@ -399,19 +399,19 @@ void PhysicalZone::unpackUpdate(NetConnection* con, BitStream* stream)
 
       // Read the polyhedron
       stream->read(&size);
-      tempPH.pointList.setSize(size);
-      for (i = 0; i < tempPH.pointList.size(); i++)
-         mathRead(*stream, &tempPH.pointList[i]);
+      tempPH.mPointList.setSize(size);
+      for (i = 0; i < tempPH.mPointList.size(); i++)
+         mathRead(*stream, &tempPH.mPointList[i]);
 
       stream->read(&size);
-      tempPH.planeList.setSize(size);
-      for (i = 0; i < tempPH.planeList.size(); i++)
-         mathRead(*stream, &tempPH.planeList[i]);
+      tempPH.mPlaneList.setSize(size);
+      for (i = 0; i < tempPH.mPlaneList.size(); i++)
+         mathRead(*stream, &tempPH.mPlaneList[i]);
 
       stream->read(&size);
-      tempPH.edgeList.setSize(size);
-      for (i = 0; i < tempPH.edgeList.size(); i++) {
-         Polyhedron::Edge& rEdge = tempPH.edgeList[i];
+      tempPH.mEdgeList.setSize(size);
+      for (i = 0; i < tempPH.mEdgeList.size(); i++) {
+         Polyhedron::Edge& rEdge = tempPH.mEdgeList[i];
 
          stream->read(&rEdge.face[0]);
          stream->read(&rEdge.face[1]);
@@ -467,12 +467,12 @@ void PhysicalZone::setPolyhedron(const Polyhedron& rPolyhedron)
 {
    mPolyhedron = rPolyhedron;
 
-   if (mPolyhedron.pointList.size() != 0) {
+   if (mPolyhedron.mPointList.size() != 0) {
       mObjBox.minExtents.set(1e10, 1e10, 1e10);
       mObjBox.maxExtents.set(-1e10, -1e10, -1e10);
-      for (U32 i = 0; i < mPolyhedron.pointList.size(); i++) {
-         mObjBox.minExtents.setMin(mPolyhedron.pointList[i]);
-         mObjBox.maxExtents.setMax(mPolyhedron.pointList[i]);
+      for (U32 i = 0; i < mPolyhedron.mPointList.size(); i++) {
+         mObjBox.minExtents.setMin(mPolyhedron.mPointList[i]);
+         mObjBox.maxExtents.setMax(mPolyhedron.mPointList[i]);
       }
    } else {
       mObjBox.minExtents.set(-0.5, -0.5, -0.5);
@@ -483,7 +483,7 @@ void PhysicalZone::setPolyhedron(const Polyhedron& rPolyhedron)
    setTransform(xform);
 
    mClippedList.clear();
-   mClippedList.mPlaneList = mPolyhedron.planeList;
+   mClippedList.mPlaneList = mPolyhedron.mPlaneList;
 
    MatrixF base(true);
    base.scale(Point3F(1.0/mObjScale.x,
@@ -540,7 +540,7 @@ bool PhysicalZone::testObject(SceneObject* enter)
    // all.  And whats the point of building a convex if no collision methods
    // are implemented?
 
-   if (mPolyhedron.pointList.size() == 0)
+   if (mPolyhedron.mPointList.size() == 0)
       return false;
 
    mClippedList.clear();

@@ -176,8 +176,8 @@ void afxT3DLightBaseData::packData(BitStream* stream)
   stream->write( mAnimState.animationPhase );
   stream->write( mFlareScale );
 
-  writeDatablockID(stream, mAnimationData, packed);
-  writeDatablockID(stream, mFlareData, packed);
+  writeDatablockID(stream, mAnimationData, mPacked);
+  writeDatablockID(stream, mFlareData, mPacked);
 }
 
 void afxT3DLightBaseData::unpackData(BitStream* stream)

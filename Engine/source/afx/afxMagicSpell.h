@@ -68,36 +68,36 @@ class afxMagicSpellData : public afxChoreographerData, public afxMagicSpellDefs
     void validateType(SimObject *object, void *typePtr);
   };
 
-  bool                  do_id_convert;
+  bool                  mDo_id_convert;
 
 public:
-  F32                   casting_dur;
-  F32                   delivery_dur;
-  F32                   linger_dur;
+  F32                   mCasting_dur;
+  F32                   mDelivery_dur;
+  F32                   mLinger_dur;
   //
-  S32                   n_casting_loops;
-  S32                   n_delivery_loops;
-  S32                   n_linger_loops;
+  S32                   mNum_casting_loops;
+  S32                   mNum_delivery_loops;
+  S32                   mNum_linger_loops;
   //
-  F32                   extra_casting_time;
-  F32                   extra_delivery_time;
-  F32                   extra_linger_time;
+  F32                   mExtra_casting_time;
+  F32                   mExtra_delivery_time;
+  F32                   mExtra_linger_time;
   //
-  bool                  do_move_interrupts;
-  F32                   move_interrupt_speed;
+  bool                  mDo_move_interrupts;
+  F32                   mMove_interrupt_speed;
   //
-  afxMagicMissileData*  missile_db;
-  bool                  launch_on_server_signal;
-  U32                   primary_target_types;
+  afxMagicMissileData*  mMissile_db;
+  bool                  mLaunch_on_server_signal;
+  U32                   mPrimary_target_types;
   //
-  afxEffectWrapperData* dummy_fx_entry;
+  afxEffectWrapperData* mDummy_fx_entry;
 
                         // various effects lists
-  afxEffectList         casting_fx_list;
-  afxEffectList         launch_fx_list;
-  afxEffectList         delivery_fx_list;
-  afxEffectList         impact_fx_list;
-  afxEffectList         linger_fx_list;
+  afxEffectList         mCasting_fx_list;
+  afxEffectList         mLaunch_fx_list;
+  afxEffectList         mDelivery_fx_list;
+  afxEffectList         mImpact_fx_list;
+  afxEffectList         mLinger_fx_list;
 
   void                  pack_fx(BitStream* stream, const afxEffectList& fx, bool packed);
   void                  unpack_fx(BitStream* stream, afxEffectList& fx);
@@ -222,39 +222,39 @@ private:
   static StringTableEntry  IMPACTED_OBJECT_CONS;
 
 private:
-  afxMagicSpellData*   datablock;
-  SimObject*           exeblock;
-  afxMagicMissileData* missile_db;
+  afxMagicSpellData*   mDatablock;
+  SimObject*           mExeblock;
+  afxMagicMissileData* mMissile_db;
 
-  ShapeBase*    caster;
-  SceneObject*  target;
-  SimObject*    caster_field;
-  SimObject*    target_field;
+  ShapeBase*    mCaster;
+  SceneObject*  mTarget;
+  SimObject*    mCaster_field;
+  SimObject*    mTarget_field;
 
-  U16           caster_scope_id;
-  U16           target_scope_id;
-  bool          target_is_shape;
+  U16           mCaster_scope_id;
+  U16           mTarget_scope_id;
+  bool          mTarget_is_shape;
 
-  bool          constraints_initialized;
-  bool          scoping_initialized;
+  bool          mConstraints_initialized;
+  bool          mScoping_initialized;
 
-  U8            spell_state;
-  F32           spell_elapsed;
+  U8            mSpell_state;
+  F32           mSpell_elapsed;
 
-  afxConstraintID listener_cons_id;
-  afxConstraintID caster_cons_id;
-  afxConstraintID target_cons_id;
-  afxConstraintID impacted_cons_id;
-  afxConstraintID camera_cons_id;
-  SceneObject*  camera_cons_obj;
+  afxConstraintID mListener_cons_id;
+  afxConstraintID mCaster_cons_id;
+  afxConstraintID mTarget_cons_id;
+  afxConstraintID mImpacted_cons_id;
+  afxConstraintID mCamera_cons_id;
+  SceneObject*  mCamera_cons_obj;
 
-  afxPhrase*    phrases[NUM_PHRASES];
-  F32           tfactors[NUM_PHRASES];
+  afxPhrase*    mPhrases[NUM_PHRASES];
+  F32           mTfactors[NUM_PHRASES];
 
-  bool          notify_castbar;
-  F32           overall_time_factor;
+  bool          mNotify_castbar;
+  F32           mOverall_time_factor;
 
-  U16           marks_mask;
+  U16           mMarks_mask;
 
 private:
   void          init();
@@ -278,13 +278,13 @@ protected:
   virtual void  unpack_constraint_info(NetConnection* conn, BitStream* stream);
 
 private:
-  afxMagicMissile*  missile;
-  bool              missile_is_armed;
-  SceneObject*      impacted_obj;
-  Point3F           impact_pos;
-  Point3F           impact_norm;
-  U16               impacted_scope_id;
-  bool              impacted_is_shape;
+  afxMagicMissile*  mMissile;
+  bool              mMissile_is_armed;
+  SceneObject*      mImpacted_obj;
+  Point3F           mImpact_pos;
+  Point3F           mImpact_norm;
+  U16               mImpacted_scope_id;
+  bool              mImpacted_is_shape;
 
   void          init_missile_s(afxMagicMissileData* mm);
   void          launch_missile_s();
@@ -353,15 +353,15 @@ public:
   void          postSpellEvent(U8 event);
   void          resolveTimeFactors();
 
-  void          setTimeFactor(F32 f) { overall_time_factor = (f > 0) ? f : 1.0f; }
-  F32           getTimeFactor() { return overall_time_factor; }
-  void          setTimeFactor(U8 phase, F32 f) { tfactors[phase] = (f > 0) ? f : 1.0f; }
-  F32           getTimeFactor(U8 phase) { return tfactors[phase]; }
+  void          setTimeFactor(F32 f) { mOverall_time_factor = (f > 0) ? f : 1.0f; }
+  F32           getTimeFactor() { return mOverall_time_factor; }
+  void          setTimeFactor(U8 phase, F32 f) { mTfactors[phase] = (f > 0) ? f : 1.0f; }
+  F32           getTimeFactor(U8 phase) { return mTfactors[phase]; }
 
-  ShapeBase*        getCaster() const { return caster; }
-  SceneObject*      getTarget() const { return target; }
-  afxMagicMissile*  getMissile() const { return missile; }
-  SceneObject*      getImpactedObject() const { return impacted_obj; }
+  ShapeBase*        getCaster() const { return mCaster; }
+  SceneObject*      getTarget() const { return mTarget; }
+  afxMagicMissile*  getMissile() const { return mMissile; }
+  SceneObject*      getImpactedObject() const { return mImpacted_obj; }
 
   virtual void      restoreObject(SceneObject*);
 
@@ -377,7 +377,7 @@ public:
 
 inline bool afxMagicSpell::is_caster_moving()
 {
-  return (caster) ? (caster->getVelocity().len() > datablock->move_interrupt_speed) : false;
+  return (mCaster) ? (mCaster->getVelocity().len() > mDatablock->mMove_interrupt_speed) : false;
 }
 
 inline bool afxMagicSpell::is_caster_client(ShapeBase* caster, GameConnection* conn)

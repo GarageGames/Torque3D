@@ -49,7 +49,7 @@ ExprEvalState gEvalState;
 StmtNode *gStatementList;
 StmtNode *gAnonFunctionList;
 U32 gAnonFunctionID = 0;
-ConsoleConstructor *ConsoleConstructor::first = NULL;
+ConsoleConstructor *ConsoleConstructor::mFirst = NULL;
 bool gWarnUndefinedScriptVariables;
 
 static char scratchBuffer[4096];
@@ -85,47 +85,47 @@ static const char * prependPercent ( const char * name )
 //--------------------------------------
 void ConsoleConstructor::init( const char *cName, const char *fName, const char *usg, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
-   mina = minArgs;
-   maxa = maxArgs;
-   funcName = fName;
-   usage = usg;
-   className = cName;
-   sc = 0; fc = 0; vc = 0; bc = 0; ic = 0;
-   callback = group = false;
-   next = first;
-   ns = false;
-   first = this;
-   toolOnly = isToolOnly;
-   this->header = header;
+   mMina = minArgs;
+   mMaxa = maxArgs;
+   mFuncName = fName;
+   mUsage = usg;
+   mClassName = cName;
+   mSC = 0; mFC = 0; mVC = 0; mBC = 0; mIC = 0;
+   mCallback = mGroup = false;
+   mNext = mFirst;
+   mNS = false;
+   mFirst = this;
+   mToolOnly = isToolOnly;
+   mHeader = header;
 }
 
 void ConsoleConstructor::setup()
 {
-   for(ConsoleConstructor *walk = first; walk; walk = walk->next)
+   for(ConsoleConstructor *walk = mFirst; walk; walk = walk->mNext)
    {
 #ifdef TORQUE_DEBUG
       walk->validate();
 #endif
 
-      if( walk->sc )
-         Con::addCommand( walk->className, walk->funcName, walk->sc, walk->usage, walk->mina, walk->maxa, walk->toolOnly, walk->header );
-      else if( walk->ic )
-         Con::addCommand( walk->className, walk->funcName, walk->ic, walk->usage, walk->mina, walk->maxa, walk->toolOnly, walk->header );
-      else if( walk->fc )
-         Con::addCommand( walk->className, walk->funcName, walk->fc, walk->usage, walk->mina, walk->maxa, walk->toolOnly, walk->header );
-      else if( walk->vc )
-         Con::addCommand( walk->className, walk->funcName, walk->vc, walk->usage, walk->mina, walk->maxa, walk->toolOnly, walk->header );
-      else if( walk->bc )
-         Con::addCommand( walk->className, walk->funcName, walk->bc, walk->usage, walk->mina, walk->maxa, walk->toolOnly, walk->header );
-      else if( walk->group )
-         Con::markCommandGroup( walk->className, walk->funcName, walk->usage );
-      else if( walk->callback )
-         Con::noteScriptCallback( walk->className, walk->funcName, walk->usage, walk->header );
-      else if( walk->ns )
+      if( walk->mSC )
+         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mSC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
+      else if( walk->mIC )
+         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mIC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
+      else if( walk->mFC )
+         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mFC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
+      else if( walk->mVC )
+         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mVC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
+      else if( walk->mBC )
+         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mBC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
+      else if( walk->mGroup )
+         Con::markCommandGroup( walk->mClassName, walk->mFuncName, walk->mUsage);
+      else if( walk->mClassName)
+         Con::noteScriptCallback( walk->mClassName, walk->mFuncName, walk->mUsage, walk->mHeader);
+      else if( walk->mNS )
       {
-         Namespace* ns = Namespace::find( StringTable->insert( walk->className ) );
+         Namespace* ns = Namespace::find( StringTable->insert( walk->mClassName) );
          if( ns )
-            ns->mUsage = walk->usage;
+            ns->mUsage = walk->mUsage;
       }
       else
       {
@@ -137,38 +137,38 @@ void ConsoleConstructor::setup()
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, StringCallback sfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
    init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
-   sc = sfunc;
+   mSC = sfunc;
 }
 
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, IntCallback ifunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
    init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
-   ic = ifunc;
+   mIC = ifunc;
 }
 
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, FloatCallback ffunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
    init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
-   fc = ffunc;
+   mFC = ffunc;
 }
 
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, VoidCallback vfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
    init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
-   vc = vfunc;
+   mVC = vfunc;
 }
 
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, BoolCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
    init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
-   bc = bfunc;
+   mBC = bfunc;
 }
 
 ConsoleConstructor::ConsoleConstructor(const char* className, const char* groupName, const char* aUsage)
 {
-   init(className, groupName, usage, -1, -2);
+   init(className, groupName, mUsage, -1, -2);
 
-   group = true;
+   mGroup = true;
 
    // Somewhere, the entry list is getting flipped, partially.
    // so we have to do tricks to deal with making sure usage
@@ -179,36 +179,36 @@ ConsoleConstructor::ConsoleConstructor(const char* className, const char* groupN
    if(aUsage)
       lastUsage = (char *)aUsage;
 
-   usage = lastUsage;
+   mUsage = lastUsage;
 }
 
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *callbackName, const char *usage, ConsoleFunctionHeader* header )
 {
    init( className, callbackName, usage, -2, -3, false, header );
-   callback = true;
-   ns = true;
+   mCallback = true;
+   mNS = true;
 }
 
 void ConsoleConstructor::validate()
 {
 #ifdef TORQUE_DEBUG
    // Don't do the following check if we're not a method/func.
-   if(this->group)
+   if(mGroup)
       return;
 
    // In debug, walk the list and make sure this isn't a duplicate.
-   for(ConsoleConstructor *walk = first; walk; walk = walk->next)
+   for(ConsoleConstructor *walk = mFirst; walk; walk = walk->mNext)
    {
       // Skip mismatching func/method names.
-      if(dStricmp(walk->funcName, this->funcName))
+      if(dStricmp(walk->mFuncName, mFuncName))
          continue;
 
       // Don't compare functions with methods or vice versa.
-      if(bool(this->className) != bool(walk->className))
+      if(bool(mClassName) != bool(walk->mClassName))
          continue;
 
       // Skip mismatching classnames, if they're present.
-      if(this->className && walk->className && dStricmp(walk->className, this->className))
+      if(mClassName && walk->mClassName && dStricmp(walk->mClassName, mClassName))
          continue;
 
       // If we encounter ourselves, stop searching; this prevents duplicate
@@ -218,13 +218,13 @@ void ConsoleConstructor::validate()
          break;
 
       // Match!
-      if(this->className)
+      if(mClassName)
       {
-         AssertISV(false, avar("ConsoleConstructor::setup - ConsoleMethod '%s::%s' collides with another of the same name.", this->className, this->funcName));
+         AssertISV(false, avar("ConsoleConstructor::setup - ConsoleMethod '%s::%s' collides with another of the same name.", mClassName, mFuncName));
       }
       else
       {
-         AssertISV(false, avar("ConsoleConstructor::setup - ConsoleFunction '%s' collides with another of the same name.", this->funcName));
+         AssertISV(false, avar("ConsoleConstructor::setup - ConsoleFunction '%s' collides with another of the same name.", mFuncName));
       }
    }
 #endif
@@ -842,9 +842,9 @@ void setIntVariable(const char *varName, S32 value)
 
    if (getVariableObjectField(varName, &obj, &objField))
    {
-      char scratchBuffer[32];
-      dSprintf(scratchBuffer, sizeof(scratchBuffer), "%d", value);
-      obj->setDataField(StringTable->insert(objField), 0, scratchBuffer);
+      char varBuffer[32];
+      dSprintf(varBuffer, sizeof(varBuffer), "%d", value);
+      obj->setDataField(StringTable->insert(objField), 0, varBuffer);
    }
    else
    {
@@ -861,9 +861,9 @@ void setFloatVariable(const char *varName, F32 value)
 
    if (getVariableObjectField(varName, &obj, &objField))
    {
-      char scratchBuffer[32];
-      dSprintf(scratchBuffer, sizeof(scratchBuffer), "%g", value);
-      obj->setDataField(StringTable->insert(objField), 0, scratchBuffer);
+      char varBuffer[32];
+      dSprintf(varBuffer, sizeof(varBuffer), "%g", value);
+      obj->setDataField(StringTable->insert(objField), 0, varBuffer);
    }
    else
    {

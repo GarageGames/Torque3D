@@ -140,7 +140,7 @@ void StmtNode::addBreakLine(CodeStream &code)
 
 StmtNode::StmtNode()
 {
-   next = NULL;
+   mNext = NULL;
    dbgFileName = CodeBlock::smCurrentParser->getCurrentFile();
 }
 
@@ -151,9 +151,9 @@ void StmtNode::setPackage(StringTableEntry)
 void StmtNode::append(StmtNode *next)
 {
    StmtNode *walk = this;
-   while (walk->next)
-      walk = walk->next;
-   walk->next = next;
+   while (walk->mNext)
+      walk = walk->mNext;
+   walk->mNext = next;
 }
 
 

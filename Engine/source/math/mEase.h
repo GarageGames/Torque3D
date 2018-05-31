@@ -76,9 +76,9 @@ class EaseF : public Ease
 {
    //-------------------------------------- Public data
   public:
-   S32 dir;       // inout, in, out
-   S32 type;      // linear, etc...
-   F32 param[2];  // optional params
+   S32 mDir;       // inout, in, out
+   S32 mType;      // linear, etc...
+   F32 mParam[2];  // optional params
 
    //-------------------------------------- Public interface
   public:
