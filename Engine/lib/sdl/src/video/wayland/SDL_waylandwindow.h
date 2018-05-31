@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,8 +21,8 @@
 
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_waylandwindow_h
-#define _SDL_waylandwindow_h
+#ifndef SDL_waylandwindow_h_
+#define SDL_waylandwindow_h_
 
 #include "../SDL_sysvideo.h"
 #include "SDL_syswm.h"
@@ -32,10 +32,22 @@
 struct SDL_WaylandInput;
 
 typedef struct {
+    struct zxdg_surface_v6 *surface;
+    union {
+        struct zxdg_toplevel_v6 *toplevel;
+        struct zxdg_popup_v6 *popup;
+    } roleobj;
+} SDL_zxdg_shell_surface;
+
+typedef struct {
     SDL_Window *sdlwindow;
     SDL_VideoData *waylandData;
     struct wl_surface *surface;
-    struct wl_shell_surface *shell_surface;
+    union {
+        /* !!! FIXME: add stable xdg_shell from 1.12 */
+        SDL_zxdg_shell_surface zxdg;
+        struct wl_shell_surface *wl;
+    } shell_surface;
     struct wl_egl_window *egl_window;
     struct SDL_WaylandInput *keyboard_device;
     EGLSurface egl_surface;
@@ -61,6 +73,6 @@ extern SDL_bool
 Wayland_GetWindowWMInfo(_THIS, SDL_Window * window, SDL_SysWMinfo * info);
 extern int Wayland_SetWindowHitTest(SDL_Window *window, SDL_bool enabled);
 
-#endif /* _SDL_waylandwindow_h */
+#endif /* SDL_waylandwindow_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */
