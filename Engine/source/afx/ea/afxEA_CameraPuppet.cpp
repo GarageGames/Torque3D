@@ -83,8 +83,8 @@ bool afxEA_CameraPuppet::ea_start()
 
   do_runtime_substitutions();
 
-  afxConstraintID obj_id = cons_mgr->getConstraintId(puppet_data->cam_def);
-  cam_cons = cons_mgr->getConstraint(obj_id);
+  afxConstraintID obj_id = mCons_mgr->getConstraintId(puppet_data->cam_def);
+  cam_cons = mCons_mgr->getConstraint(obj_id);
 
   SceneObject* obj = (cam_cons) ? cam_cons->getSceneObject() : 0;
   if (obj && obj->isClientObject())
@@ -105,9 +105,9 @@ bool afxEA_CameraPuppet::ea_update(F32 dt)
 {
   SceneObject* obj = (cam_cons) ? cam_cons->getSceneObject() : 0;
 
-  if (obj && in_scope)
+  if (obj && mIn_scope)
   {
-    obj->setTransform(updated_xfm);
+    obj->setTransform(mUpdated_xfm);
   }
 
   return true;
@@ -153,7 +153,7 @@ void afxEA_CameraPuppet::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxCameraPuppetData* orig_db = puppet_data;
     puppet_data = new afxCameraPuppetData(*orig_db, true);
-    orig_db->performSubstitutions(puppet_data, choreographer, group_index);
+    orig_db->performSubstitutions(puppet_data, mChoreographer, mGroup_index);
   }
 }
 

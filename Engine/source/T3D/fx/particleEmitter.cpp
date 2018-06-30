@@ -412,7 +412,7 @@ void ParticleEmitterData::packData(BitStream* stream)
 #if defined(AFX_CAP_PARTICLE_POOLS) 
    if (stream->writeFlag(pool_datablock))
    {
-     stream->writeRangedU32(packed ? SimObjectId((uintptr_t)pool_datablock) : pool_datablock->getId(), DataBlockObjectIdFirst, DataBlockObjectIdLast);
+     stream->writeRangedU32(mPacked ? SimObjectId((uintptr_t)pool_datablock) : pool_datablock->getId(), DataBlockObjectIdFirst, DataBlockObjectIdLast);
      stream->write(pool_index);
      stream->writeFlag(pool_depth_fade);
      stream->writeFlag(pool_radial_fade);
@@ -608,8 +608,9 @@ bool ParticleEmitterData::onAdd()
 
       // First we parse particleString into a list of particle name tokens 
       Vector<char*> dataBlocks(__FILE__, __LINE__);
-      char* tokCopy = new char[dStrlen(particleString) + 1];
-      dStrcpy(tokCopy, particleString);
+      dsize_t tokLen = dStrlen(particleString) + 1;
+      char* tokCopy = new char[tokLen];
+      dStrcpy(tokCopy, particleString, tokLen);
 
       char* currTok = dStrtok(tokCopy, " \t");
       while (currTok != NULL) 

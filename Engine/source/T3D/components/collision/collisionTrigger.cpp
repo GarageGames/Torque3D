@@ -357,12 +357,12 @@ void CollisionTrigger::setTriggerPolyhedron(const Polyhedron& rPolyhedron)
 {
    mCollisionTriggerPolyhedron = rPolyhedron;
 
-   if (mCollisionTriggerPolyhedron.pointList.size() != 0) {
+   if (mCollisionTriggerPolyhedron.mPointList.size() != 0) {
       mObjBox.minExtents.set(1e10, 1e10, 1e10);
       mObjBox.maxExtents.set(-1e10, -1e10, -1e10);
-      for (U32 i = 0; i < mCollisionTriggerPolyhedron.pointList.size(); i++) {
-         mObjBox.minExtents.setMin(mCollisionTriggerPolyhedron.pointList[i]);
-         mObjBox.maxExtents.setMax(mCollisionTriggerPolyhedron.pointList[i]);
+      for (U32 i = 0; i < mCollisionTriggerPolyhedron.mPointList.size(); i++) {
+         mObjBox.minExtents.setMin(mCollisionTriggerPolyhedron.mPointList[i]);
+         mObjBox.maxExtents.setMax(mCollisionTriggerPolyhedron.mPointList[i]);
       }
    }
    else {
@@ -374,7 +374,7 @@ void CollisionTrigger::setTriggerPolyhedron(const Polyhedron& rPolyhedron)
    setTransform(xform);
 
    mClippedList.clear();
-   mClippedList.mPlaneList = mCollisionTriggerPolyhedron.planeList;
+   mClippedList.mPlaneList = mCollisionTriggerPolyhedron.mPlaneList;
    //   for (U32 i = 0; i < mClippedList.mPlaneList.size(); i++)
    //      mClippedList.mPlaneList[i].neg();
 
@@ -412,7 +412,7 @@ void CollisionTrigger::setTriggerPolyhedron(const Polyhedron& rPolyhedron)
 
 bool CollisionTrigger::testObject(GameBase* enter)
 {
-   if (mCollisionTriggerPolyhedron.pointList.size() == 0)
+   if (mCollisionTriggerPolyhedron.mPointList.size() == 0)
       return false;
 
    mClippedList.clear();
@@ -507,17 +507,17 @@ U32 CollisionTrigger::packUpdate(NetConnection* con, U32 mask, BitStream* stream
    // Write the polyhedron
    if (stream->writeFlag(mask & PolyMask))
    {
-      stream->write(mCollisionTriggerPolyhedron.pointList.size());
-      for (i = 0; i < mCollisionTriggerPolyhedron.pointList.size(); i++)
-         mathWrite(*stream, mCollisionTriggerPolyhedron.pointList[i]);
+      stream->write(mCollisionTriggerPolyhedron.mPointList.size());
+      for (i = 0; i < mCollisionTriggerPolyhedron.mPointList.size(); i++)
+         mathWrite(*stream, mCollisionTriggerPolyhedron.mPointList[i]);
 
-      stream->write(mCollisionTriggerPolyhedron.planeList.size());
-      for (i = 0; i < mCollisionTriggerPolyhedron.planeList.size(); i++)
-         mathWrite(*stream, mCollisionTriggerPolyhedron.planeList[i]);
+      stream->write(mCollisionTriggerPolyhedron.mPlaneList.size());
+      for (i = 0; i < mCollisionTriggerPolyhedron.mPlaneList.size(); i++)
+         mathWrite(*stream, mCollisionTriggerPolyhedron.mPlaneList[i]);
 
-      stream->write(mCollisionTriggerPolyhedron.edgeList.size());
-      for (i = 0; i < mCollisionTriggerPolyhedron.edgeList.size(); i++) {
-         const Polyhedron::Edge& rEdge = mCollisionTriggerPolyhedron.edgeList[i];
+      stream->write(mCollisionTriggerPolyhedron.mEdgeList.size());
+      for (i = 0; i < mCollisionTriggerPolyhedron.mEdgeList.size(); i++) {
+         const Polyhedron::Edge& rEdge = mCollisionTriggerPolyhedron.mEdgeList[i];
 
          stream->write(rEdge.face[0]);
          stream->write(rEdge.face[1]);
@@ -555,19 +555,19 @@ void CollisionTrigger::unpackUpdate(NetConnection* con, BitStream* stream)
    {
       Polyhedron tempPH;
       stream->read(&size);
-      tempPH.pointList.setSize(size);
-      for (i = 0; i < tempPH.pointList.size(); i++)
-         mathRead(*stream, &tempPH.pointList[i]);
+      tempPH.mPointList.setSize(size);
+      for (i = 0; i < tempPH.mPointList.size(); i++)
+         mathRead(*stream, &tempPH.mPointList[i]);
 
       stream->read(&size);
-      tempPH.planeList.setSize(size);
-      for (i = 0; i < tempPH.planeList.size(); i++)
-         mathRead(*stream, &tempPH.planeList[i]);
+      tempPH.mPlaneList.setSize(size);
+      for (i = 0; i < tempPH.mPlaneList.size(); i++)
+         mathRead(*stream, &tempPH.mPlaneList[i]);
 
       stream->read(&size);
-      tempPH.edgeList.setSize(size);
-      for (i = 0; i < tempPH.edgeList.size(); i++) {
-         Polyhedron::Edge& rEdge = tempPH.edgeList[i];
+      tempPH.mEdgeList.setSize(size);
+      for (i = 0; i < tempPH.mEdgeList.size(); i++) {
+         Polyhedron::Edge& rEdge = tempPH.mEdgeList[i];
 
          stream->read(&rEdge.face[0]);
          stream->read(&rEdge.face[1]);

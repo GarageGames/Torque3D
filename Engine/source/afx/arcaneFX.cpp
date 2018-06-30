@@ -908,7 +908,7 @@ ConsoleFunction(echoThru, const char*, 2, 0, "(string passthru, string text...)"
    char *ret = Con::getReturnBuffer(len + 1);
    ret[0] = 0;
    for(i = 2; i < argc; i++)
-      dStrcat(ret, argv[i]);
+      dStrcat(ret, argv[i], len + 1);
 
    Con::printf("%s -- [%s]", ret, argv[1].getStringValue());
    ret[0] = 0;
@@ -928,7 +928,7 @@ ConsoleFunction(warnThru, const char*, 2, 0, "(string passthru, string text...)"
    char *ret = Con::getReturnBuffer(len + 1);
    ret[0] = 0;
    for(i = 2; i < argc; i++)
-      dStrcat(ret, argv[i]);
+      dStrcat(ret, argv[i], len + 1);
 
    Con::warnf("%s -- [%s]", ret, argv[1].getStringValue());
    ret[0] = 0;
@@ -948,7 +948,7 @@ ConsoleFunction(errorThru, const char*, 2, 0, "(string passthru, string text...)
    char *ret = Con::getReturnBuffer(len + 1);
    ret[0] = 0;
    for(i = 2; i < argc; i++)
-      dStrcat(ret, argv[i]);
+      dStrcat(ret, argv[i], len + 1);
 
    Con::errorf("%s -- [%s]", ret, argv[1].getStringValue());
    ret[0] = 0;

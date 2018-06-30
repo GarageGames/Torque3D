@@ -39,6 +39,9 @@
 #include "gfx/gfxCardProfile.h"
 #include "gfx/gfxTextureProfile.h"
 
+#ifndef TORQUE_BASIC_LIGHTING
+F32 AdvancedLightManager::smProjectedShadowFilterDistance = 40.0f;
+#endif
 
 ImplementEnumType( ShadowType,
    "\n\n"

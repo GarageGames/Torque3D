@@ -120,9 +120,9 @@ static void processNode(GuiTreeViewCtrl* tree, domNode* node, S32 parentID, Scen
    for (S32 i = 0; i < node->getInstance_node_array().getCount(); i++)
    {
       domInstance_node* instnode = node->getInstance_node_array()[i];
-      domNode* node = daeSafeCast<domNode>(instnode->getUrl().getElement());
-      if (node)
-         processNode(tree, node, nodeID, stats);
+      domNode* dNode = daeSafeCast<domNode>(instnode->getUrl().getElement());
+      if (dNode)
+         processNode(tree, dNode, nodeID, stats);
    }
 }
 
@@ -198,7 +198,7 @@ DefineConsoleFunction( enumColladaForImport, bool, (const char * shapePath, cons
       for (S32 j = 0; j < libraryMats->getMaterial_array().getCount(); j++)
       {
          domMaterial* mat = libraryMats->getMaterial_array()[j];
-         tree->insertItem(matsID, _GetNameOrId(mat), _GetNameOrId(mat), "", 0, 0);
+         tree->insertItem(matsID, _GetNameOrId(mat), "", "", 0, 0);
       }
    }
 
@@ -255,6 +255,17 @@ DefineConsoleFunction( enumColladaForImport, bool, (const char * shapePath, cons
       tree->setDataField(StringTable->insert("_upAxis"), 0, "Y_AXIS");
    else
       tree->setDataField(StringTable->insert("_upAxis"), 0, "Z_AXIS");
+
+   char shapesStr[16];
+   dSprintf(shapesStr, 16, "%i", stats.numMeshes);
+   char materialsStr[16];
+   dSprintf(materialsStr, 16, "%i", stats.numMaterials);
+   char animationsStr[16];
+   dSprintf(animationsStr, 16, "%i", stats.numClips);
+
+   tree->setItemValue(nodesID, StringTable->insert(shapesStr));
+   tree->setItemValue(matsID, StringTable->insert(materialsStr));
+   tree->setItemValue(animsID, StringTable->insert(animationsStr));
 
    return true;
 }

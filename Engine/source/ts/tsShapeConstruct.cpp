@@ -135,6 +135,20 @@ IMPLEMENT_CONOBJECT(TSShapeConstructor);
 TSShapeConstructor::TSShapeConstructor()
  : mShapePath(""), mLoadingShape(false)
 {
+   mOptions.upAxis = UPAXISTYPE_COUNT;
+   mOptions.unit = -1.0f;
+   mOptions.lodType = ColladaUtils::ImportOptions::TrailingNumber;
+   mOptions.singleDetailSize = 2;
+   mOptions.matNamePrefix = "";
+   mOptions.alwaysImport = "";
+   mOptions.neverImport = String(Con::getVariable("$TSShapeConstructor::neverImport"));
+   mOptions.alwaysImportMesh = "";
+   mOptions.neverImportMesh = String(Con::getVariable("$TSShapeConstructor::neverImportMesh"));
+   mOptions.ignoreNodeScale = false;
+   mOptions.adjustCenter = false;
+   mOptions.adjustFloor = false;
+   mOptions.forceUpdateMaterials = false;
+   mOptions.useDiffuseNames = false;
    mShape = NULL;
 }
 
@@ -1340,7 +1354,7 @@ DefineTSShapeConstructorMethod( getMeshMaterial, const char*, ( const char* name
    GET_MESH( getMeshMaterial, mesh, name, "" );
 
    // Return the name of the first material attached to this mesh
-   S32 matIndex = mesh->primitives[0].matIndex & TSDrawPrimitive::MaterialMask;
+   S32 matIndex = mesh->mPrimitives[0].matIndex & TSDrawPrimitive::MaterialMask;
    if ((matIndex >= 0) && (matIndex < mShape->materialList->size()))
       return mShape->materialList->getMaterialName( matIndex );
    else
@@ -1377,10 +1391,10 @@ DefineTSShapeConstructorMethod( setMeshMaterial, bool, ( const char* meshName, c
    }
 
    // Set this material for all primitives in the mesh
-   for ( S32 i = 0; i < mesh->primitives.size(); i++ )
+   for ( S32 i = 0; i < mesh->mPrimitives.size(); i++ )
    {
-      U32 matType = mesh->primitives[i].matIndex & ( TSDrawPrimitive::TypeMask | TSDrawPrimitive::Indexed );
-      mesh->primitives[i].matIndex = ( matType | matIndex );
+      U32 matType = mesh->mPrimitives[i].matIndex & ( TSDrawPrimitive::TypeMask | TSDrawPrimitive::Indexed );
+      mesh->mPrimitives[i].matIndex = ( matType | matIndex );
    }
 
    ADD_TO_CHANGE_SET();
@@ -1445,7 +1459,7 @@ DefineTSShapeConstructorMethod( getBounds, Box3F, (),,
    "Get the bounding box for the shape.\n"
    "@return Bounding box \"minX minY minZ maxX maxY maxZ\"" )
 {
-   return mShape->bounds;
+   return mShape->mBounds;
 }}
 
 DefineTSShapeConstructorMethod( setBounds, bool, ( Box3F bbox ),,
@@ -1457,10 +1471,10 @@ DefineTSShapeConstructorMethod( setBounds, bool, ( Box3F bbox ),,
    // Set shape bounds
    TSShape* shape = mShape;
 
-   shape->bounds = bbox;
-   shape->bounds.getCenter( &shape->center );
-   shape->radius = ( shape->bounds.maxExtents - shape->center ).len();
-   shape->tubeRadius = shape->radius;
+   shape->mBounds = bbox;
+   shape->mBounds.getCenter( &shape->center );
+   shape->mRadius = ( shape->mBounds.maxExtents - shape->center ).len();
+   shape->tubeRadius = shape->mRadius;
 
    ADD_TO_CHANGE_SET();
    return true;
@@ -2200,12 +2214,12 @@ void TSShapeConstructor::ChangeSet::write(TSShape* shape, Stream& stream, const 
          for (U32 j = 1; j < cmd.argc; j++)
          {
             // Use relative paths when possible
-            String str( cmd.argv[j] );
-            if ( str.startsWith( savePath ) )
-               str = str.substr( savePath.length() + 1 );
+            String relStr( cmd.argv[j] );
+            if (relStr.startsWith( savePath ) )
+				relStr = relStr.substr( savePath.length() + 1 );
 
             stream.writeText( ", \"" );
-            stream.write( str.length(), str.c_str() );
+            stream.write(relStr.length(), relStr.c_str() );
             stream.writeText( "\"" );
          }
       }

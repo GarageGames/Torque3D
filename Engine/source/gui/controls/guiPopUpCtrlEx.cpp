@@ -390,7 +390,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, addScheme, void, (S32 id, ColorI fontCol
    U32 r, g, b;
    char buf[64];
 
-   dStrcpy( buf, argv[3] );
+   dStrcpy( buf, argv[3], 64 );
    char* temp = dStrtok( buf, " \0" );
    r = temp ? dAtoi( temp ) : 0;
    temp = dStrtok( NULL, " \0" );
@@ -399,7 +399,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, addScheme, void, (S32 id, ColorI fontCol
    b = temp ? dAtoi( temp ) : 0;
    fontColor.set( r, g, b );
 
-   dStrcpy( buf, argv[4] );
+   dStrcpy( buf, argv[4], 64 );
    temp = dStrtok( buf, " \0" );
    r = temp ? dAtoi( temp ) : 0;
    temp = dStrtok( NULL, " \0" );
@@ -408,7 +408,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, addScheme, void, (S32 id, ColorI fontCol
    b = temp ? dAtoi( temp ) : 0;
    fontColorHL.set( r, g, b );
 
-   dStrcpy( buf, argv[5] );
+   dStrcpy( buf, argv[5], 64 );
    temp = dStrtok( buf, " \0" );
    r = temp ? dAtoi( temp ) : 0;
    temp = dStrtok( NULL, " \0" );
@@ -426,7 +426,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, addScheme, void, (S32 id, ColorI fontCol
 //   U32 r, g, b;
 //   char buf[64];
 //
-//   dStrcpy( buf, argv[3] );
+//   dStrcpy( buf, argv[3], 64 );
 //   char* temp = dStrtok( buf, " \0" );
 //   r = temp ? dAtoi( temp ) : 0;
 //   temp = dStrtok( NULL, " \0" );
@@ -435,7 +435,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, addScheme, void, (S32 id, ColorI fontCol
 //   b = temp ? dAtoi( temp ) : 0;
 //   fontColor.set( r, g, b );
 //
-//   dStrcpy( buf, argv[4] );
+//   dStrcpy( buf, argv[4], 64 );
 //   temp = dStrtok( buf, " \0" );
 //   r = temp ? dAtoi( temp ) : 0;
 //   temp = dStrtok( NULL, " \0" );
@@ -444,7 +444,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, addScheme, void, (S32 id, ColorI fontCol
 //   b = temp ? dAtoi( temp ) : 0;
 //   fontColorHL.set( r, g, b );
 //
-//   dStrcpy( buf, argv[5] );
+//   dStrcpy( buf, argv[5], 64 );
 //   temp = dStrtok( buf, " \0" );
 //   r = temp ? dAtoi( temp ) : 0;
 //   temp = dStrtok( NULL, " \0" );
@@ -771,13 +771,14 @@ void GuiPopUpMenuCtrlEx::setBitmap(const char *name)
    {
       char buffer[1024];
       char *p;
-      dStrcpy(buffer, name);
+      dStrcpy(buffer, name, 1024);
       p = buffer + dStrlen(buffer);
+      S32 pLen = 1024 - dStrlen(buffer);
 
-      dStrcpy(p, "_n");
+      dStrcpy(p, "_n", pLen);
       mTextureNormal = GFXTexHandle( (StringTableEntry)buffer, &GFXDefaultGUIProfile, avar("%s() - mTextureNormal (line %d)", __FUNCTION__, __LINE__) );
 
-      dStrcpy(p, "_d");
+      dStrcpy(p, "_d", pLen);
       mTextureDepressed = GFXTexHandle( (StringTableEntry)buffer, &GFXDefaultGUIProfile, avar("%s() - mTextureDepressed (line %d)", __FUNCTION__, __LINE__) );
       if ( !mTextureDepressed )
          mTextureDepressed = mTextureNormal;
@@ -840,7 +841,7 @@ void GuiPopUpMenuCtrlEx::addEntry(const char *buf, S32 id, U32 scheme)
       mIdMax = id;
 
    Entry e;
-   dStrcpy( e.buf, buf );
+   dStrcpy( e.buf, buf, 256 );
    e.id = id;
    e.scheme = scheme;
 
@@ -1210,9 +1211,9 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
       if ( drawbox )
       {
          Point2I coloredboxsize( 15, 10 );
-         RectI r( offset.x + mProfile->mTextOffset.x, offset.y + ( (getHeight() - coloredboxsize.y ) / 2 ), coloredboxsize.x, coloredboxsize.y );
-         drawUtil->drawRectFill( r, boxColor);
-         drawUtil->drawRect( r, ColorI(0,0,0));
+         RectI boxBounds( offset.x + mProfile->mTextOffset.x, offset.y + ( (getHeight() - coloredboxsize.y ) / 2 ), coloredboxsize.x, coloredboxsize.y );
+         drawUtil->drawRectFill(boxBounds, boxColor);
+         drawUtil->drawRect(boxBounds, ColorI(0,0,0));
 
          localStart.x += coloredboxsize.x + mProfile->mTextOffset.x;
       }
@@ -1236,18 +1237,18 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
 
          // Draw the second column to the right
          getColumn( mText, buff, 1, "\t" );
-         S32 txt_w = mProfile->mFont->getStrWidth( buff );
+         S32 colTxt_w = mProfile->mFont->getStrWidth( buff );
          if ( mProfile->getChildrenProfile() && mProfile->mBitmapArrayRects.size() )
          {
             // We're making use of a bitmap border, so take into account the
             // right cap of the border.
             RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
-            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - bitmapBounds[2].extent.x, localStart.y ) );
+            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - colTxt_w - bitmapBounds[2].extent.x, localStart.y ) );
             drawUtil->drawText( mProfile->mFont, textpos, buff, mProfile->mFontColors );
 
          } else
          {
-            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - 12, localStart.y ) );
+            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - colTxt_w - 12, localStart.y ) );
             drawUtil->drawText( mProfile->mFont, textpos, buff, mProfile->mFontColors );
          }
 

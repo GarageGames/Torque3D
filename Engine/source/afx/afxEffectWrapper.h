@@ -255,59 +255,59 @@ private:
   bool              test_life_conds();
 
 protected:
-  afxEffectWrapperData* datablock;
+  afxEffectWrapperData* mDatablock;
 
-  afxEffectTimingData   ew_timing;
+  afxEffectTimingData   mEW_timing;
 
-  F32               fade_in_end;
-  F32               fade_out_start;
-  F32               full_lifetime;
+  F32               mFade_in_end;
+  F32               mFade_out_start;
+  F32               mFull_lifetime;
 
-  F32               time_factor;
-  F32               prop_time_factor;
+  F32               mTime_factor;
+  F32               mProp_time_factor;
 
-  afxChoreographer* choreographer;
-  afxConstraintMgr* cons_mgr;
+  afxChoreographer* mChoreographer;
+  afxConstraintMgr* mCons_mgr;
 
-  afxConstraintID   pos_cons_id;
-  afxConstraintID   orient_cons_id;
-  afxConstraintID   aim_cons_id;
-  afxConstraintID   life_cons_id;
+  afxConstraintID   mPos_cons_id;
+  afxConstraintID   mOrient_cons_id;
+  afxConstraintID   mAim_cons_id;
+  afxConstraintID   mLife_cons_id;
 
-  afxConstraintID   effect_cons_id;
+  afxConstraintID   mEffect_cons_id;
 
-  F32               elapsed;
-  F32               life_elapsed;
-  F32               life_end;
-  bool              stopped;
-  bool              cond_alive;
+  F32               mElapsed;
+  F32               mLife_elapsed;
+  F32               mLife_end;
+  bool              mStopped;
+  bool              mCond_alive;
 
-  U32               n_updates;
+  U32               mNum_updates;
 
-  MatrixF           updated_xfm;
-  Point3F           updated_pos;
-  Point3F           updated_aim;
-  Point3F           updated_scale;
-  LinearColorF            updated_color;
+  MatrixF           mUpdated_xfm;
+  Point3F           mUpdated_pos;
+  Point3F           mUpdated_aim;
+  Point3F           mUpdated_scale;
+  LinearColorF      mUpdated_color;
 
-  F32               fade_value;
-  F32               last_fade_value;
+  F32               mFade_value;
+  F32               mLast_fade_value;
 
-  bool              do_fade_inout;
-  bool              do_fades;
-  bool              in_scope;
-  bool              is_aborted;
+  bool              mDo_fade_inout;
+  bool              mDo_fades;
+  bool              mIn_scope;
+  bool              mIs_aborted;
 
-  U8                effect_flags;
+  U8                mEffect_flags;
 
-  afxXM_Base*       xfm_modifiers[MAX_XFM_MODIFIERS];
+  afxXM_Base*       mXfm_modifiers[MAX_XFM_MODIFIERS];
 
-  F32               live_scale_factor;
-  F32               live_fade_factor;
-  F32               terrain_altitude;
-  F32               interior_altitude;
+  F32               mLive_scale_factor;
+  F32               mLive_fade_factor;
+  F32               mTerrain_altitude;
+  F32               mInterior_altitude;
 
-  S32               group_index;
+  S32               mGroup_index;
 
 public:
   /*C*/             afxEffectWrapper();
@@ -316,18 +316,18 @@ public:
   void              ew_init(afxChoreographer*, afxEffectWrapperData*, afxConstraintMgr*, 
                             F32 time_factor);
 
-  F32               getFullLifetime() { return ew_timing.lifetime + ew_timing.fade_out_time; }
-  F32               getTimeFactor() { return time_factor; }
-  afxConstraint*    getPosConstraint() { return cons_mgr->getConstraint(pos_cons_id); }
-  afxConstraint*    getOrientConstraint() { return cons_mgr->getConstraint(orient_cons_id); }
-  afxConstraint*    getAimConstraint() { return cons_mgr->getConstraint(aim_cons_id); }
-  afxConstraint*    getLifeConstraint() { return cons_mgr->getConstraint(life_cons_id); }
-  afxChoreographer* getChoreographer() { return choreographer; }
+  F32               getFullLifetime() { return mEW_timing.lifetime + mEW_timing.fade_out_time; }
+  F32               getTimeFactor() { return mTime_factor; }
+  afxConstraint*    getPosConstraint() { return mCons_mgr->getConstraint(mPos_cons_id); }
+  afxConstraint*    getOrientConstraint() { return mCons_mgr->getConstraint(mOrient_cons_id); }
+  afxConstraint*    getAimConstraint() { return mCons_mgr->getConstraint(mAim_cons_id); }
+  afxConstraint*    getLifeConstraint() { return mCons_mgr->getConstraint(mLife_cons_id); }
+  afxChoreographer* getChoreographer() { return mChoreographer; }
 
   virtual bool      isDone();
   virtual bool      deleteWhenStopped() { return false; }
-  F32               afterStopTime() { return ew_timing.fade_out_time; } 
-  bool              isAborted() const { return is_aborted; }
+  F32               afterStopTime() { return mEW_timing.fade_out_time; }
+  bool              isAborted() const { return mIs_aborted; }
 
   void              prestart();
   bool              start(F32 timestamp);
@@ -345,11 +345,11 @@ public:
   virtual SceneObject* ea_get_scene_object() const { return 0; }
   U32               ea_get_triggers() const { return 0; }
 
-  void              getUpdatedPosition(Point3F& pos) { pos = updated_pos;}
-  void              getUpdatedTransform(MatrixF& xfm) { xfm = updated_xfm; }
-  void              getUpdatedScale(Point3F& scale) { scale = updated_scale; }
-  void              getUpdatedColor(LinearColorF& color) { color = updated_color; }
-  virtual void      getUpdatedBoxCenter(Point3F& pos) { pos = updated_pos;}
+  void              getUpdatedPosition(Point3F& pos) { pos = mUpdated_pos;}
+  void              getUpdatedTransform(MatrixF& xfm) { xfm = mUpdated_xfm; }
+  void              getUpdatedScale(Point3F& scale) { scale = mUpdated_scale; }
+  void              getUpdatedColor(LinearColorF& color) { color = mUpdated_color; }
+  virtual void      getUpdatedBoxCenter(Point3F& pos) { pos = mUpdated_pos;}
 
   virtual void      getUnconstrainedPosition(Point3F& pos) { pos.zero();}
   virtual void      getUnconstrainedTransform(MatrixF& xfm) { xfm.identity(); }
@@ -358,9 +358,9 @@ public:
   SceneObject*      getSceneObject() const { return ea_get_scene_object(); }
   U32               getTriggers() const { return ea_get_triggers(); }
 
-  F32               getMass() { return datablock->mass; }
-  Point3F           getDirection() { return datablock->direction; }
-  F32               getSpeed() { return datablock->speed; }
+  F32               getMass() { return mDatablock->mass; }
+  Point3F           getDirection() { return mDatablock->direction; }
+  F32               getSpeed() { return mDatablock->speed; }
 
   virtual TSShape*          getTSShape() { return 0; }
   virtual TSShapeInstance*  getTSShapeInstance() { return 0; }
@@ -369,14 +369,14 @@ public:
   virtual void      resetAnimation(U32 tag) { }
   virtual F32       getAnimClipDuration(const char* clip) { return 0.0f; }
 
-  void              setTerrainAltitude(F32 alt) { terrain_altitude = alt; }
-  void              setInteriorAltitude(F32 alt) { interior_altitude = alt; }
-  void              getAltitudes(F32& terr_alt, F32& inter_alt) const { terr_alt = terrain_altitude; inter_alt = interior_altitude; }
+  void              setTerrainAltitude(F32 alt) { mTerrain_altitude = alt; }
+  void              setInteriorAltitude(F32 alt) { mInterior_altitude = alt; }
+  void              getAltitudes(F32& terr_alt, F32& inter_alt) const { terr_alt = mTerrain_altitude; inter_alt = mInterior_altitude; }
 
-  void              setGroupIndex(S32 idx) { group_index = idx; }
-  S32               getGroupIndex() const { return group_index; }
+  void              setGroupIndex(S32 idx) { mGroup_index = idx; }
+  S32               getGroupIndex() const { return mGroup_index; }
 
-  bool              inScope() const { return in_scope; }
+  bool              inScope() const { return mIn_scope; }
 
 public:
   static void       initPersistFields();

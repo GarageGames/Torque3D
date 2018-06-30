@@ -458,7 +458,7 @@ DefineEngineMethod( GuiListBoxCtrl, getSelectedItems, const char*, (),,
    {
       UTF8 retFormat[12];
       dSprintf( retFormat, 12, "%d ", (*i) );
-      dStrcat( retBuffer, retFormat );
+      dStrcat( retBuffer, retFormat, 12 );
    }
 
    return retBuffer;

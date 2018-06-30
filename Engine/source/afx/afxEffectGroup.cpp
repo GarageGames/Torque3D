@@ -184,7 +184,7 @@ void afxEffectGroupData::packData(BitStream* stream)
   stream->write(timing.fade_in_time);
   stream->write(timing.fade_out_time);
 
-  pack_fx(stream, fx_list, packed);
+  pack_fx(stream, fx_list, mPacked);
 }
 
 void afxEffectGroupData::unpackData(BitStream* stream)

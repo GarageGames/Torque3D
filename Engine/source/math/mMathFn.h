@@ -237,6 +237,19 @@ inline F32 mClampF(F32 val, F32 low, F32 high)
    return (F32) getMax(getMin(val, high), low);
 }
 
+inline S32 mWrap(S32 val, S32 low, S32 high)
+{
+	int len = high - low;
+	return low + (val >= 0 ? val % len : -val % len ? len - (-val % len) : 0);
+
+}
+
+inline F32 mWrapF(F32 val, F32 low, F32 high)
+{
+	F32 t = fmod(val - low, high - low);
+	return t < 0 ? t + high : t + low;
+}
+
 /// Template function for doing a linear interpolation between any two
 /// types which implement operators for scalar multiply and addition.
 template <typename T>

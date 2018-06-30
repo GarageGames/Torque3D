@@ -42,8 +42,11 @@ setNetPort(0);
 startFileChangeNotifications();
 
 // If we have editors, initialize them here as well
-if(isFile("tools/main.cs") && !$isDedicated)
-	exec("tools/main.cs");
+if (isToolBuild())
+{
+   if(isFile("tools/main.cs") && !$isDedicated)
+      exec("tools/main.cs");
+}
 	
 ModuleDatabase.setModuleExtension("module");
 ModuleDatabase.scanModules( "data", false );

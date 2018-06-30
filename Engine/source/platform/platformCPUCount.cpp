@@ -523,7 +523,7 @@ next:
                tblPkgID[j] = apicID & PackageIDMask;
                sprintf(tmp,"  AffinityMask = %d; Initial APIC = %d; Physical ID = %d, Core ID = %d,  SMT ID = %d\n",
                   dwAffinityMask, apicID, tblPkgID[j], tblCoreID[j], tblSMTID[j]);
-               strcat(g_s3Levels, tmp);
+               dStrcat(g_s3Levels, tmp, 2048);
 
                numLPEnabled ++;   // Number of available logical processors in the system.
 

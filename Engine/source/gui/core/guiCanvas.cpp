@@ -133,7 +133,8 @@ GuiCanvas::GuiCanvas(): GuiControl(),
                         mLastRenderMs(0),
                         mPlatformWindow(NULL),
                         mDisplayWindow(true),
-                        mMenuBarCtrl(NULL)
+                        mMenuBarCtrl(nullptr),
+                        mMenuBackground(nullptr)
 {
    setBounds(0, 0, 640, 480);
    mAwake = true;
@@ -276,8 +277,6 @@ bool GuiCanvas::onAdd()
    // Define the menu bar for this canvas (if any)
    Con::executef(this, "onCreateMenu");
 
-   Sim::findObject("PlatformGenericMenubar", mMenuBarCtrl);
-
    return parentRet;
 }
 
@@ -298,25 +297,49 @@ void GuiCanvas::setMenuBar(SimObject *obj)
     mMenuBarCtrl = dynamic_cast<GuiControl*>(obj);
 
     //remove old menubar
-    if( oldMenuBar )
-        Parent::removeObject( oldMenuBar );
+    if (oldMenuBar)
+    {
+        Parent::removeObject(oldMenuBar);
+        Parent::removeObject(mMenuBackground); //also remove the modeless wrapper
+    }
 
     // set new menubar    
-    if( mMenuBarCtrl )
-        Parent::addObject(mMenuBarCtrl);
+    if (mMenuBarCtrl)
+    {
+       //Add a wrapper control so that the menubar sizes correctly
+       GuiControlProfile* profile;
+       Sim::findObject("GuiModelessDialogProfile", profile);
+
+       if (!profile)
+       {
+          Con::errorf("GuiCanvas::setMenuBar: Unable to find the GuiModelessDialogProfile profile!");
+          return;
+       }
+
+       if (mMenuBackground == nullptr)
+       {
+           mMenuBackground = new GuiControl();
+           mMenuBackground->registerObject();
+
+           mMenuBackground->setControlProfile(profile);
+       }
+
+       mMenuBackground->addObject(mMenuBarCtrl);
+
+       Parent::addObject(mMenuBackground);
+    }
 
     // update window accelerator keys
     if( oldMenuBar != mMenuBarCtrl )
     {
-        StringTableEntry ste = StringTable->insert("menubar");
-        GuiMenuBar* menu = NULL;
-        menu = !oldMenuBar ? NULL : dynamic_cast<GuiMenuBar*>(oldMenuBar->findObjectByInternalName( ste, true));
-        if( menu )
-            menu->removeWindowAcceleratorMap( *getPlatformWindow()->getInputGenerator() );
+        GuiMenuBar* oldMenu = dynamic_cast<GuiMenuBar*>(oldMenuBar);
+        GuiMenuBar* newMenu = dynamic_cast<GuiMenuBar*>(mMenuBarCtrl);
 
-        menu = !mMenuBarCtrl ? NULL : dynamic_cast<GuiMenuBar*>(mMenuBarCtrl->findObjectByInternalName( ste, true));
-        if( menu )
-                menu->buildWindowAcceleratorMap( *getPlatformWindow()->getInputGenerator() );
+        if(oldMenu)
+           oldMenu->removeWindowAcceleratorMap(*getPlatformWindow()->getInputGenerator());
+
+        if(newMenu)
+           newMenu->buildWindowAcceleratorMap(*getPlatformWindow()->getInputGenerator());
     }
 }
 
@@ -1507,9 +1530,9 @@ void GuiCanvas::popDialogControl(GuiControl *gui)
 
    if (size() > 0)
    {
-      GuiControl *ctrl = static_cast<GuiControl *>(last());
-      if( ctrl->getFirstResponder() )
-         ctrl->getFirstResponder()->setFirstResponder();
+      GuiControl *lastCtrl = static_cast<GuiControl *>(last());
+      if(lastCtrl->getFirstResponder() )
+		  lastCtrl->getFirstResponder()->setFirstResponder();
    }
    else
    {
@@ -1524,8 +1547,8 @@ void GuiCanvas::popDialogControl(GuiControl *gui)
 
    if (size() > 0)
    {
-      GuiControl *ctrl = static_cast<GuiControl*>(last());
-      ctrl->buildAcceleratorMap();
+      GuiControl *lastCtrl = static_cast<GuiControl*>(last());
+	  lastCtrl->buildAcceleratorMap();
    }
    refreshMouseControl();
 }
@@ -1633,27 +1656,26 @@ void GuiCanvas::maintainSizing()
       Point2I newPos = screenRect.point;
 
       // if menubar is active displace content gui control
-      if( mMenuBarCtrl && (ctrl == getContentControl()) )
-      {          
-          const SimObject *menu = mMenuBarCtrl->findObjectByInternalName( StringTable->insert("menubar"), true);
+      if (mMenuBarCtrl && (ctrl == getContentControl()))
+      {
+         /*const SimObject *menu = mMenuBarCtrl->findObjectByInternalName( StringTable->insert("menubar"), true);
 
-          if( !menu )
-              continue;
+         if( !menu )
+             continue;
 
-          AssertFatal( dynamic_cast<const GuiControl*>(menu), "");
+         AssertFatal( dynamic_cast<const GuiControl*>(menu), "");*/
 
-          const U32 yOffset = static_cast<const GuiControl*>(menu)->getExtent().y;
-          newPos.y += yOffset;
-          newExt.y -= yOffset;
+         const U32 yOffset = static_cast<const GuiMenuBar*>(mMenuBarCtrl)->mMenubarHeight;
+         newPos.y += yOffset;
+         newExt.y -= yOffset;
       }
 
-      if(pos != newPos || ext != newExt)
+      if (pos != newPos || ext != newExt)
       {
          ctrl->resize(newPos, newExt);
          resetUpdateRegions();
       }
    }
-
 }
 
 void GuiCanvas::setupFences()

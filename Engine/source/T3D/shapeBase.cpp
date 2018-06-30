@@ -405,17 +405,17 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
             mShape->computeBounds(collisionDetails.last(), collisionBounds.last());
             mShape->getAccelerator(collisionDetails.last());
 
-            if (!mShape->bounds.isContained(collisionBounds.last()))
+            if (!mShape->mBounds.isContained(collisionBounds.last()))
             {
                if (!silent_bbox_check)
                Con::warnf("Warning: shape %s collision detail %d (Collision-%d) bounds exceed that of shape.", shapeName, collisionDetails.size() - 1, collisionDetails.last());
-               collisionBounds.last() = mShape->bounds;
+               collisionBounds.last() = mShape->mBounds;
             }
             else if (collisionBounds.last().isValidBox() == false)
             {
                if (!silent_bbox_check)
                Con::errorf("Error: shape %s-collision detail %d (Collision-%d) bounds box invalid!", shapeName, collisionDetails.size() - 1, collisionDetails.last());
-               collisionBounds.last() = mShape->bounds;
+               collisionBounds.last() = mShape->mBounds;
             }
 
             // The way LOS works is that it will check to see if there is a LOS detail that matches
@@ -482,7 +482,7 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
       damageSequence = mShape->findSequence("Damage");
 
       //
-      F32 w = mShape->bounds.len_y() / 2;
+      F32 w = mShape->mBounds.len_y() / 2;
       if (cameraMaxDist < w)
          cameraMaxDist = w;
       // just parse up the string and collect the remappings in txr_tag_remappings.
@@ -707,7 +707,7 @@ DefineEngineMethod( ShapeBaseData, checkDeployPos, bool, ( TransformF txfm ),,
 
    MatrixF mat = txfm.getMatrix();
 
-   Box3F objBox = object->mShape->bounds;
+   Box3F objBox = object->mShape->mBounds;
    Point3F boxCenter = (objBox.minExtents + objBox.maxExtents) * 0.5f;
    objBox.minExtents = boxCenter + (objBox.minExtents - boxCenter) * 0.9f;
    objBox.maxExtents = boxCenter + (objBox.maxExtents - boxCenter) * 0.9f;
@@ -808,7 +808,7 @@ void ShapeBaseData::packData(BitStream* stream)
 
    if( stream->writeFlag( debris != NULL ) )
    {
-      stream->writeRangedU32(packed? SimObjectId((uintptr_t)debris):
+      stream->writeRangedU32(mPacked? SimObjectId((uintptr_t)debris):
                              debris->getId(),DataBlockObjectIdFirst,DataBlockObjectIdLast);
    }
 
@@ -1275,7 +1275,7 @@ bool ShapeBase::onNewDataBlock( GameBaseData *dptr, bool reload )
          }
       }
 
-      mObjBox = mDataBlock->mShape->bounds;
+      mObjBox = mDataBlock->mShape->mBounds;
       resetWorldBox();
 
       // Set the initial mesh hidden state.
@@ -2801,7 +2801,7 @@ void ShapeBase::_renderBoundingBox( ObjectRenderInst *ri, SceneRenderState *stat
          MatrixF mat;
          getRenderImageTransform( ri->objectIndex, &mat );         
 
-         const Box3F &objBox = image.shapeInstance[getImageShapeIndex(image)]->getShape()->bounds;
+         const Box3F &objBox = image.shapeInstance[getImageShapeIndex(image)]->getShape()->mBounds;
 
          drawer->drawCube( desc, objBox, ColorI( 255, 255, 255 ), &mat );
       }
@@ -3315,23 +3315,23 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
             bool datablockChange = image.dataBlock != imageData;
             if (datablockChange || (image.skinNameHandle != skinDesiredNameHandle))
             {
-               MountedImage& image = mMountedImageList[i];
-               image.scriptAnimPrefix = scriptDesiredAnimPrefix;
+               MountedImage& neoImage = mMountedImageList[i];
+			   neoImage.scriptAnimPrefix = scriptDesiredAnimPrefix;
 
                setImage(   i, imageData, 
-                           skinDesiredNameHandle, image.loaded, 
-                           image.ammo, image.triggerDown, image.altTriggerDown,
-                           image.motion, image.genericTrigger[0], image.genericTrigger[1], image.genericTrigger[2], image.genericTrigger[3],
-                           image.target);
+                           skinDesiredNameHandle, neoImage.loaded,
+                           neoImage.ammo, neoImage.triggerDown, neoImage.altTriggerDown,
+                           neoImage.motion, neoImage.genericTrigger[0], neoImage.genericTrigger[1], neoImage.genericTrigger[2], neoImage.genericTrigger[3],
+                           neoImage.target);
             }
             
             if (!datablockChange && image.scriptAnimPrefix != scriptDesiredAnimPrefix)
             {
                // We don't have a new image, but we do have a new script anim prefix to work with.
                // Notify the image of this change.
-               MountedImage& image = mMountedImageList[i];
-               image.scriptAnimPrefix = scriptDesiredAnimPrefix;
-               updateAnimThread(i, getImageShapeIndex(image));
+               MountedImage& animImage = mMountedImageList[i];
+			   animImage.scriptAnimPrefix = scriptDesiredAnimPrefix;
+               updateAnimThread(i, getImageShapeIndex(animImage));
             }
 
             bool isFiring = stream->readFlag();
@@ -3586,8 +3586,8 @@ void ShapeBaseConvex::getFeatures(const MatrixF& mat, const VectorF& n, ConvexFe
    U32 numVerts = emitString[currPos++];
    for (i = 0; i < numVerts; i++) {
       cf->mVertexList.increment();
-      U32 index = emitString[currPos++];
-      mat.mulP(pAccel->vertexList[index], &cf->mVertexList.last());
+      U32 vListIDx = emitString[currPos++];
+      mat.mulP(pAccel->vertexList[vListIDx], &cf->mVertexList.last());
    }
 
    U32 numEdges = emitString[currPos++];
@@ -3689,6 +3689,7 @@ void ShapeBase::reSkin()
 {
    if ( isGhost() && mShapeInstance && mSkinNameHandle.isValidString() )
    {
+	  mShapeInstance->resetMaterialList();
       Vector<String> skins;
       String(mSkinNameHandle.getString()).split( ";", skins );
 

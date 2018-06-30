@@ -58,7 +58,27 @@ private:
 
    Vector<Component*>         mComponents;
 
-   Vector<Component*>         mToLoadComponents;
+   //Bit of helper data to let us track and manage the adding, removal and updating of networked components
+   struct NetworkedComponent
+   {
+      U32 componentIndex;
+
+      enum UpdateState
+      {
+         None,
+         Adding,
+         Removing,
+         Updating
+      };
+
+      UpdateState updateState;
+
+      U32 updateMaskBits;
+   };
+
+   Vector<NetworkedComponent> mNetworkedComponents;
+
+   U32                        mComponentNetMask;
 
    bool                       mStartComponentUpdate;
 
@@ -69,10 +89,12 @@ private:
 
    bool mInitialized;
 
+   String mTags;
+
    Signal< void(Component*) > onComponentAdded;
    Signal< void(Component*) > onComponentRemoved;
 
-   Signal< void(MatrixF*) > onTransformSet;
+   S32                       mLifetimeMS;
 
 protected:
 
@@ -105,16 +127,20 @@ public:
    {
       TransformMask = Parent::NextFreeMask << 0,
       BoundsMask = Parent::NextFreeMask << 1,
-      ComponentsMask = Parent::NextFreeMask << 2,
-      NoWarpMask = Parent::NextFreeMask << 3,
-      NamespaceMask = Parent::NextFreeMask << 4,
-      NextFreeMask = Parent::NextFreeMask << 5
+      ComponentsUpdateMask = Parent::NextFreeMask << 2,
+      AddComponentsMask = Parent::NextFreeMask << 3,
+      RemoveComponentsMask = Parent::NextFreeMask << 4,
+      NoWarpMask = Parent::NextFreeMask << 5,
+      NamespaceMask = Parent::NextFreeMask << 6,
+      NextFreeMask = Parent::NextFreeMask << 7
    };
 
    StateDelta mDelta;
    S32 mPredictionCount;            ///< Number of ticks to predict
 
    Move lastMove;
+
+   S32      mStartTimeMS;
 
    //
    Entity();
@@ -126,14 +152,14 @@ public:
    virtual void setTransform(const MatrixF &mat);
    virtual void setRenderTransform(const MatrixF &mat);
 
-   void setTransform(Point3F position, RotationF rotation);
+   void setTransform(const Point3F& position, const RotationF& rotation);
 
-   void setRenderTransform(Point3F position, RotationF rotation);
+   void setRenderTransform(const Point3F& position, const RotationF& rotation);
 
    virtual MatrixF getTransform();
    virtual Point3F getPosition() const { return mPos; }
 
-   void setRotation(RotationF rotation) {
+   void setRotation(const RotationF& rotation) {
       mRot = rotation;
       setMaskBits(TransformMask);
    };
@@ -141,8 +167,8 @@ public:
 
    static bool _setGameObject(void *object, const char *index, const char *data);
 
-   void setMountOffset(Point3F posOffset);
-   void setMountRotation(EulerF rotOffset);
+   void setMountOffset(const Point3F& posOffset);
+   void setMountRotation(const EulerF& rotOffset);
 
    //static bool _setEulerRotation( void *object, const char *index, const char *data );
    static bool _setPosition(void *object, const char *index, const char *data);
@@ -155,7 +181,7 @@ public:
    virtual void getRenderMountTransform(F32 delta, S32 index, const MatrixF &xfm, MatrixF *outMat);
 
    virtual void mountObject(SceneObject *obj, S32 node, const MatrixF &xfm = MatrixF::Identity);
-   void mountObject(SceneObject* objB, MatrixF txfm);
+   void mountObject(SceneObject* objB, const MatrixF& txfm);
    void onMount(SceneObject *obj, S32 node);
    void onUnmount(SceneObject *obj, S32 node);
 
@@ -163,12 +189,17 @@ public:
    /// @param  client   Client that is now controlling this object
    virtual void setControllingClient(GameConnection *client);
 
+   //
+   //Networking
+   //
    // NetObject
    U32 packUpdate(NetConnection *conn, U32 mask, BitStream *stream);
    void unpackUpdate(NetConnection *conn, BitStream *stream);
 
    void setComponentsDirty();
    void setComponentDirty(Component *comp, bool forceUpdate = false);
+
+   void setComponentNetMask(Component* comp, U32 mask);
 
    //Components
    virtual bool deferAddingComponents() const { return true; }
@@ -187,7 +218,7 @@ public:
       return mComponents.size(); 
    }
 
-   virtual void setObjectBox(Box3F objBox);
+   virtual void setObjectBox(const Box3F& objBox);
 
    void resetWorldBox() { Parent::resetWorldBox(); }
    void resetObjectBox() { Parent::resetObjectBox(); }

@@ -66,9 +66,13 @@ function GuiEditCanvas::onCreateMenu(%this)
    }
    
    // Menu bar
-   %this.menuBar = new MenuBar()
+   %this.menuBar = new GuiMenuBar(GuiEditorMenubar)
    {
       dynamicItemInsertPos = 3;
+      extent = "1024 20";
+      minExtent = "320 20";
+      horizSizing = "width";
+      profile = "GuiMenuBarProfile";
       
       new PopupMenu()
       {

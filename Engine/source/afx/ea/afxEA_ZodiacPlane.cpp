@@ -174,42 +174,42 @@ bool afxEA_ZodiacPlane::ea_update(F32 dt)
   if (pzode)
   {
     //LinearColorF zode_color = zode_data->color;
-    LinearColorF zode_color = updated_color;
+    LinearColorF zode_color = mUpdated_color;
 
     if (live_color_factor > 0.0)
        zode_color.interpolate(zode_color, live_color, live_color_factor);
 
-    if (do_fades)
+    if (mDo_fades)
     {
       if (zode_data->blend_flags == afxZodiacDefs::BLEND_SUBTRACTIVE)
-        zode_color *= fade_value*live_fade_factor;
+        zode_color *= mFade_value *mLive_fade_factor;
       else
-        zode_color.alpha *= fade_value*live_fade_factor;
+        zode_color.alpha *= mFade_value * mLive_fade_factor;
     }
 
     // scale and grow zode
     //F32 zode_radius = zode_data->radius_xy*updated_scale.x + life_elapsed*zode_data->growth_rate;
-    F32 zode_radius = zode_data->radius_xy + life_elapsed*zode_data->growth_rate;
+    F32 zode_radius = zode_data->radius_xy + mLife_elapsed *zode_data->growth_rate;
 
     // zode is growing
-    if (life_elapsed < zode_data->grow_in_time)
+    if (mLife_elapsed < zode_data->grow_in_time)
     {
-      F32 t = life_elapsed/zode_data->grow_in_time;
+      F32 t = mLife_elapsed /zode_data->grow_in_time;
       zode_radius = afxEase::eq(t, 0.001f, zode_radius, 0.2f, 0.8f);
     }
     // zode is shrinking
-    else if (full_lifetime - life_elapsed < zode_data->shrink_out_time)
+    else if (mFull_lifetime - mLife_elapsed < zode_data->shrink_out_time)
     {
-      F32 t = (full_lifetime - life_elapsed)/zode_data->shrink_out_time;
+      F32 t = (mFull_lifetime - mLife_elapsed)/zode_data->shrink_out_time;
       zode_radius = afxEase::eq(t, 0.001f, zode_radius, 0.0f, 0.9f);
     }
 
-    zode_radius *= live_scale_factor;
+    zode_radius *= mLive_scale_factor;
 
     if (zode_data->respect_ori_cons && !zode_data->use_full_xfm)
     {
       VectorF shape_vec;
-      updated_xfm.getColumn(1, &shape_vec);
+	  mUpdated_xfm.getColumn(1, &shape_vec);
       shape_vec.normalize();
 
       F32 ang;
@@ -246,7 +246,7 @@ bool afxEA_ZodiacPlane::ea_update(F32 dt)
       zode_angle_offset = mRadToDeg(ang); 
     }
 
-    F32 zode_angle = zode_data->calcRotationAngle(life_elapsed, datablock->rate_factor/prop_time_factor);
+    F32 zode_angle = zode_data->calcRotationAngle(mLife_elapsed, mDatablock->rate_factor/ mProp_time_factor);
     zode_angle = mFmod(zode_angle + zode_angle_offset, 360.0f); 
     aa_rot.angle = mDegToRad(zode_angle);
     
@@ -258,13 +258,13 @@ bool afxEA_ZodiacPlane::ea_update(F32 dt)
     pzode->setRadius(zode_radius);
     if (zode_data->use_full_xfm)
     {
-      updated_xfm.mul(spin_xfm);
-      pzode->setTransform(updated_xfm);
+      mUpdated_xfm.mul(spin_xfm);
+      pzode->setTransform(mUpdated_xfm);
     }
     else
       pzode->setTransform(spin_xfm);
-    pzode->setPosition(updated_pos);
-    pzode->setScale(updated_scale);
+    pzode->setPosition(mUpdated_pos);
+    pzode->setScale(mUpdated_scale);
   }
 
   return true;
@@ -307,7 +307,7 @@ void afxEA_ZodiacPlane::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxZodiacPlaneData* orig_db = zode_data;
     zode_data = new afxZodiacPlaneData(*orig_db, true);
-    orig_db->performSubstitutions(zode_data, choreographer, group_index);
+    orig_db->performSubstitutions(zode_data, mChoreographer, mGroup_index);
   }
 }
 

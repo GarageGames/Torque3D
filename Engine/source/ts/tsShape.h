@@ -354,10 +354,10 @@ class TSShape
    /// @name Bounding
    /// @{
 
-   F32 radius;
+   F32 mRadius;
    F32 tubeRadius;
    Point3F center;
-   Box3F bounds;
+   Box3F mBounds;
 
    /// @}
 

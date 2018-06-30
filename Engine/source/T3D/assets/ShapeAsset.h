@@ -44,20 +44,34 @@
 #ifndef __RESOURCE_H__
 #include "core/resource.h"
 #endif
+#ifndef _ASSET_PTR_H_
+#include "assets/assetPtr.h"
+#endif 
+#ifndef MATERIALASSET_H
+#include "MaterialAsset.h"
+#endif
+#ifndef SHAPE_ANIMATION_ASSET_H
+#include "ShapeAnimationAsset.h"
+#endif
+
+#include "gui/editor/guiInspectorTypes.h"
 
 //-----------------------------------------------------------------------------
 class ShapeAsset : public AssetBase
 {
    typedef AssetBase Parent;
 
-   AssetManager*           mpOwningAssetManager;
-   bool                    mAssetInitialized;
-   AssetDefinition*        mpAssetDefinition;
-   U32                     mAcquireReferenceCount;
-
 protected:
    StringTableEntry   mFileName;
    Resource<TSShape>	 mShape;
+
+   //Material assets we're dependent on and use
+   Vector<StringTableEntry> mMaterialAssetIds;
+   Vector<AssetPtr<MaterialAsset>> mMaterialAssets;
+
+   //Animation assets we're dependent on and use
+   Vector<StringTableEntry> mAnimationAssetIds;
+   Vector<AssetPtr<ShapeAnimationAsset>> mAnimationAssets;
 
 public:
    ShapeAsset();
@@ -66,6 +80,8 @@ public:
    /// Engine.
    static void initPersistFields();
    virtual void copyTo(SimObject* object);
+
+   virtual void setDataField(StringTableEntry slotName, const char *array, const char *value);
 
    virtual void initializeAsset();
 
@@ -78,11 +94,37 @@ public:
 
    Resource<TSShape> getShapeResource() { return mShape; }
 
+   void SplitSequencePathAndName(String& srcPath, String& srcName);
+   String getShapeFilename() { return mFileName; }
+   
+   U32 getShapeFilenameHash() { return _StringTable::hashString(mFileName); }
+
+   S32 getMaterialCount() { return mMaterialAssets.size(); }
+   S32 getAnimationCount() { return mAnimationAssets.size(); }
+   ShapeAnimationAsset* getAnimation(S32 index);
+
 protected:
    virtual void            onAssetRefresh(void);
 };
 
-DefineConsoleType(TypeShapeAssetPtr, ShapeAsset)
+DefineConsoleType(TypeShapeAssetPtr, S32)
+
+//-----------------------------------------------------------------------------
+// TypeAssetId GuiInspectorField Class
+//-----------------------------------------------------------------------------
+class GuiInspectorTypeShapeAssetPtr : public GuiInspectorTypeFileName
+{
+   typedef GuiInspectorTypeFileName Parent;
+public:
+
+   GuiBitmapButtonCtrl  *mShapeEdButton;
+
+   DECLARE_CONOBJECT(GuiInspectorTypeShapeAssetPtr);
+   static void consoleInit();
+
+   virtual GuiControl* constructEditControl();
+   virtual bool updateRects();
+};
 
 #endif
 

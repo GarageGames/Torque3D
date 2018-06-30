@@ -71,7 +71,7 @@ public:
    void disassemble();
 
    TSSortedMesh() {
-      meshType = SortedMeshType;
+      mMeshType = SortedMeshType;
    }
 };
 

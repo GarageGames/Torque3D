@@ -320,8 +320,8 @@ Item::Item()
    mAtRest = true;
    mAtRestCounter = 0;
    mInLiquid = false;
-   delta.warpTicks = 0;
-   delta.dt = 1;
+   mDelta.warpTicks = 0;
+   mDelta.dt = 1;
    mCollisionObject = 0;
    mCollisionTimeout = 0;
    mPhysicsRep = NULL;
@@ -350,7 +350,7 @@ bool Item::onAdd()
 
    if (mStatic)
       mAtRest = true;
-   mObjToWorld.getColumn(3,&delta.pos);
+   mObjToWorld.getColumn(3,&mDelta.pos);
 
    // Setup the box for our convex object...
    mObjBox.getCenter(&mConvex.mCenter);
@@ -564,21 +564,21 @@ void Item::processTick(const Move* move)
       mCollisionObject = 0;
 
    // Warp to catch up to server
-   if (delta.warpTicks > 0)
+   if (mDelta.warpTicks > 0)
    {
-      delta.warpTicks--;
+	   mDelta.warpTicks--;
 
       // Set new pos.
       MatrixF mat = mObjToWorld;
-      mat.getColumn(3,&delta.pos);
-      delta.pos += delta.warpOffset;
-      mat.setColumn(3,delta.pos);
+      mat.getColumn(3,&mDelta.pos);
+	  mDelta.pos += mDelta.warpOffset;
+      mat.setColumn(3, mDelta.pos);
       Parent::setTransform(mat);
 
       // Backstepping
-      delta.posVec.x = -delta.warpOffset.x;
-      delta.posVec.y = -delta.warpOffset.y;
-      delta.posVec.z = -delta.warpOffset.z;
+	  mDelta.posVec.x = -mDelta.warpOffset.x;
+	  mDelta.posVec.y = -mDelta.warpOffset.y;
+	  mDelta.posVec.z = -mDelta.warpOffset.z;
    }
    else
    {
@@ -601,7 +601,7 @@ void Item::processTick(const Move* move)
       else
       {
          // Need to clear out last updatePos or warp interpolation
-         delta.posVec.set(0,0,0);
+		  mDelta.posVec.set(0,0,0);
       }
    }
 }
@@ -613,11 +613,11 @@ void Item::interpolateTick(F32 dt)
       return;
 
    // Client side interpolation
-   Point3F pos = delta.pos + delta.posVec * dt;
+   Point3F pos = mDelta.pos + mDelta.posVec * dt;
    MatrixF mat = mRenderObjToWorld;
    mat.setColumn(3,pos);
    setRenderTransform(mat);
-   delta.dt = dt;
+   mDelta.dt = dt;
 }
 
 
@@ -733,7 +733,7 @@ void Item::updatePos(const U32 /*mask*/, const F32 dt)
    // Try and move
    Point3F pos;
    mObjToWorld.getColumn(3,&pos);
-   delta.posVec = pos;
+   mDelta.posVec = pos;
 
    bool contact = false;
    bool nonStatic = false;
@@ -891,9 +891,9 @@ void Item::updatePos(const U32 /*mask*/, const F32 dt)
          if (collisionList.getTime() < 1.0)
          {
             // Set to collision point
-            F32 dt = time * collisionList.getTime();
-            pos += mVelocity * dt;
-            time -= dt;
+            F32 cdt = time * collisionList.getTime();
+            pos += mVelocity * cdt;
+            time -= cdt;
 
             // Pick the most resistant surface
             F32 bd = 0;
@@ -959,9 +959,9 @@ void Item::updatePos(const U32 /*mask*/, const F32 dt)
 
    // If on the client, calculate delta for backstepping
    if (isGhost()) {
-      delta.pos     = pos;
-      delta.posVec -= pos;
-      delta.dt = 1;
+	   mDelta.pos     = pos;
+	   mDelta.posVec -= pos;
+	   mDelta.dt = 1;
    }
 
    // Update transform
@@ -1131,40 +1131,40 @@ void Item::unpackUpdate(NetConnection *connection, BitStream *stream)
       if (stream->readFlag() && isProperlyAdded()) {
          // Determin number of ticks to warp based on the average
          // of the client and server velocities.
-         delta.warpOffset = pos - delta.pos;
+		  mDelta.warpOffset = pos - mDelta.pos;
          F32 as = (speed + mVelocity.len()) * 0.5f * TickSec;
-         F32 dt = (as > 0.00001f) ? delta.warpOffset.len() / as: sMaxWarpTicks;
-         delta.warpTicks = (S32)((dt > sMinWarpTicks)? getMax(mFloor(dt + 0.5f), 1.0f): 0.0f);
+         F32 dt = (as > 0.00001f) ? mDelta.warpOffset.len() / as: sMaxWarpTicks;
+		 mDelta.warpTicks = (S32)((dt > sMinWarpTicks)? getMax(mFloor(dt + 0.5f), 1.0f): 0.0f);
 
-         if (delta.warpTicks)
+         if (mDelta.warpTicks)
          {
             // Setup the warp to start on the next tick, only the
             // object's position is warped.
-            if (delta.warpTicks > sMaxWarpTicks)
-               delta.warpTicks = sMaxWarpTicks;
-            delta.warpOffset /= (F32)delta.warpTicks;
+            if (mDelta.warpTicks > sMaxWarpTicks)
+				mDelta.warpTicks = sMaxWarpTicks;
+			mDelta.warpOffset /= (F32)mDelta.warpTicks;
          }
          else {
             // Going to skip the warp, server and client are real close.
             // Adjust the frame interpolation to move smoothly to the
             // new position within the current tick.
-            Point3F cp = delta.pos + delta.posVec * delta.dt;
-            VectorF vec = delta.pos - cp;
+            Point3F cp = mDelta.pos + mDelta.posVec * mDelta.dt;
+            VectorF vec = mDelta.pos - cp;
             F32 vl = vec.len();
             if (vl) {
-               F32 s = delta.posVec.len() / vl;
-               delta.posVec = (cp - pos) * s;
+               F32 s = mDelta.posVec.len() / vl;
+			   mDelta.posVec = (cp - pos) * s;
             }
-            delta.pos = pos;
+			mDelta.pos = pos;
             mat.setColumn(3,pos);
          }
       }
       else {
          // Set the item to the server position
-         delta.warpTicks = 0;
-         delta.posVec.set(0,0,0);
-         delta.pos = pos;
-         delta.dt = 0;
+		  mDelta.warpTicks = 0;
+		  mDelta.posVec.set(0,0,0);
+		  mDelta.pos = pos;
+		  mDelta.dt = 0;
          mat.setColumn(3,pos);
       }
    }
@@ -1254,7 +1254,7 @@ DefineEngineMethod( Item, getLastStickyPos, const char*, (),,
                object->mStickyCollisionPos.y,
                object->mStickyCollisionPos.z);
    else
-      dStrcpy(ret, "0 0 0");
+      dStrcpy(ret, "0 0 0", bufSize);
 
    return ret;
 }
@@ -1277,7 +1277,7 @@ DefineEngineMethod( Item, getLastStickyNormal, const char *, (),,
                object->mStickyCollisionNormal.y,
                object->mStickyCollisionNormal.z);
    else
-      dStrcpy(ret, "0 0 0");
+      dStrcpy(ret, "0 0 0", bufSize);
 
    return ret;
 }

@@ -24,10 +24,10 @@
 #include <stdlib.h>
 
 #include "alMain.h"
-#include "alFilter.h"
 #include "alAuxEffectSlot.h"
 #include "alError.h"
 #include "alu.h"
+#include "filters/defs.h"
 
 
 typedef struct ALdistortionState {
@@ -37,16 +37,18 @@ typedef struct ALdistortionState {
     ALfloat Gain[MAX_OUTPUT_CHANNELS];
 
     /* Effect parameters */
-    ALfilterState lowpass;
-    ALfilterState bandpass;
+    BiquadFilter lowpass;
+    BiquadFilter bandpass;
     ALfloat attenuation;
     ALfloat edge_coeff;
+
+    ALfloat Buffer[2][BUFFERSIZE];
 } ALdistortionState;
 
 static ALvoid ALdistortionState_Destruct(ALdistortionState *state);
 static ALboolean ALdistortionState_deviceUpdate(ALdistortionState *state, ALCdevice *device);
-static ALvoid ALdistortionState_update(ALdistortionState *state, const ALCdevice *Device, const ALeffectslot *Slot, const ALeffectProps *props);
-static ALvoid ALdistortionState_process(ALdistortionState *state, ALuint SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALuint NumChannels);
+static ALvoid ALdistortionState_update(ALdistortionState *state, const ALCcontext *context, const ALeffectslot *slot, const ALeffectProps *props);
+static ALvoid ALdistortionState_process(ALdistortionState *state, ALsizei SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALsizei NumChannels);
 DECLARE_DEFAULT_ALLOCATORS(ALdistortionState)
 
 DEFINE_ALEFFECTSTATE_VTABLE(ALdistortionState);
@@ -56,9 +58,6 @@ static void ALdistortionState_Construct(ALdistortionState *state)
 {
     ALeffectState_Construct(STATIC_CAST(ALeffectState, state));
     SET_VTABLE2(ALdistortionState, ALeffectState, state);
-
-    ALfilterState_clear(&state->lowpass);
-    ALfilterState_clear(&state->bandpass);
 }
 
 static ALvoid ALdistortionState_Destruct(ALdistortionState *state)
@@ -66,125 +65,121 @@ static ALvoid ALdistortionState_Destruct(ALdistortionState *state)
     ALeffectState_Destruct(STATIC_CAST(ALeffectState,state));
 }
 
-static ALboolean ALdistortionState_deviceUpdate(ALdistortionState *UNUSED(state), ALCdevice *UNUSED(device))
+static ALboolean ALdistortionState_deviceUpdate(ALdistortionState *state, ALCdevice *UNUSED(device))
 {
+    BiquadFilter_clear(&state->lowpass);
+    BiquadFilter_clear(&state->bandpass);
     return AL_TRUE;
 }
 
-static ALvoid ALdistortionState_update(ALdistortionState *state, const ALCdevice *Device, const ALeffectslot *Slot, const ALeffectProps *props)
+static ALvoid ALdistortionState_update(ALdistortionState *state, const ALCcontext *context, const ALeffectslot *slot, const ALeffectProps *props)
 {
-    ALfloat frequency = (ALfloat)Device->Frequency;
+    const ALCdevice *device = context->Device;
+    ALfloat frequency = (ALfloat)device->Frequency;
+    ALfloat coeffs[MAX_AMBI_COEFFS];
     ALfloat bandwidth;
     ALfloat cutoff;
     ALfloat edge;
 
-    /* Store distorted signal attenuation settings */
-    state->attenuation = props->Distortion.Gain;
-
-    /* Store waveshaper edge settings */
+    /* Store waveshaper edge settings. */
     edge = sinf(props->Distortion.Edge * (F_PI_2));
     edge = minf(edge, 0.99f);
     state->edge_coeff = 2.0f * edge / (1.0f-edge);
 
-    /* Lowpass filter */
     cutoff = props->Distortion.LowpassCutoff;
-    /* Bandwidth value is constant in octaves */
+    /* Bandwidth value is constant in octaves. */
     bandwidth = (cutoff / 2.0f) / (cutoff * 0.67f);
-    ALfilterState_setParams(&state->lowpass, ALfilterType_LowPass, 1.0f,
+    /* Multiply sampling frequency by the amount of oversampling done during
+     * processing.
+     */
+    BiquadFilter_setParams(&state->lowpass, BiquadType_LowPass, 1.0f,
         cutoff / (frequency*4.0f), calc_rcpQ_from_bandwidth(cutoff / (frequency*4.0f), bandwidth)
     );
 
-    /* Bandpass filter */
     cutoff = props->Distortion.EQCenter;
-    /* Convert bandwidth in Hz to octaves */
+    /* Convert bandwidth in Hz to octaves. */
     bandwidth = props->Distortion.EQBandwidth / (cutoff * 0.67f);
-    ALfilterState_setParams(&state->bandpass, ALfilterType_BandPass, 1.0f,
+    BiquadFilter_setParams(&state->bandpass, BiquadType_BandPass, 1.0f,
         cutoff / (frequency*4.0f), calc_rcpQ_from_bandwidth(cutoff / (frequency*4.0f), bandwidth)
     );
 
-    ComputeAmbientGains(Device->Dry, Slot->Params.Gain, state->Gain);
+    CalcAngleCoeffs(0.0f, 0.0f, 0.0f, coeffs);
+    ComputeDryPanGains(&device->Dry, coeffs, slot->Params.Gain * props->Distortion.Gain,
+                       state->Gain);
 }
 
-static ALvoid ALdistortionState_process(ALdistortionState *state, ALuint SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALuint NumChannels)
+static ALvoid ALdistortionState_process(ALdistortionState *state, ALsizei SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALsizei NumChannels)
 {
+    ALfloat (*restrict buffer)[BUFFERSIZE] = state->Buffer;
     const ALfloat fc = state->edge_coeff;
-    ALuint base;
-    ALuint it;
-    ALuint ot;
-    ALuint kt;
+    ALsizei base;
+    ALsizei i, k;
 
     for(base = 0;base < SamplesToDo;)
     {
-        float buffer[2][64 * 4];
-        ALuint td = minu(64, SamplesToDo-base);
+        /* Perform 4x oversampling to avoid aliasing. Oversampling greatly
+         * improves distortion quality and allows to implement lowpass and
+         * bandpass filters using high frequencies, at which classic IIR
+         * filters became unstable.
+         */
+        ALsizei todo = mini(BUFFERSIZE, (SamplesToDo-base) * 4);
 
-        /* Perform 4x oversampling to avoid aliasing.   */
-        /* Oversampling greatly improves distortion     */
-        /* quality and allows to implement lowpass and  */
-        /* bandpass filters using high frequencies, at  */
-        /* which classic IIR filters became unstable.   */
+        /* Fill oversample buffer using zero stuffing. Multiply the sample by
+         * the amount of oversampling to maintain the signal's power.
+         */
+        for(i = 0;i < todo;i++)
+            buffer[0][i] = !(i&3) ? SamplesIn[0][(i>>2)+base] * 4.0f : 0.0f;
 
-        /* Fill oversample buffer using zero stuffing */
-        for(it = 0;it < td;it++)
+        /* First step, do lowpass filtering of original signal. Additionally
+         * perform buffer interpolation and lowpass cutoff for oversampling
+         * (which is fortunately first step of distortion). So combine three
+         * operations into the one.
+         */
+        BiquadFilter_process(&state->lowpass, buffer[1], buffer[0], todo);
+
+        /* Second step, do distortion using waveshaper function to emulate
+         * signal processing during tube overdriving. Three steps of
+         * waveshaping are intended to modify waveform without boost/clipping/
+         * attenuation process.
+         */
+        for(i = 0;i < todo;i++)
         {
-            buffer[0][it*4 + 0] = SamplesIn[0][it+base];
-            buffer[0][it*4 + 1] = 0.0f;
-            buffer[0][it*4 + 2] = 0.0f;
-            buffer[0][it*4 + 3] = 0.0f;
+            ALfloat smp = buffer[1][i];
+
+            smp = (1.0f + fc) * smp/(1.0f + fc*fabsf(smp));
+            smp = (1.0f + fc) * smp/(1.0f + fc*fabsf(smp)) * -1.0f;
+            smp = (1.0f + fc) * smp/(1.0f + fc*fabsf(smp));
+
+            buffer[0][i] = smp;
         }
 
-        /* First step, do lowpass filtering of original signal,  */
-        /* additionally perform buffer interpolation and lowpass */
-        /* cutoff for oversampling (which is fortunately first   */
-        /* step of distortion). So combine three operations into */
-        /* the one.                                              */
-        ALfilterState_process(&state->lowpass, buffer[1], buffer[0], td*4);
+        /* Third step, do bandpass filtering of distorted signal. */
+        BiquadFilter_process(&state->bandpass, buffer[1], buffer[0], todo);
 
-        /* Second step, do distortion using waveshaper function  */
-        /* to emulate signal processing during tube overdriving. */
-        /* Three steps of waveshaping are intended to modify     */
-        /* waveform without boost/clipping/attenuation process.  */
-        for(it = 0;it < td;it++)
-        {
-            for(ot = 0;ot < 4;ot++)
-            {
-                /* Restore signal power by multiplying sample by amount of oversampling */
-                ALfloat smp = buffer[1][it*4 + ot] * 4.0f;
-
-                smp = (1.0f + fc) * smp/(1.0f + fc*fabsf(smp));
-                smp = (1.0f + fc) * smp/(1.0f + fc*fabsf(smp)) * -1.0f;
-                smp = (1.0f + fc) * smp/(1.0f + fc*fabsf(smp));
-
-                buffer[1][it*4 + ot] = smp;
-            }
-        }
-
-        /* Third step, do bandpass filtering of distorted signal */
-        ALfilterState_process(&state->bandpass, buffer[0], buffer[1], td*4);
-
-        for(kt = 0;kt < NumChannels;kt++)
+        todo >>= 2;
+        for(k = 0;k < NumChannels;k++)
         {
             /* Fourth step, final, do attenuation and perform decimation,
-             * store only one sample out of 4.
+             * storing only one sample out of four.
              */
-            ALfloat gain = state->Gain[kt] * state->attenuation;
+            ALfloat gain = state->Gain[k];
             if(!(fabsf(gain) > GAIN_SILENCE_THRESHOLD))
                 continue;
 
-            for(it = 0;it < td;it++)
-                SamplesOut[kt][base+it] += gain * buffer[0][it*4];
+            for(i = 0;i < todo;i++)
+                SamplesOut[k][base+i] += gain * buffer[1][i*4];
         }
 
-        base += td;
+        base += todo;
     }
 }
 
 
-typedef struct ALdistortionStateFactory {
-    DERIVE_FROM_TYPE(ALeffectStateFactory);
-} ALdistortionStateFactory;
+typedef struct DistortionStateFactory {
+    DERIVE_FROM_TYPE(EffectStateFactory);
+} DistortionStateFactory;
 
-static ALeffectState *ALdistortionStateFactory_create(ALdistortionStateFactory *UNUSED(factory))
+static ALeffectState *DistortionStateFactory_create(DistortionStateFactory *UNUSED(factory))
 {
     ALdistortionState *state;
 
@@ -194,23 +189,21 @@ static ALeffectState *ALdistortionStateFactory_create(ALdistortionStateFactory *
     return STATIC_CAST(ALeffectState, state);
 }
 
-DEFINE_ALEFFECTSTATEFACTORY_VTABLE(ALdistortionStateFactory);
+DEFINE_EFFECTSTATEFACTORY_VTABLE(DistortionStateFactory);
 
 
-ALeffectStateFactory *ALdistortionStateFactory_getFactory(void)
+EffectStateFactory *DistortionStateFactory_getFactory(void)
 {
-    static ALdistortionStateFactory DistortionFactory = { { GET_VTABLE2(ALdistortionStateFactory, ALeffectStateFactory) } };
+    static DistortionStateFactory DistortionFactory = { { GET_VTABLE2(DistortionStateFactory, EffectStateFactory) } };
 
-    return STATIC_CAST(ALeffectStateFactory, &DistortionFactory);
+    return STATIC_CAST(EffectStateFactory, &DistortionFactory);
 }
 
 
-void ALdistortion_setParami(ALeffect *UNUSED(effect), ALCcontext *context, ALenum UNUSED(param), ALint UNUSED(val))
-{ SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM); }
-void ALdistortion_setParamiv(ALeffect *effect, ALCcontext *context, ALenum param, const ALint *vals)
-{
-    ALdistortion_setParami(effect, context, param, vals[0]);
-}
+void ALdistortion_setParami(ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, ALint UNUSED(val))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid distortion integer property 0x%04x", param); }
+void ALdistortion_setParamiv(ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, const ALint *UNUSED(vals))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid distortion integer-vector property 0x%04x", param); }
 void ALdistortion_setParamf(ALeffect *effect, ALCcontext *context, ALenum param, ALfloat val)
 {
     ALeffectProps *props = &effect->Props;
@@ -218,49 +211,46 @@ void ALdistortion_setParamf(ALeffect *effect, ALCcontext *context, ALenum param,
     {
         case AL_DISTORTION_EDGE:
             if(!(val >= AL_DISTORTION_MIN_EDGE && val <= AL_DISTORTION_MAX_EDGE))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Distortion edge out of range");
             props->Distortion.Edge = val;
             break;
 
         case AL_DISTORTION_GAIN:
             if(!(val >= AL_DISTORTION_MIN_GAIN && val <= AL_DISTORTION_MAX_GAIN))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Distortion gain out of range");
             props->Distortion.Gain = val;
             break;
 
         case AL_DISTORTION_LOWPASS_CUTOFF:
             if(!(val >= AL_DISTORTION_MIN_LOWPASS_CUTOFF && val <= AL_DISTORTION_MAX_LOWPASS_CUTOFF))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Distortion low-pass cutoff out of range");
             props->Distortion.LowpassCutoff = val;
             break;
 
         case AL_DISTORTION_EQCENTER:
             if(!(val >= AL_DISTORTION_MIN_EQCENTER && val <= AL_DISTORTION_MAX_EQCENTER))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Distortion EQ center out of range");
             props->Distortion.EQCenter = val;
             break;
 
         case AL_DISTORTION_EQBANDWIDTH:
             if(!(val >= AL_DISTORTION_MIN_EQBANDWIDTH && val <= AL_DISTORTION_MAX_EQBANDWIDTH))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Distortion EQ bandwidth out of range");
             props->Distortion.EQBandwidth = val;
             break;
 
         default:
-            SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM);
+            alSetError(context, AL_INVALID_ENUM, "Invalid distortion float property 0x%04x",
+                       param);
     }
 }
 void ALdistortion_setParamfv(ALeffect *effect, ALCcontext *context, ALenum param, const ALfloat *vals)
-{
-    ALdistortion_setParamf(effect, context, param, vals[0]);
-}
+{ ALdistortion_setParamf(effect, context, param, vals[0]); }
 
-void ALdistortion_getParami(const ALeffect *UNUSED(effect), ALCcontext *context, ALenum UNUSED(param), ALint *UNUSED(val))
-{ SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM); }
-void ALdistortion_getParamiv(const ALeffect *effect, ALCcontext *context, ALenum param, ALint *vals)
-{
-    ALdistortion_getParami(effect, context, param, vals);
-}
+void ALdistortion_getParami(const ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, ALint *UNUSED(val))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid distortion integer property 0x%04x", param); }
+void ALdistortion_getParamiv(const ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, ALint *UNUSED(vals))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid distortion integer-vector property 0x%04x", param); }
 void ALdistortion_getParamf(const ALeffect *effect, ALCcontext *context, ALenum param, ALfloat *val)
 {
     const ALeffectProps *props = &effect->Props;
@@ -287,12 +277,11 @@ void ALdistortion_getParamf(const ALeffect *effect, ALCcontext *context, ALenum 
             break;
 
         default:
-            SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM);
+            alSetError(context, AL_INVALID_ENUM, "Invalid distortion float property 0x%04x",
+                       param);
     }
 }
 void ALdistortion_getParamfv(const ALeffect *effect, ALCcontext *context, ALenum param, ALfloat *vals)
-{
-    ALdistortion_getParamf(effect, context, param, vals);
-}
+{ ALdistortion_getParamf(effect, context, param, vals); }
 
 DEFINE_ALEFFECT_VTABLE(ALdistortion);

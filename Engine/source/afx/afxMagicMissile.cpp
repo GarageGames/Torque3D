@@ -446,8 +446,9 @@ bool afxMagicMissileData::onAdd()
       Vector<char*> dataBlocks(__FILE__, __LINE__);
 
       // make a copy of points_string
-      char* tokCopy = new char[dStrlen(wiggle_axis_string) + 1];
-      dStrcpy(tokCopy, wiggle_axis_string);
+      dsize_t tokCopyLen = dStrlen(wiggle_axis_string) + 1;
+      char* tokCopy = new char[tokCopyLen];
+      dStrcpy(tokCopy, wiggle_axis_string, tokCopyLen);
 
       // extract tokens one by one, adding them to dataBlocks
       char* currTok = dStrtok(tokCopy, " \t");
@@ -531,9 +532,9 @@ bool afxMagicMissileData::preload(bool server, String &errorStr)
             Con::errorf(ConsoleLogEntry::General, "ProjectileData::preload: Invalid packet, bad datablockId(decal): %d", decalId);
       */
 
-      String errorStr;
-      if( !sfxResolve( &sound, errorStr ) )
-         Con::errorf(ConsoleLogEntry::General, "afxMagicMissileData::preload: Invalid packet: %s", errorStr.c_str());
+      String sfxErrorStr;
+      if( !sfxResolve( &sound, sfxErrorStr) )
+         Con::errorf(ConsoleLogEntry::General, "afxMagicMissileData::preload: Invalid packet: %s", sfxErrorStr.c_str());
 
       if (!lightDesc && lightDescId != 0)
          if (Sim::findObject(lightDescId, lightDesc) == false)
@@ -1116,7 +1117,7 @@ bool afxMagicMissile::onAdd()
 
    // Setup our bounding box
    if (bool(mDataBlock->projectileShape) == true)
-      mObjBox = mDataBlock->projectileShape->bounds;
+      mObjBox = mDataBlock->projectileShape->mBounds;
    else
       mObjBox = Box3F(Point3F(0, 0, 0), Point3F(0, 0, 0));
    resetWorldBox();
@@ -1863,7 +1864,7 @@ SceneObject* afxMagicMissile::get_default_launcher() const
   if (mDataBlock->reverse_targeting)
   {
     if (dynamic_cast<afxMagicSpell*>(choreographer))
-      launch_cons_obj = ((afxMagicSpell*)choreographer)->target;
+      launch_cons_obj = ((afxMagicSpell*)choreographer)->mTarget;
     if (!launch_cons_obj)
     {
       Con::errorf("afxMagicMissile::get_launch_data(): missing target constraint object for reverse targeted missile.");
@@ -1873,7 +1874,7 @@ SceneObject* afxMagicMissile::get_default_launcher() const
   else
   {
     if (dynamic_cast<afxMagicSpell*>(choreographer))
-      launch_cons_obj = ((afxMagicSpell*)choreographer)->caster;
+      launch_cons_obj = ((afxMagicSpell*)choreographer)->mCaster;
     if (!launch_cons_obj)
     {
       Con::errorf("afxMagicMissile::get_launch_data(): missing launch constraint object missile.");
@@ -2035,17 +2036,17 @@ void afxMagicMissile::launch()
   {
     if (mDataBlock->reverse_targeting)
     {
-      missile_target = spell->caster;
-      collide_exempt = spell->target;
+      missile_target = spell->mCaster;
+      collide_exempt = spell->mTarget;
     }
     else
     {
-      missile_target = spell->target;
-      collide_exempt = spell->caster;
+      missile_target = spell->mTarget;
+      collide_exempt = spell->mCaster;
     }
 
-    if (spell->caster)
-      processAfter(spell->caster);
+    if (spell->mCaster)
+      processAfter(spell->mCaster);
     if (missile_target)
       deleteNotify(missile_target);
     if (collide_exempt)

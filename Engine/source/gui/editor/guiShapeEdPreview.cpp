@@ -366,8 +366,8 @@ bool GuiShapeEdPreview::setObjectModel(const char* modelName)
       mOrbitPos = shape->center;
 
       // Set camera move and zoom speed according to model size
-      mMoveSpeed = shape->radius / sMoveScaler;
-      mZoomSpeed = shape->radius / sZoomScaler;
+      mMoveSpeed = shape->mRadius / sMoveScaler;
+      mZoomSpeed = shape->mRadius / sZoomScaler;
 
       // Reset node selection
       mHoverNode = -1;
@@ -853,7 +853,7 @@ void GuiShapeEdPreview::exportToCollada( const String& path )
    if ( mModel )
    {
       MatrixF orientation( true );
-      orientation.setPosition( mModel->getShape()->bounds.getCenter() );
+      orientation.setPosition( mModel->getShape()->mBounds.getCenter() );
       orientation.inverse();
 
       OptimizedPolyList polyList;
@@ -926,8 +926,8 @@ void GuiShapeEdPreview::handleMouseDown(const GuiEvent& event, GizmoMode mode)
       }
    }
 
-   if ( mode == RotateMode )
-      mRenderCameraAxes = true;
+   //if ( mode == RotateMode )
+   //   mRenderCameraAxes = true;
 }
 
 void GuiShapeEdPreview::handleMouseUp(const GuiEvent& event, GizmoMode mode)
@@ -941,8 +941,8 @@ void GuiShapeEdPreview::handleMouseUp(const GuiEvent& event, GizmoMode mode)
       mGizmo->on3DMouseUp( mLastEvent );
    }
 
-   if ( mode == RotateMode )
-      mRenderCameraAxes = false;
+   //if ( mode == RotateMode )
+   //   mRenderCameraAxes = false;
 }
 
 void GuiShapeEdPreview::handleMouseMove(const GuiEvent& event, GizmoMode mode)
@@ -1138,8 +1138,8 @@ bool GuiShapeEdPreview::getCameraTransform(MatrixF* cameraMatrix)
       cameraMatrix->identity();
       if ( mModel )
       {
-         Point3F camPos = mModel->getShape()->bounds.getCenter();
-         F32 offset = mModel->getShape()->bounds.len();
+         Point3F camPos = mModel->getShape()->mBounds.getCenter();
+         F32 offset = mModel->getShape()->mBounds.len();
 
          switch (mDisplayType)
          {
@@ -1164,6 +1164,19 @@ void GuiShapeEdPreview::computeSceneBounds(Box3F& bounds)
 {
    if ( mModel )
       mModel->computeBounds( mCurrentDL, bounds );
+
+   if (bounds.getExtents().x < POINT_EPSILON || bounds.getExtents().y < POINT_EPSILON || bounds.getExtents().z < POINT_EPSILON)
+   {
+      bounds.set(Point3F::Zero);
+
+      //We probably don't have any actual meshes in this model, so compute using the bones if we have them
+      for (S32 i = 0; i < mModel->getShape()->nodes.size(); i++)
+      {
+         Point3F nodePos = mModel->mNodeTransforms[i].getPosition();
+
+         bounds.extend(nodePos);
+      }
+   }
 }
 
 void GuiShapeEdPreview::updateDetailLevel(const SceneRenderState* state)
@@ -1231,9 +1244,9 @@ void GuiShapeEdPreview::updateDetailLevel(const SceneRenderState* state)
             continue;
 
          // Count the number of draw calls and materials
-         mNumDrawCalls += mesh->primitives.size();
-         for ( S32 iPrim = 0; iPrim < mesh->primitives.size(); iPrim++ )
-            usedMaterials.push_back_unique( mesh->primitives[iPrim].matIndex & TSDrawPrimitive::MaterialMask );
+         mNumDrawCalls += mesh->mPrimitives.size();
+         for ( S32 iPrim = 0; iPrim < mesh->mPrimitives.size(); iPrim++ )
+            usedMaterials.push_back_unique( mesh->mPrimitives[iPrim].matIndex & TSDrawPrimitive::MaterialMask );
 
          // For skinned meshes, count the number of bones and weights
          if ( mesh->getMeshType() == TSMesh::SkinMeshType )
@@ -1429,7 +1442,7 @@ void GuiShapeEdPreview::renderWorld(const RectI &updateRect)
       // Render the shape bounding box
       if ( mRenderBounds )
       {
-         Point3F boxSize = mModel->getShape()->bounds.maxExtents - mModel->getShape()->bounds.minExtents;
+         Point3F boxSize = mModel->getShape()->mBounds.maxExtents - mModel->getShape()->mBounds.minExtents;
 
          GFXStateBlockDesc desc;
          desc.fillMode = GFXFillWireframe;
@@ -1531,7 +1544,7 @@ void GuiShapeEdPreview::renderSunDirection() const
    {
       // Render four arrows aiming in the direction of the sun's light
       ColorI color = LinearColorF( mFakeSun->getColor()).toColorI();
-      F32 length = mModel->getShape()->bounds.len() * 0.8f;
+      F32 length = mModel->getShape()->mBounds.len() * 0.8f;
 
       // Get the sun's vectors
       Point3F fwd = mFakeSun->getTransform().getForwardVector();

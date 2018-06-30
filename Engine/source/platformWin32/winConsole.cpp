@@ -176,12 +176,12 @@ void WinConsole::process()
          S32 outpos = 0;
 
          ReadConsoleInput(stdIn, rec, 20, &numEvents);
-         DWORD i;
-         for(i = 0; i < numEvents; i++)
+         DWORD evt;
+         for(evt = 0; evt < numEvents; evt++)
          {
-            if(rec[i].EventType == KEY_EVENT)
+            if(rec[evt].EventType == KEY_EVENT)
             {
-               KEY_EVENT_RECORD *ke = &(rec[i].Event.KeyEvent);
+               KEY_EVENT_RECORD *ke = &(rec[evt].Event.KeyEvent);
                if(ke->bKeyDown)
                {
                   switch (ke->uChar.AsciiChar)

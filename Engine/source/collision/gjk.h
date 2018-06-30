@@ -43,17 +43,17 @@ struct GjkCollisionState: public CollisionState
 {
    /// @name Temporary values
    /// @{
-   Point3F p[4];     ///< support points of object A in local coordinates
-   Point3F q[4];     ///< support points of object B in local coordinates
-   VectorF y[4];     ///< support points of A - B in world coordinates
+   Point3F mP[4];     ///< support points of object A in local coordinates
+   Point3F mQ[4];     ///< support points of object B in local coordinates
+   VectorF mY[4];     ///< support points of A - B in world coordinates
 
-   S32 bits;         ///< identifies current simplex
-   S32 all_bits;     ///< all_bits = bits | last_bit
-   F32 det[16][4];   ///< cached sub-determinants
-   F32 dp[4][4];     ///< cached dot products
+   S32 mBits;         ///< identifies current simplex
+   S32 mAll_bits;     ///< all_bits = bits | last_bit
+   F32 mDet[16][4];   ///< cached sub-determinants
+   F32 mDP[4][4];     ///< cached dot products
 
-   S32 last;         ///< identifies last found support point
-   S32 last_bit;     ///< last_bit = 1<<last
+   S32 mLast;         ///< identifies last found support point
+   S32 mLast_bit;     ///< last_bit = 1<<last
    /// @}
 
    ///

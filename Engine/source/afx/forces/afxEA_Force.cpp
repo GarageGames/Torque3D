@@ -95,7 +95,7 @@ bool afxEA_Force::ea_start()
 
   do_runtime_substitutions();
 
-  force_set_mgr = choreographer->getForceSetMgr();
+  force_set_mgr = mChoreographer->getForceSetMgr();
 
   return true;
 }
@@ -109,7 +109,7 @@ bool afxEA_Force::ea_update(F32 dt)
     {
       delete force;
       force = 0;
-      Con::errorf(ConsoleLogEntry::General, "Force effect failed to instantiate. (%s)", datablock->getName());
+      Con::errorf(ConsoleLogEntry::General, "Force effect failed to instantiate. (%s)", mDatablock->getName());
       return false;
     }
     force->onNewDataBlock(force_data, false);
@@ -123,8 +123,8 @@ bool afxEA_Force::ea_update(F32 dt)
 
   if (force) // && in_scope)
   {
-    if (do_fades)
-      force->setFadeAmount(fade_value);
+    if (mDo_fades)
+      force->setFadeAmount(mFade_value);
     
     force->update(dt);
   }
@@ -145,7 +145,7 @@ void afxEA_Force::ea_finish(bool was_stopped)
 
 void afxEA_Force::do_runtime_substitutions()
 {
-  force_data = force_data->cloneAndPerformSubstitutions(choreographer, group_index);
+  force_data = force_data->cloneAndPerformSubstitutions(mChoreographer, mGroup_index);
 }
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//

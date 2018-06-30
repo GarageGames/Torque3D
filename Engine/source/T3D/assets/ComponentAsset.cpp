@@ -74,7 +74,7 @@ ConsoleSetType(TypeComponentAssetPtr)
       if (pAssetPtr == NULL)
       {
          // No, so fail.
-         //Con::warnf("(TypeTextureAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
+         //Con::warnf("(TypeComponentAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
          return;
       }
 
@@ -85,24 +85,20 @@ ConsoleSetType(TypeComponentAssetPtr)
    }
 
    // Warn.
-   Con::warnf("(TypeTextureAssetPtr) - Cannot set multiple args to a single asset.");
+   Con::warnf("(TypeComponentAssetPtr) - Cannot set multiple args to a single asset.");
 }
 
 //-----------------------------------------------------------------------------
 
-ComponentAsset::ComponentAsset() :
-   mpOwningAssetManager(NULL),
-   mAssetInitialized(false),
-   mAcquireReferenceCount(0)
+ComponentAsset::ComponentAsset()
 {
-   // Generate an asset definition.
-   mpAssetDefinition = new AssetDefinition();
+   mComponentName = StringTable->EmptyString();
+   mComponentClass = StringTable->EmptyString();
+   mFriendlyName = StringTable->EmptyString();
+   mComponentType = StringTable->EmptyString();
+   mDescription = StringTable->EmptyString();
 
-   mComponentName = StringTable->lookup("");
-   mComponentClass = StringTable->lookup("");
-   mFriendlyName = StringTable->lookup("");
-   mComponentType = StringTable->lookup("");
-   mDescription = StringTable->lookup("");
+   mScriptFile = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
@@ -127,6 +123,8 @@ void ComponentAsset::initPersistFields()
    addField("friendlyName", TypeString, Offset(mFriendlyName, ComponentAsset), "The human-readble name for the component.");
    addField("componentType", TypeString, Offset(mComponentType, ComponentAsset), "The category of the component for organizing in the editor.");
    addField("description", TypeString, Offset(mDescription, ComponentAsset), "Simple description of the component.");
+
+   addField("scriptFile", TypeString, Offset(mScriptFile, ComponentAsset), "A script file with additional scripted functionality for this component.");
 }
 
 //------------------------------------------------------------------------------
@@ -135,4 +133,16 @@ void ComponentAsset::copyTo(SimObject* object)
 {
    // Call to parent.
    Parent::copyTo(object);
+}
+
+void ComponentAsset::initializeAsset()
+{
+   if(Platform::isFile(mScriptFile))
+      Con::executeFile(mScriptFile, false, false);
+}
+
+void ComponentAsset::onAssetRefresh()
+{
+   if (Platform::isFile(mScriptFile))
+      Con::executeFile(mScriptFile, false, false);
 }

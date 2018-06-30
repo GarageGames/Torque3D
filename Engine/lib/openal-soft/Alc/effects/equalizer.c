@@ -24,10 +24,10 @@
 #include <stdlib.h>
 
 #include "alMain.h"
-#include "alFilter.h"
 #include "alAuxEffectSlot.h"
 #include "alError.h"
 #include "alu.h"
+#include "filters/defs.h"
 
 
 /*  The document  "Effects Extension Guide.pdf"  says that low and high  *
@@ -72,25 +72,25 @@
  * http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt                   */
 
 
-/* The maximum number of sample frames per update. */
-#define MAX_UPDATE_SAMPLES 256
-
 typedef struct ALequalizerState {
     DERIVE_FROM_TYPE(ALeffectState);
 
-    /* Effect gains for each channel */
-    ALfloat Gain[MAX_EFFECT_CHANNELS][MAX_OUTPUT_CHANNELS];
+    struct {
+        /* Effect gains for each channel */
+        ALfloat CurrentGains[MAX_OUTPUT_CHANNELS];
+        ALfloat TargetGains[MAX_OUTPUT_CHANNELS];
 
-    /* Effect parameters */
-    ALfilterState filter[4][MAX_EFFECT_CHANNELS];
+        /* Effect parameters */
+        BiquadFilter filter[4];
+    } Chans[MAX_EFFECT_CHANNELS];
 
-    ALfloat SampleBuffer[4][MAX_EFFECT_CHANNELS][MAX_UPDATE_SAMPLES];
+    ALfloat SampleBuffer[MAX_EFFECT_CHANNELS][BUFFERSIZE];
 } ALequalizerState;
 
 static ALvoid ALequalizerState_Destruct(ALequalizerState *state);
 static ALboolean ALequalizerState_deviceUpdate(ALequalizerState *state, ALCdevice *device);
-static ALvoid ALequalizerState_update(ALequalizerState *state, const ALCdevice *device, const ALeffectslot *slot, const ALeffectProps *props);
-static ALvoid ALequalizerState_process(ALequalizerState *state, ALuint SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALuint NumChannels);
+static ALvoid ALequalizerState_update(ALequalizerState *state, const ALCcontext *context, const ALeffectslot *slot, const ALeffectProps *props);
+static ALvoid ALequalizerState_process(ALequalizerState *state, ALsizei SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALsizei NumChannels);
 DECLARE_DEFAULT_ALLOCATORS(ALequalizerState)
 
 DEFINE_ALEFFECTSTATE_VTABLE(ALequalizerState);
@@ -98,18 +98,8 @@ DEFINE_ALEFFECTSTATE_VTABLE(ALequalizerState);
 
 static void ALequalizerState_Construct(ALequalizerState *state)
 {
-    int it, ft;
-
     ALeffectState_Construct(STATIC_CAST(ALeffectState, state));
     SET_VTABLE2(ALequalizerState, ALeffectState, state);
-
-    /* Initialize sample history only on filter creation to avoid */
-    /* sound clicks if filter settings were changed in runtime.   */
-    for(it = 0; it < 4; it++)
-    {
-        for(ft = 0;ft < MAX_EFFECT_CHANNELS;ft++)
-            ALfilterState_clear(&state->filter[it][ft]);
-    }
 }
 
 static ALvoid ALequalizerState_Destruct(ALequalizerState *state)
@@ -117,131 +107,100 @@ static ALvoid ALequalizerState_Destruct(ALequalizerState *state)
     ALeffectState_Destruct(STATIC_CAST(ALeffectState,state));
 }
 
-static ALboolean ALequalizerState_deviceUpdate(ALequalizerState *UNUSED(state), ALCdevice *UNUSED(device))
+static ALboolean ALequalizerState_deviceUpdate(ALequalizerState *state, ALCdevice *UNUSED(device))
 {
+    ALsizei i, j;
+
+    for(i = 0; i < MAX_EFFECT_CHANNELS;i++)
+    {
+        for(j = 0;j < 4;j++)
+            BiquadFilter_clear(&state->Chans[i].filter[j]);
+        for(j = 0;j < MAX_OUTPUT_CHANNELS;j++)
+            state->Chans[i].CurrentGains[j] = 0.0f;
+    }
     return AL_TRUE;
 }
 
-static ALvoid ALequalizerState_update(ALequalizerState *state, const ALCdevice *device, const ALeffectslot *slot, const ALeffectProps *props)
+static ALvoid ALequalizerState_update(ALequalizerState *state, const ALCcontext *context, const ALeffectslot *slot, const ALeffectProps *props)
 {
+    const ALCdevice *device = context->Device;
     ALfloat frequency = (ALfloat)device->Frequency;
-    ALfloat gain, freq_mult;
+    ALfloat gain, f0norm;
     ALuint i;
 
     STATIC_CAST(ALeffectState,state)->OutBuffer = device->FOAOut.Buffer;
     STATIC_CAST(ALeffectState,state)->OutChannels = device->FOAOut.NumChannels;
     for(i = 0;i < MAX_EFFECT_CHANNELS;i++)
-        ComputeFirstOrderGains(device->FOAOut, IdentityMatrixf.m[i],
-                               slot->Params.Gain, state->Gain[i]);
+        ComputeFirstOrderGains(&device->FOAOut, IdentityMatrixf.m[i],
+                               slot->Params.Gain, state->Chans[i].TargetGains);
 
     /* Calculate coefficients for the each type of filter. Note that the shelf
      * filters' gain is for the reference frequency, which is the centerpoint
      * of the transition band.
      */
-    gain = sqrtf(props->Equalizer.LowGain);
-    freq_mult = props->Equalizer.LowCutoff/frequency;
-    ALfilterState_setParams(&state->filter[0][0], ALfilterType_LowShelf,
-        gain, freq_mult, calc_rcpQ_from_slope(gain, 0.75f)
+    gain = maxf(sqrtf(props->Equalizer.LowGain), 0.0625f); /* Limit -24dB */
+    f0norm = props->Equalizer.LowCutoff/frequency;
+    BiquadFilter_setParams(&state->Chans[0].filter[0], BiquadType_LowShelf,
+        gain, f0norm, calc_rcpQ_from_slope(gain, 0.75f)
     );
+
+    gain = maxf(props->Equalizer.Mid1Gain, 0.0625f);
+    f0norm = props->Equalizer.Mid1Center/frequency;
+    BiquadFilter_setParams(&state->Chans[0].filter[1], BiquadType_Peaking,
+        gain, f0norm, calc_rcpQ_from_bandwidth(
+            f0norm, props->Equalizer.Mid1Width
+        )
+    );
+
+    gain = maxf(props->Equalizer.Mid2Gain, 0.0625f);
+    f0norm = props->Equalizer.Mid2Center/frequency;
+    BiquadFilter_setParams(&state->Chans[0].filter[2], BiquadType_Peaking,
+        gain, f0norm, calc_rcpQ_from_bandwidth(
+            f0norm, props->Equalizer.Mid2Width
+        )
+    );
+
+    gain = maxf(sqrtf(props->Equalizer.HighGain), 0.0625f);
+    f0norm = props->Equalizer.HighCutoff/frequency;
+    BiquadFilter_setParams(&state->Chans[0].filter[3], BiquadType_HighShelf,
+        gain, f0norm, calc_rcpQ_from_slope(gain, 0.75f)
+    );
+
     /* Copy the filter coefficients for the other input channels. */
     for(i = 1;i < MAX_EFFECT_CHANNELS;i++)
     {
-        state->filter[0][i].a1 = state->filter[0][0].a1;
-        state->filter[0][i].a2 = state->filter[0][0].a2;
-        state->filter[0][i].b0 = state->filter[0][0].b0;
-        state->filter[0][i].b1 = state->filter[0][0].b1;
-        state->filter[0][i].b2 = state->filter[0][0].b2;
-    }
-
-    gain = props->Equalizer.Mid1Gain;
-    freq_mult = props->Equalizer.Mid1Center/frequency;
-    ALfilterState_setParams(&state->filter[1][0], ALfilterType_Peaking,
-        gain, freq_mult, calc_rcpQ_from_bandwidth(
-            freq_mult, props->Equalizer.Mid1Width
-        )
-    );
-    for(i = 1;i < MAX_EFFECT_CHANNELS;i++)
-    {
-        state->filter[1][i].a1 = state->filter[1][0].a1;
-        state->filter[1][i].a2 = state->filter[1][0].a2;
-        state->filter[1][i].b0 = state->filter[1][0].b0;
-        state->filter[1][i].b1 = state->filter[1][0].b1;
-        state->filter[1][i].b2 = state->filter[1][0].b2;
-    }
-
-    gain = props->Equalizer.Mid2Gain;
-    freq_mult = props->Equalizer.Mid2Center/frequency;
-    ALfilterState_setParams(&state->filter[2][0], ALfilterType_Peaking,
-        gain, freq_mult, calc_rcpQ_from_bandwidth(
-            freq_mult, props->Equalizer.Mid2Width
-        )
-    );
-    for(i = 1;i < MAX_EFFECT_CHANNELS;i++)
-    {
-        state->filter[2][i].a1 = state->filter[2][0].a1;
-        state->filter[2][i].a2 = state->filter[2][0].a2;
-        state->filter[2][i].b0 = state->filter[2][0].b0;
-        state->filter[2][i].b1 = state->filter[2][0].b1;
-        state->filter[2][i].b2 = state->filter[2][0].b2;
-    }
-
-    gain = sqrtf(props->Equalizer.HighGain);
-    freq_mult = props->Equalizer.HighCutoff/frequency;
-    ALfilterState_setParams(&state->filter[3][0], ALfilterType_HighShelf,
-        gain, freq_mult, calc_rcpQ_from_slope(gain, 0.75f)
-    );
-    for(i = 1;i < MAX_EFFECT_CHANNELS;i++)
-    {
-        state->filter[3][i].a1 = state->filter[3][0].a1;
-        state->filter[3][i].a2 = state->filter[3][0].a2;
-        state->filter[3][i].b0 = state->filter[3][0].b0;
-        state->filter[3][i].b1 = state->filter[3][0].b1;
-        state->filter[3][i].b2 = state->filter[3][0].b2;
+        BiquadFilter_copyParams(&state->Chans[i].filter[0], &state->Chans[0].filter[0]);
+        BiquadFilter_copyParams(&state->Chans[i].filter[1], &state->Chans[0].filter[1]);
+        BiquadFilter_copyParams(&state->Chans[i].filter[2], &state->Chans[0].filter[2]);
+        BiquadFilter_copyParams(&state->Chans[i].filter[3], &state->Chans[0].filter[3]);
     }
 }
 
-static ALvoid ALequalizerState_process(ALequalizerState *state, ALuint SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALuint NumChannels)
+static ALvoid ALequalizerState_process(ALequalizerState *state, ALsizei SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALsizei NumChannels)
 {
-    ALfloat (*Samples)[MAX_EFFECT_CHANNELS][MAX_UPDATE_SAMPLES] = state->SampleBuffer;
-    ALuint it, kt, ft;
-    ALuint base;
+    ALfloat (*restrict temps)[BUFFERSIZE] = state->SampleBuffer;
+    ALsizei c;
 
-    for(base = 0;base < SamplesToDo;)
+    for(c = 0;c < MAX_EFFECT_CHANNELS;c++)
     {
-        ALuint td = minu(MAX_UPDATE_SAMPLES, SamplesToDo-base);
+        BiquadFilter_process(&state->Chans[c].filter[0], temps[0], SamplesIn[c], SamplesToDo);
+        BiquadFilter_process(&state->Chans[c].filter[1], temps[1], temps[0], SamplesToDo);
+        BiquadFilter_process(&state->Chans[c].filter[2], temps[2], temps[1], SamplesToDo);
+        BiquadFilter_process(&state->Chans[c].filter[3], temps[3], temps[2], SamplesToDo);
 
-        for(ft = 0;ft < MAX_EFFECT_CHANNELS;ft++)
-            ALfilterState_process(&state->filter[0][ft], Samples[0][ft], &SamplesIn[ft][base], td);
-        for(ft = 0;ft < MAX_EFFECT_CHANNELS;ft++)
-            ALfilterState_process(&state->filter[1][ft], Samples[1][ft], Samples[0][ft], td);
-        for(ft = 0;ft < MAX_EFFECT_CHANNELS;ft++)
-            ALfilterState_process(&state->filter[2][ft], Samples[2][ft], Samples[1][ft], td);
-        for(ft = 0;ft < MAX_EFFECT_CHANNELS;ft++)
-            ALfilterState_process(&state->filter[3][ft], Samples[3][ft], Samples[2][ft], td);
-
-        for(ft = 0;ft < MAX_EFFECT_CHANNELS;ft++)
-        {
-            for(kt = 0;kt < NumChannels;kt++)
-            {
-                ALfloat gain = state->Gain[ft][kt];
-                if(!(fabsf(gain) > GAIN_SILENCE_THRESHOLD))
-                    continue;
-
-                for(it = 0;it < td;it++)
-                    SamplesOut[kt][base+it] += gain * Samples[3][ft][it];
-            }
-        }
-
-        base += td;
+        MixSamples(temps[3], NumChannels, SamplesOut,
+            state->Chans[c].CurrentGains, state->Chans[c].TargetGains,
+            SamplesToDo, 0, SamplesToDo
+        );
     }
 }
 
 
-typedef struct ALequalizerStateFactory {
-    DERIVE_FROM_TYPE(ALeffectStateFactory);
-} ALequalizerStateFactory;
+typedef struct EqualizerStateFactory {
+    DERIVE_FROM_TYPE(EffectStateFactory);
+} EqualizerStateFactory;
 
-ALeffectState *ALequalizerStateFactory_create(ALequalizerStateFactory *UNUSED(factory))
+ALeffectState *EqualizerStateFactory_create(EqualizerStateFactory *UNUSED(factory))
 {
     ALequalizerState *state;
 
@@ -251,22 +210,20 @@ ALeffectState *ALequalizerStateFactory_create(ALequalizerStateFactory *UNUSED(fa
     return STATIC_CAST(ALeffectState, state);
 }
 
-DEFINE_ALEFFECTSTATEFACTORY_VTABLE(ALequalizerStateFactory);
+DEFINE_EFFECTSTATEFACTORY_VTABLE(EqualizerStateFactory);
 
-ALeffectStateFactory *ALequalizerStateFactory_getFactory(void)
+EffectStateFactory *EqualizerStateFactory_getFactory(void)
 {
-    static ALequalizerStateFactory EqualizerFactory = { { GET_VTABLE2(ALequalizerStateFactory, ALeffectStateFactory) } };
+    static EqualizerStateFactory EqualizerFactory = { { GET_VTABLE2(EqualizerStateFactory, EffectStateFactory) } };
 
-    return STATIC_CAST(ALeffectStateFactory, &EqualizerFactory);
+    return STATIC_CAST(EffectStateFactory, &EqualizerFactory);
 }
 
 
-void ALequalizer_setParami(ALeffect *UNUSED(effect), ALCcontext *context, ALenum UNUSED(param), ALint UNUSED(val))
-{ SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM); }
-void ALequalizer_setParamiv(ALeffect *effect, ALCcontext *context, ALenum param, const ALint *vals)
-{
-    ALequalizer_setParami(effect, context, param, vals[0]);
-}
+void ALequalizer_setParami(ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, ALint UNUSED(val))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid equalizer integer property 0x%04x", param); }
+void ALequalizer_setParamiv(ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, const ALint *UNUSED(vals))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid equalizer integer-vector property 0x%04x", param); }
 void ALequalizer_setParamf(ALeffect *effect, ALCcontext *context, ALenum param, ALfloat val)
 {
     ALeffectProps *props = &effect->Props;
@@ -274,79 +231,75 @@ void ALequalizer_setParamf(ALeffect *effect, ALCcontext *context, ALenum param, 
     {
         case AL_EQUALIZER_LOW_GAIN:
             if(!(val >= AL_EQUALIZER_MIN_LOW_GAIN && val <= AL_EQUALIZER_MAX_LOW_GAIN))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Equalizer low-band gain out of range");
             props->Equalizer.LowGain = val;
             break;
 
         case AL_EQUALIZER_LOW_CUTOFF:
             if(!(val >= AL_EQUALIZER_MIN_LOW_CUTOFF && val <= AL_EQUALIZER_MAX_LOW_CUTOFF))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Equalizer low-band cutoff out of range");
             props->Equalizer.LowCutoff = val;
             break;
 
         case AL_EQUALIZER_MID1_GAIN:
             if(!(val >= AL_EQUALIZER_MIN_MID1_GAIN && val <= AL_EQUALIZER_MAX_MID1_GAIN))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Equalizer mid1-band gain out of range");
             props->Equalizer.Mid1Gain = val;
             break;
 
         case AL_EQUALIZER_MID1_CENTER:
             if(!(val >= AL_EQUALIZER_MIN_MID1_CENTER && val <= AL_EQUALIZER_MAX_MID1_CENTER))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Equalizer mid1-band center out of range");
             props->Equalizer.Mid1Center = val;
             break;
 
         case AL_EQUALIZER_MID1_WIDTH:
             if(!(val >= AL_EQUALIZER_MIN_MID1_WIDTH && val <= AL_EQUALIZER_MAX_MID1_WIDTH))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Equalizer mid1-band width out of range");
             props->Equalizer.Mid1Width = val;
             break;
 
         case AL_EQUALIZER_MID2_GAIN:
             if(!(val >= AL_EQUALIZER_MIN_MID2_GAIN && val <= AL_EQUALIZER_MAX_MID2_GAIN))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Equalizer mid2-band gain out of range");
             props->Equalizer.Mid2Gain = val;
             break;
 
         case AL_EQUALIZER_MID2_CENTER:
             if(!(val >= AL_EQUALIZER_MIN_MID2_CENTER && val <= AL_EQUALIZER_MAX_MID2_CENTER))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Equalizer mid2-band center out of range");
             props->Equalizer.Mid2Center = val;
             break;
 
         case AL_EQUALIZER_MID2_WIDTH:
             if(!(val >= AL_EQUALIZER_MIN_MID2_WIDTH && val <= AL_EQUALIZER_MAX_MID2_WIDTH))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Equalizer mid2-band width out of range");
             props->Equalizer.Mid2Width = val;
             break;
 
         case AL_EQUALIZER_HIGH_GAIN:
             if(!(val >= AL_EQUALIZER_MIN_HIGH_GAIN && val <= AL_EQUALIZER_MAX_HIGH_GAIN))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Equalizer high-band gain out of range");
             props->Equalizer.HighGain = val;
             break;
 
         case AL_EQUALIZER_HIGH_CUTOFF:
             if(!(val >= AL_EQUALIZER_MIN_HIGH_CUTOFF && val <= AL_EQUALIZER_MAX_HIGH_CUTOFF))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Equalizer high-band cutoff out of range");
             props->Equalizer.HighCutoff = val;
             break;
 
         default:
-            SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM);
+            alSetError(context, AL_INVALID_ENUM, "Invalid equalizer float property 0x%04x", param);
     }
 }
 void ALequalizer_setParamfv(ALeffect *effect, ALCcontext *context, ALenum param, const ALfloat *vals)
-{
-    ALequalizer_setParamf(effect, context, param, vals[0]);
-}
+{ ALequalizer_setParamf(effect, context, param, vals[0]); }
 
-void ALequalizer_getParami(const ALeffect *UNUSED(effect), ALCcontext *context, ALenum UNUSED(param), ALint *UNUSED(val))
-{ SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM); }
-void ALequalizer_getParamiv(const ALeffect *effect, ALCcontext *context, ALenum param, ALint *vals)
-{
-    ALequalizer_getParami(effect, context, param, vals);
-}
+void ALequalizer_getParami(const ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, ALint *UNUSED(val))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid equalizer integer property 0x%04x", param); }
+void ALequalizer_getParamiv(const ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, ALint *UNUSED(vals))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid equalizer integer-vector property 0x%04x", param); }
 void ALequalizer_getParamf(const ALeffect *effect, ALCcontext *context, ALenum param, ALfloat *val)
 {
     const ALeffectProps *props = &effect->Props;
@@ -393,12 +346,10 @@ void ALequalizer_getParamf(const ALeffect *effect, ALCcontext *context, ALenum p
             break;
 
         default:
-            SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM);
+            alSetError(context, AL_INVALID_ENUM, "Invalid equalizer float property 0x%04x", param);
     }
 }
 void ALequalizer_getParamfv(const ALeffect *effect, ALCcontext *context, ALenum param, ALfloat *vals)
-{
-    ALequalizer_getParamf(effect, context, param, vals);
-}
+{ ALequalizer_getParamf(effect, context, param, vals); }
 
 DEFINE_ALEFFECT_VTABLE(ALequalizer);

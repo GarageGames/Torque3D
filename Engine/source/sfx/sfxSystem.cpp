@@ -647,7 +647,7 @@ void SFXSystem::deleteWhenStopped( SFXSource* source )
    // If the source isn't already on the play-once source list,
    // put it there now.
    
-   Vector< SFXSource* >::iterator iter = find( mPlayOnceSources.begin(), mPlayOnceSources.end(), source );
+   Vector< SFXSource* >::iterator iter = T3D::find( mPlayOnceSources.begin(), mPlayOnceSources.end(), source );
    if( iter == mPlayOnceSources.end() )
       mPlayOnceSources.push_back( source );
 }
@@ -674,9 +674,9 @@ void SFXSystem::_onRemoveSource( SFXSource* source )
 {
    // Check if it was a play once source.
    
-   Vector< SFXSource* >::iterator iter = find( mPlayOnceSources.begin(), mPlayOnceSources.end(), source );
-   if ( iter != mPlayOnceSources.end() )
-      mPlayOnceSources.erase_fast( iter );
+   Vector< SFXSource* >::iterator sourceIter = T3D::find( mPlayOnceSources.begin(), mPlayOnceSources.end(), source );
+   if (sourceIter != mPlayOnceSources.end() )
+      mPlayOnceSources.erase_fast(sourceIter);
 
    // Update the stats.
    
@@ -684,9 +684,9 @@ void SFXSystem::_onRemoveSource( SFXSource* source )
    
    if( dynamic_cast< SFXSound* >( source ) )
    {
-      SFXSoundVector::iterator iter = find( mSounds.begin(), mSounds.end(), static_cast< SFXSound* >( source ) );
-      if( iter != mSounds.end() )
-         mSounds.erase_fast( iter );
+      SFXSoundVector::iterator vectorIter = T3D::find( mSounds.begin(), mSounds.end(), static_cast< SFXSound* >( source ) );
+      if(vectorIter != mSounds.end() )
+         mSounds.erase_fast(vectorIter);
          
       mStatNumSounds = mSounds.size();
    }

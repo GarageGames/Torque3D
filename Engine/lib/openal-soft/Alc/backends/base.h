@@ -5,6 +5,10 @@
 #include "threads.h"
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct ClockLatency {
     ALint64 ClockTime;
     ALint64 Latency;
@@ -43,7 +47,6 @@ struct ALCbackendVtable {
     void (*const Destruct)(ALCbackend*);
 
     ALCenum (*const open)(ALCbackend*, const ALCchar*);
-    void (*const close)(ALCbackend*);
 
     ALCboolean (*const reset)(ALCbackend*);
     ALCboolean (*const start)(ALCbackend*);
@@ -63,7 +66,6 @@ struct ALCbackendVtable {
 #define DEFINE_ALCBACKEND_VTABLE(T)                                           \
 DECLARE_THUNK(T, ALCbackend, void, Destruct)                                  \
 DECLARE_THUNK1(T, ALCbackend, ALCenum, open, const ALCchar*)                  \
-DECLARE_THUNK(T, ALCbackend, void, close)                                     \
 DECLARE_THUNK(T, ALCbackend, ALCboolean, reset)                               \
 DECLARE_THUNK(T, ALCbackend, ALCboolean, start)                               \
 DECLARE_THUNK(T, ALCbackend, void, stop)                                      \
@@ -79,7 +81,6 @@ static const struct ALCbackendVtable T##_ALCbackend_vtable = {                \
     T##_ALCbackend_Destruct,                                                  \
                                                                               \
     T##_ALCbackend_open,                                                      \
-    T##_ALCbackend_close,                                                     \
     T##_ALCbackend_reset,                                                     \
     T##_ALCbackend_start,                                                     \
     T##_ALCbackend_stop,                                                      \
@@ -137,17 +138,31 @@ static const struct ALCbackendFactoryVtable T##_ALCbackendFactory_vtable = {  \
 
 ALCbackendFactory *ALCpulseBackendFactory_getFactory(void);
 ALCbackendFactory *ALCalsaBackendFactory_getFactory(void);
+ALCbackendFactory *ALCcoreAudioBackendFactory_getFactory(void);
 ALCbackendFactory *ALCossBackendFactory_getFactory(void);
 ALCbackendFactory *ALCjackBackendFactory_getFactory(void);
 ALCbackendFactory *ALCsolarisBackendFactory_getFactory(void);
-ALCbackendFactory *ALCmmdevBackendFactory_getFactory(void);
+ALCbackendFactory *ALCsndioBackendFactory_getFactory(void);
+ALCbackendFactory *ALCqsaBackendFactory_getFactory(void);
+ALCbackendFactory *ALCwasapiBackendFactory_getFactory(void);
 ALCbackendFactory *ALCdsoundBackendFactory_getFactory(void);
 ALCbackendFactory *ALCwinmmBackendFactory_getFactory(void);
 ALCbackendFactory *ALCportBackendFactory_getFactory(void);
+ALCbackendFactory *ALCopenslBackendFactory_getFactory(void);
 ALCbackendFactory *ALCnullBackendFactory_getFactory(void);
 ALCbackendFactory *ALCwaveBackendFactory_getFactory(void);
+ALCbackendFactory *ALCsdl2BackendFactory_getFactory(void);
 ALCbackendFactory *ALCloopbackFactory_getFactory(void);
 
-ALCbackend *create_backend_wrapper(ALCdevice *device, const BackendFuncs *funcs, ALCbackend_Type type);
+
+inline void ALCdevice_Lock(ALCdevice *device)
+{ V0(device->Backend,lock)(); }
+
+inline void ALCdevice_Unlock(ALCdevice *device)
+{ V0(device->Backend,unlock)(); }
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* AL_BACKENDS_BASE_H */

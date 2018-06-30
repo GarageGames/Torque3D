@@ -21,9 +21,11 @@
 #include "SDL_endian.h"
 /* #include <sys/types.h> */
 
+#define _IEEE_LIBM
 #define attribute_hidden
 #define libm_hidden_proto(x)
 #define libm_hidden_def(x)
+#define strong_alias(x, y)
 
 #ifndef __HAIKU__ /* already defined in a system header. */
 typedef unsigned int u_int32_t;
@@ -35,8 +37,11 @@ typedef unsigned int u_int32_t;
 #define cos             SDL_uclibc_cos
 #define fabs            SDL_uclibc_fabs
 #define floor           SDL_uclibc_floor
+#define __ieee754_fmod  SDL_uclibc_fmod
 #define __ieee754_log   SDL_uclibc_log
+#define __ieee754_log10 SDL_uclibc_log10
 #define __ieee754_pow   SDL_uclibc_pow
+#define scalbln         SDL_uclibc_scalbln
 #define scalbn          SDL_uclibc_scalbn
 #define sin             SDL_uclibc_sin
 #define __ieee754_sqrt  SDL_uclibc_sqrt

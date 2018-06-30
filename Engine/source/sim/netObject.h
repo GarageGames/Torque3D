@@ -132,8 +132,8 @@ struct GhostInfo;
 ///       // the ScopeAlways flag indicates that the object is always scoped
 ///       // on all active connections.
 ///       mNetFlags.set(ScopeAlways | Ghostable);
-///       dStrcpy(message1, "Hello World 1!");
-///       dStrcpy(message2, "Hello World 2!");
+///       dStrcpy(message1, "Hello World 1!", bufLen);
+///       dStrcpy(message2, "Hello World 2!", bufLen);
 ///    }
 /// @endcode
 ///
@@ -187,12 +187,12 @@ struct GhostInfo;
 ///    void setMessage1(const char *msg)
 ///    {
 ///       setMaskBits(Message1Mask);
-///       dStrcpy(message1, msg);
+///       dStrcpy(message1, msg, bufLen);
 ///    }
 ///    void setMessage2(const char *msg)
 ///    {
 ///       setMaskBits(Message2Mask);
-///       dStrcpy(message2, msg);
+///       dStrcpy(message2, msg, bufLen);
 ///    }
 /// @endcode
 ///
@@ -411,17 +411,68 @@ public:
 
    /// @}
 protected:
-   U16           scope_id;
-   U16           scope_refs;
-   bool          scope_registered;
+   U16           mScope_id;
+   U16           mScope_refs;
+   bool          mScope_registered;
    virtual void  onScopeIdChange() { }
 public:
    enum { SCOPE_ID_BITS = 14 };
-   U16           getScopeId() const { return scope_id; }
+   U16           getScopeId() const { return mScope_id; }
    U16           addScopeRef();
    void          removeScopeRef();
-   void          setScopeRegistered(bool flag) { scope_registered = flag; }
-   bool          getScopeRegistered() const { return scope_registered; }
+   void          setScopeRegistered(bool flag) { mScope_registered = flag; }
+   bool          getScopeRegistered() const { return mScope_registered; }
+
+protected:
+   /// Add a networked field
+   ///
+   /// A networked field is a regular field but with a bitmask flag associated to it.
+   /// When the field is set, it automatically triggers a call to setMaskBits with the mask associated to the field
+   /// in order to streamline simple networking code
+   /// Register a complex field.
+   ///
+   /// @param  in_pFieldname     Name of the field.
+   /// @param  in_fieldType      Type of the field. @see ConsoleDynamicTypes
+   /// @param  in_fieldOffset    Offset to  the field from the start of the class; calculated using the Offset() macro.
+   /// @param  in_elementCount   Number of elements in this field. Arrays of elements are assumed to be contiguous in memory.
+   /// @param  in_pFieldDocs     Usage string for this field. @see console_autodoc
+   static void addNetworkedField(const char*   in_pFieldname,
+      const U32     in_fieldType,
+      const dsize_t in_fieldOffset,
+      const U32     in_elementCount = 1,
+      const char*   in_pFieldDocs = NULL,
+      U32 flags = 0,
+      U32 networkMask = 0);
+
+   static void addNetworkedField(const char*   in_pFieldname,
+      const U32     in_fieldType,
+      const dsize_t in_fieldOffset,
+      AbstractClassRep::WriteDataNotify in_writeDataFn,
+      const U32     in_elementCount = 1,
+      const char*   in_pFieldDocs = NULL,
+      U32 flags = 0,
+      U32 networkMask = 0);
+
+   /// Register a simple field.
+   ///
+   /// @param  in_pFieldname  Name of the field.
+   /// @param  in_fieldType   Type of the field. @see ConsoleDynamicTypes
+   /// @param  in_fieldOffset Offset to  the field from the start of the class; calculated using the Offset() macro.
+   /// @param  in_pFieldDocs  Usage string for this field. @see console_autodoc
+   static void addNetworkedField(const char*   in_pFieldname,
+      const U32     in_fieldType,
+      const dsize_t in_fieldOffset,
+      const char*   in_pFieldDocs,
+      U32 flags = 0,
+      U32 networkMask = 0);
+
+   static void addNetworkedField(const char*   in_pFieldname,
+      const U32     in_fieldType,
+      const dsize_t in_fieldOffset,
+      AbstractClassRep::WriteDataNotify in_writeDataFn,
+      const char*   in_pFieldDocs,
+      U32 flags = 0,
+      U32 networkMask = 0);
 };
 
 //-----------------------------------------------------------------------------

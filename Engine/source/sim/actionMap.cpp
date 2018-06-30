@@ -245,11 +245,11 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
       else
       {
          // IMPORTANT -- do NOT change the following line, it identifies the file as an input map file
-         dStrcpy( lineBuffer, "// Torque Input Map File\n" );
+         dStrcpy( lineBuffer, "// Torque Input Map File\n", 1024 );
          iostrm->write( dStrlen( lineBuffer ), lineBuffer );
       }
 
-      dSprintf(lineBuffer, 1023, "if (isObject(%s)) %s.delete();\n"
+      dSprintf(lineBuffer, 1024, "if (isObject(%s)) %s.delete();\n"
                                  "new ActionMap(%s);\n", getName(), getName(), getName());
       iostrm->write(dStrlen(lineBuffer), lineBuffer);
 
@@ -269,9 +269,15 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
             if (getKeyString(rNode.action, objectbuffer) == false)
                continue;
 
-            const char* command = (rNode.flags & Node::BindCmd) ? "bindCmd" : "bind";
+            const char* command;
+            if (rNode.flags & Node::BindCmd)
+               command = "bindCmd";
+            else if (rNode.flags & Node::Held)
+               command = "held";
+            else
+               command = "bind";
 
-            dSprintf(lineBuffer, 1023, "%s.%s(%s, \"%s%s\"",
+            dSprintf(lineBuffer, 1024, "%s.%s(%s, \"%s%s\"",
                                         getName(),
                                         command,
                                         devbuffer,
@@ -292,44 +298,53 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
                   buff[curr++] = 'I';
                buff[curr] = '\0';
 
-               dStrcat(lineBuffer, buff);
+               dStrcat(lineBuffer, buff, 1024);
             }
 
             if (rNode.flags & Node::HasDeadZone) {
                char buff[64];
                dSprintf(buff, 63, ", \"%g %g\"", rNode.deadZoneBegin, rNode.deadZoneEnd);
-               dStrcat(lineBuffer, buff);
+               dStrcat(lineBuffer, buff, 1024);
             }
 
             if (rNode.flags & Node::HasScale) {
                char buff[64];
                dSprintf(buff, 63, ", %g", rNode.scaleFactor);
-               dStrcat(lineBuffer, buff);
+               dStrcat(lineBuffer, buff, 1024);
             }
 
             if (rNode.flags & Node::BindCmd) {
                if (rNode.makeConsoleCommand) {
-                  dStrcat(lineBuffer, ", \"");
+                  dStrcat(lineBuffer, ", \"", 1024);
                   U32 pos = dStrlen(lineBuffer);
                   expandEscape(lineBuffer + pos, rNode.makeConsoleCommand);
-                  dStrcat(lineBuffer, "\"");
+                  dStrcat(lineBuffer, "\"", 1024);
                } else {
-                  dStrcat(lineBuffer, ", \"\"");
+                  dStrcat(lineBuffer, ", \"\"", 1024);
                }
                if (rNode.breakConsoleCommand) {
-                  dStrcat(lineBuffer, ", \"");
+                  dStrcat(lineBuffer, ", \"", 1024);
                   U32 pos = dStrlen(lineBuffer);
                   expandEscape(lineBuffer + pos, rNode.breakConsoleCommand);
-                  dStrcat(lineBuffer, "\"");
+                  dStrcat(lineBuffer, "\"", 1024);
                }
                else
-                  dStrcat(lineBuffer, ", \"\"");
-            } else {
-               dStrcat(lineBuffer, ", ");
-               dStrcat(lineBuffer, rNode.consoleFunction);
+                  dStrcat(lineBuffer, ", \"\"", 1024);
+            }
+            else if (rNode.flags & Node::Held) 
+            {
+               dStrcat(lineBuffer, ", ", 1024);
+               dStrcat(lineBuffer, rNode.consoleFunction, 1024);
+
+               dStrcat(lineBuffer, ", ", 1024);
+               dStrcat(lineBuffer, rNode.contextEvent->mConsoleFunctionHeld, 1024);
+            } 
+            else {
+               dStrcat(lineBuffer, ", ", 1024);
+               dStrcat(lineBuffer, rNode.consoleFunction, 1024);
             }
 
-            dStrcat(lineBuffer, ");\n");
+            dStrcat(lineBuffer, ");\n", 1024);
             iostrm->write(dStrlen(lineBuffer), lineBuffer);
          }
       }
@@ -353,10 +368,16 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
             if (getKeyString(rNode.action, keybuffer) == false)
                continue;
 
-            const char* command = (rNode.flags & Node::BindCmd) ? "bindCmd" : "bind";
+            const char* command;
+            if (rNode.flags & Node::BindCmd)
+               command = "bindCmd";
+            else if (rNode.flags & Node::Held)
+               command = "held";
+            else
+               command = "bind";
 
             char finalBuffer[1024];
-            dSprintf(finalBuffer, 1023, "%s.%s(%s, \"%s%s\"",
+            dSprintf(finalBuffer, 1024, "%s.%s(%s, \"%s%s\"",
                                         getName(),
                                         command,
                                         devbuffer,
@@ -377,42 +398,51 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
                   buff[curr++] = 'I';
                buff[curr] = '\0';
 
-               dStrcat(finalBuffer, buff);
+               dStrcat(finalBuffer, buff, 1024);
             }
 
             if (rNode.flags & Node::HasDeadZone) {
                char buff[64];
                dSprintf(buff, 63, ", \"%g %g\"", rNode.deadZoneBegin, rNode.deadZoneEnd);
-               dStrcat(finalBuffer, buff);
+               dStrcat(finalBuffer, buff, 1024);
             }
 
             if (rNode.flags & Node::HasScale) {
                char buff[64];
                dSprintf(buff, 63, ", %g", rNode.scaleFactor);
-               dStrcat(finalBuffer, buff);
+               dStrcat(finalBuffer, buff, 1024);
             }
 
             if (rNode.flags & Node::BindCmd) {
                if (rNode.makeConsoleCommand) {
-                  dStrcat(finalBuffer, ", \"");
-                  dStrcat(finalBuffer, rNode.makeConsoleCommand);
-                  dStrcat(finalBuffer, "\"");
+                  dStrcat(finalBuffer, ", \"", 1024);
+                  dStrcat(finalBuffer, rNode.makeConsoleCommand, 1024);
+                  dStrcat(finalBuffer, "\"", 1024);
                } else {
-                  dStrcat(finalBuffer, ", \"\"");
+                  dStrcat(finalBuffer, ", \"\"", 1024);
                }
                if (rNode.breakConsoleCommand) {
-                  dStrcat(finalBuffer, ", \"");
-                  dStrcat(finalBuffer, rNode.breakConsoleCommand);
-                  dStrcat(finalBuffer, "\"");
+                  dStrcat(finalBuffer, ", \"", 1024);
+                  dStrcat(finalBuffer, rNode.breakConsoleCommand, 1024);
+                  dStrcat(finalBuffer, "\"", 1024);
                }
                else
-                  dStrcat(finalBuffer, ", \"\"");
-            } else {
-               dStrcat(finalBuffer, ", ");
-               dStrcat(finalBuffer, rNode.consoleFunction);
+                  dStrcat(finalBuffer, ", \"\"", 1024);
+            }
+            else if (rNode.flags & Node::Held)
+            {
+               dStrcat(finalBuffer, ", ", 1024);
+               dStrcat(finalBuffer, rNode.consoleFunction, 1024);
+
+               dStrcat(finalBuffer, ", ", 1024);
+               dStrcat(finalBuffer, rNode.contextEvent->mConsoleFunctionHeld, 1024);
+            } 
+            else {
+               dStrcat(finalBuffer, ", ", 1024);
+               dStrcat(finalBuffer, rNode.consoleFunction, 1024);
             }
 
-            dStrcat(finalBuffer, ");");
+            dStrcat(finalBuffer, ");", 1024);
             Con::printf(finalBuffer);
          }
       }
@@ -423,7 +453,7 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
 bool ActionMap::createEventDescriptor(const char* pEventString, EventDescriptor* pDescriptor)
 {
    char copyBuffer[256];
-   dStrcpy(copyBuffer, pEventString);
+   dStrcpy(copyBuffer, pEventString, 256);
 
    // Do we have modifiers?
    char* pSpace = dStrchr(copyBuffer, ' ');
@@ -756,8 +786,8 @@ const char* ActionMap::getBinding( const char* command )
          {
             dSprintf( buffer, sizeof( buffer ), "%s\t%s%s", deviceBuffer, modifierString, keyBuffer );
             if ( returnString[0] )
-               dStrcat( returnString, "\t" );
-            dStrcat( returnString, buffer );
+               dStrcat( returnString, "\t", 1024 );
+            dStrcat( returnString, buffer, 1024 );
          }
       }
 
@@ -794,6 +824,17 @@ const char* ActionMap::getCommand( const char* device, const char* action )
                      ( mapNode->breakConsoleCommand ? mapNode->breakConsoleCommand : "" ) );             
                return( returnString );
             }              
+            if (mapNode->flags & Node::Held)
+            {
+               S32 bufferLen = dStrlen(mapNode->consoleFunction) + dStrlen(mapNode->contextEvent->mConsoleFunctionHeld) + 2;
+               char* returnString = Con::getReturnBuffer(bufferLen);
+
+               dSprintf(returnString, bufferLen, "%st%s",
+                  (mapNode->consoleFunction ? mapNode->consoleFunction : ""),
+                  (mapNode->contextEvent->mConsoleFunctionHeld ? mapNode->contextEvent->mConsoleFunctionHeld : ""));
+
+               return(returnString);
+            }
             else
                return( mapNode->consoleFunction );             
          }
@@ -867,8 +908,9 @@ const char* ActionMap::getDeadZone( const char* device, const char* action )
             {
                char buf[64];
                dSprintf( buf, sizeof( buf ), "%g %g", mapNode->deadZoneBegin, mapNode->deadZoneEnd );
-               char* returnString = Con::getReturnBuffer( dStrlen( buf ) + 1 );
-               dStrcpy( returnString, buf );
+               dsize_t returnLen = dStrlen(buf) + 1;
+               char* returnString = Con::getReturnBuffer( returnLen );
+               dStrcpy( returnString, buf, returnLen );
                return( returnString );
             }
             else
@@ -954,7 +996,7 @@ bool ActionMap::getDeviceName(const U32 deviceType, const U32 deviceInstance, ch
 {
    switch (deviceType) {
      case KeyboardDeviceType:
-      dStrcpy(buffer, "keyboard");
+      dStrcpy(buffer, "keyboard", 16);
       break;
 
      case MouseDeviceType:
@@ -1094,7 +1136,7 @@ bool ActionMap::getKeyString(const U32 action, char* buffer)
       for (U32 i = 0; gAsciiMap[i].asciiCode != 0xFFFF; i++) {
          if (gAsciiMap[i].asciiCode == asciiCode)
          {
-            dStrcpy(buffer, gAsciiMap[i].pDescription);
+            dStrcpy(buffer, gAsciiMap[i].pDescription, 16);
             return true;
          }
       }
@@ -1118,14 +1160,14 @@ bool ActionMap::getKeyString(const U32 action, char* buffer)
       }
       //for (U32 i = 0; gVirtualMap[i].code != 0xFFFFFFFF; i++) {
       //   if (gVirtualMap[i].code == action) {
-      //      dStrcpy(buffer, gVirtualMap[i].pDescription);
+      //      dStrcpy(buffer, gVirtualMap[i].pDescription, 16);
       //      return true;
       //   }
       //}
       const char* desc = INPUTMGR->findVirtualMapDescFromCode(action);
       if(desc)
       {
-         dStrcpy(buffer, desc);
+         dStrcpy(buffer, desc, 16);
          return true;
       }
    }
@@ -1311,6 +1353,76 @@ bool ActionMap::processBind(const U32 argc, const char** argv, SimObject* object
 }
 
 //------------------------------------------------------------------------------
+bool ActionMap::processHoldBind(const char *device, const char *action, const char *holdFunc, const char *tapFunc, const U32 holdTime, const bool holdOnly, const bool retHoldTime)
+{
+   U32 deviceType;
+   U32 deviceInst;
+
+   if (!getDeviceTypeAndInstance(device, deviceType, deviceInst))
+   {
+      Con::printf("processBindCmd: unknown device: %s", device);
+      return false;
+   }
+
+   // Ok, we now have the deviceType and instance.  Create an event descriptor  
+   //  for the bind...  
+   //  
+   EventDescriptor eventDescriptor;
+   if (createEventDescriptor(action, &eventDescriptor) == false) {
+      Con::printf("Could not create a description for binding: %s", action);
+      return false;
+   }
+
+   // SI_POV == SI_MOVE, and the POV works fine with bindCmd, so we have to add these manually.  
+   if ((eventDescriptor.eventCode == SI_XAXIS) ||
+      (eventDescriptor.eventCode == SI_YAXIS) ||
+      (eventDescriptor.eventCode == SI_ZAXIS) ||
+      (eventDescriptor.eventCode == SI_RXAXIS) ||
+      (eventDescriptor.eventCode == SI_RYAXIS) ||
+      (eventDescriptor.eventCode == SI_RZAXIS) ||
+      (eventDescriptor.eventCode == SI_SLIDER) ||
+      (eventDescriptor.eventCode == SI_XPOV) ||
+      (eventDescriptor.eventCode == SI_YPOV) ||
+      (eventDescriptor.eventCode == SI_XPOV2) ||
+      (eventDescriptor.eventCode == SI_YPOV2))
+   {
+      Con::warnf("ActionMap::processBindCmd - Cannot use 'bindCmd' with a move event type. Use 'bind' instead.");
+      return false;
+   }
+
+   // Event has now been described, and device determined.  we need now to extract  
+   //  any modifiers that the action map will apply to incoming events before  
+   //  calling the bound function...  
+   //  
+   // DMMTODO  
+   F32 deadZoneBegin = 0.0f;
+   F32 deadZoneEnd = 0.0f;
+   F32 scaleFactor = 1.0f;
+
+   // Ensure that the console function is properly specified?  
+   //  
+   // DMMTODO  
+
+   // Create the full bind entry, and place it in the map  
+   //  
+   // DMMTODO  
+   Node* pBindNode = getNode(deviceType, deviceInst,
+      eventDescriptor.flags,
+      eventDescriptor.eventCode);
+
+   pBindNode->flags = Node::Held;
+   pBindNode->deadZoneBegin = deadZoneBegin;
+   pBindNode->deadZoneEnd = deadZoneEnd;
+   pBindNode->scaleFactor = scaleFactor;
+   pBindNode->consoleFunction = StringTable->insert(dStrdup(tapFunc));
+
+   pBindNode->contextEvent = new ContextAction(StringTable->insert(dStrdup(holdFunc)), holdTime, pBindNode, holdOnly);
+   pBindNode->contextEvent->mReturnHoldTime = retHoldTime;
+
+   return true;
+}
+
+//------------------------------------------------------------------------------
 bool ActionMap::processAction(const InputEventInfo* pEvent)
 {
    // Suppress excluded input events, like alt-tab.
@@ -1328,7 +1440,9 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
       // Enter the break into the table if this is a make event...
       // Do this now rather than after command is processed because
       // command might add a binding which can move the vector of nodes.
-      enterBreakEvent(pEvent, pNode);
+      // Filter to prevent Hold buttons from being eaten  
+      if (!(pNode->flags & Node::Held))
+         enterBreakEvent(pEvent, pNode);
 
       // Whadda ya know, we have this bound.  Set up, and call the console
       //  function associated with it...
@@ -1368,6 +1482,15 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
          // it's a bind command
          if(pNode->makeConsoleCommand)
             Con::evaluate(pNode->makeConsoleCommand);
+      }
+      else if (pNode->flags & Node::Held)
+      {
+         //check if we're already holding, if not, start our timer  
+         if (!pNode->contextEvent->mActive) {
+            pNode->contextEvent->mActive = true;
+            pNode->contextEvent->mStartTime = Sim::getCurrentTime();
+            pNode->contextEvent->mEventValue = value;
+         }
       }
       else if ( pNode->consoleFunction[0] )
       {
@@ -1529,6 +1652,20 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
    }
    else if (pEvent->action == SI_BREAK)
    {
+      const Node* button = findNode(pEvent->deviceType, pEvent->deviceInst,
+         pEvent->modifier, pEvent->objInst);
+
+      if (button != NULL) 
+      {
+         if (button->flags == Node::Held)
+         {
+            if (!button->contextEvent->mBreakEvent)
+               button->contextEvent->mBreakEvent = true;
+
+            return true;
+         }
+      }
+
       return checkBreakTable(pEvent);
    }
    else if (pEvent->action == SI_VALUE)
@@ -1809,6 +1946,78 @@ void ActionMap::fireBreakEvent( U32 i, F32 fValue )
 }
 
 //------------------------------------------------------------------------------
+//Context actions
+ContextAction::ContextAction(StringTableEntry func, F32 minHoldTime, ActionMap::Node* button, bool holdOnly)
+   : mStartTime(0), mEventValue(1.0f), mBreakEvent(false), mDidHold(false), mActive(false), mReturnHoldTime(false)
+{
+   mButton = button;
+   mMinHoldTime = minHoldTime;
+   mConsoleFunctionHeld = func;
+
+   mHoldOnly = holdOnly;
+}
+
+void ContextAction::processTick()
+{
+   if (mActive)
+   {
+      F32 currTime = Sim::getCurrentTime();
+      static const char *argv[2];
+
+      //see if this key even is still active  
+      if (!mBreakEvent)
+      {
+         //are we only checking if it's holding?  
+         if (mHoldOnly)
+         {
+            //yes, we are, and since it's held, we fire off our function  
+            if (mReturnHoldTime)
+            {
+               argv[0] = mConsoleFunctionHeld;
+               argv[1] = Con::getFloatArg(mEventValue);
+               argv[2] = Con::getFloatArg((currTime - mStartTime));
+               Con::execute(3, argv);
+            }
+            else
+            {
+               argv[0] = mConsoleFunctionHeld;
+               argv[1] = Con::getFloatArg(mEventValue);
+               Con::execute(2, argv);
+            }
+         }
+         //if we don't care if we're just holding, check our time  
+         //have we passed our min limit?  
+         else if ((currTime - mStartTime) >= mMinHoldTime)
+         {
+            //holy crap, we have, fire off our hold function   
+            mDidHold = true;
+            argv[0] = mConsoleFunctionHeld;
+            argv[1] = Con::getFloatArg(mEventValue);
+            Con::execute(2, argv);
+         }
+         //otherwise we haven't yet, so keep our active status  
+         return;
+      }
+      //hmm, apparently not, so see if we tapped the key instead  
+      else
+      {
+         if (!mHoldOnly && !mDidHold)
+         {
+            //yes, we tapped and we care, so fire off the tap function.  
+            argv[0] = mButton->consoleFunction;
+            argv[1] = Con::getFloatArg(mEventValue);
+            Con::execute(2, argv);
+         }
+         //otherwise we don't care and we're done, so reset everything  
+         mActive = false;
+         mStartTime = 0;
+         mBreakEvent = false;
+         mDidHold = false;
+      }
+   }
+}
+
+//------------------------------------------------------------------------------
 
 // Console interop version.
 
@@ -1957,6 +2166,18 @@ DefineEngineMethod( ActionMap, bindCmd, bool, ( const char* device, const char* 
    "@endtsexample\n\n")
 {
    return object->processBindCmd( device, action, makeCmd, breakCmd );
+}
+
+DefineEngineMethod(ActionMap, bindContext, void, (const char* device, const char* action, const char* holdFunction, const char* tapFunction, U32 holdTime),
+   ("", "", "", "", 0), "actionMap.bindCmd( device, action, holdFunction, tapFunction, holdTime)")
+{
+   object->processHoldBind(device, action, holdFunction, tapFunction, holdTime, false);
+}
+
+DefineEngineMethod(ActionMap, bindHold, void, (const char* device, const char* action, const char* holdFunction, bool returnHoldTime),
+   ("", "", "", false), "actionMap.bindCmd( device, action, holdFunction, returnHoldTime)")
+{
+   object->processHoldBind(device, action, holdFunction, "", 0, true, returnHoldTime);
 }
 
 DefineEngineMethod( ActionMap, unbind, bool, ( const char* device, const char* action ),,

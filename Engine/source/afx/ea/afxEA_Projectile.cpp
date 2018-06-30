@@ -92,7 +92,7 @@ afxEA_Projectile::~afxEA_Projectile()
 
 bool afxEA_Projectile::isDone()
 {
-  return (datablock->use_as_cons_obj || datablock->use_ghost_as_cons_obj) ? projectile_done : impacted;
+  return (mDatablock->use_as_cons_obj || mDatablock->use_ghost_as_cons_obj) ? projectile_done : impacted;
 }
 
 void afxEA_Projectile::ea_set_datablock(SimDataBlock* db)
@@ -117,8 +117,8 @@ bool afxEA_Projectile::ea_start()
   }
   else
   {
-    if (datablock->use_ghost_as_cons_obj && datablock->effect_name != ST_NULLSTRING)
-      projectile = new afxProjectile(afx_projectile_data->networking, choreographer->getChoreographerId(), datablock->effect_name);
+    if (mDatablock->use_ghost_as_cons_obj && mDatablock->effect_name != ST_NULLSTRING)
+      projectile = new afxProjectile(afx_projectile_data->networking, mChoreographer->getChoreographerId(), mDatablock->effect_name);
     else
       projectile = new afxProjectile(afx_projectile_data->networking, 0, ST_NULLSTRING);
     projectile->ignoreSourceTimeout = afx_projectile_data->ignore_src_timeout;
@@ -127,8 +127,8 @@ bool afxEA_Projectile::ea_start()
       projectile->dynamicCollisionMask = afx_projectile_data->dynamicCollisionMask;
       projectile->staticCollisionMask = afx_projectile_data->staticCollisionMask;
     }
-    afxConstraintID launch_pos_id = cons_mgr->getConstraintId(afx_projectile_data->launch_pos_def);
-    launch_cons = cons_mgr->getConstraint(launch_pos_id);
+    afxConstraintID launch_pos_id = mCons_mgr->getConstraintId(afx_projectile_data->launch_pos_def);
+    launch_cons = mCons_mgr->getConstraint(launch_pos_id);
     launch_dir_bias = afx_projectile_data->launch_dir_bias;
   }
 
@@ -141,7 +141,7 @@ bool afxEA_Projectile::ea_update(F32 dt)
 {
   if (!launched && projectile)
   {
-    if (in_scope)
+    if (mIn_scope)
     {
       afxConstraint* pos_cons = getPosConstraint();
       ShapeBase* src_obj = (pos_cons) ? (dynamic_cast<ShapeBase*>(pos_cons->getSceneObject())) : 0;
@@ -155,19 +155,19 @@ bool afxEA_Projectile::ea_update(F32 dt)
         {
         case afxProjectileData::OrientConstraint:
           dir_vec.set(0,0,1); 
-          updated_xfm.mulV(dir_vec);
+          mUpdated_xfm.mulV(dir_vec);
           break;
         case afxProjectileData::LaunchDirField:
           dir_vec.set(0,0,1); 
           break;
         case afxProjectileData::TowardPos2Constraint:
         default:
-          dir_vec = updated_aim - updated_pos;
+          dir_vec = mUpdated_aim - mUpdated_pos;
           break;
         }
       }
       else
-        dir_vec = updated_aim - updated_pos;
+        dir_vec = mUpdated_aim - mUpdated_pos;
 
       dir_vec.normalizeSafe();
       if (!launch_dir_bias.isZero())
@@ -184,7 +184,7 @@ bool afxEA_Projectile::ea_update(F32 dt)
         projectile->init(launch_pos, dir_vec, (launch_obj) ? launch_obj : src_obj);
       }
       else
-        projectile->init(updated_pos, dir_vec, src_obj);
+        projectile->init(mUpdated_pos, dir_vec, src_obj);
 
       if (!projectile->registerObject())
       {
@@ -197,7 +197,7 @@ bool afxEA_Projectile::ea_update(F32 dt)
       deleteNotify(projectile);
 
       if (projectile)
-        projectile->setDataField(StringTable->insert("afxOwner"), 0, choreographer->getIdString());
+        projectile->setDataField(StringTable->insert("afxOwner"), 0, mChoreographer->getIdString());
 
     }
     launched = true;
@@ -205,10 +205,10 @@ bool afxEA_Projectile::ea_update(F32 dt)
 
   if (launched && projectile)
   {
-    if (in_scope)
+    if (mIn_scope)
     {
-      updated_xfm = projectile->getRenderTransform();
-      updated_xfm.getColumn(3, &updated_pos);
+      mUpdated_xfm = projectile->getRenderTransform();
+	  mUpdated_xfm.getColumn(3, &mUpdated_pos);
     }
   }
 
@@ -247,7 +247,7 @@ void afxEA_Projectile::do_runtime_substitutions()
       afxProjectileData* orig_db = (afxProjectileData*)projectile_data;
       afx_projectile_data = new afxProjectileData(*orig_db, true);
       projectile_data = afx_projectile_data;
-      orig_db->performSubstitutions(projectile_data, choreographer, group_index);
+      orig_db->performSubstitutions(projectile_data, mChoreographer, mGroup_index);
     }
     else
     {
@@ -255,7 +255,7 @@ void afxEA_Projectile::do_runtime_substitutions()
       ProjectileData* orig_db = projectile_data;
       afx_projectile_data = 0;
       projectile_data = new ProjectileData(*orig_db, true);
-      orig_db->performSubstitutions(projectile_data, choreographer, group_index);
+      orig_db->performSubstitutions(projectile_data, mChoreographer, mGroup_index);
     }
   }
 }

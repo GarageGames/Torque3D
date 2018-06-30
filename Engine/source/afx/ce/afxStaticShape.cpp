@@ -122,11 +122,11 @@ ConsoleDocClass( afxStaticShape,
 
 afxStaticShape::afxStaticShape()
 {
-  afx_data = 0;
-  is_visible = true;
-  chor_id = 0;
-  hookup_with_chor = false;
-  ghost_cons_name = ST_NULLSTRING;
+  mAFX_data = 0;
+  mIs_visible = true;
+  mChor_id = 0;
+  mHookup_with_chor = false;
+  mGhost_cons_name = ST_NULLSTRING;
 }
 
 afxStaticShape::~afxStaticShape()
@@ -135,8 +135,8 @@ afxStaticShape::~afxStaticShape()
 
 void afxStaticShape::init(U32 chor_id, StringTableEntry cons_name)
 {
-  this->chor_id = chor_id;
-  ghost_cons_name = cons_name;
+  mChor_id = chor_id;
+  mGhost_cons_name = cons_name;
 }
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//
@@ -147,7 +147,7 @@ bool afxStaticShape::onNewDataBlock(GameBaseData* dptr, bool reload)
   if (!mDataBlock || !Parent::onNewDataBlock(dptr, reload))
     return false;
 
-  afx_data = dynamic_cast<afxStaticShapeData*>(mDataBlock);
+  mAFX_data = dynamic_cast<afxStaticShapeData*>(mDataBlock);
 
   if (!mShapeInstance)
     return true;
@@ -156,10 +156,10 @@ bool afxStaticShape::onNewDataBlock(GameBaseData* dptr, bool reload)
 
   // if datablock is afxStaticShapeData we get the sequence setting 
   // directly from the datablock on the client-side only
-  if (afx_data)
+  if (mAFX_data)
   {
     if (isClientObject())
-      seq_name = afx_data->sequence;
+      seq_name = mAFX_data->sequence;
   }
   // otherwise datablock is stock StaticShapeData and we look for
   // a sequence name on a dynamic field on the server.
@@ -188,13 +188,13 @@ void afxStaticShape::advanceTime(F32 dt)
 {
   Parent::advanceTime(dt);
 
-  if (hookup_with_chor)
+  if (mHookup_with_chor)
   {
-    afxChoreographer* chor = arcaneFX::findClientChoreographer(chor_id);
+    afxChoreographer* chor = arcaneFX::findClientChoreographer(mChor_id);
     if (chor)
     {
-      chor->setGhostConstraintObject(this, ghost_cons_name);
-      hookup_with_chor = false;
+      chor->setGhostConstraintObject(this, mGhost_cons_name);
+	  mHookup_with_chor = false;
     }
   }
 }
@@ -206,8 +206,8 @@ U32 afxStaticShape::packUpdate(NetConnection* conn, U32 mask, BitStream* stream)
   // InitialUpdate
   if (stream->writeFlag(mask & InitialUpdateMask)) 
   {
-    stream->write(chor_id);
-    stream->writeString(ghost_cons_name);
+    stream->write(mChor_id);
+    stream->writeString(mGhost_cons_name);
   }
 
   return retMask;
@@ -222,11 +222,11 @@ void afxStaticShape::unpackUpdate(NetConnection * conn, BitStream * stream)
   // InitialUpdate
   if (stream->readFlag())
   {
-    stream->read(&chor_id);
-    ghost_cons_name = stream->readSTString();
+    stream->read(&mChor_id);
+	mGhost_cons_name = stream->readSTString();
 
-    if (chor_id != 0 && ghost_cons_name != ST_NULLSTRING)
-      hookup_with_chor = true;
+    if (mChor_id != 0 && mGhost_cons_name != ST_NULLSTRING)
+      mHookup_with_chor = true;
   }
 }
 
@@ -234,7 +234,7 @@ void afxStaticShape::unpackUpdate(NetConnection * conn, BitStream * stream)
 
 void afxStaticShape::prepRenderImage(SceneRenderState* state)
 {
-  if (is_visible) 
+  if (mIs_visible) 
      Parent::prepRenderImage(state);
 }
 

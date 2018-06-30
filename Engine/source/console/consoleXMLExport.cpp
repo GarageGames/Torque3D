@@ -319,8 +319,8 @@ DefineConsoleFunction( consoleExportXML, const char*, (), ,"Exports console defi
    Con::XMLExport xmlExport;
    String xml;
    xmlExport.exportXML(xml);
-   char* ret = Con::getReturnBuffer(xml.length() + 1);
-   dStrcpy(ret, xml.c_str());
+   char* ret = Con::getReturnBuffer(xml.size());
+   dStrcpy(ret, xml.c_str(), xml.size());
    return ret;
 }
 

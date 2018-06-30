@@ -2501,6 +2501,19 @@ const char * GuiTreeViewCtrl::getItemValue(S32 itemId)
 
 //-----------------------------------------------------------------------------
 
+S32 GuiTreeViewCtrl::getItemAtPosition(Point2I position)
+{
+   BitSet32 hitFlags = 0;
+   Item* item;
+
+   if (_hitTest(position, item, hitFlags))
+      return item->mId;
+   else
+      return -1;
+}
+
+//-----------------------------------------------------------------------------
+
 bool GuiTreeViewCtrl::editItem( S32 itemId, const char* newText, const char* newValue )
 {
    Item* item = getItem( itemId );
@@ -2991,10 +3004,10 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
 {
    if( !mActive || !mAwake || !mVisible )
       return;
-
+   
+   BitSet32 hitFlags = 0;
    if( isMethod("onMouseUp") )
    {
-      BitSet32 hitFlags = 0;
       Item* item;
       
       S32 hitItemId = -1;
@@ -3012,26 +3025,26 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
       return;
    }
 
-   BitSet32 hitFlags = 0;
-   Item *item;
-   bool hitCheck = _hitTest( event.mousePoint, item, hitFlags );
+   hitFlags = 0;
+   Item *hitItem;
+   bool hitCheck = _hitTest( event.mousePoint, hitItem, hitFlags );
    mRenamingItem = NULL;
 
    if( hitCheck )
    {
       if ( event.mouseClickCount == 1 && !mMouseDragged && mPossibleRenameItem != NULL )
       {
-         if ( item == mPossibleRenameItem )
-            showItemRenameCtrl( item );
+         if (hitItem == mPossibleRenameItem )
+            showItemRenameCtrl(hitItem);
       }
       else // If mouseUp occurs on the same item as mouse down
       {
-         bool wasSelected = isSelected( item );
+         bool wasSelected = isSelected(hitItem);
          bool multiSelect = getSelectedItemsCount() > 1;
-         if( wasSelected && multiSelect && item == mTempItem )
+         if( wasSelected && multiSelect && hitItem == mTempItem )
          {
             clearSelection();
-            addSelection( item->mId );
+            addSelection( hitItem->mId );
          }
       }
    }
@@ -3048,7 +3061,7 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
    {
       Parent::onMouseMove( event );
          
-      BitSet32 hitFlags = 0;
+      hitFlags = 0;
       if( !_hitTest( event.mousePoint, newItem2, hitFlags ) )
       {
          if( !mShowRoot )
@@ -3781,16 +3794,12 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
       if (item->isInspectorData())
       {
          Entity* e = dynamic_cast<Entity*>(item->getObject());
-         //if (item->mScriptInfo.mText != StringTable->insert("Components"))
-         {
-            Entity* e = dynamic_cast<Entity*>(item->getObject());
-            if (e)
-            {
-               if (item->isExpanded())
-                  e->onInspect();
-               else
-                  e->onEndInspect();
-            }
+		 if (e)
+		 {
+			 if (item->isExpanded())
+				 e->onInspect();
+			 else
+				 e->onEndInspect();
          }
       }
       
@@ -4741,15 +4750,15 @@ StringTableEntry GuiTreeViewCtrl::getTextToRoot( S32 itemId, const char * delimi
    dMemset( bufferOne, 0, sizeof(bufferOne) );
    dMemset( bufferTwo, 0, sizeof(bufferTwo) );
 
-   dStrcpy( bufferOne, item->getText() );
+   dStrcpy( bufferOne, item->getText(), 1024 );
 
    Item *prevNode = item->mParent;
    while ( prevNode )
    {
       dMemset( bufferNodeText, 0, sizeof(bufferNodeText) );
-      dStrcpy( bufferNodeText, prevNode->getText() );
+      dStrcpy( bufferNodeText, prevNode->getText(), 128 );
       dSprintf( bufferTwo, 1024, "%s%s%s",bufferNodeText, delimiter, bufferOne );
-      dStrcpy( bufferOne, bufferTwo );
+      dStrcpy( bufferOne, bufferTwo, 1024 );
       dMemset( bufferTwo, 0, sizeof(bufferTwo) );
       prevNode = prevNode->mParent;
    }
@@ -5549,4 +5558,12 @@ DefineEngineMethod( GuiTreeViewCtrl, clearFilterText, void, (),,
    "@see getFilterText" )
 {
    object->clearFilterText();
+}
+
+DefineEngineMethod(GuiTreeViewCtrl, getItemAtPosition, S32, (Point2I position), (Point2I::Zero),
+   "Get the tree item at the passed in position.\n\n"
+   "@param position The position to check for what item is below it.\n"
+   "@return The id of the item under the position.")
+{
+   return object->getItemAtPosition(position);
 }

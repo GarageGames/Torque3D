@@ -58,8 +58,9 @@
 using namespace Torque;
 
 extern bool gEditingMission;
-
+#ifdef TORQUE_AFX_ENABLED
 #include "afx/ce/afxZodiacMgr.h"
+#endif
 
 IMPLEMENT_CO_NETOBJECT_V1(TSStatic);
 
@@ -136,7 +137,9 @@ TSStatic::TSStatic()
    mHasGradients = false;
    mInvertGradientRange = false;
    mGradientRangeUser.set(0.0f, 180.0f);
+#ifdef TORQUE_AFX_ENABLED
    afxZodiacData::convertGradientRangeFromDegrees(mGradientRange, mGradientRangeUser);
+#endif
 }
 
 TSStatic::~TSStatic()
@@ -370,7 +373,7 @@ bool TSStatic::_createShape()
          NetConnection::filesWereDownloaded() )
       return false;
 
-   mObjBox = mShape->bounds;
+   mObjBox = mShape->mBounds;
    resetWorldBox();
 
    mShapeInstance = new TSShapeInstance( mShape, isClientObject() );
@@ -534,6 +537,7 @@ void TSStatic::reSkin()
 {
    if ( isGhost() && mShapeInstance && mSkinNameHandle.isValidString() )
    {
+	  mShapeInstance->resetMaterialList();
       Vector<String> skins;
       String(mSkinNameHandle.getString()).split( ";", skins );
 
@@ -721,9 +725,10 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
       }
    }
    mShapeInstance->render( rdata );
-
+#ifdef TORQUE_AFX_ENABLED
    if (!mIgnoreZodiacs && mDecalDetailsPtr != 0)
       afxZodiacMgr::renderPolysoupZodiacs(state, this);
+#endif
    if ( mRenderNormalScalar > 0 )
    {
       ObjectRenderInst *ri = state->getRenderPass()->allocInst<ObjectRenderInst>();
@@ -1069,6 +1074,97 @@ bool TSStatic::buildPolyList(PolyListContext context, AbstractPolyList* polyList
    return true;
 }
 
+bool TSStatic::buildExportPolyList(ColladaUtils::ExportData* exportData, const Box3F &box, const SphereF &)
+{
+   if (!mShapeInstance)
+      return false;
+
+   if (mCollisionType == Bounds)
+   {
+      ColladaUtils::ExportData::colMesh* colMesh;
+      exportData->colMeshes.increment();
+      colMesh = &exportData->colMeshes.last();
+
+      colMesh->mesh.setTransform(&mObjToWorld, mObjScale);
+      colMesh->mesh.setObject(this);
+
+      colMesh->mesh.addBox(mObjBox);
+
+      colMesh->colMeshName = String::ToString("ColBox%d-1", exportData->colMeshes.size());
+   }
+   else if (mCollisionType == VisibleMesh)
+   {
+      ColladaUtils::ExportData::colMesh* colMesh;
+      exportData->colMeshes.increment();
+      colMesh = &exportData->colMeshes.last();
+
+      colMesh->mesh.setTransform(&mObjToWorld, mObjScale);
+      colMesh->mesh.setObject(this);
+
+      mShapeInstance->buildPolyList(&colMesh->mesh, 0);
+
+      colMesh->colMeshName = String::ToString("ColMesh%d-1", exportData->colMeshes.size());
+   }
+   else if (mCollisionType == CollisionMesh)
+   {
+      // Everything else is done from the collision meshes
+      // which may be built from either the visual mesh or
+      // special collision geometry.
+      for (U32 i = 0; i < mCollisionDetails.size(); i++)
+      {
+         ColladaUtils::ExportData::colMesh* colMesh;
+         exportData->colMeshes.increment();
+         colMesh = &exportData->colMeshes.last();
+
+         colMesh->mesh.setTransform(&mObjToWorld, mObjScale);
+         colMesh->mesh.setObject(this);
+
+         mShapeInstance->buildPolyListOpcode(mCollisionDetails[i], &colMesh->mesh, box);
+
+         colMesh->colMeshName = String::ToString("ColMesh%d-1", exportData->colMeshes.size());
+      }
+   }
+
+   //Next, process the LOD levels and materials.
+   if (isServerObject() && getClientObject())
+   {
+      TSStatic* clientShape = dynamic_cast<TSStatic*>(getClientObject());
+      U32 numDetails = clientShape->mShapeInstance->getNumDetails() - 1;
+
+      exportData->meshData.increment();
+
+      //Prep a meshData for this shape in particular
+      ColladaUtils::ExportData::meshLODData* meshData = &exportData->meshData.last();
+
+      //Fill out the info we'll need later to actually append our mesh data for the detail levels during the processing phase
+      meshData->shapeInst = clientShape->mShapeInstance;
+      meshData->originatingObject = this;
+      meshData->meshTransform = mObjToWorld;
+      meshData->scale = mObjScale;
+
+      //Iterate over all our detail levels
+      for (U32 i = 0; i < clientShape->mShapeInstance->getNumDetails(); i++)
+      {
+         TSShape::Detail detail = clientShape->mShapeInstance->getShape()->details[i];
+
+         String detailName = String::ToLower(clientShape->mShapeInstance->getShape()->getName(detail.nameIndex));
+
+         //Skip it if it's a collision or line of sight element
+         if (detailName.startsWith("col") || detailName.startsWith("los"))
+            continue;
+
+         meshData->meshDetailLevels.increment();
+
+         ColladaUtils::ExportData::detailLevel* curDetail = &meshData->meshDetailLevels.last();
+
+         //Make sure we denote the size this detail level has
+         curDetail->size = detail.size;
+      }
+   }
+
+   return true;
+}
+
 void TSStatic::buildConvex(const Box3F& box, Convex* convex)
 {
    if ( mCollisionType == None )
@@ -1275,6 +1371,16 @@ void TSStatic::onUnmount( SceneObject *obj, S32 node )
    _updateShouldTick();
 }
 
+U32 TSStatic::getNumDetails()
+{
+	if (isServerObject() && getClientObject())
+	{
+		TSStatic* clientShape = dynamic_cast<TSStatic*>(getClientObject());
+		return clientShape->mShapeInstance->getNumDetails();
+	}
+	return 0;
+};
+
 //------------------------------------------------------------------------
 //These functions are duplicated in tsStatic and shapeBase.
 //They each function a little differently; but achieve the same purpose of gathering
@@ -1399,11 +1505,13 @@ void TSStatic::set_special_typing()
 
 void TSStatic::onStaticModified(const char* slotName, const char*newValue)
 {
+#ifdef TORQUE_AFX_ENABLED
    if (slotName == afxZodiacData::GradientRangeSlot)
    {
       afxZodiacData::convertGradientRangeFromDegrees(mGradientRange, mGradientRangeUser);
       return;
    }
+#endif
 
    set_special_typing();
 }

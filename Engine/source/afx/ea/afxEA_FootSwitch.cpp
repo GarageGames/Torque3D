@@ -40,8 +40,8 @@ class afxEA_FootSwitch : public afxEffectWrapper
 {
   typedef afxEffectWrapper Parent;
 
-  afxFootSwitchData* footfall_data;
-  Player*           player;
+  afxFootSwitchData* mFootfall_data;
+  Player*           mPlayer;
 
   void              do_runtime_substitutions();
 
@@ -62,38 +62,38 @@ public:
 
 afxEA_FootSwitch::afxEA_FootSwitch()
 {
-  footfall_data = 0;
-  player = 0;
+  mFootfall_data = 0;
+  mPlayer = 0;
 }
 
 inline void afxEA_FootSwitch::set_overrides(Player* player)
 {
-  if (footfall_data->override_all)
+  if (mFootfall_data->override_all)
     player->overrideFootfallFX();
   else
-    player->overrideFootfallFX(footfall_data->override_decals, 
-                               footfall_data->override_sounds, 
-                               footfall_data->override_dust);
+    player->overrideFootfallFX(mFootfall_data->override_decals,
+                               mFootfall_data->override_sounds, 
+                               mFootfall_data->override_dust);
 }
 
 inline void afxEA_FootSwitch::clear_overrides(Player* player)
 {
-  if (footfall_data->override_all)
+  if (mFootfall_data->override_all)
     player->restoreFootfallFX();
   else
-    player->restoreFootfallFX(footfall_data->override_decals, 
-                              footfall_data->override_sounds, 
-                              footfall_data->override_dust);
+    player->restoreFootfallFX(mFootfall_data->override_decals,
+                              mFootfall_data->override_sounds, 
+                              mFootfall_data->override_dust);
 }
 
 void afxEA_FootSwitch::ea_set_datablock(SimDataBlock* db)
 {
-  footfall_data = dynamic_cast<afxFootSwitchData*>(db);
+  mFootfall_data = dynamic_cast<afxFootSwitchData*>(db);
 }
 
 bool afxEA_FootSwitch::ea_start()
 {
-  if (!footfall_data)
+  if (!mFootfall_data)
   {
     Con::errorf("afxEA_FootSwitch::ea_start() -- missing or incompatible datablock.");
     return false;
@@ -102,25 +102,25 @@ bool afxEA_FootSwitch::ea_start()
   do_runtime_substitutions();
 
   afxConstraint* pos_cons = getPosConstraint();
-  player = (pos_cons) ? dynamic_cast<Player*>(pos_cons->getSceneObject()) : 0;
-  if (player)
-    set_overrides(player);
+  mPlayer = (pos_cons) ? dynamic_cast<Player*>(pos_cons->getSceneObject()) : 0;
+  if (mPlayer)
+    set_overrides(mPlayer);
 
   return true;
 }
 
 bool afxEA_FootSwitch::ea_update(F32 dt)
 {
-  if (!player)
+  if (!mPlayer)
     return true;
 
   afxConstraint* pos_cons = getPosConstraint();
   Player* temp_player = (pos_cons) ? dynamic_cast<Player*>(pos_cons->getSceneObject()) : 0;
-  if (temp_player && temp_player != player)
+  if (temp_player && temp_player != mPlayer)
   {
-    player = temp_player;
-    if (player)
-      set_overrides(player);
+    mPlayer = temp_player;
+    if (mPlayer)
+      set_overrides(mPlayer);
   }
 
   return true;
@@ -128,24 +128,24 @@ bool afxEA_FootSwitch::ea_update(F32 dt)
 
 void afxEA_FootSwitch::ea_finish(bool was_stopped)
 {
-  if (!player)
+  if (!mPlayer)
     return;
 
   afxConstraint* pos_cons = getPosConstraint();
   Player* temp_player = (pos_cons) ? dynamic_cast<Player*>(pos_cons->getSceneObject()) : 0;
-  if (temp_player == player)
-    clear_overrides(player);
+  if (temp_player == mPlayer)
+    clear_overrides(mPlayer);
 }
 
 void afxEA_FootSwitch::do_runtime_substitutions()
 {
   // only clone the datablock if there are substitutions
-  if (footfall_data->getSubstitutionCount() > 0)
+  if (mFootfall_data->getSubstitutionCount() > 0)
   {
     // clone the datablock and perform substitutions
-    afxFootSwitchData* orig_db = footfall_data;
-    footfall_data = new afxFootSwitchData(*orig_db, true);
-    orig_db->performSubstitutions(footfall_data, choreographer, group_index);
+    afxFootSwitchData* orig_db = mFootfall_data;
+	mFootfall_data = new afxFootSwitchData(*orig_db, true);
+    orig_db->performSubstitutions(mFootfall_data, mChoreographer, mGroup_index);
   }
 }
 

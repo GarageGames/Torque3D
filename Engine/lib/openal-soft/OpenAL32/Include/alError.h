@@ -2,6 +2,7 @@
 #define _AL_ERROR_H_
 
 #include "alMain.h"
+#include "logging.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -9,21 +10,16 @@ extern "C" {
 
 extern ALboolean TrapALError;
 
-ALvoid alSetError(ALCcontext *Context, ALenum errorCode);
+void alSetError(ALCcontext *context, ALenum errorCode, const char *msg, ...) DECL_FORMAT(printf, 3, 4);
 
-#define SET_ERROR_AND_RETURN(ctx, err) do {                                    \
-    alSetError((ctx), (err));                                                  \
-    return;                                                                    \
-} while(0)
-
-#define SET_ERROR_AND_RETURN_VALUE(ctx, err, val) do {                         \
-    alSetError((ctx), (err));                                                  \
-    return (val);                                                              \
-} while(0)
-
-#define SET_ERROR_AND_GOTO(ctx, err, lbl) do {                                 \
-    alSetError((ctx), (err));                                                  \
+#define SETERR_GOTO(ctx, err, lbl, ...) do {                                   \
+    alSetError((ctx), (err), __VA_ARGS__);                                     \
     goto lbl;                                                                  \
+} while(0)
+
+#define SETERR_RETURN(ctx, err, retval, ...) do {                              \
+    alSetError((ctx), (err), __VA_ARGS__);                                     \
+    return retval;                                                             \
 } while(0)
 
 #ifdef __cplusplus

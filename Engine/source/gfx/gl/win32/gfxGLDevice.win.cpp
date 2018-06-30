@@ -129,11 +129,11 @@ void GFXGLDevice::enumerateAdapters( Vector<GFXAdapter*> &adapterList )
 
    if (renderer)
    {
-      dStrcpy(toAdd->mName, renderer);
+      dStrcpy(toAdd->mName, renderer, GFXAdapter::MaxAdapterNameLen);
       dStrncat(toAdd->mName, " OpenGL", GFXAdapter::MaxAdapterNameLen);
    }
    else
-      dStrcpy(toAdd->mName, "OpenGL");
+      dStrcpy(toAdd->mName, "OpenGL", GFXAdapter::MaxAdapterNameLen);
 
    toAdd->mType = OpenGL;
    toAdd->mShaderModel = 0.f;

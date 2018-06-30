@@ -491,7 +491,7 @@ namespace Con
    bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWorkingDirectoryHint = NULL, const bool ensureTrailingSlash = false);
    void collapsePath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWorkingDirectoryHint = NULL);
    bool isBasePath(const char* SrcPath, const char* pBasePath);
-   void ensureTrailingSlash(char* pDstPath, const char* pSrcPath);
+   void ensureTrailingSlash(char* pDstPath, const char* pSrcPath, S32 dstSize);
    bool stripRepeatSlashes(char* pDstPath, const char* pSrcPath, S32 dstSize);
    StringTableEntry getDSOPath(const char *scriptPath);
 
@@ -972,38 +972,38 @@ public:
    /// @ref console_autodoc
    /// @{
 
-   StringCallback sc;   ///< A function/method that returns a string.
-   IntCallback ic;      ///< A function/method that returns an int.
-   FloatCallback fc;    ///< A function/method that returns a float.
-   VoidCallback vc;     ///< A function/method that returns nothing.
-   BoolCallback bc;     ///< A function/method that returns a bool.
-   bool group;          ///< Indicates that this is a group marker.
-   bool ns;             ///< Indicates that this is a namespace marker.
+   StringCallback mSC;   ///< A function/method that returns a string.
+   IntCallback mIC;      ///< A function/method that returns an int.
+   FloatCallback mFC;    ///< A function/method that returns a float.
+   VoidCallback mVC;     ///< A function/method that returns nothing.
+   BoolCallback mBC;     ///< A function/method that returns a bool.
+   bool mGroup;          ///< Indicates that this is a group marker.
+   bool mNS;             ///< Indicates that this is a namespace marker.
                         ///  @deprecated Unused.
-   bool callback;       ///< Is this a callback into script?
+   bool mCallback;       ///< Is this a callback into script?
 
                         /// @}
 
                         /// Minimum number of arguments expected by the function.
-   S32 mina;
+   S32 mMina;
 
    /// Maximum number of arguments accepted by the funtion.  Zero for varargs.
-   S32 maxa;
+   S32 mMaxa;
 
    /// Name of the function/method.
-   const char* funcName;
+   const char* mFuncName;
 
    /// Name of the class namespace to which to add the method.
-   const char* className;
+   const char* mClassName;
 
    /// Usage string for documentation.
-   const char* usage;
+   const char* mUsage;
 
    /// Whether this is a TORQUE_TOOLS only function.
-   bool toolOnly;
+   bool mToolOnly;
 
    /// The extended function header.
-   ConsoleFunctionHeader* header;
+   ConsoleFunctionHeader* mHeader;
 
    /// @name ConsoleConstructor Innards
    ///
@@ -1066,8 +1066,8 @@ public:
    /// @{
 
    ///
-   ConsoleConstructor *next;
-   static ConsoleConstructor *first;
+   ConsoleConstructor *mNext;
+   static ConsoleConstructor *mFirst;
 
    void init(const char* cName, const char* fName, const char *usg, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
 

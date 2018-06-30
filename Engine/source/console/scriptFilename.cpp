@@ -189,7 +189,7 @@ bool expandToolScriptFilename(char *filename, U32 size, const char *src)
          // Relative to script directory
          if(cbFullPath)
          {
-            dStrcpy(varBuf, cbFullPath);
+            dStrcpy(varBuf, cbFullPath, 1024);
             slash = dStrrchr(varBuf, '/');
             if(slash) *slash = 0;
 
@@ -219,7 +219,7 @@ bool expandOldScriptFilename(char *filename, U32 size, const char *src)
    const StringTableEntry cbName = CodeBlock::getCurrentCodeBlockName();
    if (!cbName)
    {
-      dStrcpy(filename, src);
+      dStrcpy(filename, src, size);
       return true;
    }
 
@@ -244,7 +244,7 @@ bool expandOldScriptFilename(char *filename, U32 size, const char *src)
          *filename = 0;
          return false;
       }
-      dStrcpy(filename, src);
+      dStrcpy(filename, src, size);
       return true;
    }
 
@@ -264,7 +264,7 @@ bool expandOldScriptFilename(char *filename, U32 size, const char *src)
    }
 
    dStrncpy(filename, cbName, length);
-   dStrcpy(filename+length, src+1);
+   dStrcpy(filename+length, src+1, size - length);
    return true;
 }
 
@@ -325,7 +325,7 @@ bool collapseScriptFilename(char *filename, U32 size, const char *src)
       *filename = 0;
       if(*test[i].replace)
          dSprintf(filename, size, "%s/", test[i].replace);
-      dStrcat(filename, rel);
+      dStrcat(filename, rel, size);
       return true;
    }
 

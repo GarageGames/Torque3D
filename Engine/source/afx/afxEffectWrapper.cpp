@@ -380,7 +380,7 @@ void afxEffectWrapperData::packData(BitStream* stream)
 {
   Parent::packData(stream);
 
-  writeDatablockID(stream, effect_data, packed);
+  writeDatablockID(stream, effect_data, mPacked);
 
   stream->writeString(effect_name);
 
@@ -419,7 +419,7 @@ void afxEffectWrapperData::packData(BitStream* stream)
   stream->write(scale_factor);
 
   // modifiers
-  pack_mods(stream, xfm_modifiers, packed);
+  pack_mods(stream, xfm_modifiers, mPacked);
 
   mathWrite(*stream, forced_bbox);
   stream->write(update_forced_bbox);
@@ -681,55 +681,55 @@ ConsoleDocClass( afxEffectWrapper,
 
 afxEffectWrapper::afxEffectWrapper()
 {
-  choreographer = 0;
-  datablock = 0;
-  cons_mgr = 0;
+  mChoreographer = 0;
+  mDatablock = 0;
+  mCons_mgr = 0;
 
-  cond_alive = true;
-  elapsed = 0;
-  life_end = 0;
-  life_elapsed = 0;
-  stopped = false;
-  n_updates = 0;
-  fade_value = 1.0f;
-  last_fade_value = 0.0f;
-  fade_in_end = 0.0;
-  fade_out_start = 0.0f;
-  in_scope = true;
-  is_aborted = false;
-  do_fade_inout = false;
-  do_fades = false;
-  full_lifetime = 0;
+  mCond_alive = true;
+  mElapsed = 0;
+  mLife_end = 0;
+  mLife_elapsed = 0;
+  mStopped = false;
+  mNum_updates = 0;
+  mFade_value = 1.0f;
+  mLast_fade_value = 0.0f;
+  mFade_in_end = 0.0;
+  mFade_out_start = 0.0f;
+  mIn_scope = true;
+  mIs_aborted = false;
+  mDo_fade_inout = false;
+  mDo_fades = false;
+  mFull_lifetime = 0;
 
-  time_factor = 1.0f;
-  prop_time_factor = 1.0f;
+  mTime_factor = 1.0f;
+  mProp_time_factor = 1.0f;
 
-  live_scale_factor = 1.0f;
-  live_fade_factor = 1.0f;
-  terrain_altitude = -1.0f;
-  interior_altitude = -1.0f;
+  mLive_scale_factor = 1.0f;
+  mLive_fade_factor = 1.0f;
+  mTerrain_altitude = -1.0f;
+  mInterior_altitude = -1.0f;
 
-  group_index = 0;
+  mGroup_index = 0;
 
-  dMemset(xfm_modifiers, 0, sizeof(xfm_modifiers));
+  dMemset(mXfm_modifiers, 0, sizeof(mXfm_modifiers));
 }
 
 afxEffectWrapper::~afxEffectWrapper()
 {
   for (S32 i = 0; i < MAX_XFM_MODIFIERS; i++)
-    if (xfm_modifiers[i])
-      delete xfm_modifiers[i];
+    if (mXfm_modifiers[i])
+      delete mXfm_modifiers[i];
 
-  if (datablock && datablock->effect_name != ST_NULLSTRING)
+  if (mDatablock && mDatablock->effect_name != ST_NULLSTRING)
   {
-    choreographer->removeNamedEffect(this);
-    if (datablock->use_as_cons_obj && !effect_cons_id.undefined())
-      cons_mgr->setReferenceEffect(effect_cons_id, 0);
+    mChoreographer->removeNamedEffect(this);
+    if (mDatablock->use_as_cons_obj && !mEffect_cons_id.undefined())
+      mCons_mgr->setReferenceEffect(mEffect_cons_id, 0);
   }
 
-  if (datablock && datablock->isTempClone())
-    delete datablock;
-  datablock = 0;
+  if (mDatablock && mDatablock->isTempClone())
+    delete mDatablock;
+  mDatablock = 0;
 }
 
 #undef myOffset
@@ -737,9 +737,9 @@ afxEffectWrapper::~afxEffectWrapper()
 
 void afxEffectWrapper::initPersistFields()
 {
-  addField("liveScaleFactor",     TypeF32,    myOffset(live_scale_factor),
+  addField("liveScaleFactor",     TypeF32,    myOffset(mLive_scale_factor),
     "...");
-  addField("liveFadeFactor",      TypeF32,    myOffset(live_fade_factor),
+  addField("liveFadeFactor",      TypeF32,    myOffset(mLive_fade_factor),
     "...");
 
   Parent::initPersistFields();
@@ -754,37 +754,37 @@ void afxEffectWrapper::ew_init(afxChoreographer*     choreographer,
   AssertFatal(datablock != NULL, "Datablock is missing.");
   AssertFatal(cons_mgr != NULL, "Constraint manager is missing.");
 
-  this->choreographer = choreographer;
-  this->datablock = datablock;
-  this->cons_mgr = cons_mgr;
+  mChoreographer = choreographer;
+  mDatablock = datablock;
+  mCons_mgr = cons_mgr;
   ea_set_datablock(datablock->effect_data);
 
-  ew_timing = datablock->ewd_timing;
-  if (ew_timing.life_bias != 1.0f)
+  mEW_timing = datablock->ewd_timing;
+  if (mEW_timing.life_bias != 1.0f)
   {
-    if (ew_timing.lifetime > 0)
-      ew_timing.lifetime *= ew_timing.life_bias;
-    ew_timing.fade_in_time *= ew_timing.life_bias;
-    ew_timing.fade_out_time *= ew_timing.life_bias;
+    if (mEW_timing.lifetime > 0)
+      mEW_timing.lifetime *= mEW_timing.life_bias;
+	mEW_timing.fade_in_time *= mEW_timing.life_bias;
+	mEW_timing.fade_out_time *= mEW_timing.life_bias;
   }
 
-  pos_cons_id = cons_mgr->getConstraintId(datablock->pos_cons_def);
-  orient_cons_id = cons_mgr->getConstraintId(datablock->orient_cons_def);
-  aim_cons_id = cons_mgr->getConstraintId(datablock->aim_cons_def);
-  life_cons_id = cons_mgr->getConstraintId(datablock->life_cons_def);
+  mPos_cons_id = cons_mgr->getConstraintId(datablock->pos_cons_def);
+  mOrient_cons_id = cons_mgr->getConstraintId(datablock->orient_cons_def);
+  mAim_cons_id = cons_mgr->getConstraintId(datablock->aim_cons_def);
+  mLife_cons_id = cons_mgr->getConstraintId(datablock->life_cons_def);
 
-  this->time_factor = (datablock->ignore_time_factor) ? 1.0f : time_factor;
+  mTime_factor = (datablock->ignore_time_factor) ? 1.0f : time_factor;
 
   if (datablock->propagate_time_factor)
-    prop_time_factor = time_factor;
+    mProp_time_factor = time_factor;
 
   if (datablock->runsHere(choreographer->isServerObject()))
   {
     for (int i = 0; i < MAX_XFM_MODIFIERS && datablock->xfm_modifiers[i] != 0; i++)
     {
-      xfm_modifiers[i] = datablock->xfm_modifiers[i]->create(this, choreographer->isServerObject());
-      AssertFatal(xfm_modifiers[i] != 0, avar("Error, creation failed for xfm_modifiers[%d] of %s.", i, datablock->getName()));
-      if (xfm_modifiers[i] == 0)
+      mXfm_modifiers[i] = datablock->xfm_modifiers[i]->create(this, choreographer->isServerObject());
+      AssertFatal(mXfm_modifiers[i] != 0, avar("Error, creation failed for xfm_modifiers[%d] of %s.", i, datablock->getName()));
+      if (mXfm_modifiers[i] == 0)
         Con::errorf("Error, creation failed for xfm_modifiers[%d] of %s.", i, datablock->getName());
     }
   }
@@ -795,9 +795,9 @@ void afxEffectWrapper::ew_init(afxChoreographer*     choreographer,
     choreographer->addNamedEffect(this);
     if (datablock->use_as_cons_obj)
     {
-      effect_cons_id = cons_mgr->setReferenceEffect(datablock->effect_name, this);
-      if (effect_cons_id.undefined() && datablock->isTempClone() && datablock->runsHere(choreographer->isServerObject()))
-        effect_cons_id = cons_mgr->createReferenceEffect(datablock->effect_name, this);
+      mEffect_cons_id = cons_mgr->setReferenceEffect(datablock->effect_name, this);
+      if (mEffect_cons_id.undefined() && datablock->isTempClone() && datablock->runsHere(choreographer->isServerObject()))
+		  mEffect_cons_id = cons_mgr->createReferenceEffect(datablock->effect_name, this);
     }
   }
 }
@@ -805,37 +805,37 @@ void afxEffectWrapper::ew_init(afxChoreographer*     choreographer,
 void afxEffectWrapper::prestart() 
 {
   // modify timing values by time_factor
-  if (ew_timing.lifetime > 0)
-    ew_timing.lifetime *= time_factor;
-  ew_timing.delay *= time_factor;
-  ew_timing.fade_in_time *= time_factor;
-  ew_timing.fade_out_time *= time_factor;
+  if (mEW_timing.lifetime > 0)
+    mEW_timing.lifetime *= mTime_factor;
+  mEW_timing.delay *= mTime_factor;
+  mEW_timing.fade_in_time *= mTime_factor;
+  mEW_timing.fade_out_time *= mTime_factor;
 
-  if (ew_timing.lifetime < 0)
+  if (mEW_timing.lifetime < 0)
   {
-    full_lifetime = INFINITE_LIFETIME;
-    life_end = INFINITE_LIFETIME;
+    mFull_lifetime = INFINITE_LIFETIME;
+    mLife_end = INFINITE_LIFETIME;
   }
   else
   {
-    full_lifetime = ew_timing.lifetime + ew_timing.fade_out_time;
-    life_end = ew_timing.delay + ew_timing.lifetime;
+    mFull_lifetime = mEW_timing.lifetime + mEW_timing.fade_out_time;
+	mLife_end = mEW_timing.delay + mEW_timing.lifetime;
   }
 
-  if ((ew_timing.fade_in_time + ew_timing.fade_out_time) > 0.0f)
+  if ((mEW_timing.fade_in_time + mEW_timing.fade_out_time) > 0.0f)
   {
-    fade_in_end = ew_timing.delay + ew_timing.fade_in_time;
-    if (full_lifetime == INFINITE_LIFETIME)
-      fade_out_start = INFINITE_LIFETIME;
+    mFade_in_end = mEW_timing.delay + mEW_timing.fade_in_time;
+    if (mFull_lifetime == INFINITE_LIFETIME)
+      mFade_out_start = INFINITE_LIFETIME;
     else
-      fade_out_start = ew_timing.delay + ew_timing.lifetime;
-    do_fade_inout = true;
+      mFade_out_start = mEW_timing.delay + mEW_timing.lifetime;
+    mDo_fade_inout = true;
   }
 
-  if (!do_fade_inout && datablock->vis_keys != NULL && datablock->vis_keys->numKeys() > 0)
+  if (!mDo_fade_inout && mDatablock->vis_keys != NULL && mDatablock->vis_keys->numKeys() > 0)
   {
     //do_fades = true;
-    fade_out_start = ew_timing.delay + ew_timing.lifetime;
+    mFade_out_start = mEW_timing.delay + mEW_timing.lifetime;
   }
 }
 
@@ -843,22 +843,22 @@ bool afxEffectWrapper::start(F32 timestamp)
 { 
   if (!ea_is_enabled())
   {
-    Con::warnf("afxEffectWrapper::start() -- effect type of %s is currently disabled.", datablock->getName());
+    Con::warnf("afxEffectWrapper::start() -- effect type of %s is currently disabled.", mDatablock->getName());
     return false;
   }
 
   afxConstraint* life_constraint = getLifeConstraint();
   if (life_constraint)
-    cond_alive = life_constraint->getLivingState();
+    mCond_alive = life_constraint->getLivingState();
 
-  elapsed = timestamp; 
+  mElapsed = timestamp; 
 
   for (S32 i = 0; i < MAX_XFM_MODIFIERS; i++)
   {
-    if (!xfm_modifiers[i])
+    if (!mXfm_modifiers[i])
       break;
     else
-      xfm_modifiers[i]->start(timestamp);
+		mXfm_modifiers[i]->start(timestamp);
   }
 
   if (!ea_start())
@@ -874,109 +874,109 @@ bool afxEffectWrapper::start(F32 timestamp)
 bool afxEffectWrapper::test_life_conds()
 {
   afxConstraint* life_constraint = getLifeConstraint();
-  if (!life_constraint || datablock->life_conds == 0)
+  if (!life_constraint || mDatablock->life_conds == 0)
     return true;
 
   S32 now_state = life_constraint->getDamageState();
-  if ((datablock->life_conds & DEAD) != 0 && now_state == ShapeBase::Disabled)
+  if ((mDatablock->life_conds & DEAD) != 0 && now_state == ShapeBase::Disabled)
     return true;
-  if ((datablock->life_conds & ALIVE) != 0 && now_state == ShapeBase::Enabled)
+  if ((mDatablock->life_conds & ALIVE) != 0 && now_state == ShapeBase::Enabled)
     return true;
-  if ((datablock->life_conds & DYING) != 0)
-    return (cond_alive && now_state == ShapeBase::Disabled);
+  if ((mDatablock->life_conds & DYING) != 0)
+    return (mCond_alive && now_state == ShapeBase::Disabled);
 
   return false;
 }
 
 bool afxEffectWrapper::update(F32 dt) 
 { 
-  elapsed += dt; 
+  mElapsed += dt; 
 
   // life_elapsed won't exceed full_lifetime
-  life_elapsed = getMin(elapsed - ew_timing.delay, full_lifetime);
+  mLife_elapsed = getMin(mElapsed - mEW_timing.delay, mFull_lifetime);
 
   // update() returns early if elapsed is outside of active timing range 
   //     (delay <= elapsed <= delay+lifetime)
   // note: execution is always allowed beyond this point at least once, 
   //       even if elapsed exceeds the lifetime.
-  if (elapsed < ew_timing.delay)
+  if (mElapsed < mEW_timing.delay)
   {
     setScopeStatus(false);
     return false;
   }
   
-  if (!datablock->requiresStop(ew_timing) && ew_timing.lifetime < 0)
+  if (!mDatablock->requiresStop(mEW_timing) && mEW_timing.lifetime < 0)
   {
-    F32 afterlife = elapsed - ew_timing.delay;
-    if (afterlife > 1.0f || ((afterlife > 0.0f) && (n_updates > 0)))
+    F32 afterlife = mElapsed - mEW_timing.delay;
+    if (afterlife > 1.0f || ((afterlife > 0.0f) && (mNum_updates > 0)))
     {
-      setScopeStatus(ew_timing.residue_lifetime > 0.0f);
+      setScopeStatus(mEW_timing.residue_lifetime > 0.0f);
       return false;
     }
   }
   else
   {
-    F32 afterlife = elapsed - (full_lifetime + ew_timing.delay);
-    if (afterlife > 1.0f || ((afterlife > 0.0f) && (n_updates > 0)))
+    F32 afterlife = mElapsed - (mFull_lifetime + mEW_timing.delay);
+    if (afterlife > 1.0f || ((afterlife > 0.0f) && (mNum_updates > 0)))
     {
-      setScopeStatus(ew_timing.residue_lifetime > 0.0f);
+      setScopeStatus(mEW_timing.residue_lifetime > 0.0f);
       return false;
     }
   }
 
   // first time here, test if required conditions for effect are met
-  if (n_updates == 0)
+  if (mNum_updates == 0)
   {
     if (!test_life_conds())
     {
-      elapsed = full_lifetime + ew_timing.delay;
+      mElapsed = mFull_lifetime + mEW_timing.delay;
       setScopeStatus(false);
-      n_updates++;
+	  mNum_updates++;
       return false;
     }
   }
 
   setScopeStatus(true);
-  n_updates++;
+  mNum_updates++;
 
 
   // calculate current fade value if enabled
-  if (do_fade_inout)
+  if (mDo_fade_inout)
   {
-    if (ew_timing.fade_in_time > 0 && elapsed <= fade_in_end)
+    if (mEW_timing.fade_in_time > 0 && mElapsed <= mFade_in_end)
     {
-      F32 t = mClampF((elapsed-ew_timing.delay)/ew_timing.fade_in_time, 0.0f, 1.0f);
-      fade_value = afxEase::t(t, ew_timing.fadein_ease.x,ew_timing.fadein_ease.y);
-      do_fades = true;
+      F32 t = mClampF((mElapsed - mEW_timing.delay)/ mEW_timing.fade_in_time, 0.0f, 1.0f);
+      mFade_value = afxEase::t(t, mEW_timing.fadein_ease.x, mEW_timing.fadein_ease.y);
+      mDo_fades = true;
     }
-    else if (elapsed > fade_out_start)
+    else if (mElapsed > mFade_out_start)
     {
-      if (ew_timing.fade_out_time == 0)
-        fade_value = 0.0f;
+      if (mEW_timing.fade_out_time == 0)
+        mFade_value = 0.0f;
       else
       {
-        F32 t = mClampF(1.0f-(elapsed-fade_out_start)/ew_timing.fade_out_time, 0.0f, 1.0f);
-        fade_value = afxEase::t(t, ew_timing.fadeout_ease.x,ew_timing.fadeout_ease.y);
+        F32 t = mClampF(1.0f-(mElapsed - mFade_out_start)/ mEW_timing.fade_out_time, 0.0f, 1.0f);
+        mFade_value = afxEase::t(t, mEW_timing.fadeout_ease.x, mEW_timing.fadeout_ease.y);
       }
-      do_fades = true;
+	  mDo_fades = true;
     }
     else
     {
-      fade_value = 1.0f;
-      do_fades = false;
+      mFade_value = 1.0f;
+	  mDo_fades = false;
     }
   }
   else
   {
-    fade_value = 1.0;
-    do_fades = false;
+    mFade_value = 1.0;
+	mDo_fades = false;
   }
 
-  if (datablock->vis_keys && datablock->vis_keys->numKeys() > 0)
+  if (mDatablock->vis_keys && mDatablock->vis_keys->numKeys() > 0)
   {
-    F32 vis = datablock->vis_keys->evaluate(elapsed-ew_timing.delay);
-    fade_value *= mClampF(vis, 0.0f, 1.0f);
-    do_fades = (fade_value < 1.0f);
+    F32 vis = mDatablock->vis_keys->evaluate(mElapsed - mEW_timing.delay);
+    mFade_value *= mClampF(vis, 0.0f, 1.0f);
+	mDo_fades = (mFade_value < 1.0f);
   }
 
   // DEAL WITH CONSTRAINTS
@@ -990,17 +990,17 @@ bool afxEffectWrapper::update(F32 dt)
   afxConstraint* pos_constraint = getPosConstraint();
   if (pos_constraint)
   {
-    bool valid = pos_constraint->getPosition(CONS_POS, datablock->pos_cons_def.history_time);
+    bool valid = pos_constraint->getPosition(CONS_POS, mDatablock->pos_cons_def.mHistory_time);
     if (!valid)
       getUnconstrainedPosition(CONS_POS);
     setScopeStatus(valid);
-    if (valid && datablock->borrow_altitudes)
+    if (valid && mDatablock->borrow_altitudes)
     {
       F32 terr_alt, inter_alt;
       if (pos_constraint->getAltitudes(terr_alt, inter_alt))
       {
-        terrain_altitude = terr_alt;
-        interior_altitude = inter_alt;
+        mTerrain_altitude = terr_alt;
+        mInterior_altitude = inter_alt;
       }
     }
   }
@@ -1013,7 +1013,7 @@ bool afxEffectWrapper::update(F32 dt)
   afxConstraint* orient_constraint = getOrientConstraint();
   if (orient_constraint) 
   {
-    orient_constraint->getTransform(CONS_XFM, datablock->pos_cons_def.history_time);
+    orient_constraint->getTransform(CONS_XFM, mDatablock->pos_cons_def.mHistory_time);
   }
   else
   {
@@ -1022,11 +1022,11 @@ bool afxEffectWrapper::update(F32 dt)
 
   afxConstraint* aim_constraint = getAimConstraint();
   if (aim_constraint)
-    aim_constraint->getPosition(CONS_AIM, datablock->pos_cons_def.history_time);
+    aim_constraint->getPosition(CONS_AIM, mDatablock->pos_cons_def.mHistory_time);
   else
     CONS_AIM.zero();
 
-  CONS_SCALE.set(datablock->scale_factor, datablock->scale_factor, datablock->scale_factor);
+  CONS_SCALE.set(mDatablock->scale_factor, mDatablock->scale_factor, mDatablock->scale_factor);
 
   /*
   if (datablock->isPositional() && CONS_POS.isZero() && in_scope)
@@ -1035,44 +1035,44 @@ bool afxEffectWrapper::update(F32 dt)
 
   getBaseColor(CONS_COLOR);
 
-  params.vis = fade_value;
+  params.vis = mFade_value;
 
   // apply modifiers
   for (int i = 0; i < MAX_XFM_MODIFIERS; i++)
   {
-    if (!xfm_modifiers[i])
+    if (!mXfm_modifiers[i])
       break;
     else
-      xfm_modifiers[i]->updateParams(dt, life_elapsed, params);
+      mXfm_modifiers[i]->updateParams(dt, mLife_elapsed, params);
   }
 
   // final pos/orient is determined
-  updated_xfm = CONS_XFM;  
-  updated_pos = CONS_POS;
-  updated_aim = CONS_AIM;
-  updated_xfm.setPosition(updated_pos);
-  updated_scale = CONS_SCALE;
-  updated_color = CONS_COLOR;
+  mUpdated_xfm = CONS_XFM;  
+  mUpdated_pos = CONS_POS;
+  mUpdated_aim = CONS_AIM;
+  mUpdated_xfm.setPosition(mUpdated_pos);
+  mUpdated_scale = CONS_SCALE;
+  mUpdated_color = CONS_COLOR;
 
   if (params.vis > 1.0f)
-    fade_value = 1.0f;
+    mFade_value = 1.0f;
   else
-    fade_value = params.vis;
+    mFade_value = params.vis;
 
-  if (last_fade_value != fade_value)
+  if (mLast_fade_value != mFade_value)
   {
-    do_fades = true;
-    last_fade_value = fade_value;
+    mDo_fades = true;
+	mLast_fade_value = mFade_value;
   }
   else
   {
-    do_fades = (fade_value < 1.0f);
+    mDo_fades = (mFade_value < 1.0f);
   }
 
   if (!ea_update(dt))
   {
-    is_aborted = true;
-    Con::errorf("afxEffectWrapper::update() -- effect %s ended unexpectedly.", datablock->getName());
+    mIs_aborted = true;
+    Con::errorf("afxEffectWrapper::update() -- effect %s ended unexpectedly.", mDatablock->getName());
   }
 
   return true;
@@ -1080,44 +1080,44 @@ bool afxEffectWrapper::update(F32 dt)
 
 void afxEffectWrapper::stop() 
 { 
-  if (!datablock->requiresStop(ew_timing))
+  if (!mDatablock->requiresStop(mEW_timing))
     return;
 
-  stopped = true; 
+  mStopped = true; 
 
   // this resets full_lifetime so it starts to shrink or fade
-  if (full_lifetime == INFINITE_LIFETIME)
+  if (mFull_lifetime == INFINITE_LIFETIME)
   {
-    full_lifetime = (elapsed - ew_timing.delay) + afterStopTime();
-    life_end = elapsed; 
-    if (ew_timing.fade_out_time > 0)
-      fade_out_start = elapsed;
+    mFull_lifetime = (mElapsed - mEW_timing.delay) + afterStopTime();
+	mLife_end = mElapsed;
+    if (mEW_timing.fade_out_time > 0)
+      mFade_out_start = mElapsed;
   }
 }
 
 void afxEffectWrapper::cleanup(bool was_stopped)
 { 
   ea_finish(was_stopped);
-  if (!effect_cons_id.undefined())
+  if (!mEffect_cons_id.undefined())
   {
-    cons_mgr->setReferenceEffect(effect_cons_id, 0);
-    effect_cons_id = afxConstraintID();
+    mCons_mgr->setReferenceEffect(mEffect_cons_id, 0);
+	mEffect_cons_id = afxConstraintID();
   }
 }
 
 void afxEffectWrapper::setScopeStatus(bool in_scope)
 { 
-  if (this->in_scope != in_scope)
+  if (mIn_scope != in_scope)
   {
-    this->in_scope = in_scope;
+    mIn_scope = in_scope;
     ea_set_scope_status(in_scope);
   }
 }
 
 bool afxEffectWrapper::isDone() 
 { 
-  if (!datablock->is_looping)
-    return (elapsed >= (life_end + ew_timing.fade_out_time));
+  if (!mDatablock->is_looping)
+    return (mElapsed >= (mLife_end + mEW_timing.fade_out_time));
 
   return false;
 }
@@ -1136,7 +1136,7 @@ afxEffectWrapper* afxEffectWrapper::ew_create(afxChoreographer*      choreograph
 
   if (adapter)
   {
-    adapter->group_index = (datablock->group_index != -1) ? datablock->group_index : group_index;
+    adapter->mGroup_index = (datablock->group_index != -1) ? datablock->group_index : group_index;
     adapter->ew_init(choreographer, datablock, cons_mgr, time_factor); 
   }
 

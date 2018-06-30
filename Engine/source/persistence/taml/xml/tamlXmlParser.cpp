@@ -53,7 +53,7 @@ bool TamlXmlParser::accept( const char* pFilename, TamlVisitor& visitor )
 
 #ifdef TORQUE_OS_ANDROID
     if (strlen(pFilename) > strlen(filenameBuffer)) {
-    	strcpy(filenameBuffer, pFilename);
+    	dStrcpy(filenameBuffer, pFilename, 1024);
     }
 #endif
 

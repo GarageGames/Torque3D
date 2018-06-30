@@ -407,7 +407,7 @@ private:
    /// @name Rendering
    /// @{
 
-   duDebugDrawTorque dd;
+   duDebugDrawTorque mDbgDraw;
 
    void renderToDrawer();
 

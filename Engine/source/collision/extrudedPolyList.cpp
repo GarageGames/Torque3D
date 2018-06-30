@@ -72,11 +72,11 @@ void ExtrudedPolyList::extrude(const Polyhedron& pt, const VectorF& vector)
    mPolyPlaneList.clear();
 
    // Determine which faces will be extruded.
-   mExtrudedList.setSize(pt.planeList.size());
+   mExtrudedList.setSize(pt.mPlaneList.size());
 
-   for (U32 f = 0; f < pt.planeList.size(); f++) 
+   for (U32 f = 0; f < pt.mPlaneList.size(); f++)
    {
-      const PlaneF& face = pt.planeList[f];
+      const PlaneF& face = pt.mPlaneList[f];
       ExtrudedFace& eface = mExtrudedList[f];
       F32 dot = mDot(face,vector);
       eface.active = dot > EqualEpsilon;
@@ -96,9 +96,9 @@ void ExtrudedPolyList::extrude(const Polyhedron& pt, const VectorF& vector)
    }
 
    // Produce extruded planes for bounding and internal edges
-   for (U32 e = 0; e < pt.edgeList.size(); e++) 
+   for (U32 e = 0; e < pt.mEdgeList.size(); e++) 
    {
-      Polyhedron::Edge const& edge = pt.edgeList[e];
+      Polyhedron::Edge const& edge = pt.mEdgeList[e];
       ExtrudedFace& ef1 = mExtrudedList[edge.face[0]];
       ExtrudedFace& ef2 = mExtrudedList[edge.face[1]];
       if (ef1.active || ef2.active) 
@@ -106,8 +106,8 @@ void ExtrudedPolyList::extrude(const Polyhedron& pt, const VectorF& vector)
 
          // Assumes that the edge points are clockwise
          // for face[0].
-         const Point3F& p1 = pt.pointList[edge.vertex[1]];
-         const Point3F &p2 = pt.pointList[edge.vertex[0]];
+         const Point3F& p1 = pt.mPointList[edge.vertex[1]];
+         const Point3F &p2 = pt.mPointList[edge.vertex[0]];
          Point3F p3 = p2 + vector;
 
          mPlaneList.increment(2);

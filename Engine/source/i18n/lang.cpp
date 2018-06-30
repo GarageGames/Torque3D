@@ -42,8 +42,9 @@ LangFile::LangFile(const UTF8 *langName /* = NULL */)
 
 	if(langName)
 	{
-		mLangName = new UTF8 [dStrlen(langName) + 1];
-		dStrcpy(mLangName, langName);
+		dsize_t langNameLen = dStrlen(langName) + 1;
+		mLangName = new UTF8 [langNameLen];
+		dStrcpy(mLangName, langName, langNameLen);
 	}
 	else
 		mLangName = NULL;
@@ -136,8 +137,9 @@ const UTF8 * LangFile::getString(U32 id)
 
 U32 LangFile::addString(const UTF8 *str)
 {
-	UTF8 *newstr = new UTF8 [dStrlen(str) + 1];
-	dStrcpy(newstr, str);
+	dsize_t newstrLen = dStrlen(str) + 1;
+	UTF8 *newstr = new UTF8 [newstrLen];
+	dStrcpy(newstr, str, newstrLen);
 	mStringTable.push_back(newstr);
 	return mStringTable.size() - 1;
 }
@@ -156,8 +158,9 @@ void LangFile::setString(U32 id, const UTF8 *str)
 
    SAFE_DELETE_ARRAY(mStringTable[id]);
 
-	UTF8 *newstr = new UTF8 [dStrlen(str) + 1];
-	dStrcpy(newstr, str);
+	dsize_t newstrLen = dStrlen(str) + 1;
+	UTF8 *newstr = new UTF8 [newstrLen];
+	dStrcpy(newstr, str, newstrLen);
 	mStringTable[id] = newstr;
 }
 
@@ -166,8 +169,9 @@ void LangFile::setLangName(const UTF8 *newName)
 	if(mLangName)
 		delete [] mLangName;
 	
-	mLangName = new UTF8 [dStrlen(newName) + 1];
-	dStrcpy(mLangName, newName);
+	dsize_t langNameLen = dStrlen(newName) + 1;
+	mLangName = new UTF8 [langNameLen];
+	dStrcpy(mLangName, newName, langNameLen);
 }
 
 void LangFile::setLangFile(const UTF8 *langFile)
@@ -175,8 +179,9 @@ void LangFile::setLangFile(const UTF8 *langFile)
 	if(mLangFile)
 		delete [] mLangFile;
 	
-	mLangFile = new UTF8 [dStrlen(langFile) + 1];
-	dStrcpy(mLangFile, langFile);
+	dsize_t langFileLen = dStrlen(langFile) + 1;
+	mLangFile = new UTF8 [langFileLen];
+	dStrcpy(mLangFile, langFile, langFileLen);
 }
 
 bool LangFile::activateLanguage()
@@ -349,8 +354,9 @@ DefineConsoleMethod(LangTable, getString, const char *, (U32 id), ,
 	const char * str =	(const char*)object->getString(id);
 	if(str != NULL)
 	{
-		char * ret = Con::getReturnBuffer(dStrlen(str) + 1);
-		dStrcpy(ret, str);
+		dsize_t retLen = dStrlen(str) + 1;
+		char * ret = Con::getReturnBuffer(retLen);
+		dStrcpy(ret, str, retLen);
 		return ret;
 	}
 	
@@ -387,8 +393,9 @@ DefineConsoleMethod(LangTable, getLangName, const char *, (S32 langId), , "(int 
 	const char * str = (const char*)object->getLangName(langId);
 	if(str != NULL)
 	{
-		char * ret = Con::getReturnBuffer(dStrlen(str) + 1);
-		dStrcpy(ret, str);
+		dsize_t retLen = dStrlen(str) + 1;
+		char * ret = Con::getReturnBuffer(retLen);
+		dStrcpy(ret, str, retLen);
 		return ret;
 	}
 	
@@ -414,7 +421,7 @@ UTF8 *sanitiseVarName(const UTF8 *varName, UTF8 *buffer, U32 bufsize)
 		return NULL;
 	}
 	
-	dStrcpy(buffer, (const UTF8*)"I18N::");
+	dStrcpy(buffer, (const UTF8*)"I18N::", bufsize);
 	
 	UTF8 *dptr = buffer + 6;
 	const UTF8 *sptr = varName;

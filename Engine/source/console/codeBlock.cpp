@@ -392,14 +392,14 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
    if (size)
    {
       globalFloats = new F64[size];
-      for (U32 i = 0; i < size; i++)
+      for (i = 0; i < size; i++)
          st.read(&globalFloats[i]);
    }
    st.read(&size);
    if (size)
    {
       functionFloats = new F64[size];
-      for (U32 i = 0; i < size; i++)
+      for (i = 0; i < size; i++)
          st.read(&functionFloats[i]);
    }
    U32 codeLength;
@@ -409,6 +409,8 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
    U32 totSize = codeLength + lineBreakPairCount * 2;
    code = new U32[totSize];
 
+   // 0xFF is used as a flag to help compress the bytecode.
+   // If detected, the bytecode is only a U8.
    for (i = 0; i < codeLength; i++)
    {
       U8 b;
@@ -442,7 +444,11 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
       {
          U32 ip;
          st.read(&ip);
+#ifdef TORQUE_CPU_X64
+         *(U64*)(code + ip) = (U64)ste;
+#else
          code[ip] = *((U32 *)&ste);
+#endif
       }
    }
 
@@ -692,10 +698,10 @@ String CodeBlock::getFunctionArgs(U32 ip)
 {
    StringBuilder str;
 
-   U32 fnArgc = code[ip + 5];
+   U32 fnArgc = code[ip + 8];
    for (U32 i = 0; i < fnArgc; ++i)
    {
-      StringTableEntry var = CodeToSTE(code, ip + (i * 2) + 6);
+      StringTableEntry var = CodeToSTE(code, ip + (i * 2) + 9);
 
       if (i != 0)
          str.append(", ");

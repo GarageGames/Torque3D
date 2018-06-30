@@ -84,28 +84,28 @@ bool afxEA_ParticleEmitter::ea_start()
       {
          afxParticleEmitterVector* pe = new afxParticleEmitterVector();
          pe->onNewDataBlock(afx_emitter_db, false);
-         pe->setAFXOwner(choreographer);
+         pe->setAFXOwner(mChoreographer);
          emitter = pe;
       }
       else if (dynamic_cast<afxParticleEmitterConeData*>(emitter_data))
       {
          afxParticleEmitterCone* pe = new afxParticleEmitterCone();
          pe->onNewDataBlock(afx_emitter_db, false);
-         pe->setAFXOwner(choreographer);
+         pe->setAFXOwner(mChoreographer);
          emitter = pe;
       }
       else if (dynamic_cast<afxParticleEmitterPathData*>(emitter_data))
       {
          afxParticleEmitterPath* pe = new afxParticleEmitterPath();
          pe->onNewDataBlock(afx_emitter_db, false);
-         pe->setAFXOwner(choreographer);
+         pe->setAFXOwner(mChoreographer);
          emitter = pe;
       }
       else if (dynamic_cast<afxParticleEmitterDiscData*>(emitter_data))
       {
          afxParticleEmitterDisc* pe = new afxParticleEmitterDisc();
          pe->onNewDataBlock(afx_emitter_db, false);
-         pe->setAFXOwner(choreographer);
+         pe->setAFXOwner(mChoreographer);
          emitter = pe;
       }
    }
@@ -120,7 +120,7 @@ bool afxEA_ParticleEmitter::ea_start()
   // here we find or create any required particle-pools
   if (emitter_data->pool_datablock)
   { 
-    afxParticlePool* pool = choreographer->findParticlePool(emitter_data->pool_datablock, emitter_data->pool_index);
+    afxParticlePool* pool = mChoreographer->findParticlePool(emitter_data->pool_datablock, emitter_data->pool_index);
     if (!pool)
     {
       afxParticlePoolData* pool_data = emitter_data->pool_datablock;
@@ -129,7 +129,7 @@ bool afxEA_ParticleEmitter::ea_start()
         // clone the datablock and perform substitutions
         afxParticlePoolData* orig_db = pool_data;
         pool_data = new afxParticlePoolData(*orig_db, true);
-        orig_db->performSubstitutions(pool_data, choreographer, group_index);
+        orig_db->performSubstitutions(pool_data, mChoreographer, mGroup_index);
       }
 
       pool = new afxParticlePool();
@@ -143,8 +143,8 @@ bool afxEA_ParticleEmitter::ea_start()
       }
       if (pool)
       {
-        pool->setChoreographer(choreographer);
-        choreographer->registerParticlePool(pool);
+        pool->setChoreographer(mChoreographer);
+		mChoreographer->registerParticlePool(pool);
       }
     }
     if (pool)
@@ -160,12 +160,12 @@ bool afxEA_ParticleEmitter::ea_start()
     return false;
   }
 
-  if (datablock->forced_bbox.isValidBox())
+  if (mDatablock->forced_bbox.isValidBox())
   {
     do_bbox_update = true;
   }
 
-  emitter->setSortPriority(datablock->sort_priority);
+  emitter->setSortPriority(mDatablock->sort_priority);
   deleteNotify(emitter);
 
   return true;
@@ -173,26 +173,26 @@ bool afxEA_ParticleEmitter::ea_start()
 
 bool afxEA_ParticleEmitter::ea_update(F32 dt)
 {
-  if (emitter && in_scope)
+  if (emitter && mIn_scope)
   {
     if (do_bbox_update)
     {
       Box3F bbox = emitter->getObjBox();
 
-      bbox.minExtents = updated_pos + datablock->forced_bbox.minExtents;
-      bbox.maxExtents = updated_pos + datablock->forced_bbox.maxExtents;
+      bbox.minExtents = mUpdated_pos + mDatablock->forced_bbox.minExtents;
+      bbox.maxExtents = mUpdated_pos + mDatablock->forced_bbox.maxExtents;
 
       emitter->setForcedObjBox(bbox);
       emitter->setTransform(emitter->getTransform());
 
-      if (!datablock->update_forced_bbox)
+      if (!mDatablock->update_forced_bbox)
         do_bbox_update = false;
     }
 
-    if (do_fades)
-      emitter->setFadeAmount(fade_value);
+    if (mDo_fades)
+      emitter->setFadeAmount(mFade_value);
     
-    emitter->emitParticlesExt(updated_xfm, updated_pos, Point3F(0.0,0.0,0.0), (U32)(dt*1000));
+    emitter->emitParticlesExt(mUpdated_xfm, mUpdated_pos, Point3F(0.0,0.0,0.0), (U32)(dt*1000));
   }
 
   return true;
@@ -209,7 +209,7 @@ void afxEA_ParticleEmitter::ea_finish(bool was_stopped)
     //   note - fully faded particles are not always
     //     invisible, so they are still kept alive and 
     //     deleted via deleteWhenEmpty().
-    if (ew_timing.fade_out_time > 0.0f)
+    if (mEW_timing.fade_out_time > 0.0f)
       emitter->setFadeAmount(0.0f);
     if (dynamic_cast<afxParticleEmitter*>(emitter))
       ((afxParticleEmitter*)emitter)->setAFXOwner(0);
@@ -240,32 +240,32 @@ void afxEA_ParticleEmitter::do_runtime_substitutions()
       {
         afxParticleEmitterVectorData* orig_db = (afxParticleEmitterVectorData*)emitter_data;
         emitter_data = new afxParticleEmitterVectorData(*orig_db, true);
-        orig_db->performSubstitutions(emitter_data, choreographer, group_index);
+        orig_db->performSubstitutions(emitter_data, mChoreographer, mGroup_index);
       }
       else if (dynamic_cast<afxParticleEmitterConeData*>(emitter_data))
       {
         afxParticleEmitterConeData* orig_db = (afxParticleEmitterConeData*)emitter_data;
         emitter_data = new afxParticleEmitterConeData(*orig_db, true);
-        orig_db->performSubstitutions(emitter_data, choreographer, group_index);
+        orig_db->performSubstitutions(emitter_data, mChoreographer, mGroup_index);
      }
       else if (dynamic_cast<afxParticleEmitterPathData*>(emitter_data))
       {
         afxParticleEmitterPathData* orig_db = (afxParticleEmitterPathData*)emitter_data;
         emitter_data = new afxParticleEmitterPathData(*orig_db, true);
-        orig_db->performSubstitutions(emitter_data, choreographer, group_index);
+        orig_db->performSubstitutions(emitter_data, mChoreographer, mGroup_index);
       }
       else if (dynamic_cast<afxParticleEmitterDiscData*>(emitter_data))
       {
         afxParticleEmitterDiscData* orig_db = (afxParticleEmitterDiscData*)emitter_data;
         emitter_data = new afxParticleEmitterDiscData(*orig_db, true);
-        orig_db->performSubstitutions(emitter_data, choreographer, group_index);
+        orig_db->performSubstitutions(emitter_data, mChoreographer, mGroup_index);
       }
     }
     else
     {
       ParticleEmitterData* orig_db = emitter_data;
       emitter_data = new ParticleEmitterData(*orig_db, true);
-      orig_db->performSubstitutions(emitter_data, choreographer, group_index);
+      orig_db->performSubstitutions(emitter_data, mChoreographer, mGroup_index);
     }
 
     if (clone_particles)
@@ -277,7 +277,7 @@ void afxEA_ParticleEmitter::do_runtime_substitutions()
           // clone the datablock and perform substitutions
           ParticleData* orig_db = emitter_data->particleDataBlocks[i];
           emitter_data->particleDataBlocks[i] = new ParticleData(*orig_db, true);
-          orig_db->performSubstitutions(emitter_data->particleDataBlocks[i], choreographer, group_index);
+          orig_db->performSubstitutions(emitter_data->particleDataBlocks[i], mChoreographer, mGroup_index);
         }
       }
     }

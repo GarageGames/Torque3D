@@ -554,7 +554,7 @@ bool XClipboard::setClipboard(const char *text)
    checkTDataSize(len);
 
    // copy the data into the storage buffer
-   dStrcpy(mTData, text);
+   dStrcpy(mTData, text, mTDataSize);
 
    // tell X that we own the clipboard.  (we'll get events
    // if an app tries to paste)

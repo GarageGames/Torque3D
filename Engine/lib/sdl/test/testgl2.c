@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -56,7 +56,7 @@ static int LoadContext(GL_Context * data)
     do { \
         data->func = SDL_GL_GetProcAddress(#func); \
         if ( ! data->func ) { \
-            return SDL_SetError("Couldn't load GL function %s: %s\n", #func, SDL_GetError()); \
+            return SDL_SetError("Couldn't load GL function %s: %s", #func, SDL_GetError()); \
         } \
     } while ( 0 );
 #endif /* __SDL_NOGETPROCADDR__ */

@@ -108,16 +108,16 @@ F32 afxEA_Zodiac::calc_facing_angle()
 
 inline F32 afxEA_Zodiac::calc_terrain_alt_bias()
 {
-  if (terrain_altitude >= zode_data->altitude_max)
+  if (mTerrain_altitude >= zode_data->altitude_max)
     return 0.0f;
-  return 1.0f - (terrain_altitude - zode_data->altitude_falloff)/altitude_falloff_range;
+  return 1.0f - (mTerrain_altitude - zode_data->altitude_falloff)/altitude_falloff_range;
 }
 
 inline F32 afxEA_Zodiac::calc_interior_alt_bias()
 {
-  if (interior_altitude >= zode_data->altitude_max)
+  if (mInterior_altitude >= zode_data->altitude_max)
     return 0.0f;
-  return 1.0f - (interior_altitude - zode_data->altitude_falloff)/altitude_falloff_range;
+  return 1.0f - (mInterior_altitude - zode_data->altitude_falloff)/altitude_falloff_range;
 }
 
 afxEA_Zodiac::afxEA_Zodiac()
@@ -170,13 +170,13 @@ bool afxEA_Zodiac::ea_start()
 
 bool afxEA_Zodiac::ea_update(F32 dt)
 {
-  if (!in_scope)
+  if (!mIn_scope)
     return true;
 
   //~~~~~~~~~~~~~~~~~~~~//
   // Zodiac Color
 
-  zode_color = updated_color;
+  zode_color = mUpdated_color;
 
   if (live_color_factor > 0.0)
   {
@@ -190,15 +190,15 @@ bool afxEA_Zodiac::ea_update(F32 dt)
      //Con::printf("LIVE-COLOR-FACTOR is ZERO");
   }
 
-  if (do_fades)
+  if (mDo_fades)
   {
-    if (fade_value < 0.01f)
+    if (mFade_value < 0.01f)
       return true; // too transparent
 
     if (zode_data->blend_flags == afxZodiacDefs::BLEND_SUBTRACTIVE)
-      zode_color *= fade_value*live_fade_factor;
+      zode_color *= mFade_value * mLive_fade_factor;
     else
-      zode_color.alpha *= fade_value*live_fade_factor;
+      zode_color.alpha *= mFade_value * mLive_fade_factor;
   }
 
   if (zode_color.alpha < 0.01f)
@@ -208,22 +208,22 @@ bool afxEA_Zodiac::ea_update(F32 dt)
   // Zodiac
 
   // scale and grow zode
-  zode_radius = zode_data->radius_xy*updated_scale.x + life_elapsed*zode_data->growth_rate;
+  zode_radius = zode_data->radius_xy*mUpdated_scale.x + mLife_elapsed *zode_data->growth_rate;
 
   // zode is growing
-  if (life_elapsed < zode_data->grow_in_time)
+  if (mLife_elapsed < zode_data->grow_in_time)
   {
-    F32 t = life_elapsed/zode_data->grow_in_time;
+    F32 t = mLife_elapsed /zode_data->grow_in_time;
     zode_radius = afxEase::eq(t, 0.001f, zode_radius, 0.2f, 0.8f);
   }
   // zode is shrinking
-  else if (full_lifetime - life_elapsed < zode_data->shrink_out_time)
+  else if (mFull_lifetime - mLife_elapsed < zode_data->shrink_out_time)
   {
-    F32 t = (full_lifetime - life_elapsed)/zode_data->shrink_out_time;
+    F32 t = (mFull_lifetime - mLife_elapsed)/zode_data->shrink_out_time;
     zode_radius = afxEase::eq(t, 0.001f, zode_radius, 0.0f, 0.9f);
   }
 
-  zode_radius *= live_scale_factor;
+  zode_radius *= mLive_scale_factor;
 
   if (zode_radius < 0.001f)
     return true; // too small
@@ -238,7 +238,7 @@ bool afxEA_Zodiac::ea_update(F32 dt)
   //~~~~~~~~~~~~~~~~~~~~//
   // Zodiac Position
 
-  zode_pos = updated_pos;
+  zode_pos = mUpdated_pos;
 
   //~~~~~~~~~~~~~~~~~~~~//
   // Zodiac Rotation 
@@ -249,7 +249,7 @@ bool afxEA_Zodiac::ea_update(F32 dt)
     if (orient_constraint)
     {
       VectorF shape_vec;
-      updated_xfm.getColumn(1, &shape_vec);
+	  mUpdated_xfm.getColumn(1, &shape_vec);
       shape_vec.z = 0.0f;
       shape_vec.normalize();
       F32 pitch, yaw;
@@ -258,14 +258,14 @@ bool afxEA_Zodiac::ea_update(F32 dt)
     }
   }
 
-  zode_angle = zode_data->calcRotationAngle(life_elapsed, datablock->rate_factor/prop_time_factor);
+  zode_angle = zode_data->calcRotationAngle(mLife_elapsed, mDatablock->rate_factor/ mProp_time_factor);
   zode_angle = mFmod(zode_angle + zode_angle_offset, 360.0f);     
 
   //~~~~~~~~~~~~~~~~~~~~//
   // post zodiac
   if ((zode_data->zflags & afxZodiacDefs::SHOW_ON_TERRAIN) != 0)
   {
-    if (do_altitude_bias && terrain_altitude > zode_data->altitude_falloff)
+    if (do_altitude_bias && mTerrain_altitude > zode_data->altitude_falloff)
     {
       F32 alt_bias = calc_terrain_alt_bias();
       if (alt_bias > 0.0f)
@@ -287,7 +287,7 @@ bool afxEA_Zodiac::ea_update(F32 dt)
 
   if ((zode_data->zflags & afxZodiacDefs::SHOW_ON_INTERIORS) != 0)
   {
-    if (do_altitude_bias && interior_altitude > zode_data->altitude_falloff)
+    if (do_altitude_bias && mInterior_altitude > zode_data->altitude_falloff)
     {
       F32 alt_bias = calc_interior_alt_bias();
       if (alt_bias > 0.0f)
@@ -310,17 +310,17 @@ bool afxEA_Zodiac::ea_update(F32 dt)
 
 void afxEA_Zodiac::ea_finish(bool was_stopped)
 {
-  if (in_scope && ew_timing.residue_lifetime > 0)
+  if (mIn_scope && mEW_timing.residue_lifetime > 0)
   {
-    if (do_fades)
+    if (mDo_fades)
     {
-      if (fade_value < 0.01f)
+      if (mFade_value < 0.01f)
         return;
-      zode_color.alpha *= fade_value;
+      zode_color.alpha *= mFade_value;
     }
     if ((zode_data->zflags & afxZodiacDefs::SHOW_ON_TERRAIN) != 0)
     {
-      if (do_altitude_bias && terrain_altitude > zode_data->altitude_falloff)
+      if (do_altitude_bias && mTerrain_altitude > zode_data->altitude_falloff)
       {
         F32 alt_bias = calc_terrain_alt_bias();
         if (alt_bias > 0.0f)
@@ -332,20 +332,20 @@ void afxEA_Zodiac::ea_finish(bool was_stopped)
           if (zode_data->altitude_fades)
             zode_color.alpha *= alt_bias;
           became_residue = true;
-          afxResidueMgr::add_terrain_zodiac(ew_timing.residue_lifetime, ew_timing.residue_fadetime, zode_data, zode_pos, alt_rad, 
+          afxResidueMgr::add_terrain_zodiac(mEW_timing.residue_lifetime, mEW_timing.residue_fadetime, zode_data, zode_pos, alt_rad,
                                             alt_clr, zode_angle);
         }
       }
       else
       {
         became_residue = true;
-        afxResidueMgr::add_terrain_zodiac(ew_timing.residue_lifetime, ew_timing.residue_fadetime, zode_data, zode_pos, zode_radius, 
+        afxResidueMgr::add_terrain_zodiac(mEW_timing.residue_lifetime, mEW_timing.residue_fadetime, zode_data, zode_pos, zode_radius,
                                           zode_color, zode_angle);
       }
     }
     if ((zode_data->zflags & afxZodiacDefs::SHOW_ON_INTERIORS) != 0)
     {
-      if (do_altitude_bias && interior_altitude > zode_data->altitude_falloff)
+      if (do_altitude_bias && mInterior_altitude > zode_data->altitude_falloff)
       {
         F32 alt_bias = calc_interior_alt_bias();
         if (alt_bias > 0.0f)
@@ -361,7 +361,7 @@ void afxEA_Zodiac::ea_finish(bool was_stopped)
           if (became_residue)
             temp_zode = new afxZodiacData(*zode_data, true);
           became_residue = true;
-          afxResidueMgr::add_interior_zodiac(ew_timing.residue_lifetime, ew_timing.residue_fadetime, temp_zode, zode_pos, alt_rad, 
+          afxResidueMgr::add_interior_zodiac(mEW_timing.residue_lifetime, mEW_timing.residue_fadetime, temp_zode, zode_pos, alt_rad,
                                              zode_vrange, alt_clr, zode_angle);
         }
 
@@ -372,7 +372,7 @@ void afxEA_Zodiac::ea_finish(bool was_stopped)
         if (became_residue)
           temp_zode = new afxZodiacData(*zode_data, true);
         became_residue = true;
-        afxResidueMgr::add_interior_zodiac(ew_timing.residue_lifetime, ew_timing.residue_fadetime, temp_zode, zode_pos, zode_radius, 
+        afxResidueMgr::add_interior_zodiac(mEW_timing.residue_lifetime, mEW_timing.residue_fadetime, temp_zode, zode_pos, zode_radius,
                                            zode_vrange, zode_color, zode_angle);
       }
     }
@@ -387,7 +387,7 @@ void afxEA_Zodiac::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxZodiacData* orig_db = zode_data;
     zode_data = new afxZodiacData(*orig_db, true);
-    orig_db->performSubstitutions(zode_data, choreographer, group_index);
+    orig_db->performSubstitutions(zode_data, mChoreographer, mGroup_index);
   }
 }
 

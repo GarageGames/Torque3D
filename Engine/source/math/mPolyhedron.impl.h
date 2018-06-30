@@ -462,7 +462,7 @@ void PolyhedronData::buildBoxData( Polyhedron& poly, const MatrixF& mat, const B
 
    // Corner points.
 
-   typename Polyhedron::PointListType& pointList = poly.pointList;
+   typename Polyhedron::PointListType& pointList = poly.mPointList;
 
    pointList[ 0 ] = min; // near left bottom
    pointList[ 1 ] = min + yvec; // far left bottom
@@ -475,7 +475,7 @@ void PolyhedronData::buildBoxData( Polyhedron& poly, const MatrixF& mat, const B
 
    // Side planes.
 
-   typename Polyhedron::PlaneListType& planeList = poly.planeList;
+   typename Polyhedron::PlaneListType& planeList = poly.mPlaneList;
 
    const F32 pos = invertNormals ? -1.f : 1.f;
    const F32 neg = - pos;
@@ -490,7 +490,7 @@ void PolyhedronData::buildBoxData( Polyhedron& poly, const MatrixF& mat, const B
    // The edges are constructed so that the vertices
    // are oriented clockwise for face[0].
 
-   typename Polyhedron::EdgeType* edge = &poly.edgeList[ 0 ];
+   typename Polyhedron::EdgeType* edge = &poly.mEdgeList[ 0 ];
 
    for( U32 i = 0; i < 4; ++ i )
    {

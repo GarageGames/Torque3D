@@ -561,12 +561,13 @@ DefineConsoleFunction( stripChars, const char*, ( const char* str, const char* c
    "@endtsexample\n"
    "@ingroup Strings" )
 {
-   char* ret = Con::getReturnBuffer( dStrlen( str ) + 1 );
-   dStrcpy( ret, str );
+   S32 len = dStrlen(str) + 1;
+   char* ret = Con::getReturnBuffer( len );
+   dStrcpy( ret, str, len );
    U32 pos = dStrcspn( ret, chars );
    while ( pos < dStrlen( ret ) )
    {
-      dStrcpy( ret + pos, ret + pos + 1 );
+      dStrcpy( ret + pos, ret + pos + 1, len - pos );
       pos = dStrcspn( ret, chars );
    }
    return( ret );
@@ -584,8 +585,9 @@ DefineConsoleFunction( strlwr, const char*, ( const char* str ),,
    "@see strupr\n"
    "@ingroup Strings" )
 {
-   char *ret = Con::getReturnBuffer(dStrlen(str) + 1);
-   dStrcpy(ret, str);
+   dsize_t retLen = dStrlen(str) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, str, retLen);
    return dStrlwr(ret);
 }
 
@@ -601,8 +603,9 @@ DefineConsoleFunction( strupr, const char*, ( const char* str ),,
    "@see strlwr\n"
    "@ingroup Strings" )
 {
-   char *ret = Con::getReturnBuffer(dStrlen(str) + 1);
-   dStrcpy(ret, str);
+   dsize_t retLen = dStrlen(str) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, str, retLen);
    return dStrupr(ret);
 }
 
@@ -663,21 +666,22 @@ DefineConsoleFunction( strreplace, const char*, ( const char* source, const char
          count++;
       }
    }
-   char *ret = Con::getReturnBuffer(dStrlen(source) + 1 + (toLen - fromLen) * count);
+   S32 retLen = dStrlen(source) + 1 + (toLen - fromLen) * count;
+   char *ret = Con::getReturnBuffer(retLen);
    U32 scanp = 0;
    U32 dstp = 0;
    for(;;)
    {
-      const char *scan = dStrstr(source + scanp, from);
-      if(!scan)
+      const char *subScan = dStrstr(source + scanp, from);
+      if(!subScan)
       {
-         dStrcpy(ret + dstp, source + scanp);
+         dStrcpy(ret + dstp, source + scanp, retLen - dstp);
          return ret;
       }
-      U32 len = scan - (source + scanp);
-      dStrncpy(ret + dstp, source + scanp, len);
+      U32 len = subScan - (source + scanp);
+      dStrncpy(ret + dstp, source + scanp, getMin(len, retLen - dstp));
       dstp += len;
-      dStrcpy(ret + dstp, to);
+      dStrcpy(ret + dstp, to, retLen - dstp);
       dstp += toLen;
       scanp += len + fromLen;
    }
@@ -901,8 +905,8 @@ DefineConsoleFunction( startsWith, bool, ( const char* str, const char* prefix, 
    char* targetBuf = new char[ targetLen + 1 ];
 
    // copy src and target into buffers
-   dStrcpy( srcBuf, str );
-   dStrcpy( targetBuf, prefix );
+   dStrcpy( srcBuf, str, srcLen + 1 );
+   dStrcpy( targetBuf, prefix, targetLen + 1 );
 
    // reassign src/target pointers to lowercase versions
    str = dStrlwr( srcBuf );
@@ -952,8 +956,8 @@ DefineConsoleFunction( endsWith, bool, ( const char* str, const char* suffix, bo
    char* targetBuf = new char[ targetLen + 1 ];
 
    // copy src and target into buffers
-   dStrcpy( srcBuf, str );
-   dStrcpy( targetBuf, suffix );
+   dStrcpy( srcBuf, str, srcLen + 1 );
+   dStrcpy( targetBuf, suffix, targetLen + 1 );
 
    // reassign src/target pointers to lowercase versions
    str = dStrlwr( srcBuf );
@@ -1824,8 +1828,9 @@ DefineEngineFunction( detag, const char*, ( const char* str ),,
       if( word == NULL )
          return "";
          
-      char* ret = Con::getReturnBuffer( dStrlen( word + 1 ) + 1 );
-      dStrcpy( ret, word + 1 );
+      dsize_t retLen = dStrlen(word + 1) + 1;
+      char* ret = Con::getReturnBuffer(retLen);
+      dStrcpy( ret, word + 1, retLen );
       return ret;
    }
    else
@@ -1889,7 +1894,7 @@ ConsoleFunction( echo, void, 2, 0, "( string message... ) "
    char *ret = Con::getReturnBuffer(len + 1);
    ret[0] = 0;
    for(i = 1; i < argc; i++)
-      dStrcat(ret, argv[i]);
+      dStrcat(ret, argv[i], len + 1);
 
    Con::printf("%s", ret);
    ret[0] = 0;
@@ -1913,7 +1918,7 @@ ConsoleFunction( warn, void, 2, 0, "( string message... ) "
    char *ret = Con::getReturnBuffer(len + 1);
    ret[0] = 0;
    for(i = 1; i < argc; i++)
-      dStrcat(ret, argv[i]);
+      dStrcat(ret, argv[i], len + 1);
 
    Con::warnf(ConsoleLogEntry::General, "%s", ret);
    ret[0] = 0;
@@ -1937,7 +1942,7 @@ ConsoleFunction( error, void, 2, 0, "( string message... ) "
    char *ret = Con::getReturnBuffer(len + 1);
    ret[0] = 0;
    for(i = 1; i < argc; i++)
-      dStrcat(ret, argv[i]);
+      dStrcat(ret, argv[i], len + 1);
 
    Con::errorf(ConsoleLogEntry::General, "%s", ret);
    ret[0] = 0;

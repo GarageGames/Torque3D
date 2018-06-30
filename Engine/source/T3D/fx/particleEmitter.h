@@ -47,10 +47,12 @@
 class RenderPassManager;
 class ParticleData;
 
-#define AFX_CAP_PARTICLE_POOLS
-#if defined(AFX_CAP_PARTICLE_POOLS)
-class afxParticlePoolData;
-class afxParticlePool;
+#ifdef TORQUE_AFX_ENABLED
+	#define AFX_CAP_PARTICLE_POOLS
+	#if defined(AFX_CAP_PARTICLE_POOLS)
+	class afxParticlePoolData;
+	class afxParticlePool;
+	#endif
 #endif
 
 //*****************************************************************************
