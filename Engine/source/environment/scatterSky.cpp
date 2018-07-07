@@ -955,8 +955,9 @@ void ScatterSky::_render( ObjectRenderInst *ri, SceneRenderState *state, BaseMat
 
    Point3F camPos2 = state->getCameraPosition();
    MatrixF xfm(true);
-   
+   xfm.setPosition(camPos2 - Point3F(0, 0, mZOffset));
    GFX->multWorld(xfm);
+
    MatrixF xform(proj);//GFX->getProjectionMatrix());
    xform *= GFX->getViewMatrix();
    xform *=  GFX->getWorldMatrix();
@@ -968,7 +969,6 @@ void ScatterSky::_render( ObjectRenderInst *ri, SceneRenderState *state, BaseMat
       rotMat.set(EulerF(M_PI_F, 0.0, 0.0));
       xform.mul(rotMat);
    }
-   xform.setPosition(xform.getPosition() - Point3F(0, 0, mZOffset));
 
    mShaderConsts->setSafe( mModelViewProjSC, xform );
    mShaderConsts->setSafe( mMiscSC, miscParams );
