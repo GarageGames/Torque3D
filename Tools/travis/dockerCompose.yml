@@ -1,0 +1,11 @@
+version: '2'
+services:
+  ubuntu-latest-lts:
+    volumes:
+     - ../../:/Torque3D
+    image: "ubuntu:latest"
+    command: sleep infinity
+  # fedora-25:
+  #   volumes:
+  #    - ../../:/Torque3D
+  #   image: "fedora:25"
