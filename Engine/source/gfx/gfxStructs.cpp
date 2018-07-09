@@ -49,7 +49,9 @@ void GFXVideoMode::parseFromString( const char *str )
 
    PARSE_ELEM(S32, resolution.x, dAtoi, tempBuf, " x\0")
    PARSE_ELEM(S32, resolution.y, dAtoi, NULL,    " x\0")
-   PARSE_ELEM(S32, fullScreen,   dAtob, NULL,    " \0")
+   const char *boolptr = dStrtok(NULL, " \0");
+   if (boolptr)
+      fullScreen = dAtob(boolptr);
    PARSE_ELEM(S32, bitDepth,     dAtoi, NULL,    " \0")
    PARSE_ELEM(S32, refreshRate,  dAtoi, NULL,    " \0")
    PARSE_ELEM(S32, antialiasLevel, dAtoi, NULL,    " \0")
