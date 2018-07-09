@@ -267,7 +267,7 @@ struct PolyhedronFixedVectorData : public PolyhedronData
       Point3F* getPoints() const { return mPointList.address(); }
 
       /// Return the number of edges that this polyhedron has.
-      U32 getNumEdges() const { return edgeList.size(); }
+      U32 getNumEdges() const { return mEdgeList.size(); }
 
       ///
       Edge* getEdges() const { return mEdgeList.address(); }
