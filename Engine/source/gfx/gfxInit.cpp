@@ -84,28 +84,15 @@ inline static void _GFXInitReportAdapters(Vector<GFXAdapter*> &adapters)
    }
 }
 
-inline static void _GFXInitGetInitialRes(GFXVideoMode &vm, const Point2I &initialSize)
+inline static void _GFXInitGetInitialRes(GFXVideoMode &vm)
 {
-   const U32 kDefaultWindowSizeX = 800;
-   const U32 kDefaultWindowSizeY = 600;
-   const bool kDefaultFullscreen = false;
-   const U32 kDefaultBitDepth = 32;
-   const U32 kDefaultRefreshRate = 60;
-
    // cache the desktop size of the main screen
    GFXVideoMode desktopVm = GFXInit::getDesktopResolution();
 
    // load pref variables, properly choose windowed / fullscreen  
    const String resString = Con::getVariable("$pref::Video::mode");
 
-   // Set defaults into the video mode, then have it parse the user string.
-   vm.resolution.x = kDefaultWindowSizeX;
-   vm.resolution.y = kDefaultWindowSizeY;
-   vm.fullScreen   = kDefaultFullscreen;
-   vm.bitDepth     = kDefaultBitDepth;
-   vm.refreshRate  = kDefaultRefreshRate;
-   vm.wideScreen = false;
-
+   // Parse video mode settings from pref string
    vm.parseFromString(resString);
 }
 
@@ -365,7 +352,7 @@ GFXAdapter *GFXInit::getBestAdapterChoice()
 GFXVideoMode GFXInit::getInitialVideoMode()
 {
    GFXVideoMode vm;
-   _GFXInitGetInitialRes(vm, Point2I(800,600));
+   _GFXInitGetInitialRes(vm);
    return vm;
 }
 
