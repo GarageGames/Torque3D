@@ -249,6 +249,10 @@ enum InputObjectInstancesEnum
    SI_DPOV2          = 0x215,
    SI_LPOV2          = 0x216,
    SI_RPOV2          = 0x217,
+   SI_XBALL          = 0x218,
+   SI_YBALL          = 0x219,
+   SI_XBALL2         = 0x21A,
+   SI_YBALL2         = 0x21B,
 
    XI_CONNECT        = 0x300,
    XI_THUMBLX        = 0x301,
@@ -273,7 +277,9 @@ enum InputObjectInstancesEnum
    XI_A              = 0x317,
    XI_B              = 0x318,
    XI_X              = 0x319,
-   XI_Y              = 0x320,
+   XI_Y              = 0x31A,
+   XI_GUIDE          = 0x31B,
+   XI_DISCONNECT     = 0x31C,
 
    INPUT_DEVICE_PLUGIN_CODES_START = 0x400,
 };

@@ -22,11 +22,13 @@
 
 #include "platform/platformInput.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "core/util/journal/process.h"
 #include "windowManager/platformWindowMgr.h"
 
 #include "sdlInput.h"
 #include "platform/platformInput.h"
+#include "sdlInputManager.h"
 #include "SDL.h"
 
 #ifdef LOG_INPUT
@@ -35,7 +37,7 @@
 #endif
 
 // Static class variables:
-InputManager*  Input::smManager;
+InputManager*  Input::smManager = NULL;
 bool           Input::smActive;
 U8             Input::smModifierKeys;
 bool           Input::smLastKeyboardActivated;
@@ -90,6 +92,12 @@ void Input::init()
    setModifierKeys(0);
    fillAsciiTable();
    Con::printf( "" );
+
+   smManager = new SDLInputManager;
+   if (smManager)
+   {
+      SDLInputManager::init();
+   }
 
    // Set ourselves to participate in per-frame processing.
    Process::notify(Input::process, PROCESS_INPUT_ORDER);
@@ -159,6 +167,13 @@ void Input::destroy()
 
    SDL_QuitSubSystem( SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMECONTROLLER );
 
+   if (smManager)
+   {
+      if (smManager->isEnabled())
+         smManager->disable();
+      delete smManager;
+      smManager = NULL;
+   }
 }
 
 //------------------------------------------------------------------------------
@@ -186,8 +201,8 @@ void Input::activate()
    //ImmReleaseContext( getWin32WindowHandle(), winState.imeHandle );
 #endif
 
-   if ( !Con::getBoolVariable( "$enableDirectInput" ) )
-      return;
+   if (smManager && !smManager->isEnabled())
+      smManager->enable();
 
    if ( smManager && smManager->isEnabled() && !smActive )
    {
@@ -199,7 +214,10 @@ void Input::activate()
 //------------------------------------------------------------------------------
 void Input::deactivate()
 {
-   if ( smManager && smManager->isEnabled() && smActive )
+   if (smManager && smManager->isEnabled())
+      smManager->disable();
+
+   if (smActive)
    {
       smActive = false;
       Con::printf( "Input deactivated." );
