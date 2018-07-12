@@ -179,6 +179,7 @@ void ForestWind::setStrengthAndDirection( F32 strength, const VectorF &direction
    {
       mStrength = strength;
       mDirection = direction;
+      mCurrentTarget.zero();
       mIsDirty = true;
    }
 }
