@@ -41,7 +41,7 @@ struct InputEventInfo;
 
 struct EventDescriptor
 {
-   U8  flags;      ///< Combination of any modifier flags.
+   U16 flags;      ///< Combination of any modifier flags.
    U8  eventType;  ///< SI_KEY, etc.
    U16 eventCode;  ///< From event.h
 };
@@ -184,10 +184,6 @@ class ActionMap : public SimObject
    /// This fires a break event for every currently pending item in the break
    /// table.
    static void clearAllBreaks();
-
-   /// Returns true if the specified key + modifiers are bound to something
-   /// on the global action map.
-   static bool checkAsciiGlobal(U16 key, U32 modifiers);
 
    static bool getDeviceTypeAndInstance(const char *device, U32 &deviceType, U32 &deviceInstance);
 

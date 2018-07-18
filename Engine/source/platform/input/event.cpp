@@ -51,6 +51,7 @@ InputEventManager::InputEventManager()
    mNextDeviceTypeCode = INPUT_DEVICE_PLUGIN_DEVICES_START;
    mNextDeviceCode = INPUT_DEVICE_PLUGIN_CODES_START;
 
+   buildKeyboardMap();
    buildVirtualMap();
 }
 
@@ -199,19 +200,54 @@ struct CodeMapping
    InputObjectInstances code;
 };
 
-CodeMapping gVirtualMap[] =
+CodeMapping gKeyboardMap[] =
 {
    //-------------------------------------- KEYBOARD EVENTS
    //
+   { "a",             SI_KEY,    KEY_A           },
+   { "b",             SI_KEY,    KEY_B           },
+   { "c",             SI_KEY,    KEY_C           },
+   { "d",             SI_KEY,    KEY_D           },
+   { "e",             SI_KEY,    KEY_E           },
+   { "f",             SI_KEY,    KEY_F           },
+   { "g",             SI_KEY,    KEY_G           },
+   { "h",             SI_KEY,    KEY_H           },
+   { "i",             SI_KEY,    KEY_I           },
+   { "j",             SI_KEY,    KEY_J           },
+   { "k",             SI_KEY,    KEY_K           },
+   { "l",             SI_KEY,    KEY_L           },
+   { "m",             SI_KEY,    KEY_M           },
+   { "n",             SI_KEY,    KEY_N           },
+   { "o",             SI_KEY,    KEY_O           },
+   { "p",             SI_KEY,    KEY_P           },
+   { "q",             SI_KEY,    KEY_Q           },
+   { "r",             SI_KEY,    KEY_R           },
+   { "s",             SI_KEY,    KEY_S           },
+   { "t",             SI_KEY,    KEY_T           },
+   { "u",             SI_KEY,    KEY_U           },
+   { "v",             SI_KEY,    KEY_V           },
+   { "w",             SI_KEY,    KEY_W           },
+   { "x",             SI_KEY,    KEY_X           },
+   { "y",             SI_KEY,    KEY_Y           },
+   { "z",             SI_KEY,    KEY_Z           },
+
+   { "1",             SI_KEY,    KEY_1           },
+   { "2",             SI_KEY,    KEY_2           },
+   { "3",             SI_KEY,    KEY_3           },
+   { "4",             SI_KEY,    KEY_4           },
+   { "5",             SI_KEY,    KEY_5           },
+   { "6",             SI_KEY,    KEY_6           },
+   { "7",             SI_KEY,    KEY_7           },
+   { "8",             SI_KEY,    KEY_8           },
+   { "9",             SI_KEY,    KEY_9           },
+   { "0",             SI_KEY,    KEY_0           },
+
    { "backspace",     SI_KEY,    KEY_BACKSPACE   },
    { "tab",           SI_KEY,    KEY_TAB         },
 
    { "return",        SI_KEY,    KEY_RETURN      },
    { "enter",         SI_KEY,    KEY_RETURN      },
 
-   { "shift",         SI_KEY,    KEY_SHIFT       },
-   { "ctrl",          SI_KEY,    KEY_CONTROL     },
-   { "alt",           SI_KEY,    KEY_ALT         },
    { "pause",         SI_KEY,    KEY_PAUSE       },
    { "capslock",      SI_KEY,    KEY_CAPSLOCK    },
 
@@ -231,12 +267,8 @@ CodeMapping gVirtualMap[] =
    { "delete",        SI_KEY,    KEY_DELETE      },
    { "help",          SI_KEY,    KEY_HELP        },
 
-   { "win_lwindow",   SI_KEY,    KEY_WIN_LWINDOW },
-   { "win_rwindow",   SI_KEY,    KEY_WIN_RWINDOW },
    { "win_apps",      SI_KEY,    KEY_WIN_APPS    },
 
-   { "cmd",           SI_KEY,    KEY_ALT         },
-   { "opt",           SI_KEY,    KEY_MAC_OPT     },
    { "lopt",          SI_KEY,    KEY_MAC_LOPT    },
    { "ropt",          SI_KEY,    KEY_MAC_ROPT    },
 
@@ -257,6 +289,8 @@ CodeMapping gVirtualMap[] =
    { "numpaddecimal", SI_KEY,    KEY_DECIMAL     },
    { "numpaddivide",  SI_KEY,    KEY_DIVIDE      },
    { "numpadenter",   SI_KEY,    KEY_NUMPADENTER },
+   { "numpadclear",   SI_KEY,    KEY_NUMPADCLEAR },
+   { "numpadequals",  SI_KEY,    KEY_NUMPADEQUALS},
 
    { "f1",            SI_KEY,    KEY_F1          },
    { "f2",            SI_KEY,    KEY_F2          },
@@ -292,6 +326,7 @@ CodeMapping gVirtualMap[] =
    { "rcontrol",      SI_KEY,    KEY_RCONTROL    },
    { "lalt",          SI_KEY,    KEY_LALT        },
    { "ralt",          SI_KEY,    KEY_RALT        },
+   { "grave",         SI_KEY,    KEY_TILDE       },
    { "tilde",         SI_KEY,    KEY_TILDE       },
 
    { "minus",         SI_KEY,    KEY_MINUS       },
@@ -306,6 +341,14 @@ CodeMapping gVirtualMap[] =
    { "slash",         SI_KEY,    KEY_SLASH       },
    { "lessthan",      SI_KEY,    KEY_OEM_102     },
 
+   { "anykey",          SI_KEY,  KEY_ANYKEY              },
+
+   // Array terminator
+   { "nomatch",        SI_UNKNOWN, (InputObjectInstances)0xFFFFFFFF }
+};
+
+CodeMapping gVirtualMap[] =
+{
    //-------------------------------------- BUTTON EVENTS
    // Joystick/Mouse buttons
    { "button0",       SI_BUTTON, KEY_BUTTON0    },
@@ -369,24 +412,17 @@ CodeMapping gVirtualMap[] =
 
    //-------------------------------------- POV EVENTS
    // Joystick POV:
-   { "xpov",          SI_POV,    SI_XPOV        },
-   { "ypov",          SI_POV,    SI_YPOV        },
    { "upov",          SI_POV,    SI_UPOV        },
    { "dpov",          SI_POV,    SI_DPOV        },
    { "lpov",          SI_POV,    SI_LPOV        },
    { "rpov",          SI_POV,    SI_RPOV        },
-   { "xpov2",         SI_POV,    SI_XPOV2       },
-   { "ypov2",         SI_POV,    SI_YPOV2       },
    { "upov2",         SI_POV,    SI_UPOV2       },
    { "dpov2",         SI_POV,    SI_DPOV2       },
    { "lpov2",         SI_POV,    SI_LPOV2       },
    { "rpov2",         SI_POV,    SI_RPOV2       },
+   { "povmask",       SI_INT,    SI_POVMASK     },
+   { "povmask2",      SI_INT,    SI_POVMASK2    },
 
-#if defined( TORQUE_OS_WIN )
-   //-------------------------------------- XINPUT EVENTS
-   // Controller connect / disconnect:
-   { "connect",       SI_BUTTON, XI_CONNECT     },
-   
    // L & R Thumbsticks:
    { "thumblx",       SI_AXIS,   XI_THUMBLX     },
    { "thumbly",       SI_AXIS,   XI_THUMBLY     },
@@ -403,9 +439,10 @@ CodeMapping gVirtualMap[] =
    { "dpadl",         SI_BUTTON, SI_LPOV   },
    { "dpadr",         SI_BUTTON, SI_RPOV  },
 
-   // START & BACK Buttons:
-   { "btn_start",     SI_BUTTON, XI_START       },
+   // Back, Guide & Start Buttons:
    { "btn_back",      SI_BUTTON, XI_BACK        },
+   { "btn_guide",     SI_BUTTON, XI_GUIDE       },
+   { "btn_start",     SI_BUTTON, XI_START       },
 
    // L & R Thumbstick Buttons:
    { "btn_lt",        SI_BUTTON, XI_LEFT_THUMB  },
@@ -420,12 +457,8 @@ CodeMapping gVirtualMap[] =
    { "btn_b",         SI_BUTTON, XI_B           },
    { "btn_x",         SI_BUTTON, XI_X           },
    { "btn_y",         SI_BUTTON, XI_Y           },
-#endif
 
-   //-------------------------------------- MISCELLANEOUS EVENTS
-   //
-
-   { "anykey",        SI_KEY,      KEY_ANYKEY },
+   // Array terminator
    { "nomatch",       SI_UNKNOWN,  (InputObjectInstances)0xFFFFFFFF }
 };
 
@@ -451,6 +484,28 @@ void InputEventManager::buildVirtualMap()
    }
 }
 
+void InputEventManager::buildKeyboardMap()
+{
+   char desc[256];
+   VirtualMapData* data;
+
+   for (U32 j = 0; gKeyboardMap[j].code != 0xFFFFFFFF; j++)
+   {
+      // Make sure the description is lower case
+      desc[0] = 0;
+      dStrncpy(desc, gKeyboardMap[j].pDescription, 255);
+      dStrlwr(desc);
+
+      data = new VirtualMapData();
+      data->type = gKeyboardMap[j].type;
+      data->code = gKeyboardMap[j].code;
+      data->desc = StringTable->insert(desc);
+
+      mKeyboardMap.insert(data, desc);
+      mScanCodeMap.insertUnique(data->code, *data);
+   }
+}
+
 void InputEventManager::addVirtualMap(const char* description, InputEventType type, InputObjectInstances code)
 {
    // Make sure the description is lower case
@@ -468,6 +523,16 @@ void InputEventManager::addVirtualMap(const char* description, InputEventType ty
    mActionCodeMap.insertUnique(data->code, *data);
 }
 
+InputEventManager::VirtualMapData* InputEventManager::findKeyboardMap(const char* description)
+{
+   char desc[256];
+   desc[0] = 0;
+   dStrncpy(desc, description, 255);
+   dStrlwr(desc);
+
+   return mKeyboardMap.retreive(desc);
+}
+
 InputEventManager::VirtualMapData* InputEventManager::findVirtualMap(const char* description)
 {
    char desc[256];
@@ -482,6 +547,15 @@ const char* InputEventManager::findVirtualMapDescFromCode(U32 code)
 {
    HashTable<U32, VirtualMapData>::Iterator itr = mActionCodeMap.find(code);
    if(itr != mActionCodeMap.end())
+      return itr->value.desc;
+
+   return NULL;
+}
+
+const char* InputEventManager::findKeyboardMapDescFromCode(U32 code)
+{
+   HashTable<U32, VirtualMapData>::Iterator itr = mScanCodeMap.find(code);
+   if(itr != mScanCodeMap.end())
       return itr->value.desc;
 
    return NULL;

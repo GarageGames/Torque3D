@@ -368,7 +368,7 @@ typedef JournaledSignal<void(WindowId,U32,S32,S32,bool)> MouseEvent;
 typedef JournaledSignal<void(WindowId,U32,S32,S32)> MouseWheelEvent;
 
 /// void event(WindowId,U32 modifier,U32 action,U16 key)
-typedef JournaledSignal<void(WindowId,U32,U32,U16)> KeyEvent;
+typedef JournaledSignal<void(WindowId,U32,U32,S32,U16)> KeyEvent;
 
 /// void event(WindowId,U32 modifier,U16 key)
 typedef JournaledSignal<void(WindowId,U32,U16)> CharEvent;

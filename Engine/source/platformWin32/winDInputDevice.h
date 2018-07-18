@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#ifndef TORQUE_SDL
 #ifndef _WINDINPUTDEVICE_H_
 #define _WINDINPUTDEVICE_H_
 
@@ -157,3 +158,4 @@ inline U8 DInputDevice::getDeviceID()
 InputObjectInstances DIK_to_Key( U8 dikCode );
 U8  Key_to_DIK( U16 keyCode );
 #endif // _H_WINDINPUTDEVICE_
+#endif //!TORQUE_SDL

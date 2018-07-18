@@ -723,7 +723,7 @@ void GuiConvexEditorCtrl::updateGizmo()
    S32 &flags = mGizmoProfile->flags;
    GizmoAlignment &align = mGizmoProfile->alignment;
 
-   U8 keys = Input::getModifierKeys();
+   U16 keys = Input::getModifierKeys();
 
    mCtrlDown = keys & ( SI_LCTRL | SI_LSHIFT );
 
