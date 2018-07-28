@@ -217,8 +217,8 @@ bool GFXD3D11TextureObject::copyToBmp(GBitmap* bmp)
    if (FAILED(hr))
    {
       Con::errorf("GFXD3D11TextureObject::copyToBmp - Failed to create staging texture"); 
-	  PROFILE_END_NAMED(GFXD3D11TextureObject_copyToBmp_pixCopy);
-	  PROFILE_END();
+      PROFILE_END_NAMED(GFXD3D11TextureObject_copyToBmp_pixCopy);
+      PROFILE_END();
       return false;
    }
 
@@ -233,8 +233,8 @@ bool GFXD3D11TextureObject::copyToBmp(GBitmap* bmp)
       //cleanup
       SAFE_RELEASE(pStagingTexture);
       Con::errorf("GFXD3D11TextureObject::copyToBmp - Failed to map staging texture");
-	  PROFILE_END_NAMED(GFXD3D11TextureObject_copyToBmp_pixCopy);
-	  PROFILE_END();
+      PROFILE_END_NAMED(GFXD3D11TextureObject_copyToBmp_pixCopy);
+      PROFILE_END();
       return false;
    }
 
