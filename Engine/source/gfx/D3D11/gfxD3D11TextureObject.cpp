@@ -202,9 +202,7 @@ bool GFXD3D11TextureObject::copyToBmp(GBitmap* bmp)
    else
       // unsupported
       AssertFatal(false, "GFXD3D11TextureObject::copyToBmp - unsupported bitmap format");
-
-   PROFILE_START(GFXD3D11TextureObject_copyToBmp_pixCopy);
-
+   
    //create temp staging texture
    D3D11_TEXTURE2D_DESC desc;
    static_cast<ID3D11Texture2D*>(mD3DTexture)->GetDesc(&desc);
@@ -216,7 +214,7 @@ bool GFXD3D11TextureObject::copyToBmp(GBitmap* bmp)
    HRESULT hr = D3D11DEVICE->CreateTexture2D(&desc, NULL, &pStagingTexture);
    if (FAILED(hr))
    {
-      Con::errorf("GFXD3D11TextureObject::copyToBmp - Failed to create staging texture");
+      Con::errorf("GFXD3D11TextureObject::copyToBmp - Failed to create staging texture"); 
       return false;
    }
 
@@ -270,7 +268,6 @@ bool GFXD3D11TextureObject::copyToBmp(GBitmap* bmp)
    D3D11DEVICECONTEXT->Unmap(pStagingTexture, 0);
 
    SAFE_RELEASE(pStagingTexture);
-
    PROFILE_END();
 
    return true;
