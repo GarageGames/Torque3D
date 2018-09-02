@@ -1,9 +1,0 @@
-<ComponentAsset
-    canSave="true"
-    canSaveDynamicFields="true"
-    AssetName="FPSControlsComponentAsset"
-    componentName="FPSControls"
-    componentClass="Component"
-    friendlyName="FPS Controls"
-    componentType="Input"
-    description="First Person Shooter-type controls." />
