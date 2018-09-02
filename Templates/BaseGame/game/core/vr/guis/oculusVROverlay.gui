@@ -1,0 +1,19 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = singleton GuiControl(OculusVROverlay) {
+   canSaveDynamicFields = "0";
+   Enabled = "1";
+   isContainer = "1";
+   Profile = "GuiContentProfile";
+   HorizSizing = "width";
+   VertSizing = "height";
+   Position = "0 0";
+   Extent = "512 512";
+   MinExtent = "8 8";
+   canSave = "1";
+   Visible = "1";
+   tooltipprofile = "GuiToolTipProfile";
+   hovertime = "1000";
+   useVariable = "0";
+   tile = "0";
+};
+//--- OBJECT WRITE END ---

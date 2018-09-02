@@ -1,0 +1,8 @@
+<ComponentAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="ShapeCollisionComponentAsset"
+    componentClass="ShapeCollisionComponent"
+    friendlyName="Shape Collision"
+    componentType="Collision"
+    description="Enables an entity to collide with things with bounds, collision or visible meshes" />

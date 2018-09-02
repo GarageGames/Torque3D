@@ -1,0 +1,8 @@
+<ComponentAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="TriggerComponentAsset"
+    componentClass="TriggerComponent"
+    friendlyName="Trigger Component"
+    componentType="Collision"
+    description="Enables callback and event behaviors on collision with the entity." />

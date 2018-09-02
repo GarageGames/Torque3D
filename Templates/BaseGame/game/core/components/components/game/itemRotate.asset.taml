@@ -1,0 +1,10 @@
+<ComponentAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="ItemRotationComponentAsset"
+    componentName="ItemRotationComponent"
+    componentClass="Component"
+    friendlyName="Item Rotation"
+    componentType="Game"
+    description="Rotates the entity around an axis, like an item pickup."
+    scriptFile="core/components/components/game/itemRotate.cs" />

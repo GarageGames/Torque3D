@@ -1,0 +1,8 @@
+<ComponentAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="CameraOrbiterComponentAsset"
+    componentClass="CameraOrbiterComponent"
+    friendlyName="Camera Orbiter"
+    componentType="Game"
+    description="Acts as a boon arm for a camera component." />
