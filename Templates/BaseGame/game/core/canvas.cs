@@ -84,10 +84,10 @@ function configureCanvas()
    echo("--------------");
    echo("Attempting to set resolution to \"" @ %resX SPC %resY SPC %fs SPC %bpp SPC %rate SPC %aa @ "\"");
    
-   %deskRes    = getDesktopResolution();      
-   %deskResX   = getWord(%deskRes, $WORD::RES_X);
-   %deskResY   = getWord(%deskRes, $WORD::RES_Y);
-   %deskResBPP = getWord(%deskRes, 2);
+   %deskRes    = getPrimaryDesktopArea();      
+   %deskResX   = getWord(%deskRes, 2) - getWord(%deskRes, 0);
+   %deskResY   = getWord(%deskRes, 3) - getWord(%deskRes, 1);
+   %deskResBPP = getWord(getDesktopResolution(), 2);
    
    // We shouldn't be getting this any more but just in case...
    if (%bpp $= "Default")
@@ -98,9 +98,11 @@ function configureCanvas()
    {
       // Windowed mode has to use the same bit depth as the desktop
       %bpp = %deskResBPP;
+
+      %switched = false;
       
       // Windowed mode also has to run at a smaller resolution than the desktop
-      if ((%resX >= %deskResX) || (%resY >= %deskResY))
+      if ((%resX > %deskResX) || (%resY > %deskResY))
       {
          warn("Warning: The requested windowed resolution is equal to or larger than the current desktop resolution. Attempting to find a better resolution");
       
@@ -112,20 +114,35 @@ function configureCanvas()
             %testResY = getWord(%testRes, $WORD::RES_Y);
             %testBPP  = getWord(%testRes, $WORD::BITDEPTH);
 
-            if (%testBPP != %bpp)
-               continue;
+            //TODO Canvas.getMode does not return bpp reliably
+            //if (%testBPP != %bpp)
+            //   continue;
             
-            if ((%testResX < %deskResX) && (%testResY < %deskResY))
+            if ((%testResX <= %deskResX) && (%testResY <= %deskResY))
             {
                // This will work as our new resolution
                %resX = %testResX;
                %resY = %testResY;
+               %switched = true;
                
                warn("Warning: Switching to \"" @ %resX SPC %resY SPC %bpp @ "\"");
                
                break;
             }
          }
+      }
+
+      //If it should change resolution but doesn't, use available desktop area
+      if(!%switched)
+      {
+         %padding = 0;
+            
+         //need padding for linux (macOS?)
+         if($platform !$= "windows") %padding = 10;
+
+         if(%resX > %deskResX) %resX   = %deskResX - 10;
+         if(%resY > %deskResY) %resY   = %deskResY - 10;
+         warn("Warning: Switching to \"" @ %resX SPC %resY SPC %bpp @ "\"");
       }
    }
    
@@ -150,6 +167,15 @@ function configureCanvas()
 
    // Actually set the new video mode
    Canvas.setVideoMode(%resX, %resY, %fs, %bpp, %rate, %aa);
+
+   //If maximized then restore and set the size to prevent
+   //linux canvas offseting issue
+   if(Canvas.isMaximized() && $platform !$= "windows")
+   {
+      Canvas.restoreWindow();
+      Canvas.setSize(%resX, %resY);
+   }
+
 
    commandToServer('setClientAspectRatio', %resX, %resY);
 

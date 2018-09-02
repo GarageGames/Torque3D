@@ -95,6 +95,8 @@ public:
    /// This should probably move to the abstract window manager
    static GFXVideoMode getDesktopResolution();
 
+   static RectI getPrimaryDesktopArea();
+
    /// Based on user preferences (or in the absence of a valid user selection,
    /// a heuristic), return a "best" adapter.
    static GFXAdapter *getBestAdapterChoice();

@@ -75,16 +75,15 @@ PlatformWindowManagerSDL::~PlatformWindowManagerSDL()
 
 RectI PlatformWindowManagerSDL::getPrimaryDesktopArea()
 {
-   // TODO SDL
-   AssertFatal(0, "");
-   return RectI(0,0,0,0);
+   SDL_Rect rect;
+   SDL_GetDisplayUsableBounds(0, &rect);
+   return RectI(rect.x, rect.y, rect.w, rect.h);
 }
 
 Point2I PlatformWindowManagerSDL::getDesktopResolution()
 {
    SDL_DisplayMode mode;
    SDL_GetDesktopDisplayMode(0, &mode);
-
    // Return Resolution
    return Point2I(mode.w, mode.h);
 }
