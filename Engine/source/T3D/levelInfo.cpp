@@ -26,8 +26,10 @@
 #include "console/consoleTypes.h"
 #include "core/stream/bitStream.h"
 #include "scene/sceneManager.h"
+#if defined(TORQUE_ADVANCED_LIGHTING)
 #include "lighting/advanced/advancedLightManager.h"
 #include "lighting/advanced/advancedLightBinManager.h"
+#endif
 #include "sfx/sfxAmbience.h"
 #include "sfx/sfxSoundscape.h"
 #include "sfx/sfxSystem.h"
@@ -101,16 +103,21 @@ LevelInfo::LevelInfo()
    mAccuTextureName = "";
    mAccuTexture = NULL;
 
+#if defined(TORQUE_ADVANCED_LIGHTING)
    // Register with the light manager activation signal, and we need to do it first
    // so the advanced light bin manager can be instructed about MRT lightmaps
    LightManager::smActivateSignal.notify(this, &LevelInfo::_onLMActivate, 0.01f);
+#endif
 }
 
 //-----------------------------------------------------------------------------
 
 LevelInfo::~LevelInfo()
 {
+#if defined(TORQUE_ADVANCED_LIGHTING)
    LightManager::smActivateSignal.remove(this, &LevelInfo::_onLMActivate);
+#endif
+
    if (!mAccuTexture.isNull())
    {
       mAccuTexture.free();
@@ -334,7 +341,7 @@ void LevelInfo::_updateSceneGraph()
    // If the level info specifies that MRT pre-pass should be used in this scene
    // enable it via the appropriate light manager
    // (Basic lighting doesn't do anything different right now)
-#ifndef TORQUE_DEDICATED
+#if !defined(TORQUE_DEDICATED) && defined(TORQUE_ADVANCED_LIGHTING)
    if(isClientObject())
       _onLMActivate(LIGHTMGR->getId(), true);
 #endif
@@ -347,7 +354,7 @@ void LevelInfo::_updateSceneGraph()
 
 void LevelInfo::_onLMActivate(const char *lm, bool enable)
 {
-#ifndef TORQUE_DEDICATED
+#if !defined(TORQUE_DEDICATED) && defined(TORQUE_ADVANCED_LIGHTING)
    // Advanced light manager
    if(enable && String(lm) == String("ADVLM"))
    {
