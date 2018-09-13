@@ -27,6 +27,8 @@ F32 ExtendedMoveManager::mRotAA[ExtendedMove::MaxPositionsRotations] = { 1, };
 
 F32 ExtendedMoveManager::mPosScale = 2.0f;
 
+static ExtendedMove ClampedNullExtendedMove;
+
 void ExtendedMoveManager::init()
 {
    for(U32 i = 0; i < ExtendedMove::MaxPositionsRotations; ++i)
@@ -82,6 +84,8 @@ void ExtendedMoveManager::init()
       "@brief Indicates the scale to be given to mvPos values.\n\n"
       ""
       "@ingroup Game");
+
+   ClampedNullExtendedMove.clamp();
 }
 
 const ExtendedMove NullExtendedMove;
@@ -115,7 +119,7 @@ void ExtendedMove::pack(BitStream *stream, const Move * basemove)
 {
    bool alwaysWriteAll = basemove!=NULL;
    if (!basemove)
-      basemove = &NullExtendedMove;
+      basemove = &ClampedNullExtendedMove;
 
    // Write the standard Move stuff
    packMove(stream, basemove, alwaysWriteAll);
