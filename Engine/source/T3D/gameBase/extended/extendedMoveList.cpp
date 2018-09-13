@@ -74,7 +74,7 @@ bool ExtendedMoveList::getNextExtMove( ExtendedMove &curMove )
       }
       else
       {
-         //Rotation is passed in as an Angle Axis in degrees.  We need to convert this into a Quat.
+         //Rotation is passed in as an Angle Axis in degrees.
          AngAxisF q(Point3F(ExtendedMoveManager::mRotAX[i], ExtendedMoveManager::mRotAY[i], ExtendedMoveManager::mRotAZ[i]), mDegToRad(ExtendedMoveManager::mRotAA[i]));
          curMove.rotX[i] = q.axis.x;
          curMove.rotY[i] = q.axis.y;

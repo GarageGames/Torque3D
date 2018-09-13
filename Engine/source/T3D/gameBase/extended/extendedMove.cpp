@@ -22,8 +22,8 @@ F32 ExtendedMoveManager::mPosZ[ExtendedMove::MaxPositionsRotations] = { 0, };
 bool ExtendedMoveManager::mRotIsEuler[ExtendedMove::MaxPositionsRotations] = { 0, };
 F32 ExtendedMoveManager::mRotAX[ExtendedMove::MaxPositionsRotations] = { 0, };
 F32 ExtendedMoveManager::mRotAY[ExtendedMove::MaxPositionsRotations] = { 0, };
-F32 ExtendedMoveManager::mRotAZ[ExtendedMove::MaxPositionsRotations] = { 0, };
-F32 ExtendedMoveManager::mRotAA[ExtendedMove::MaxPositionsRotations] = { 1, };
+F32 ExtendedMoveManager::mRotAZ[ExtendedMove::MaxPositionsRotations] = { 1, 1, 1 };
+F32 ExtendedMoveManager::mRotAA[ExtendedMove::MaxPositionsRotations] = { 0, };
 
 F32 ExtendedMoveManager::mPosScale = 2.0f;
 
@@ -104,8 +104,8 @@ ExtendedMove::ExtendedMove() : Move()
       posZ[i] = 0;
       rotX[i] = 0;
       rotY[i] = 0;
-      rotZ[i] = 0;
-      rotW[i] = 1;
+      rotZ[i] = 1;
+      rotW[i] = 0;
 
       cposX[i] = 0;
       cposY[i] = 0;
