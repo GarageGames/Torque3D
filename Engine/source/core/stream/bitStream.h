@@ -207,18 +207,18 @@ public:
    void readAffineTransform(MatrixF*);
 
    /// Writes a quaternion in a lossy compressed format that
-   /// is ( bitCount * 3 ) + 1 bits in size.
+   /// is ( bitCount * 3 ) + 2 bits in size.
    ///
    /// @param quat The normalized quaternion to write.
-   /// @param bitCount The the storage space for the xyz component of
+   /// @param bitCount The the storage space for the packed components of
    ///                 the quaternion.
    ///
    void writeQuat( const QuatF& quat, U32 bitCount = 9 );
 
    /// Reads a quaternion written with writeQuat.
    ///
-   /// @param quat The normalized quaternion to write.
-   /// @param bitCount The the storage space for the xyz component of
+   /// @param quat The quaternion that was read.
+   /// @param bitCount The the storage space for the packed components of
    ///                 the quaternion.  Must match the bitCount at write.
    /// @see writeQuat
    ///
