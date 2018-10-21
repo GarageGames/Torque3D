@@ -23,19 +23,21 @@
 
 singleton SFXAmbience( AudioAmbienceDefault )
 {
-   environment = AudioEnvOff;
+   environment = "PresetRoom";
 };
 
 singleton SFXAmbience( AudioAmbienceOutside )
 {
-   environment = AudioEnvPlain;
    states[ 0 ] = AudioLocationOutside;
+   environment = "FactoryLongPassage";
+   states[0] = "AudioLocationOutside";
 };
 
 singleton SFXAmbience( AudioAmbienceInside )
 {
-   environment = AudioEnvRoom;
+   environment = "PresetHangar";
    states[ 0 ] = AudioLocationInside;
+   states[0] = "AudioLocationInside";
 };
 
 singleton SFXAmbience( AudioAmbienceUnderwater )

@@ -23,6 +23,10 @@
 #include "sfx/openal/sfxALDevice.h"
 #include "sfx/openal/sfxALBuffer.h"
 #include "platform/async/asyncUpdate.h"
+#include "console/consoleTypes.h"
+#include "core/volume.h"
+#include "sfx/sfxSystem.h"
+#include "platform/platform.h"
 
 
 //-----------------------------------------------------------------------------
@@ -43,15 +47,19 @@ SFXALDevice::SFXALDevice(  SFXProvider *provider,
    // TODO: The OpenAL device doesn't set the primary buffer
    // $pref::SFX::frequency or $pref::SFX::bitrate!
 
+   ALint attribs[4] = { 0 };
+   ALCint iSends = 0;
+   attribs[0] = ALC_MAX_AUXILIARY_SENDS;
+   attribs[1] = 4;
    mDevice = mOpenAL.alcOpenDevice( name );
    mOpenAL.alcGetError( mDevice );
    if( mDevice ) 
    {
-      mContext = mOpenAL.alcCreateContext( mDevice, NULL );
+      mContext = mOpenAL.alcCreateContext( mDevice, attribs );
 
       if( mContext ) 
          mOpenAL.alcMakeContextCurrent( mContext );
-
+	  mOpenAL.alcGetIntegerv(mDevice, ALC_MAX_AUXILIARY_SENDS, 1, &iSends);
       U32 err = mOpenAL.alcGetError( mDevice );
       
       if( err != ALC_NO_ERROR )
@@ -116,7 +124,7 @@ SFXVoice* SFXALDevice::createVoice( bool is3D, SFXBuffer *buffer )
    SFXALBuffer* alBuffer = dynamic_cast<SFXALBuffer*>( buffer );
    AssertFatal( alBuffer, "SFXALDevice::createVoice() - Got bad buffer!" );
 
-   SFXALVoice* voice = SFXALVoice::create( this, alBuffer );
+   SFXALVoice* voice = SFXALVoice::create( this, alBuffer);
    if ( !voice )
       return NULL;
 
@@ -145,6 +153,9 @@ void SFXALDevice::setListener( U32 index, const SFXListenerProperties& listener 
    mOpenAL.alListenerfv( AL_POSITION, pos );
    mOpenAL.alListenerfv( AL_VELOCITY, velocity );
    mOpenAL.alListenerfv( AL_ORIENTATION, (const F32 *)&tupple[0] );
+   ///ctrl-effects Pass a unit size to openal, 1.0 assumes 1 meter to 1 game unit.
+   ///Crucial for air absorbtion calculations.
+   mOpenAL.alListenerf(AL_METERS_PER_UNIT, 1.0f);
 }
 
 //-----------------------------------------------------------------------------
@@ -164,6 +175,12 @@ void SFXALDevice::setDistanceModel( SFXDistanceModel model )
          if( mUserRolloffFactor != mRolloffFactor )
             _setRolloffFactor( mUserRolloffFactor );
          break;
+
+	  case SFXDistanceModelExponent:
+		  mOpenAL.alDistanceModel(AL_EXPONENT_DISTANCE_CLAMPED);
+		  if (mUserRolloffFactor != mRolloffFactor)
+			  _setRolloffFactor(mUserRolloffFactor);
+		  break;
          
       default:
          AssertWarn( false, "SFXALDevice::setDistanceModel - distance model not implemented" );
@@ -200,3 +217,91 @@ void SFXALDevice::setRolloffFactor( F32 factor )
       
    mUserRolloffFactor = factor;
 }
+
+void SFXALDevice::setReverb(const SFXReverbProperties& reverb)
+{
+	mOpenAL.alGenAuxiliaryEffectSlots(1, &effectSlot);
+	mOpenAL.alGenEffects(1, &effect);
+	Platform::outputDebugString("Updated");
+
+	EFXEAXREVERBPROPERTIES prop = EFX_REVERB_PRESET_GENERIC;
+
+		prop.flDensity = reverb.flDensity;
+		prop.flDiffusion = reverb.flDiffusion;
+		prop.flGain = reverb.flGain;
+		prop.flGainHF = reverb.flGainHF;
+		prop.flGainLF = reverb.flGainLF;
+		prop.flDecayTime = reverb.flDecayTime;
+		prop.flDecayHFRatio = reverb.flDecayHFRatio;
+		prop.flDecayLFRatio = reverb.flDecayLFRatio;
+		prop.flReflectionsGain = reverb.flReflectionsGain;
+		prop.flReflectionsDelay = reverb.flReflectionsDelay;
+		prop.flLateReverbGain = reverb.flLateReverbGain;
+		prop.flLateReverbDelay = reverb.flLateReverbDelay;
+		prop.flEchoTime = reverb.flEchoTime;
+		prop.flEchoDepth = reverb.flEchoDepth;
+		prop.flModulationTime = reverb.flModulationTime;
+		prop.flModulationDepth = reverb.flModulationDepth;
+		prop.flAirAbsorptionGainHF = reverb.flAirAbsorptionGainHF;
+		prop.flHFReference = reverb.flHFReference;
+		prop.flLFReference = reverb.flLFReference;
+		prop.flRoomRolloffFactor = reverb.flRoomRolloffFactor;
+		prop.iDecayHFLimit = reverb.iDecayHFLimit;
+
+	if (mOpenAL.alGetEnumValue("AL_EFFECT_EAXREVERB") != 0)
+	{
+
+		/// EAX Reverb is available. Set the EAX effect type
+
+		mOpenAL.alEffecti(effect, AL_EFFECT_TYPE, AL_EFFECT_EAXREVERB);
+
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_DENSITY, prop.flDensity);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_DIFFUSION, prop.flDiffusion);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_GAIN, prop.flGain);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_GAINHF, prop.flGainHF);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_GAINLF, prop.flGainLF);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_DECAY_TIME, prop.flDecayTime);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_DECAY_HFRATIO, prop.flDecayHFRatio);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_DECAY_LFRATIO, prop.flDecayLFRatio);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_REFLECTIONS_GAIN, prop.flReflectionsGain);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_REFLECTIONS_DELAY, prop.flReflectionsDelay);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_LATE_REVERB_GAIN, prop.flLateReverbGain);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_LATE_REVERB_DELAY, prop.flLateReverbDelay);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_ECHO_TIME, prop.flEchoTime);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_ECHO_DEPTH, prop.flEchoDepth);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_MODULATION_TIME, prop.flModulationTime);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_MODULATION_DEPTH, prop.flModulationDepth);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_AIR_ABSORPTION_GAINHF, prop.flAirAbsorptionGainHF);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_HFREFERENCE, prop.flHFReference);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_LFREFERENCE, prop.flLFReference);
+		mOpenAL.alEffectf(effect, AL_EAXREVERB_ROOM_ROLLOFF_FACTOR, prop.flRoomRolloffFactor);
+		mOpenAL.alEffecti(effect, AL_EAXREVERB_DECAY_HFLIMIT, prop.iDecayHFLimit);
+		mOpenAL.alAuxiliaryEffectSloti(1, AL_EFFECTSLOT_EFFECT, effect);
+		Platform::outputDebugString("reverb properties set");
+
+		}
+		else
+		{
+
+		/// No EAX Reverb. Set the standard reverb effect
+		mOpenAL.alEffecti(effect, AL_EFFECT_TYPE, AL_EFFECT_REVERB);
+
+		mOpenAL.alEffectf(effect, AL_REVERB_DENSITY, prop.flDensity);
+		mOpenAL.alEffectf(effect, AL_REVERB_DIFFUSION, prop.flDiffusion);
+		mOpenAL.alEffectf(effect, AL_REVERB_GAIN, prop.flGain);
+		mOpenAL.alEffectf(effect, AL_REVERB_GAINHF, prop.flGainHF);
+		mOpenAL.alEffectf(effect, AL_REVERB_DECAY_TIME, prop.flDecayTime);
+		mOpenAL.alEffectf(effect, AL_REVERB_DECAY_HFRATIO, prop.flDecayHFRatio);
+		mOpenAL.alEffectf(effect, AL_REVERB_REFLECTIONS_GAIN, prop.flReflectionsGain);
+		mOpenAL.alEffectf(effect, AL_REVERB_REFLECTIONS_DELAY, prop.flReflectionsDelay);
+		mOpenAL.alEffectf(effect, AL_REVERB_LATE_REVERB_GAIN, prop.flLateReverbGain);
+		mOpenAL.alEffectf(effect, AL_REVERB_LATE_REVERB_DELAY, prop.flLateReverbDelay);
+		mOpenAL.alEffectf(effect, AL_REVERB_AIR_ABSORPTION_GAINHF, prop.flAirAbsorptionGainHF);
+		mOpenAL.alEffectf(effect, AL_REVERB_ROOM_ROLLOFF_FACTOR, prop.flRoomRolloffFactor);
+		mOpenAL.alEffecti(effect, AL_REVERB_DECAY_HFLIMIT, prop.iDecayHFLimit);
+		mOpenAL.alAuxiliaryEffectSloti(1, AL_EFFECTSLOT_EFFECT, effect);
+
+	}
+
+}
+

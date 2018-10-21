@@ -211,6 +211,10 @@ void SFXDSDevice::setDistanceModel( SFXDistanceModel model )
    case SFXDistanceModelLogarithmic:
       break; // Nothing to do.
 
+   case SFXDistanceModelExponent:
+	   Con::errorf("SFXDSDevice::setDistanceModel - 'exponential' distance attenuation not supported by DirectSound");
+	   break;
+
    default:
       AssertWarn( false, "SFXDSDevice::setDistanceModel() - model not implemented" );
    }

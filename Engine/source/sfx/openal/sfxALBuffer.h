@@ -50,7 +50,7 @@ class SFXALBuffer : public SFXBuffer
       
       /// AL buffer in case this is a static, non-streaming buffer.
       ALuint mALBuffer;
-      
+
       /// Free buffers for use in queuing in case this is a streaming buffer.
       Vector< ALuint > mFreeBuffers;
 
@@ -112,6 +112,8 @@ class SFXALBuffer : public SFXBuffer
                                     const ThreadSafeRef< SFXStream >& stream,
                                     SFXDescription* description,
                                     bool useHardware );
+	  ///reverb
+	  
 
       virtual ~SFXALBuffer();
 };

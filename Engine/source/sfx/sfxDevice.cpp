@@ -208,3 +208,4 @@ void SFXDevice::_removeVoice( SFXVoice* voice )
       mVoices.erase( iter );
    }
 }
+

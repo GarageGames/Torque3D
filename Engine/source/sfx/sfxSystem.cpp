@@ -94,6 +94,9 @@ ImplementEnumType( SFXDistanceModel,
    { SFXDistanceModelLogarithmic, "Logarithmic", 
       "Volume attenuates logarithmically starting from the reference distance and halving every reference distance step from there on. "
       "Attenuation stops at max distance but volume won't reach zero." },
+   { SFXDistanceModelExponent, "Exponential",
+	"Volume attenuates exponentially starting from the reference distance and attenuating every reference distance step by the rolloff factor. "
+	"Attenuation stops at max distance but volume won't reach zero." },
 EndImplementEnumType;
 
 ImplementEnumType( SFXChannel,

@@ -36,6 +36,9 @@
 #else
 #  include <al/al.h>
 #  include <al/alc.h>
+#include <AL/alext.h>
+#include <AL/efx-presets.h>
+
 #endif
 
 #ifndef ALAPIENTRY
@@ -118,7 +121,6 @@ typedef void           (ALAPIENTRY *LPALGETBUFFERI)( ALuint bid, ALenum param, A
 typedef void           (ALAPIENTRY *LPALDOPPLERFACTOR)( ALfloat value );
 typedef void           (ALAPIENTRY *LPALDOPPLERVELOCITY)( ALfloat value );
 typedef void           (ALAPIENTRY *LPALDISTANCEMODEL)( ALenum distanceModel );
-
 typedef ALCcontext *   (ALCAPIENTRY *LPALCCREATECONTEXT) (ALCdevice *device, const ALCint *attrlist);
 typedef ALCboolean     (ALCAPIENTRY *LPALCMAKECONTEXTCURRENT)( ALCcontext *context );
 typedef void           (ALCAPIENTRY *LPALCPROCESSCONTEXT)( ALCcontext *context );
@@ -134,6 +136,31 @@ typedef void *         (ALCAPIENTRY *LPALCGETPROCADDRESS)(ALCdevice *device, con
 typedef ALCenum        (ALCAPIENTRY *LPALCGETENUMVALUE)(ALCdevice *device, const ALCchar *enumname );
 typedef const ALCchar* (ALCAPIENTRY *LPALCGETSTRING)( ALCdevice *device, ALCenum param );
 typedef void           (ALCAPIENTRY *LPALCGETINTEGERV)( ALCdevice *device, ALCenum param, ALCsizei size, ALCint *dest );
+typedef void			(ALAPIENTRY *LPALGENEFFECTS)(ALsizei n, ALuint *effects);
+typedef void			(ALAPIENTRY *LPALDELETEEFFECTS)(ALsizei n, const ALuint *effects);
+typedef ALboolean		(ALAPIENTRY *LPALISEFFECT)(ALuint effect);
+typedef void			(ALAPIENTRY *LPALEFFECTI)(ALuint effect, ALenum param, ALint value);
+typedef void			(ALAPIENTRY *LPALEFFECTIV)(ALuint effect, ALenum param, const ALint *values);
+typedef void			(ALAPIENTRY *LPALEFFECTF)(ALuint effect, ALenum param, ALfloat value);
+typedef void			(ALAPIENTRY *LPALEFFECTFV)(ALuint effect, ALenum param, const ALfloat *values);
+typedef void			(ALAPIENTRY *LPALGETEFFECTI)(ALuint effect, ALenum param, ALint *value);
+typedef void			(ALAPIENTRY *LPALGETEFFECTIV)(ALuint effect, ALenum param, ALint *values);
+typedef void			(ALAPIENTRY *LPALGETEFFECTF)(ALuint effect, ALenum param, ALfloat *value);
+typedef void			(ALAPIENTRY *LPALGETEFFECTFV)(ALuint effect, ALenum param, ALfloat *values);
+typedef void			(ALAPIENTRY *LPALRELEASEALEFFECTS)(ALCdevice *device);
+typedef void			(ALAPIENTRY *LPALGENAUXILIARYEFFECTSLOTS)(ALsizei n, ALuint *effectslots);
+typedef void			(ALAPIENTRY *LPALDELETEAUXILIARYEFFECTSLOTS)(ALsizei n, const ALuint *effectslots);
+typedef ALboolean		(ALAPIENTRY *LPALISAUXILIARYEFFECTSLOT)(ALuint effectslot);
+typedef void			(ALAPIENTRY *LPALAUXILIARYEFFECTSLOTI)(ALuint effectslot, ALenum param, ALint value);
+typedef void			(ALAPIENTRY *LPALAUXILIARYEFFECTSLOTIV)(ALuint effectslot, ALenum param, const ALint *values);
+typedef void			(ALAPIENTRY *LPALAUXILIARYEFFECTSLOTF)(ALuint effectslot, ALenum param, ALfloat value);
+typedef void			(ALAPIENTRY *LPALAUXILIARYEFFECTSLOTFV)(ALuint effectslot, ALenum param, const ALfloat *values);
+typedef void			(ALAPIENTRY *LPALGETAUXILIARYEFFECTSLOTI)(ALuint effectslot, ALenum param, ALint *value);
+typedef void			(ALAPIENTRY *LPALGETAUXILIARYEFFECTSLOTIV)(ALuint effectslot, ALenum param, ALint *values);
+typedef void			(ALAPIENTRY *LPALGETAUXILIARYEFFECTSLOTF)(ALuint effectslot, ALenum param, ALfloat *value);
+typedef void			(ALAPIENTRY *LPALGETAUXILIARYEFFECTSLOTFV)(ALuint effectslot, ALenum param, ALfloat *values);
+typedef void			(ALAPIENTRY *LPALSOURCE3I)(ALuint source, ALenum param, ALint value1, ALint value2, ALint value3);
+
 
 typedef struct
 {
@@ -165,6 +192,7 @@ typedef struct
 	LPALDELETESOURCES			   alDeleteSources;
 	LPALISSOURCE				   alIsSource;
 	LPALSOURCEI					   alSourcei;
+	LPALSOURCE3I				   alSource3i;
 	LPALSOURCEF					   alSourcef;
 	LPALSOURCE3F				   alSource3f;
 	LPALSOURCEFV				   alSourcefv;
@@ -203,6 +231,30 @@ typedef struct
 	LPALCISEXTENSIONPRESENT		alcIsExtensionPresent;
 	LPALCGETPROCADDRESS			alcGetProcAddress;
 	LPALCGETENUMVALUE			   alcGetEnumValue;
+	LPALGENEFFECTS				alGenEffects;
+	LPALDELETEEFFECTS			alDeleteEffects;
+	LPALISEFFECT				alIsEffect;
+	LPALEFFECTI					alEffecti;
+	LPALEFFECTIV				alEffectiv;
+	LPALEFFECTF					alEffectf;
+	LPALEFFECTFV				alEffectfv;
+	LPALGETEFFECTI 				alGetEffecti;
+	LPALGETEFFECTIV				alGetEffectiv;
+	LPALGETEFFECTF				alGetEffectf;
+	LPALGETEFFECTFV				alGetEffectfv;
+	LPALRELEASEALEFFECTS		alReleaseEffects;
+	LPALGENAUXILIARYEFFECTSLOTS				alGenAuxiliaryEffectSlots;
+	LPALDELETEAUXILIARYEFFECTSLOTS			alDeleteAuxiliaryEffectSlots;
+	LPALISAUXILIARYEFFECTSLOT				alIsAuxiliaryEffectSlot;
+	LPALAUXILIARYEFFECTSLOTI				alAuxiliaryEffectSloti;
+	LPALAUXILIARYEFFECTSLOTIV				alAuxiliaryEffectSlotiv;
+	LPALAUXILIARYEFFECTSLOTF				alAuxiliaryEffectSlotf;
+	LPALAUXILIARYEFFECTSLOTFV				alAuxiliaryEffectSlotfv;
+	LPALGETAUXILIARYEFFECTSLOTI				alGetAuxiliaryEffectSloti;
+	LPALGETAUXILIARYEFFECTSLOTIV			alGetAuxiliaryEffectSlotiv;
+	LPALGETAUXILIARYEFFECTSLOTF				alGetAuxiliaryEffectSlotf;
+	LPALGETAUXILIARYEFFECTSLOTFV			alGetAuxiliaryEffectSlotfv;
+
 } OPENALFNTABLE, *LPOPENALFNTABLE;
 #endif
 

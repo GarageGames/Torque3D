@@ -34,8 +34,12 @@
 singleton SFXDescription( AudioDefault3D : AudioEffect )
 {
    is3D              = true;
-   ReferenceDistance = 20.0;
-   MaxDistance       = 100.0;
+   ReferenceDistance = "5";
+   MaxDistance       = "40";
+   rolloffFactor = "1.3";
+   useCustomReverb = "1";
+   reverbDensity = "1";
+   reverbDecayTime = "20";
 };
 
 singleton SFXDescription( AudioSoft3D : AudioEffect )
@@ -51,13 +55,26 @@ singleton SFXDescription( AudioClose3D : AudioEffect )
    is3D              = true;
    ReferenceDistance = 10.0;
    MaxDistance       = 60.0;
+   useCustomReverb = "1";
 };
 
 singleton SFXDescription( AudioClosest3D : AudioEffect )
 {
    is3D              = true;
-   ReferenceDistance = 5.0;
+   ReferenceDistance = "0";
    MaxDistance       = 10.0;
+   useCustomReverb = "1";
+   reverbDirect = "47";
+   reverbRoom = "87";
+   reverbOcclusionLFRatio = "0.244094";
+   reverbOcclusionRoomRatio = "1.49606";
+   reverbOcclusionDirectRatio = "0.944882";
+   reverbAirAbsorptionFactor = "0.944882";
+   reverbFlags = "39";
+   reverbDensity = "1";
+   reverbDecayTime = "10";
+   reverbDiffusion = "0.5";
+   decayHFLimit = "0";
 };
 
 //-----------------------------------------------------------------------------

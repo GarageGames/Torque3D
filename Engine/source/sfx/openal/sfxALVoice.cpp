@@ -24,6 +24,10 @@
 #include "sfx/openal/sfxALVoice.h"
 #include "sfx/openal/sfxALBuffer.h"
 #include "sfx/openal/sfxALDevice.h"
+#include "sfx/sfxSystem.h"
+#include "sfx/sfxAmbience.h"
+#include "sfx/sfxSoundscape.h"
+#include "sfx/sfxEnvironment.h"
 
 
 #ifdef TORQUE_DEBUG
@@ -37,221 +41,224 @@
 //#define DEBUG_SPEW
 
 
-SFXALVoice* SFXALVoice::create( SFXALDevice* device, SFXALBuffer *buffer )
+SFXALVoice* SFXALVoice::create(SFXALDevice* device, SFXALBuffer *buffer)
 {
-   AssertFatal( buffer, "SFXALVoice::create() - Got null buffer!" );
- 
-   ALuint sourceName;
-   device->mOpenAL.alGenSources( 1, &sourceName );
-   AssertFatal( device->mOpenAL.alIsSource( sourceName ), "AL Source Sanity Check Failed!" );
+	AssertFatal(buffer, "SFXALVoice::create() - Got null buffer!");
 
-   // Is this 3d?
-   // Okay, this looks odd, but bear with me for a moment.  AL_SOURCE_RELATIVE does NOT indicate
-   // whether or not the volume of the sound should change depending on the position of the listener.
-   // OpenAL assumes that the volume will ALWAYS depend on the position of the listener.  What AL_SOURCE_RELATIVE
-   // does do is dictate if the position of THIS SOURCE is relative to the listener.  If AL_SOURCE_RELATIVE is AL_TRUE
-   // and the source's position is 0, 0, 0, then the source is directly on top of the listener at all times, which is what
-   // we want for non-3d sounds.
-   device->mOpenAL.alSourcei( sourceName, AL_SOURCE_RELATIVE, ( buffer->mIs3d ? AL_FALSE : AL_TRUE ) );
-   
-   if( buffer->mIs3d )
-      device->mOpenAL.alSourcef( sourceName, AL_ROLLOFF_FACTOR, device->mRolloffFactor );
+	ALuint sourceName;
+	device->mOpenAL.alGenSources(1, &sourceName);
+	AssertFatal(device->mOpenAL.alIsSource(sourceName), "AL Source Sanity Check Failed!");
+	
 
-   SFXALVoice *voice = new SFXALVoice( device->mOpenAL,
-                                       buffer,
-                                       sourceName );
+	// Is this 3d?
+	// Okay, this looks odd, but bear with me for a moment.  AL_SOURCE_RELATIVE does NOT indicate
+	// whether or not the volume of the sound should change depending on the position of the listener.
+	// OpenAL assumes that the volume will ALWAYS depend on the position of the listener.  What AL_SOURCE_RELATIVE
+	// does do is dictate if the position of THIS SOURCE is relative to the listener.  If AL_SOURCE_RELATIVE is AL_TRUE
+	// and the source's position is 0, 0, 0, then the source is directly on top of the listener at all times, which is what
+	// we want for non-3d sounds.
+	device->mOpenAL.alSourcei(sourceName, AL_SOURCE_RELATIVE, (buffer->mIs3d ? AL_FALSE : AL_TRUE));
 
-   return voice;
+	if (buffer->mIs3d)
+		device->mOpenAL.alSourcef(sourceName, AL_ROLLOFF_FACTOR, device->mRolloffFactor);
+
+	SFXALVoice *voice = new SFXALVoice(device->mOpenAL,
+		buffer,
+		sourceName);
+	
+	return voice;
 }
 
-SFXALVoice::SFXALVoice( const OPENALFNTABLE &oalft,
-                        SFXALBuffer *buffer, 
-                        ALuint sourceName )
+SFXALVoice::SFXALVoice(const OPENALFNTABLE &oalft,
+	SFXALBuffer *buffer,
+	ALuint sourceName)
 
-   :  Parent( buffer ),
-      mSourceName( sourceName ),
-      mResumeAtSampleOffset( -1.0f ),
-      mSampleOffset( 0 ),
-      mOpenAL( oalft )
+	: Parent(buffer),
+	mSourceName(sourceName),
+	mResumeAtSampleOffset(-1.0f),
+	mSampleOffset(0),
+	mOpenAL(oalft)
 {
-   AL_SANITY_CHECK();
+	AL_SANITY_CHECK();
 }
 
 SFXALVoice::~SFXALVoice()
 {
-   mOpenAL.alDeleteSources( 1, &mSourceName );
+	
+	mOpenAL.alDeleteSources(1, &mSourceName);
 }
 
 void SFXALVoice::_lateBindStaticBufferIfNecessary()
 {
-   if( !mBuffer->isStreaming() )
-   {
-      ALint bufferId;
-      mOpenAL.alGetSourcei( mSourceName, AL_BUFFER, &bufferId );
-      if( !bufferId )
-         mOpenAL.alSourcei( mSourceName, AL_BUFFER, _getBuffer()->mALBuffer );
-   }
+	if (!mBuffer->isStreaming())
+	{
+		ALint bufferId;
+		mOpenAL.alGetSourcei(mSourceName, AL_BUFFER, &bufferId);
+		if (!bufferId)
+			mOpenAL.alSourcei(mSourceName, AL_BUFFER, _getBuffer()->mALBuffer);
+	}
 }
 
 
 SFXStatus SFXALVoice::_status() const
 {
-   AL_SANITY_CHECK();
+	AL_SANITY_CHECK();
 
-   ALint state;
-   mOpenAL.alGetSourcei( mSourceName, AL_SOURCE_STATE, &state );
+	ALint state;
+	mOpenAL.alGetSourcei(mSourceName, AL_SOURCE_STATE, &state);
 
-   switch( state )
-   {
-      case AL_PLAYING:  return SFXStatusPlaying;
-      case AL_PAUSED:   return SFXStatusPaused;
-      default:          return SFXStatusStopped;
-   }
+	switch (state)
+	{
+	case AL_PLAYING:  return SFXStatusPlaying;
+	case AL_PAUSED:   return SFXStatusPaused;
+	default:          return SFXStatusStopped;
+	}
 }
 
 void SFXALVoice::_play()
 {
-   AL_SANITY_CHECK();
+	AL_SANITY_CHECK();
 
-   _lateBindStaticBufferIfNecessary();
+	_lateBindStaticBufferIfNecessary();
 
-   #ifdef DEBUG_SPEW
-   Platform::outputDebugString( "[SFXALVoice] Starting playback" );
-   #endif
-   
-   mOpenAL.alSourcePlay( mSourceName );
-   
-   //WORKAROUND: Adjust play cursor for buggy OAL when resuming playback.  Do this after alSourcePlay
-   // as it is the play function that will cause the cursor to jump.
-   
-   if( mResumeAtSampleOffset != -1.0f )
-   {
-      mOpenAL.alSourcef( mSourceName, AL_SAMPLE_OFFSET, mResumeAtSampleOffset );
-      mResumeAtSampleOffset = -1.0f;
-   }
+#ifndef DEBUG_SPEW
+	Platform::outputDebugString("[SFXALVoice] Starting playback");
+#endif
+
+	mOpenAL.alSource3i(mSourceName, AL_AUXILIARY_SEND_FILTER, 1, 0, AL_FILTER_NULL);
+	mOpenAL.alSourcePlay(mSourceName);
+
+	//WORKAROUND: Adjust play cursor for buggy OAL when resuming playback.  Do this after alSourcePlay
+	// as it is the play function that will cause the cursor to jump.
+	
+	if (mResumeAtSampleOffset != -1.0f)
+	{
+		mOpenAL.alSourcef(mSourceName, AL_SAMPLE_OFFSET, mResumeAtSampleOffset);
+		mResumeAtSampleOffset = -1.0f;
+	}
 }
 
 void SFXALVoice::_pause()
-{   
-   AL_SANITY_CHECK();
+{
+	AL_SANITY_CHECK();
 
-   #ifdef DEBUG_SPEW
-   Platform::outputDebugString( "[SFXALVoice] Pausing playback" );
-   #endif
+#ifdef DEBUG_SPEW
+	Platform::outputDebugString("[SFXALVoice] Pausing playback");
+#endif
 
-   mOpenAL.alSourcePause( mSourceName );
-   
-   //WORKAROUND: Another workaround for buggy OAL.  Resuming playback of a paused source will cause the 
-   // play cursor to jump.  Save the cursor so we can manually move it into position in _play().  Sigh.
-   
-   mOpenAL.alGetSourcef( mSourceName, AL_SAMPLE_OFFSET, &mResumeAtSampleOffset );
+	mOpenAL.alSourcePause(mSourceName);
+
+	//WORKAROUND: Another workaround for buggy OAL.  Resuming playback of a paused source will cause the 
+	// play cursor to jump.  Save the cursor so we can manually move it into position in _play().  Sigh.
+
+	mOpenAL.alGetSourcef(mSourceName, AL_SAMPLE_OFFSET, &mResumeAtSampleOffset);
 }
 
 void SFXALVoice::_stop()
 {
-   AL_SANITY_CHECK();
-   
-   #ifdef DEBUG_SPEW
-   Platform::outputDebugString( "[SFXALVoice] Stopping playback" );
-   #endif
+	AL_SANITY_CHECK();
 
-   mOpenAL.alSourceStop( mSourceName );
-   mSampleOffset = 0;
-   
-   mResumeAtSampleOffset = -1.0f;
+#ifdef DEBUG_SPEW
+	Platform::outputDebugString("[SFXALVoice] Stopping playback");
+#endif
+
+	mOpenAL.alSourceStop(mSourceName);
+	mSampleOffset = 0;
+
+	mResumeAtSampleOffset = -1.0f;
 }
 
-void SFXALVoice::_seek( U32 sample )
+void SFXALVoice::_seek(U32 sample)
 {
-   AL_SANITY_CHECK();
-   
-   _lateBindStaticBufferIfNecessary();
-   mOpenAL.alSourcei( mSourceName, AL_SAMPLE_OFFSET, sample );
+	AL_SANITY_CHECK();
 
-   mResumeAtSampleOffset = -1.0f;
+	_lateBindStaticBufferIfNecessary();
+	mOpenAL.alSourcei(mSourceName, AL_SAMPLE_OFFSET, sample);
+
+	mResumeAtSampleOffset = -1.0f;
 }
 
 U32 SFXALVoice::_tell() const
 {
-   // Flush processed buffers as AL_SAMPLE_OFFSET will snap back to zero as soon
-   // as the queue is processed in whole.
+	// Flush processed buffers as AL_SAMPLE_OFFSET will snap back to zero as soon
+	// as the queue is processed in whole.
 
-   if( mBuffer->isStreaming() )
-      mBuffer->write( NULL, 0 );
+	if (mBuffer->isStreaming())
+		mBuffer->write(NULL, 0);
 
-   ALint pos;
-   mOpenAL.alGetSourcei( mSourceName, AL_SAMPLE_OFFSET, &pos );
-   return ( pos + mSampleOffset );
+	ALint pos;
+	mOpenAL.alGetSourcei(mSourceName, AL_SAMPLE_OFFSET, &pos);
+	return (pos + mSampleOffset);
 }
 
-void SFXALVoice::setMinMaxDistance( F32 min, F32 max )
+void SFXALVoice::setMinMaxDistance(F32 min, F32 max)
 {
-   AL_SANITY_CHECK();
+	AL_SANITY_CHECK();
 
-   mOpenAL.alSourcef( mSourceName, AL_REFERENCE_DISTANCE, min );
-   mOpenAL.alSourcef( mSourceName, AL_MAX_DISTANCE, max );
+	mOpenAL.alSourcef(mSourceName, AL_REFERENCE_DISTANCE, min);
+	mOpenAL.alSourcef(mSourceName, AL_MAX_DISTANCE, max);
 }
 
-void SFXALVoice::play( bool looping )
+void SFXALVoice::play(bool looping)
 {
-   AL_SANITY_CHECK();
+	AL_SANITY_CHECK();
 
-   mOpenAL.alSourceStop( mSourceName );
-   if( !mBuffer->isStreaming() )
-      mOpenAL.alSourcei( mSourceName, AL_LOOPING, ( looping ? AL_TRUE : AL_FALSE ) );
+	mOpenAL.alSourceStop(mSourceName);
+	if (!mBuffer->isStreaming())
+		mOpenAL.alSourcei(mSourceName, AL_LOOPING, (looping ? AL_TRUE : AL_FALSE));
 
-   Parent::play( looping );
+	Parent::play(looping);
 }
 
-void SFXALVoice::setVelocity( const VectorF& velocity )
+void SFXALVoice::setVelocity(const VectorF& velocity)
 {
-   AL_SANITY_CHECK();
+	AL_SANITY_CHECK();
 
-   // Torque and OpenAL are both right handed 
-   // systems, so no coordinate flipping is needed.
+	// Torque and OpenAL are both right handed 
+	// systems, so no coordinate flipping is needed.
 
-   mOpenAL.alSourcefv( mSourceName, AL_VELOCITY, velocity );
+	mOpenAL.alSourcefv(mSourceName, AL_VELOCITY, velocity);
 }
 
-void SFXALVoice::setTransform( const MatrixF& transform )
+void SFXALVoice::setTransform(const MatrixF& transform)
 {
-   AL_SANITY_CHECK();
+	AL_SANITY_CHECK();
 
-   // Torque and OpenAL are both right handed 
-   // systems, so no coordinate flipping is needed.
+	// Torque and OpenAL are both right handed 
+	// systems, so no coordinate flipping is needed.
 
-   Point3F pos, dir;
-   transform.getColumn( 3, &pos );
-   transform.getColumn( 1, &dir );
+	Point3F pos, dir;
+	transform.getColumn(3, &pos);
+	transform.getColumn(1, &dir);
 
-   mOpenAL.alSourcefv( mSourceName, AL_POSITION, pos );
-   mOpenAL.alSourcefv( mSourceName, AL_DIRECTION, dir );
+	mOpenAL.alSourcefv(mSourceName, AL_POSITION, pos);
+	mOpenAL.alSourcefv(mSourceName, AL_DIRECTION, dir);
 }
 
-void SFXALVoice::setVolume( F32 volume )
+void SFXALVoice::setVolume(F32 volume)
 {
-   AL_SANITY_CHECK();
+	AL_SANITY_CHECK();
 
-   mOpenAL.alSourcef( mSourceName, AL_GAIN, volume );
+	mOpenAL.alSourcef(mSourceName, AL_GAIN, volume);
 }
 
-void SFXALVoice::setPitch( F32 pitch )
-{ 
-   AL_SANITY_CHECK();
-
-   mOpenAL.alSourcef( mSourceName, AL_PITCH, pitch );
-}
-
-void SFXALVoice::setCone( F32 innerAngle, F32 outerAngle, F32 outerVolume )
+void SFXALVoice::setPitch(F32 pitch)
 {
-   AL_SANITY_CHECK();
+	AL_SANITY_CHECK();
 
-   mOpenAL.alSourcef( mSourceName, AL_CONE_INNER_ANGLE, innerAngle );
-   mOpenAL.alSourcef( mSourceName, AL_CONE_OUTER_ANGLE, outerAngle );
-   mOpenAL.alSourcef( mSourceName, AL_CONE_OUTER_GAIN, outerVolume );
+	mOpenAL.alSourcef(mSourceName, AL_PITCH, pitch);
 }
 
-void SFXALVoice::setRolloffFactor( F32 factor )
+void SFXALVoice::setCone(F32 innerAngle, F32 outerAngle, F32 outerVolume)
 {
-   mOpenAL.alSourcef( mSourceName, AL_ROLLOFF_FACTOR, factor );
+	AL_SANITY_CHECK();
+
+	mOpenAL.alSourcef(mSourceName, AL_CONE_INNER_ANGLE, innerAngle);
+	mOpenAL.alSourcef(mSourceName, AL_CONE_OUTER_ANGLE, outerAngle);
+	mOpenAL.alSourcef(mSourceName, AL_CONE_OUTER_GAIN, outerVolume);
+}
+
+void SFXALVoice::setRolloffFactor(F32 factor)
+{
+	mOpenAL.alSourcef(mSourceName, AL_ROLLOFF_FACTOR, factor);
 }

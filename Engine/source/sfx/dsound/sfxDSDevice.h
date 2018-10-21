@@ -134,7 +134,7 @@ class SFXDSDevice : public SFXDevice
       virtual SFXVoice* createVoice( bool is3D, SFXBuffer *buffer );
       virtual void update();
       virtual void setListener( U32 index, const SFXListenerProperties& listener );
-      virtual void setDistanceModel( SFXDistanceModel mode );
+      virtual void setDistanceModel( SFXDistanceModel model );
       virtual void setDopplerFactor( F32 factor );
       virtual void setRolloffFactor( F32 factor );
 };
