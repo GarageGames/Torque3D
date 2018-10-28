@@ -20,10 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
-// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
-// Copyright (C) 2015 Faust Logic, Inc.
-//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #ifndef _SFXDESCRIPTION_H_
 #define _SFXDESCRIPTION_H_
 
@@ -196,9 +192,6 @@ class SFXDescription : public SimDataBlock
       /// Validates the description fixing any
       /// parameters that are out of range.
       void validate();
-   public:
-      SFXDescription(const SFXDescription&, bool);
-      virtual bool allowSubstitutions() const { return true; }
 };
 
 

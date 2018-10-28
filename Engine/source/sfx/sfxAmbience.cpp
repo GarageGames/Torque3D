@@ -83,10 +83,10 @@ SFXAmbience::ChangeSignal SFXAmbience::smChangeSignal;
 //-----------------------------------------------------------------------------
 
 SFXAmbience::SFXAmbience()
-   : mDopplerFactor( 0.5f ),
-     mRolloffFactor( 1.f ),
+   : mEnvironment( NULL ),
      mSoundTrack( NULL ),
-     mEnvironment( NULL )
+     mRolloffFactor( 1.f ),
+     mDopplerFactor( 0.5f )
 {
    dMemset( mState, 0, sizeof( mState ) );
 }

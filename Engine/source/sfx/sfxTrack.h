@@ -20,10 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
-// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
-// Copyright (C) 2015 Faust Logic, Inc.
-//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #ifndef _SFXTRACK_H_
 #define _SFXTRACK_H_
 
@@ -96,8 +92,6 @@ class SFXTrack : public SimDataBlock
       DECLARE_CONOBJECT( SFXTrack );
       DECLARE_CATEGORY( "SFX" );
       DECLARE_DESCRIPTION( "Abstract base class for any kind of data that can be turned into SFXSources." );
-   public:
-      /*C*/ SFXTrack(const SFXTrack&, bool = false);
 };
 
 #endif // !_SFXTRACK_H_

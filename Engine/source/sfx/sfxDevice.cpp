@@ -165,12 +165,12 @@ void SFXDevice::_removeBuffer( SFXBuffer* buffer )
 {
    AssertFatal( buffer, "SFXDevice::_removeBuffer() - Got a null buffer!" );
 
-   BufferIterator iter = T3D::find( mBuffers.begin(), mBuffers.end(), buffer );
+   BufferIterator iter = find( mBuffers.begin(), mBuffers.end(), buffer );
    if( iter != mBuffers.end() )
    {
-      SFXBuffer* curBuf = *iter;
+      SFXBuffer* buffer = *iter;
 
-      mStatNumBufferBytes -= curBuf->getMemoryUsed();
+      mStatNumBufferBytes -= buffer->getMemoryUsed();
       mStatNumBuffers --;
       
       mBuffers.erase( iter );
@@ -201,10 +201,11 @@ void SFXDevice::_removeVoice( SFXVoice* voice )
 {
    AssertFatal( voice, "SFXDevice::_removeVoice() - Got null voice!" );
 
-   VoiceIterator iter = T3D::find( mVoices.begin(), mVoices.end(), voice );
+   VoiceIterator iter = find( mVoices.begin(), mVoices.end(), voice );
    if( iter != mVoices.end() )
    {
       mStatNumVoices --;
       mVoices.erase( iter );
    }
 }
+

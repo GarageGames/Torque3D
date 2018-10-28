@@ -49,19 +49,23 @@ SFXALBuffer* SFXALBuffer::create(   const OPENALFNTABLE &oalft,
    return buffer;
 }
 
+
+
 SFXALBuffer::SFXALBuffer(  const OPENALFNTABLE &oalft, 
                            const ThreadSafeRef< SFXStream >& stream,
                            SFXDescription* description,
                            bool useHardware )
    :  Parent( stream, description ),
-      mIs3d( description->mIs3D ),
+      mOpenAL( oalft ),
       mUseHardware( useHardware ),
-      mOpenAL( oalft )
+      mIs3d( description->mIs3D )
 {
    // Set up device buffers.
 
-   if( !isStreaming() )
-      mOpenAL.alGenBuffers( 1, &mALBuffer );
+	if (!isStreaming()) {
+		mOpenAL.alGenBuffers(1, &mALBuffer);
+	}
+
 }
 
 SFXALBuffer::~SFXALBuffer()
@@ -70,9 +74,10 @@ SFXALBuffer::~SFXALBuffer()
       _getUniqueVoice()->stop();
 
    // Release buffers.
-   if ( mOpenAL.alIsBuffer( mALBuffer ))
-      mOpenAL.alDeleteBuffers( 1, &mALBuffer );
-
+   if (mOpenAL.alIsBuffer(mALBuffer)) {
+	   mOpenAL.alDeleteBuffers(1, &mALBuffer);
+   }
+   ///mOpenAL.alDeleteAuxiliaryEffectSlots(1, &slot);
    while( mFreeBuffers.size() )
    {
       ALuint buffer = mFreeBuffers.last();
@@ -83,6 +88,7 @@ SFXALBuffer::~SFXALBuffer()
 
 void SFXALBuffer::write( SFXInternal::SFXStreamPacket* const* packets, U32 num )
 {
+	
    using namespace SFXInternal;
    
    if( !num )
@@ -91,6 +97,8 @@ void SFXALBuffer::write( SFXInternal::SFXStreamPacket* const* packets, U32 num )
    // If this is not a streaming buffer, just load the data into our single
    // static buffer.
    
+   
+
    if( !isStreaming() )
    {
       SFXStreamPacket* packet = packets[ num - 1 ];
@@ -109,10 +117,10 @@ void SFXALBuffer::write( SFXInternal::SFXStreamPacket* const* packets, U32 num )
    mutex.lock( &_getUniqueVoice()->mMutex, true );
 
    // Unqueue processed packets.
-
    ALuint source = _getUniqueVoice()->mSourceName;
    ALint numProcessed;
    mOpenAL.alGetSourcei( source, AL_BUFFERS_PROCESSED, &numProcessed );
+   
    
    for( U32 i = 0; i < numProcessed; ++ i )
    {
@@ -160,6 +168,8 @@ void SFXALBuffer::write( SFXInternal::SFXStreamPacket* const* packets, U32 num )
       
       destructSingle( packet );
       
+	  
+
       // Queue the buffer.
       
       mOpenAL.alSourceQueueBuffers( source, 1, &buffer );

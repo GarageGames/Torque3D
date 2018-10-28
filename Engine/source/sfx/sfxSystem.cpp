@@ -94,6 +94,9 @@ ImplementEnumType( SFXDistanceModel,
    { SFXDistanceModelLogarithmic, "Logarithmic", 
       "Volume attenuates logarithmically starting from the reference distance and halving every reference distance step from there on. "
       "Attenuation stops at max distance but volume won't reach zero." },
+   { SFXDistanceModelExponent, "Exponential",
+	"Volume attenuates exponentially starting from the reference distance and attenuating every reference distance step by the rolloff factor. "
+	"Attenuation stops at max distance but volume won't reach zero." },
 EndImplementEnumType;
 
 ImplementEnumType( SFXChannel,
@@ -198,8 +201,8 @@ SFXSystem::SFXSystem()
       mStatNumVoices( 0 ),
       mStatSourceUpdateTime( 0 ),
       mStatParameterUpdateTime( 0 ),
-      mDistanceModel( SFXDistanceModelLinear ),
       mStatAmbientUpdateTime( 0 ),
+      mDistanceModel( SFXDistanceModelLinear ),
       mDopplerFactor( 0.5 ),
       mRolloffFactor( 1.0 ),
       mSoundscapeMgr( NULL )
@@ -473,6 +476,9 @@ bool SFXSystem::createDevice( const String& providerName, const String& deviceNa
    mDevice->setDistanceModel( mDistanceModel );
    mDevice->setDopplerFactor( mDopplerFactor );
    mDevice->setRolloffFactor( mRolloffFactor );
+   //OpenAL requires slots for effects, this creates an empty function 
+   //that will run when a sfxdevice is created.
+   mDevice->openSlots();
    mDevice->setReverb( mReverb );
       
    // Signal system.
@@ -647,7 +653,7 @@ void SFXSystem::deleteWhenStopped( SFXSource* source )
    // If the source isn't already on the play-once source list,
    // put it there now.
    
-   Vector< SFXSource* >::iterator iter = T3D::find( mPlayOnceSources.begin(), mPlayOnceSources.end(), source );
+   Vector< SFXSource* >::iterator iter = find( mPlayOnceSources.begin(), mPlayOnceSources.end(), source );
    if( iter == mPlayOnceSources.end() )
       mPlayOnceSources.push_back( source );
 }
@@ -674,9 +680,9 @@ void SFXSystem::_onRemoveSource( SFXSource* source )
 {
    // Check if it was a play once source.
    
-   Vector< SFXSource* >::iterator sourceIter = T3D::find( mPlayOnceSources.begin(), mPlayOnceSources.end(), source );
-   if (sourceIter != mPlayOnceSources.end() )
-      mPlayOnceSources.erase_fast(sourceIter);
+   Vector< SFXSource* >::iterator iter = find( mPlayOnceSources.begin(), mPlayOnceSources.end(), source );
+   if ( iter != mPlayOnceSources.end() )
+      mPlayOnceSources.erase_fast( iter );
 
    // Update the stats.
    
@@ -684,9 +690,9 @@ void SFXSystem::_onRemoveSource( SFXSource* source )
    
    if( dynamic_cast< SFXSound* >( source ) )
    {
-      SFXSoundVector::iterator vectorIter = T3D::find( mSounds.begin(), mSounds.end(), static_cast< SFXSound* >( source ) );
-      if(vectorIter != mSounds.end() )
-         mSounds.erase_fast(vectorIter);
+      SFXSoundVector::iterator iter = find( mSounds.begin(), mSounds.end(), static_cast< SFXSound* >( source ) );
+      if( iter != mSounds.end() )
+         mSounds.erase_fast( iter );
          
       mStatNumSounds = mSounds.size();
    }
@@ -1048,6 +1054,11 @@ void SFXSystem::setRolloffFactor( F32 factor )
 }
 
 //-----------------------------------------------------------------------------
+
+void SFXSystem::openSlots()
+{
+	mDevice->openSlots();
+}
 
 void SFXSystem::setReverb( const SFXReverbProperties& reverb )
 {

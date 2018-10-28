@@ -40,7 +40,7 @@ class SFXProvider;
 #ifndef _SFXALVOICE_H_
 #  include "sfx/openal/sfxALVoice.h"
 #endif
-
+#include "sfx/sfxAmbience.h"
 #ifndef _OPENALFNTABLE
 #  include "sfx/openal/LoadOAL.h"
 #endif
@@ -48,43 +48,51 @@ class SFXProvider;
 
 class SFXALDevice : public SFXDevice
 {
-   public:
+public:
 
-      typedef SFXDevice Parent;
-      friend class SFXALVoice; // mDistanceFactor, mRolloffFactor
+	typedef SFXDevice Parent;
+	friend class SFXALVoice; // mDistanceFactor, mRolloffFactor
 
-      SFXALDevice(   SFXProvider *provider, 
-                     const OPENALFNTABLE &openal, 
-                     String name, 
-                     bool useHardware, 
-                     S32 maxBuffers );
+	SFXALDevice(SFXProvider *provider,
+		const OPENALFNTABLE &openal,
+		String name,
+		bool useHardware,
+		S32 maxBuffers);
 
-      virtual ~SFXALDevice();
+	virtual ~SFXALDevice();
 
-   protected:
+protected:
 
-      OPENALFNTABLE mOpenAL;
+	OPENALFNTABLE mOpenAL;
 
-      ALCcontext *mContext;
+	ALCcontext *mContext;
 
-      ALCdevice *mDevice;
-      
-      SFXDistanceModel mDistanceModel;
-      F32 mDistanceFactor;
-      F32 mRolloffFactor;
-      F32 mUserRolloffFactor;
-      
-      void _setRolloffFactor( F32 factor );
+	ALCdevice *mDevice;
 
-   public:
+	SFXDistanceModel mDistanceModel;
+	F32 mDistanceFactor;
+	F32 mRolloffFactor;
+	F32 mUserRolloffFactor;
 
-      // SFXDevice.
-      virtual SFXBuffer* createBuffer( const ThreadSafeRef< SFXStream >& stream, SFXDescription* description );
-      virtual SFXVoice* createVoice( bool is3D, SFXBuffer *buffer );
-      virtual void setListener( U32 index, const SFXListenerProperties& listener );
-      virtual void setDistanceModel( SFXDistanceModel model );
-      virtual void setDopplerFactor( F32 factor );
-      virtual void setRolloffFactor( F32 factor );
+	void _setRolloffFactor(F32 factor);
+
+public:
+
+	// SFXDevice.
+	virtual SFXBuffer* createBuffer(const ThreadSafeRef< SFXStream >& stream, SFXDescription* description);
+	virtual SFXVoice* createVoice(bool is3D, SFXBuffer *buffer);
+	virtual void setListener(U32 index, const SFXListenerProperties& listener);
+	virtual void setDistanceModel(SFXDistanceModel model);
+	virtual void setDopplerFactor(F32 factor);
+	virtual void setRolloffFactor(F32 factor);
+   //function for openAL to open slots
+	virtual void openSlots();
+   //slots
+	ALuint		effectSlot;
+	ALuint		effect;
+   //get values from sfxreverbproperties and pass it to openal device
+	virtual void setReverb(const SFXReverbProperties& reverb);
+	virtual void resetReverb() {}
 };
 
 #endif // _SFXALDEVICE_H_

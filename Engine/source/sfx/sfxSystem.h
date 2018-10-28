@@ -414,6 +414,8 @@ class SFXSystem
       ///
       const SFXReverbProperties& getReverb() const { return mReverb; }
       
+	  void openSlots();
+
       ///
       void setReverb( const SFXReverbProperties& reverb );
       
