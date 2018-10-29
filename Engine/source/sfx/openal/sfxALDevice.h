@@ -85,6 +85,15 @@ class SFXALDevice : public SFXDevice
       virtual void setDistanceModel( SFXDistanceModel model );
       virtual void setDopplerFactor( F32 factor );
       virtual void setRolloffFactor( F32 factor );
+      //function for openAL to open slots
+      virtual void openSlots();
+      //slots
+      ALuint	effectSlot[4] = { 0 };
+      ALuint	effect[2] = { 0 };
+      ALuint   uLoop;
+      //get values from sfxreverbproperties and pass it to openal device
+      virtual void setReverb(const SFXReverbProperties& reverb);
+      virtual void resetReverb() {}
 };
 
 #endif // _SFXALDEVICE_H_

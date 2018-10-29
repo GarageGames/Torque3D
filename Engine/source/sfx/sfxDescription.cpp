@@ -389,91 +389,55 @@ void SFXDescription::initPersistFields()
 
    addGroup( "Reverb" );
    
-      addField( "useCustomReverb",     TypeBool,   Offset( mUseReverb, SFXDescription ),
-         "If true, use the reverb properties defined here on sounds.\n"
-         "By default, sounds will be assigned a generic reverb profile.  By setting this flag to true, "
-         "a custom reverb setup can be defined using the \"Reverb\" properties that will then be assigned "
-         "to sounds playing with the description.\n\n"
-         "@ref SFX_reverb" );
-      addField( "reverbDirect",              TypeS32,    Offset( mReverb.mDirect, SFXDescription ),
-         "Direct path level (at low and mid frequencies).\n"
-         "@note SUPPORTED: EAX/I3DL2/FMODSFX\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbDirectHF",            TypeS32,    Offset( mReverb.mDirectHF, SFXDescription ),
-         "Relative direct path level at high frequencies.\n"
-         "@note SUPPORTED: EAX/I3DL2\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbRoom",                TypeS32,    Offset( mReverb.mRoom, SFXDescription ),
-         "Room effect level (at low and mid frequencies).\n"
-         "@note SUPPORTED: EAX/I3DL2/FMODSFX\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbRoomHF",              TypeS32,    Offset( mReverb.mRoomHF, SFXDescription ),
-         "Relative room effect level at high frequencies.\n"
-         "@note SUPPORTED: EAX/I3DL2\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbObstruction",         TypeS32,    Offset( mReverb.mObstruction, SFXDescription ),
-         "Main obstruction control (attenuation at high frequencies).\n"
-         "@note SUPPORTED: EAX/I3DL2\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbObstructionLFRatio",  TypeF32,    Offset( mReverb.mObstructionLFRatio, SFXDescription ),
-         "Obstruction low-frequency level re. main control.\n"
-         "@note SUPPORTED: EAX/I3DL2\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbOcclusion",           TypeS32,    Offset( mReverb.mOcclusion, SFXDescription ),
-         "Main occlusion control (attenuation at high frequencies)."
-         "@note SUPPORTED: EAX/I3DL2\n\n"
-         "\n@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbOcclusionLFRatio",    TypeF32,    Offset( mReverb.mOcclusionLFRatio, SFXDescription ),
-         "Occlusion low-frequency level re. main control.\n"
-         "@note SUPPORTED: EAX/I3DL2\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbOcclusionRoomRatio",  TypeF32,    Offset( mReverb.mOcclusionRoomRatio, SFXDescription ),
-         "Relative occlusion control for room effect.\n"
-         "@note SUPPORTED: EAX Only\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbOcclusionDirectRatio",TypeF32,    Offset( mReverb.mOcclusionDirectRatio, SFXDescription ),
-         "Relative occlusion control for direct path.\n"
-         "@note SUPPORTED: EAX Only\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbExclusion",           TypeS32,    Offset( mReverb.mExclusion, SFXDescription ),
-         "Main exclusion control (attenuation at high frequencies).\n"
-         "@note SUPPORTED: EAX Only\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbExclusionLFRatio",    TypeF32,    Offset( mReverb.mExclusionLFRatio, SFXDescription ),
-         "Exclusion low-frequency level re. main control.\n"
-         "@note SUPPORTED: EAX Only\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbOutsideVolumeHF",     TypeS32,    Offset( mReverb.mOutsideVolumeHF, SFXDescription ),
-         "Outside sound cone level at high frequencies.\n"
-         "@note SUPPORTED: EAX Only\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbDopplerFactor",       TypeF32,    Offset( mReverb.mDopplerFactor, SFXDescription ),
-         "Per-source doppler factor.\n"
-         "@note SUPPORTED: EAX Only\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbReverbRolloffFactor", TypeF32,    Offset( mReverb.mRolloffFactor, SFXDescription ),
-         "Per-source logarithmic falloff factor.\n"
-         "@note SUPPORTED: EAX Only\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbRoomRolloffFactor",   TypeF32,    Offset( mReverb.mRoomRolloffFactor, SFXDescription ),
-         "Room effect falloff factor.\n"
-         "@note SUPPORTED: EAX/I3DL2\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbAirAbsorptionFactor", TypeF32,    Offset( mReverb.mAirAbsorptionFactor, SFXDescription ),
-         "Multiplies SFXEnvironment::airAbsorptionHR.\n"
-         "@note SUPPORTED: EAX Only\n\n"
-         "@see http://www.atc.creative.com/algorithms/eax20.pdf" );
-      addField( "reverbFlags",         TypeS32,    Offset( mReverb.mFlags, SFXDescription ),
-         "Bitfield combination of per-sound reverb flags.\n"
-         "@see REVERB_DIRECTHFAUTO\n"
-         "@see REVERB_ROOMAUTO\n"
-         "@see REVERB_ROOMHFAUTO\n"
-         "@see REVERB_INSTANCE0\n"
-         "@see REVERB_INSTANCE1\n"
-         "@see REVERB_INSTANCE2\n"
-         "@see REVERB_INSTANCE3\n" );
-      
-   endGroup( "Reverb" );
+   addField("useCustomReverb", TypeBool, Offset(mUseReverb, SFXDescription),
+      "If true, use the reverb properties defined here on sounds.\n"
+      "By default, sounds will be assigned a generic reverb profile.  By setting this flag to true, "
+      "a custom reverb setup can be defined using the \"Reverb\" properties that will then be assigned "
+      "to sounds playing with the description.\n\n"
+      "@ref SFX_reverb");
+   addField("reverbDensity", TypeF32, Offset(mReverb.flDensity, SFXDescription),
+      "Density of reverb environment.");
+   addField("reverbDiffusion", TypeF32, Offset(mReverb.flDiffusion, SFXDescription),
+      "Environment diffusion.");
+   addField("reverbGain", TypeF32, Offset(mReverb.flGain, SFXDescription),
+      "Reverb Gain Level.");
+   addField("reverbGainHF", TypeF32, Offset(mReverb.flGainHF, SFXDescription),
+      "Reverb Gain to high frequencies");
+   addField("reverbGainLF", TypeF32, Offset(mReverb.flGainLF, SFXDescription),
+      "Reverb Gain to high frequencies");
+   addField("reverbDecayTime", TypeF32, Offset(mReverb.flDecayTime, SFXDescription),
+      "Decay time for the reverb.");
+   addField("reverbDecayHFRatio", TypeF32, Offset(mReverb.flDecayHFRatio, SFXDescription),
+      "High frequency decay time ratio.");
+   addField("reverbDecayLFRatio", TypeF32, Offset(mReverb.flDecayLFRatio, SFXDescription),
+      "High frequency decay time ratio.");
+   addField("reflectionsGain", TypeF32, Offset(mReverb.flReflectionsGain, SFXDescription),
+      "Reflection Gain.");
+   addField("reflectionDelay", TypeF32, Offset(mReverb.flReflectionsDelay, SFXDescription),
+      "How long to delay reflections.");
+   addField("lateReverbGain", TypeF32, Offset(mReverb.flLateReverbGain, SFXDescription),
+      "Late reverb gain amount.");
+   addField("lateReverbDelay", TypeF32, Offset(mReverb.flLateReverbDelay, SFXDescription),
+      "Late reverb delay time.");
+   addField("reverbEchoTime", TypeF32, Offset(mReverb.flEchoTime, SFXDescription),
+      "Reverb echo time.");
+   addField("reverbEchoDepth", TypeF32, Offset(mReverb.flEchoDepth, SFXDescription),
+      "Reverb echo depth.");
+   addField("reverbModTime", TypeF32, Offset(mReverb.flModulationTime, SFXDescription),
+      "Reverb Modulation time.");
+   addField("reverbModTime", TypeF32, Offset(mReverb.flModulationDepth, SFXDescription),
+      "Reverb Modulation time.");
+   addField("airAbsorbtionGainHF", TypeF32, Offset(mReverb.flAirAbsorptionGainHF, SFXDescription),
+      "High Frequency air absorbtion");
+   addField("reverbHFRef", TypeF32, Offset(mReverb.flHFReference, SFXDescription),
+      "Reverb High Frequency Reference.");
+   addField("reverbLFRef", TypeF32, Offset(mReverb.flLFReference, SFXDescription),
+      "Reverb Low Frequency Reference.");
+   addField("roomRolloffFactor", TypeF32, Offset(mReverb.flRoomRolloffFactor, SFXDescription),
+      "Rolloff factor for reverb.");
+   addField("decayHFLimit", TypeS32, Offset(mReverb.iDecayHFLimit, SFXDescription),
+      "High Frequency decay limit.");
+   endGroup("Reverb");
    
    Parent::initPersistFields();
 }
@@ -570,24 +534,27 @@ void SFXDescription::packData( BitStream *stream )
       
       if( mUseReverb )
       {
-         stream->writeRangedS32( mReverb.mDirect, -10000, 1000 );
-         stream->writeRangedS32( mReverb.mDirectHF, -10000, 0 );
-         stream->writeRangedS32( mReverb.mRoom, -10000, 1000 );
-         stream->writeRangedS32( mReverb.mRoomHF, -10000, 0 );
-         stream->writeRangedS32( mReverb.mObstruction, -10000, 0 );
-         stream->writeRangedF32( mReverb.mObstructionLFRatio, 0.0, 1.0, 7 );
-         stream->writeRangedS32( mReverb.mOcclusion, -10000, 0 );
-         stream->writeRangedF32( mReverb.mOcclusionLFRatio, 0.0, 1.0, 7 );
-         stream->writeRangedF32( mReverb.mOcclusionRoomRatio, 0.0, 10.0, 7 );
-         stream->writeRangedF32( mReverb.mOcclusionDirectRatio, 0.0, 10.0, 7 );
-         stream->writeRangedS32( mReverb.mExclusion, -10000, 0 );
-         stream->writeRangedF32( mReverb.mExclusionLFRatio, 0.0, 1.0, 7 );
-         stream->writeRangedS32( mReverb.mOutsideVolumeHF, -10000, 0 );
-         stream->writeRangedF32( mReverb.mDopplerFactor, 0.0, 10.0, 7 );
-         stream->writeRangedF32( mReverb.mRolloffFactor, 0.0, 10.0, 7 );
-         stream->writeRangedF32( mReverb.mRoomRolloffFactor, 0.0, 10.0, 7 );
-         stream->writeRangedF32( mReverb.mAirAbsorptionFactor, 0.0, 10.0, 7 );
-         stream->writeInt( mReverb.mFlags, 6 );
+         stream->write(mReverb.flDensity);
+         stream->write(mReverb.flDiffusion);
+         stream->write(mReverb.flGain);
+         stream->write(mReverb.flGainHF);
+         stream->write(mReverb.flGainLF);
+         stream->write(mReverb.flDecayTime);
+         stream->write(mReverb.flDecayHFRatio);
+         stream->write(mReverb.flDecayLFRatio);
+         stream->write(mReverb.flReflectionsGain);
+         stream->write(mReverb.flReflectionsDelay);
+         stream->write(mReverb.flLateReverbGain);
+         stream->write(mReverb.flLateReverbDelay);
+         stream->write(mReverb.flEchoTime);
+         stream->write(mReverb.flEchoDepth);
+         stream->write(mReverb.flModulationTime);
+         stream->write(mReverb.flModulationDepth);
+         stream->write(mReverb.flAirAbsorptionGainHF);
+         stream->write(mReverb.flHFReference);
+         stream->write(mReverb.flLFReference);
+         stream->write(mReverb.flRoomRolloffFactor);
+         stream->write(mReverb.iDecayHFLimit);
       }
    }
 
@@ -640,24 +607,27 @@ void SFXDescription::unpackData( BitStream *stream )
       
       if( mUseReverb )
       {
-         mReverb.mDirect               = stream->readRangedS32( -10000, 1000 );
-         mReverb.mDirectHF             = stream->readRangedS32( -10000, 0 );
-         mReverb.mRoom                 = stream->readRangedS32( -10000, 1000 );
-         mReverb.mRoomHF               = stream->readRangedS32( -10000, 0 );
-         mReverb.mObstruction          = stream->readRangedS32( -10000, 0 );
-         mReverb.mObstructionLFRatio   = stream->readRangedF32( 0.0, 1.0, 7 );
-         mReverb.mOcclusion            = stream->readRangedS32( -10000, 0 );
-         mReverb.mOcclusionLFRatio     = stream->readRangedF32( 0.0, 1.0, 7 );
-         mReverb.mOcclusionRoomRatio   = stream->readRangedF32( 0.0, 10.0, 7 );
-         mReverb.mOcclusionDirectRatio = stream->readRangedF32( 0.0, 10.0, 7 );
-         mReverb.mExclusion            = stream->readRangedS32( -10000, 0 );
-         mReverb.mExclusionLFRatio     = stream->readRangedF32( 0.0, 1.0, 7 );
-         mReverb.mOutsideVolumeHF      = stream->readRangedS32( -10000, 0 );
-         mReverb.mDopplerFactor        = stream->readRangedF32( 0.0, 10.0, 7 );
-         mReverb.mRolloffFactor        = stream->readRangedF32( 0.0, 10.0, 7 );
-         mReverb.mRoomRolloffFactor    = stream->readRangedF32( 0.0, 10.0, 7 );
-         mReverb.mAirAbsorptionFactor  = stream->readRangedF32( 0.0, 10.0, 7 );
-         mReverb.mFlags                = stream->readInt( 6 );
+         stream->read(&mReverb.flDensity);
+         stream->read(&mReverb.flDiffusion);
+         stream->read(&mReverb.flGain);
+         stream->read(&mReverb.flGainHF);
+         stream->read(&mReverb.flGainLF);
+         stream->read(&mReverb.flDecayTime);
+         stream->read(&mReverb.flDecayHFRatio);
+         stream->read(&mReverb.flDecayLFRatio);
+         stream->read(&mReverb.flReflectionsGain);
+         stream->read(&mReverb.flReflectionsDelay);
+         stream->read(&mReverb.flLateReverbGain);
+         stream->read(&mReverb.flLateReverbDelay);
+         stream->read(&mReverb.flEchoTime);
+         stream->read(&mReverb.flEchoDepth);
+         stream->read(&mReverb.flModulationTime);
+         stream->read(&mReverb.flModulationDepth);
+         stream->read(&mReverb.flAirAbsorptionGainHF);
+         stream->read(&mReverb.flHFReference);
+         stream->read(&mReverb.flLFReference);
+         stream->read(&mReverb.flRoomRolloffFactor);
+         stream->read(&mReverb.iDecayHFLimit);
       }
    }
 
