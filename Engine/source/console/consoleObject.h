@@ -662,6 +662,29 @@ public:
       // Finally, do any class specific initialization...
       T::initPersistFields();
       T::consoleInit();
+
+      EnginePropertyTable::Property* props = new EnginePropertyTable::Property[sg_tempFieldList.size()];
+
+      for (int i = 0; i < sg_tempFieldList.size(); ++i)
+      {
+         EnginePropertyTable::Property prop;
+         prop.mDocString = sg_tempFieldList[i].pFieldDocs;
+         prop.mName = sg_tempFieldList[i].pFieldname;
+         prop.mNumElements = sg_tempFieldList[i].elementCount;
+         prop.mFlags = 0;
+         if (sg_tempFieldList[i].type == StartGroupFieldType)
+            prop.mFlags |= EnginePropertyGroupBegin;
+         if (sg_tempFieldList[i].type == EndGroupFieldType)
+            prop.mFlags |= EnginePropertyGroupEnd;
+         prop.mType = sg_tempFieldList[i].type;
+
+         props[i] = prop;
+      }
+
+      _smPropertyTable = EnginePropertyTable(sg_tempFieldList.size(), props);
+      smPropertyTable = _smPropertyTable;
+
+      const_cast<EngineTypeInfo*>(mTypeInfo)->mPropertyTable = &_smPropertyTable;
  
       // Let the base finish up.
       AbstractClassRep::init();
