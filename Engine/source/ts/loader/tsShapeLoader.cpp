@@ -1172,7 +1172,7 @@ void TSShapeLoader::install()
       {
          TSMesh *mesh = shape->meshes[obj.startMeshIndex + iMesh];
 
-         if (mesh && !mesh->primitives.size())
+         if (mesh && !mesh->mPrimitives.size())
          {
             S32 oldMeshCount = obj.numMeshes;
             destructInPlace(mesh);
@@ -1220,13 +1220,13 @@ void TSShapeLoader::install()
       }
    }
 
-   computeBounds(shape->bounds);
-   if (!shape->bounds.isValidBox())
-      shape->bounds = Box3F(1.0f);
+   computeBounds(shape->mBounds);
+   if (!shape->mBounds.isValidBox())
+      shape->mBounds = Box3F(1.0f);
 
-   shape->bounds.getCenter(&shape->center);
-   shape->radius = (shape->bounds.maxExtents - shape->center).len();
-   shape->tubeRadius = shape->radius;
+   shape->mBounds.getCenter(&shape->center);
+   shape->mRadius = (shape->mBounds.maxExtents - shape->center).len();
+   shape->tubeRadius = shape->mRadius;
 
    shape->init();
    shape->finalizeEditable();
@@ -1325,14 +1325,14 @@ String TSShapeLoader::getFormatFilters()
    return output.end();
 }
 
-DefineConsoleFunction( getFormatExtensions, const char*, ( ),, 
+DefineEngineFunction( getFormatExtensions, const char*, ( ),, 
   "Returns a list of supported shape format extensions separated by tabs."
   "Example output: *.dsq TAB *.dae TAB")
 {
    return Con::getReturnBuffer(TSShapeLoader::getFormatExtensions());
 }
 
-DefineConsoleFunction( getFormatFilters, const char*, ( ),, 
+DefineEngineFunction( getFormatFilters, const char*, ( ),, 
   "Returns a list of supported shape formats in filter form.\n"
   "Example output: DSQ Files|*.dsq|COLLADA Files|*.dae|")
 {

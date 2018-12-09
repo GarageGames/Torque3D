@@ -114,7 +114,7 @@ void SFXALProvider::init()
          dSprintf( temp, sizeof( temp ), "[EAX %d.0] %s", eax, ( mALDL->IsExtensionSupported( i, SFXALEAXRAM ) ? "EAX-RAM" : "" ) );
       }
       else
-         dStrcpy( temp, "" );
+         dStrcpy( temp, "", 256 );
 
       info->driver = String::ToString( deviceFormat, major, minor, temp );
       info->hasHardware = eax > 0;

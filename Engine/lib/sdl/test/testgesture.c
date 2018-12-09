@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,7 +25,6 @@
 #define WIDTH 640
 #define HEIGHT 480
 #define BPP 4
-#define DEPTH 32
 
 /* MUST BE A POWER OF 2! */
 #define EVENT_BUF_SIZE 256

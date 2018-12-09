@@ -39,8 +39,9 @@ void GFXVideoMode::parseFromString( const char *str )
       return;
 
    // Copy the string, as dStrtok is destructive
-   char *tempBuf = new char[dStrlen( str ) + 1];
-   dStrcpy( tempBuf, str );
+   dsize_t tempBufLen = dStrlen(str) + 1;
+   char *tempBuf = new char[tempBufLen];
+   dStrcpy( tempBuf, str, tempBufLen );
 
 #define PARSE_ELEM(type, var, func, tokParam, sep) \
    if(const char *ptr = dStrtok( tokParam, sep)) \
@@ -48,7 +49,9 @@ void GFXVideoMode::parseFromString( const char *str )
 
    PARSE_ELEM(S32, resolution.x, dAtoi, tempBuf, " x\0")
    PARSE_ELEM(S32, resolution.y, dAtoi, NULL,    " x\0")
-   PARSE_ELEM(S32, fullScreen,   dAtob, NULL,    " \0")
+   const char *boolptr = dStrtok(NULL, " \0");
+   if (boolptr)
+      fullScreen = dAtob(boolptr);
    PARSE_ELEM(S32, bitDepth,     dAtoi, NULL,    " \0")
    PARSE_ELEM(S32, refreshRate,  dAtoi, NULL,    " \0")
    PARSE_ELEM(S32, antialiasLevel, dAtoi, NULL,    " \0")

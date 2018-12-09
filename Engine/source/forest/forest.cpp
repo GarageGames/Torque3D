@@ -361,22 +361,22 @@ void Forest::saveDataFile( const char *path )
       mData->write( mDataFileName );
 }
 
-DefineConsoleMethod( Forest, saveDataFile, void, (const char * path), (""), "saveDataFile( [path] )" )
+DefineEngineMethod( Forest, saveDataFile, void, (const char * path), (""), "saveDataFile( [path] )" )
 {   
    object->saveDataFile( path );
 }
 
-DefineConsoleMethod(Forest, isDirty, bool, (), , "()")
+DefineEngineMethod(Forest, isDirty, bool, (), , "()")
 {
    return object->getData() && object->getData()->isDirty();
 }
 
-DefineConsoleMethod(Forest, regenCells, void, (), , "()")
+DefineEngineMethod(Forest, regenCells, void, (), , "()")
 {
    object->getData()->regenCells();
 }
 
-DefineConsoleMethod(Forest, clear, void, (), , "()" )
+DefineEngineMethod(Forest, clear, void, (), , "()" )
 {
    object->clear();
 }

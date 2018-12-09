@@ -253,6 +253,7 @@ void MatInstance::construct()
    mIsForwardLit = false;
    mIsValid = false;
    mIsHardwareSkinned = false;
+   needsHighlighting = false;
 
    MATMGR->_track(this);
 }

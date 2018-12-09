@@ -177,13 +177,13 @@ ConsoleDocClass( GuiIdleCamFadeBitmapCtrl,
 				"This is going to be deprecated, and any useful code ported to FadeinBitmap\n\n"
 				"@internal");
 
-DefineConsoleMethod(GuiIdleCamFadeBitmapCtrl, fadeIn, void, (), , "()"
+DefineEngineMethod(GuiIdleCamFadeBitmapCtrl, fadeIn, void, (), , "()"
 			  "@internal")
 {
    object->fadeIn();
 }
 
-DefineConsoleMethod(GuiIdleCamFadeBitmapCtrl, fadeOut, void, (), , "()"
+DefineEngineMethod(GuiIdleCamFadeBitmapCtrl, fadeOut, void, (), , "()"
 			  "@internal")
 {
    object->fadeOut();

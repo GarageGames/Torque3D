@@ -55,7 +55,7 @@ ScreenShot::ScreenShot()
 
 void ScreenShot::setPending( const char *filename, bool writeJPG, S32 tiles, F32 overlap )
 {
-   dStrcpy( mFilename, filename );
+   dStrcpy( mFilename, filename, 256 );
    mWriteJPG = writeJPG;
    mTiles = getMax( tiles, 1 );
    mPixelOverlap.set(getMin(overlap, 0.25f), getMin(overlap, 0.25f));      

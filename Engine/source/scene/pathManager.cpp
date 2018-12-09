@@ -207,12 +207,12 @@ void PathManager::clearPaths()
 #endif
 }
 
-DefineConsoleFunction( clearServerPaths, void, ( ), , "")
+DefineEngineFunction( clearServerPaths, void, ( ), , "")
 {
    gServerPathManager->clearPaths();
 }
 
-DefineConsoleFunction( clearClientPaths, void, ( ), , "")
+DefineEngineFunction( clearClientPaths, void, ( ), , "")
 {
    gClientPathManager->clearPaths();
 }

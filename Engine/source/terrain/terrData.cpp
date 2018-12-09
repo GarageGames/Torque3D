@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "terrain/terrData.h"
 
@@ -142,7 +147,7 @@ ConsoleDocFragment _getTerrainUnderWorldPoint2(
    "bool getTerrainUnderWorldPoint( F32 x, F32 y, F32 z);"
 );
 
-DefineConsoleFunction( getTerrainUnderWorldPoint, S32, (const char* ptOrX, const char* y, const char* z), ("", ""),
+DefineEngineFunction( getTerrainUnderWorldPoint, S32, (const char* ptOrX, const char* y, const char* z), ("", ""),
                                                       "(Point3F x/y/z) Gets the terrain block that is located under the given world point.\n"
                                                       "@param x/y/z The world coordinates (floating point values) you wish to query at. " 
                                                       "These can be formatted as either a string (\"x y z\") or separately as (x, y, z)\n"
@@ -200,6 +205,8 @@ TerrainBlock::TerrainBlock()
 {
    mTypeMask = TerrainObjectType | StaticObjectType | StaticShapeObjectType;
    mNetFlags.set(Ghostable | ScopeAlways);
+   mIgnoreZodiacs = false;
+   zode_primBuffer = 0;
 }
 
 
@@ -218,6 +225,7 @@ TerrainBlock::~TerrainBlock()
    if (editor)
       editor->detachTerrain(this);
 #endif
+   deleteZodiacPrimitiveBuffer();
 }
 
 void TerrainBlock::_onTextureEvent( GFXTexCallbackCode code )
@@ -1006,6 +1014,7 @@ void TerrainBlock::_rebuildQuadtree()
 
    // Build the shared PrimitiveBuffer.
    mCell->createPrimBuffer( &mPrimBuffer );
+   deleteZodiacPrimitiveBuffer();
 }
 
 void TerrainBlock::_updatePhysics()
@@ -1148,6 +1157,9 @@ void TerrainBlock::initPersistFields()
 
    endGroup( "Misc" );
 
+   addGroup("AFX");
+   addField("ignoreZodiacs",     TypeBool,      Offset(mIgnoreZodiacs,    TerrainBlock));
+   endGroup("AFX");
    Parent::initPersistFields();
 
    removeField( "scale" );
@@ -1198,6 +1210,7 @@ U32 TerrainBlock::packUpdate(NetConnection* con, U32 mask, BitStream *stream)
       stream->write( mScreenError );
 
    stream->writeInt(mBaseTexFormat, 32);
+   stream->writeFlag(mIgnoreZodiacs);
 
    return retMask;
 }
@@ -1267,6 +1280,7 @@ void TerrainBlock::unpackUpdate(NetConnection* con, BitStream *stream)
       stream->read( &mScreenError );
 
    mBaseTexFormat = (BaseTexFormat)stream->readInt(32);
+   mIgnoreZodiacs = stream->readFlag();
 }
 
 void TerrainBlock::getMinMaxHeight( F32 *minHeight, F32 *maxHeight ) const 
@@ -1289,20 +1303,20 @@ DefineEngineMethod( TerrainBlock, save, bool, ( const char* fileName),,
 				   "@return True if file save was successful, false otherwise")
 {
 	char filename[256];
-	dStrcpy(filename,fileName);
+	dStrcpy(filename,fileName,256);
    char *ext = dStrrchr(filename, '.');
    if (!ext || dStricmp(ext, ".ter") != 0)
-      dStrcat(filename, ".ter");
+      dStrcat(filename, ".ter", 256);
    return static_cast<TerrainBlock*>(object)->save(filename);
 }
 
 //ConsoleMethod(TerrainBlock, save, bool, 3, 3, "(string fileName) - saves the terrain block's terrain file to the specified file name.")
 //{
 //   char filename[256];
-//   dStrcpy(filename,argv[2]);
+//   dStrcpy(filename,argv[2],256);
 //   char *ext = dStrrchr(filename, '.');
 //   if (!ext || dStricmp(ext, ".ter") != 0)
-//      dStrcat(filename, ".ter");
+//      dStrcat(filename, ".ter", 256);
 //   return static_cast<TerrainBlock*>(object)->save(filename);
 //}
 
@@ -1324,7 +1338,7 @@ ConsoleDocFragment _getTerrainHeight2(
    "bool getTerrainHeight( F32 x, F32 y);"
 );
 
-DefineConsoleFunction( getTerrainHeight, F32, (const char* ptOrX, const char* y), (""), "(Point2 pos) - gets the terrain height at the specified position."
+DefineEngineFunction( getTerrainHeight, F32, (const char* ptOrX, const char* y), (""), "(Point2 pos) - gets the terrain height at the specified position."
 				"@param pos The world space point, minus the z (height) value\n Can be formatted as either (\"x y\") or (x,y)\n"
 				"@return Returns the terrain height at the given point as an F32 value.\n"
 				"@hide")
@@ -1369,7 +1383,7 @@ ConsoleDocFragment _getTerrainHeightBelowPosition2(
    "bool getTerrainHeightBelowPosition( F32 x, F32 y);"
 );
 
-DefineConsoleFunction( getTerrainHeightBelowPosition, F32, (const char* ptOrX, const char* y, const char* z), ("", ""),
+DefineEngineFunction( getTerrainHeightBelowPosition, F32, (const char* ptOrX, const char* y, const char* z), ("", ""),
             "(Point3F pos) - gets the terrain height at the specified position."
 				"@param pos The world space point. Can be formatted as either (\"x y z\") or (x,y,z)\n"
 				"@note This function is useful if you simply want to grab the terrain height underneath an object.\n"
@@ -1405,3 +1419,19 @@ DefineConsoleFunction( getTerrainHeightBelowPosition, F32, (const char* ptOrX, c
 	
 	return height;
 }
+const U16* TerrainBlock::getZodiacPrimitiveBuffer()
+{ 
+   if (!zode_primBuffer && !mIgnoreZodiacs)
+      TerrCell::createZodiacPrimBuffer(&zode_primBuffer);
+   return zode_primBuffer;
+}
+
+void TerrainBlock::deleteZodiacPrimitiveBuffer()
+{
+   if (zode_primBuffer != 0)
+   {
+      delete [] zode_primBuffer;
+      zode_primBuffer = 0;
+   }
+}
+

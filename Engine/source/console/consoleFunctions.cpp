@@ -184,7 +184,7 @@ bool isValidPort(U16 port)
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strasc, int, ( const char* chr ),,
+DefineEngineFunction( strasc, int, ( const char* chr ),,
    "Return the integer character code value corresponding to the first character in the given string.\n"
    "@param chr a (one-character) string.\n"
    "@return the UTF32 code value for the first character in the given string.\n"
@@ -195,7 +195,7 @@ DefineConsoleFunction( strasc, int, ( const char* chr ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strformat, const char*, ( const char* format, const char* value ),,
+DefineEngineFunction( strformat, const char*, ( const char* format, const char* value ),,
    "Format the given value as a string using printf-style formatting.\n"
    "@param format A printf-style format string.\n"
    "@param value The value argument matching the given format string.\n\n"
@@ -252,7 +252,7 @@ DefineConsoleFunction( strformat, const char*, ( const char* format, const char*
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strcmp, S32, ( const char* str1, const char* str2 ),,
+DefineEngineFunction( strcmp, S32, ( const char* str1, const char* str2 ),,
    "Compares two strings using case-<b>sensitive</b> comparison.\n"
    "@param str1 The first string.\n"
    "@param str2 The second string.\n"
@@ -271,7 +271,7 @@ DefineConsoleFunction( strcmp, S32, ( const char* str1, const char* str2 ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( stricmp, S32, ( const char* str1, const char* str2 ),,
+DefineEngineFunction( stricmp, S32, ( const char* str1, const char* str2 ),,
    "Compares two strings using case-<b>insensitive</b> comparison.\n"
    "@param str1 The first string.\n"
    "@param str2 The second string.\n"
@@ -290,7 +290,7 @@ DefineConsoleFunction( stricmp, S32, ( const char* str1, const char* str2 ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strnatcmp, S32, ( const char* str1, const char* str2 ),,
+DefineEngineFunction( strnatcmp, S32, ( const char* str1, const char* str2 ),,
    "Compares two strings using \"natural order\" case-<b>sensitive</b> comparison.\n"
    "Natural order means that rather than solely comparing single character code values, strings are ordered in a "
    "natural way.  For example, the string \"hello10\" is considered greater than the string \"hello2\" even though "
@@ -325,7 +325,7 @@ DefineConsoleFunction( strnatcmp, S32, ( const char* str1, const char* str2 ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strinatcmp, S32, ( const char* str1, const char* str2 ),,
+DefineEngineFunction( strinatcmp, S32, ( const char* str1, const char* str2 ),,
    "Compares two strings using \"natural order\" case-<b>insensitive</b> comparison.\n"
    "Natural order means that rather than solely comparing single character code values, strings are ordered in a "
    "natural way.  For example, the string \"hello10\" is considered greater than the string \"hello2\" even though "
@@ -360,7 +360,7 @@ DefineConsoleFunction( strinatcmp, S32, ( const char* str1, const char* str2 ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strlen, S32, ( const char* str ),,
+DefineEngineFunction( strlen, S32, ( const char* str ),,
    "Get the length of the given string in bytes.\n"
    "@note This does <b>not</b> return a true character count for strings with multi-byte characters!\n"
    "@param str A string.\n"
@@ -371,7 +371,7 @@ DefineConsoleFunction( strlen, S32, ( const char* str ),,
 }
 
 //-----------------------------------------------------------------------------
-DefineConsoleFunction( strlenskip, S32, ( const char* str, const char* first, const char* last ),,
+DefineEngineFunction( strlenskip, S32, ( const char* str, const char* first, const char* last ),,
    "Calculate the length of a string in characters, skipping everything between and including first and last.\n"
    "@param str A string.\n"
    "@param first First character to look for to skip block of text.\n"
@@ -406,7 +406,7 @@ DefineConsoleFunction( strlenskip, S32, ( const char* str, const char* first, co
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strstr, S32, ( const char* string, const char* substring ),,
+DefineEngineFunction( strstr, S32, ( const char* string, const char* substring ),,
    "Find the start of @a substring in the given @a string searching from left to right.\n"
    "@param string The string to search.\n"
    "@param substring The string to search for.\n"
@@ -425,7 +425,7 @@ DefineConsoleFunction( strstr, S32, ( const char* string, const char* substring 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strpos, S32, ( const char* haystack, const char* needle, S32 offset ), ( 0 ),
+DefineEngineFunction( strpos, S32, ( const char* haystack, const char* needle, S32 offset ), ( 0 ),
    "Find the start of @a needle in @a haystack searching from left to right beginning at the given offset.\n"
    "@param haystack The string to search.\n"
    "@param needle The string to search for.\n"
@@ -450,7 +450,7 @@ DefineConsoleFunction( strpos, S32, ( const char* haystack, const char* needle, 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strposr, S32, ( const char* haystack, const char* needle, S32 offset ), ( 0 ),
+DefineEngineFunction( strposr, S32, ( const char* haystack, const char* needle, S32 offset ), ( 0 ),
    "Find the start of @a needle in @a haystack searching from right to left beginning at the given offset.\n"
    "@param haystack The string to search.\n"
    "@param needle The string to search for.\n"
@@ -477,7 +477,7 @@ DefineConsoleFunction( strposr, S32, ( const char* haystack, const char* needle,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( ltrim, const char*, ( const char* str ),,
+DefineEngineFunction( ltrim, const char*, ( const char* str ),,
    "Remove leading whitespace from the string.\n"
    "@param str A string.\n"
    "@return A string that is the same as @a str but with any leading (i.e. leftmost) whitespace removed.\n\n"
@@ -496,7 +496,7 @@ DefineConsoleFunction( ltrim, const char*, ( const char* str ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( rtrim, const char*, ( const char* str ),,
+DefineEngineFunction( rtrim, const char*, ( const char* str ),,
    "Remove trailing whitespace from the string.\n"
    "@param str A string.\n"
    "@return A string that is the same as @a str but with any trailing (i.e. rightmost) whitespace removed.\n\n"
@@ -523,7 +523,7 @@ DefineConsoleFunction( rtrim, const char*, ( const char* str ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( trim, const char*, ( const char* str ),,
+DefineEngineFunction( trim, const char*, ( const char* str ),,
    "Remove leading and trailing whitespace from the string.\n"
    "@param str A string.\n"
    "@return A string that is the same as @a str but with any leading (i.e. leftmost) and trailing (i.e. rightmost) whitespace removed.\n\n"
@@ -551,7 +551,7 @@ DefineConsoleFunction( trim, const char*, ( const char* str ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( stripChars, const char*, ( const char* str, const char* chars ),,
+DefineEngineFunction( stripChars, const char*, ( const char* str, const char* chars ),,
    "Remove all occurrences of characters contained in @a chars from @a str.\n"
    "@param str The string to filter characters out from.\n"
    "@param chars A string of characters to filter out from @a str.\n"
@@ -561,12 +561,13 @@ DefineConsoleFunction( stripChars, const char*, ( const char* str, const char* c
    "@endtsexample\n"
    "@ingroup Strings" )
 {
-   char* ret = Con::getReturnBuffer( dStrlen( str ) + 1 );
-   dStrcpy( ret, str );
+   S32 len = dStrlen(str) + 1;
+   char* ret = Con::getReturnBuffer( len );
+   dStrcpy( ret, str, len );
    U32 pos = dStrcspn( ret, chars );
    while ( pos < dStrlen( ret ) )
    {
-      dStrcpy( ret + pos, ret + pos + 1 );
+      dStrcpy( ret + pos, ret + pos + 1, len - pos );
       pos = dStrcspn( ret, chars );
    }
    return( ret );
@@ -574,7 +575,7 @@ DefineConsoleFunction( stripChars, const char*, ( const char* str, const char* c
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strlwr, const char*, ( const char* str ),,
+DefineEngineFunction( strlwr, const char*, ( const char* str ),,
    "Return an all lower-case version of the given string.\n"
    "@param str A string.\n"
    "@return A version of @a str with all characters converted to lower-case.\n\n"
@@ -584,14 +585,15 @@ DefineConsoleFunction( strlwr, const char*, ( const char* str ),,
    "@see strupr\n"
    "@ingroup Strings" )
 {
-   char *ret = Con::getReturnBuffer(dStrlen(str) + 1);
-   dStrcpy(ret, str);
+   dsize_t retLen = dStrlen(str) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, str, retLen);
    return dStrlwr(ret);
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strupr, const char*, ( const char* str ),,
+DefineEngineFunction( strupr, const char*, ( const char* str ),,
    "Return an all upper-case version of the given string.\n"
    "@param str A string.\n"
    "@return A version of @a str with all characters converted to upper-case.\n\n"
@@ -601,14 +603,15 @@ DefineConsoleFunction( strupr, const char*, ( const char* str ),,
    "@see strlwr\n"
    "@ingroup Strings" )
 {
-   char *ret = Con::getReturnBuffer(dStrlen(str) + 1);
-   dStrcpy(ret, str);
+   dsize_t retLen = dStrlen(str) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, str, retLen);
    return dStrupr(ret);
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strchr, const char*, ( const char* str, const char* chr ),,
+DefineEngineFunction( strchr, const char*, ( const char* str, const char* chr ),,
    "Find the first occurrence of the given character in @a str.\n"
    "@param str The string to search.\n"
    "@param chr The character to search for.  Only the first character from the string is taken.\n"
@@ -622,7 +625,7 @@ DefineConsoleFunction( strchr, const char*, ( const char* str, const char* chr )
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strrchr, const char*, ( const char* str, const char* chr ),,
+DefineEngineFunction( strrchr, const char*, ( const char* str, const char* chr ),,
    "Find the last occurrence of the given character in @a str."
    "@param str The string to search.\n"
    "@param chr The character to search for.  Only the first character from the string is taken.\n"
@@ -636,7 +639,7 @@ DefineConsoleFunction( strrchr, const char*, ( const char* str, const char* chr 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strreplace, const char*, ( const char* source, const char* from, const char* to ),,
+DefineEngineFunction( strreplace, const char*, ( const char* source, const char* from, const char* to ),,
    "Replace all occurrences of @a from in @a source with @a to.\n"
    "@param source The string in which to replace the occurrences of @a from.\n"
    "@param from The string to replace in @a source.\n"
@@ -663,21 +666,22 @@ DefineConsoleFunction( strreplace, const char*, ( const char* source, const char
          count++;
       }
    }
-   char *ret = Con::getReturnBuffer(dStrlen(source) + 1 + (toLen - fromLen) * count);
+   S32 retLen = dStrlen(source) + 1 + (toLen - fromLen) * count;
+   char *ret = Con::getReturnBuffer(retLen);
    U32 scanp = 0;
    U32 dstp = 0;
    for(;;)
    {
-      const char *scan = dStrstr(source + scanp, from);
-      if(!scan)
+      const char *subScan = dStrstr(source + scanp, from);
+      if(!subScan)
       {
-         dStrcpy(ret + dstp, source + scanp);
+         dStrcpy(ret + dstp, source + scanp, retLen - dstp);
          return ret;
       }
-      U32 len = scan - (source + scanp);
-      dStrncpy(ret + dstp, source + scanp, len);
+      U32 len = subScan - (source + scanp);
+      dStrncpy(ret + dstp, source + scanp, getMin(len, retLen - dstp));
       dstp += len;
-      dStrcpy(ret + dstp, to);
+      dStrcpy(ret + dstp, to, retLen - dstp);
       dstp += toLen;
       scanp += len + fromLen;
    }
@@ -686,7 +690,7 @@ DefineConsoleFunction( strreplace, const char*, ( const char* source, const char
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strrepeat, const char*, ( const char* str, S32 numTimes, const char* delimiter ), ( "" ),
+DefineEngineFunction( strrepeat, const char*, ( const char* str, S32 numTimes, const char* delimiter ), ( "" ),
    "Return a string that repeats @a str @a numTimes number of times delimiting each occurrence with @a delimiter.\n"
    "@param str The string to repeat multiple times.\n"
    "@param numTimes The number of times to repeat @a str in the result string.\n"
@@ -713,7 +717,7 @@ DefineConsoleFunction( strrepeat, const char*, ( const char* str, S32 numTimes, 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getSubStr, const char*, ( const char* str, S32 start, S32 numChars ), ( -1 ),
+DefineEngineFunction( getSubStr, const char*, ( const char* str, S32 start, S32 numChars ), ( -1 ),
    "@brief Return a substring of @a str starting at @a start and continuing either through to the end of @a str "
    "(if @a numChars is -1) or for @a numChars characters (except if this would exceed the actual source "
    "string length).\n"
@@ -754,7 +758,7 @@ DefineConsoleFunction( getSubStr, const char*, ( const char* str, S32 start, S32
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strIsMatchExpr, bool, ( const char* pattern, const char* str, bool caseSensitive ), ( false ),
+DefineEngineFunction( strIsMatchExpr, bool, ( const char* pattern, const char* str, bool caseSensitive ), ( false ),
    "Match a pattern against a string.\n"
    "@param pattern The wildcard pattern to match against.  The pattern can include characters, '*' to match "
       "any number of characters and '?' to match a single character.\n"
@@ -773,7 +777,7 @@ DefineConsoleFunction( strIsMatchExpr, bool, ( const char* pattern, const char* 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( strIsMatchMultipleExpr, bool, ( const char* patterns, const char* str, bool caseSensitive ), ( false ),
+DefineEngineFunction( strIsMatchMultipleExpr, bool, ( const char* patterns, const char* str, bool caseSensitive ), ( false ),
    "Match a multiple patterns against a single string.\n"
    "@param patterns A tab-separated list of patterns.  Each pattern can include charaters, '*' to match "
       "any number of characters and '?' to match a single character.  Each of the patterns is tried in turn.\n"
@@ -792,7 +796,7 @@ DefineConsoleFunction( strIsMatchMultipleExpr, bool, ( const char* patterns, con
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getTrailingNumber, S32, ( const char* str ),,
+DefineEngineFunction( getTrailingNumber, S32, ( const char* str ),,
    "Get the numeric suffix of the given input string.\n"
    "@param str The string from which to read out the numeric suffix.\n"
    "@return The numeric value of the number suffix of @a str or -1 if @a str has no such suffix.\n\n"
@@ -809,7 +813,7 @@ DefineConsoleFunction( getTrailingNumber, S32, ( const char* str ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( stripTrailingNumber, String, ( const char* str ),,
+DefineEngineFunction( stripTrailingNumber, String, ( const char* str ),,
    "Strip a numeric suffix from the given string.\n"
    "@param str The string from which to strip its numeric suffix.\n"
    "@return The string @a str without its number suffix or the original string @a str if it has no such suffix.\n\n"
@@ -825,7 +829,7 @@ DefineConsoleFunction( stripTrailingNumber, String, ( const char* str ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getFirstNumber, String, ( const char* str ),,
+DefineEngineFunction( getFirstNumber, String, ( const char* str ),,
    "Get the first occuring number from @a str.\n"
    "@param str The string from which to read out the first number.\n"
    "@return String representation of the number or "" if no number.\n\n")
@@ -837,7 +841,7 @@ DefineConsoleFunction( getFirstNumber, String, ( const char* str ),,
 
 //----------------------------------------------------------------
 
-DefineConsoleFunction( isspace, bool, ( const char* str, S32 index ),,
+DefineEngineFunction( isspace, bool, ( const char* str, S32 index ),,
    "Test whether the character at the given position is a whitespace character.\n"
    "Characters such as tab, space, or newline are considered whitespace.\n"
    "@param str The string to test.\n"
@@ -854,7 +858,7 @@ DefineConsoleFunction( isspace, bool, ( const char* str, S32 index ),,
 
 //----------------------------------------------------------------
 
-DefineConsoleFunction( isalnum, bool, ( const char* str, S32 index ),,
+DefineEngineFunction( isalnum, bool, ( const char* str, S32 index ),,
    "Test whether the character at the given position is an alpha-numeric character.\n"
    "Alpha-numeric characters are characters that are either alphabetic (a-z, A-Z) or numbers (0-9).\n"
    "@param str The string to test.\n"
@@ -871,7 +875,7 @@ DefineConsoleFunction( isalnum, bool, ( const char* str, S32 index ),,
 
 //----------------------------------------------------------------
 
-DefineConsoleFunction( startsWith, bool, ( const char* str, const char* prefix, bool caseSensitive ), ( false ),
+DefineEngineFunction( startsWith, bool, ( const char* str, const char* prefix, bool caseSensitive ), ( false ),
    "Test whether the given string begins with the given prefix.\n"
    "@param str The string to test.\n"
    "@param prefix The potential prefix of @a str.\n"
@@ -901,8 +905,8 @@ DefineConsoleFunction( startsWith, bool, ( const char* str, const char* prefix, 
    char* targetBuf = new char[ targetLen + 1 ];
 
    // copy src and target into buffers
-   dStrcpy( srcBuf, str );
-   dStrcpy( targetBuf, prefix );
+   dStrcpy( srcBuf, str, srcLen + 1 );
+   dStrcpy( targetBuf, prefix, targetLen + 1 );
 
    // reassign src/target pointers to lowercase versions
    str = dStrlwr( srcBuf );
@@ -920,7 +924,7 @@ DefineConsoleFunction( startsWith, bool, ( const char* str, const char* prefix, 
 
 //----------------------------------------------------------------
 
-DefineConsoleFunction( endsWith, bool, ( const char* str, const char* suffix, bool caseSensitive ), ( false ),
+DefineEngineFunction( endsWith, bool, ( const char* str, const char* suffix, bool caseSensitive ), ( false ),
    "@brief Test whether the given string ends with the given suffix.\n\n"
    "@param str The string to test.\n"
    "@param suffix The potential suffix of @a str.\n"
@@ -952,8 +956,8 @@ DefineConsoleFunction( endsWith, bool, ( const char* str, const char* suffix, bo
    char* targetBuf = new char[ targetLen + 1 ];
 
    // copy src and target into buffers
-   dStrcpy( srcBuf, str );
-   dStrcpy( targetBuf, suffix );
+   dStrcpy( srcBuf, str, srcLen + 1 );
+   dStrcpy( targetBuf, suffix, targetLen + 1 );
 
    // reassign src/target pointers to lowercase versions
    str = dStrlwr( srcBuf );
@@ -974,7 +978,7 @@ DefineConsoleFunction( endsWith, bool, ( const char* str, const char* suffix, bo
 
 //----------------------------------------------------------------
 
-DefineConsoleFunction( strchrpos, S32, ( const char* str, const char* chr, S32 start ), ( 0 ),
+DefineEngineFunction( strchrpos, S32, ( const char* str, const char* chr, S32 start ), ( 0 ),
    "Find the first occurrence of the given character in the given string.\n"
    "@param str The string to search.\n"
    "@param chr The character to look for.  Only the first character of this string will be searched for.\n"
@@ -994,7 +998,7 @@ DefineConsoleFunction( strchrpos, S32, ( const char* str, const char* chr, S32 s
 
 //----------------------------------------------------------------
 
-DefineConsoleFunction( strrchrpos, S32, ( const char* str, const char* chr, S32 start ), ( 0 ),
+DefineEngineFunction( strrchrpos, S32, ( const char* str, const char* chr, S32 start ), ( 0 ),
    "Find the last occurrence of the given character in the given string.\n"
    "@param str The string to search.\n"
    "@param chr The character to look for.  Only the first character of this string will be searched for.\n"
@@ -1021,7 +1025,7 @@ DefineConsoleFunction( strrchrpos, S32, ( const char* str, const char* chr, S32 
 
 //----------------------------------------------------------------
 
-DefineConsoleFunction(ColorFloatToInt, ColorI, (LinearColorF color), ,
+DefineEngineFunction(ColorFloatToInt, ColorI, (LinearColorF color), ,
    "Convert from a float color to an integer color (0.0 - 1.0 to 0 to 255).\n"
    "@param color Float color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha.\n"
    "@return Converted color value (0 - 255)\n\n"
@@ -1033,7 +1037,7 @@ DefineConsoleFunction(ColorFloatToInt, ColorI, (LinearColorF color), ,
    return color.toColorI();
 }
 
-DefineConsoleFunction(ColorIntToFloat, LinearColorF, (ColorI color), ,
+DefineEngineFunction(ColorIntToFloat, LinearColorF, (ColorI color), ,
    "Convert from a integer color to an float color (0 to 255 to 0.0 - 1.0).\n"
    "@param color Integer color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha.\n"
    "@return Converted color value (0.0 - 1.0)\n\n"
@@ -1045,7 +1049,7 @@ DefineConsoleFunction(ColorIntToFloat, LinearColorF, (ColorI color), ,
    return LinearColorF(color);
 }
 
-DefineConsoleFunction(ColorRGBToHEX, const char*, (ColorI color), ,
+DefineEngineFunction(ColorRGBToHEX, const char*, (ColorI color), ,
    "Convert from a integer RGB (red, green, blue) color to hex color value (0 to 255 to 00 - FF).\n"
    "@param color Integer color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha. It excepts an alpha, but keep in mind this will not be converted.\n"
    "@return Hex color value (#000000 - #FFFFFF), alpha isn't handled/converted so it is only the RGB value\n\n"
@@ -1057,7 +1061,7 @@ DefineConsoleFunction(ColorRGBToHEX, const char*, (ColorI color), ,
    return Con::getReturnBuffer(color.getHex());
 }
 
-DefineConsoleFunction(ColorRGBToHSB, const char*, (ColorI color), ,
+DefineEngineFunction(ColorRGBToHSB, const char*, (ColorI color), ,
    "Convert from a integer RGB (red, green, blue) color to HSB (hue, saturation, brightness). HSB is also know as HSL or HSV as well, with the last letter standing for lightness or value.\n"
    "@param color Integer color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha. It excepts an alpha, but keep in mind this will not be converted.\n"
    "@return HSB color value, alpha isn't handled/converted so it is only the RGB value\n\n"
@@ -1071,7 +1075,7 @@ DefineConsoleFunction(ColorRGBToHSB, const char*, (ColorI color), ,
    return Con::getReturnBuffer(s);
 }
 
-DefineConsoleFunction(ColorHEXToRGB, ColorI, (const char* hex), ,
+DefineEngineFunction(ColorHEXToRGB, ColorI, (const char* hex), ,
    "Convert from a hex color value to an integer RGB (red, green, blue) color (00 - FF to 0 to 255).\n"
    "@param hex Hex color value (#000000 - #FFFFFF) to be converted to an RGB (red, green, blue) value.\n"
    "@return Integer color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha. Alpha isn't handled/converted so only pay attention to the RGB value\n\n"
@@ -1085,7 +1089,7 @@ DefineConsoleFunction(ColorHEXToRGB, ColorI, (const char* hex), ,
    return color;
 }
 
-DefineConsoleFunction(ColorHSBToRGB, ColorI, (Point3I hsb), ,
+DefineEngineFunction(ColorHSBToRGB, ColorI, (Point3I hsb), ,
    "Convert from a HSB (hue, saturation, brightness) to an integer RGB (red, green, blue) color. HSB is also know as HSL or HSV as well, with the last letter standing for lightness or value.\n"
    "@param hsb HSB (hue, saturation, brightness) value to be converted.\n"
    "@return Integer color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha. Alpha isn't handled/converted so only pay attention to the RGB value\n\n"
@@ -1101,7 +1105,7 @@ DefineConsoleFunction(ColorHSBToRGB, ColorI, (Point3I hsb), ,
 
 //----------------------------------------------------------------
 
-DefineConsoleFunction( strToggleCaseToWords, const char*, ( const char* str ),,
+DefineEngineFunction( strToggleCaseToWords, const char*, ( const char* str ),,
    "Parse a Toggle Case word into separate words.\n"
    "@param str The string to parse.\n"
    "@return new string space separated.\n\n"
@@ -1126,7 +1130,7 @@ DefineConsoleFunction( strToggleCaseToWords, const char*, ( const char* str ),,
 //----------------------------------------------------------------
 
 // Warning: isInt and isFloat are very 'strict' and might need to be adjusted to allow other values. //seanmc
-DefineConsoleFunction( isInt, bool, ( const char* str),,
+DefineEngineFunction( isInt, bool, ( const char* str),,
    "Returns true if the string is an integer.\n"
    "@param str The string to test.\n"
    "@return true if @a str is an integer and false if not\n\n"
@@ -1140,7 +1144,7 @@ DefineConsoleFunction( isInt, bool, ( const char* str),,
 
 //----------------------------------------------------------------
 
-DefineConsoleFunction( isFloat, bool, ( const char* str, bool sciOk), (false),
+DefineEngineFunction( isFloat, bool, ( const char* str, bool sciOk), (false),
    "Returns true if the string is a float.\n"
    "@param str The string to test.\n"
    "@param sciOk Test for correct scientific notation and accept it (ex. 1.2e+14)"
@@ -1155,7 +1159,7 @@ DefineConsoleFunction( isFloat, bool, ( const char* str, bool sciOk), (false),
 
 //----------------------------------------------------------------
 
-DefineConsoleFunction( isValidPort, bool, ( const char* str),,
+DefineEngineFunction( isValidPort, bool, ( const char* str),,
    "Returns true if the string is a valid port number.\n"
    "@param str The string to test.\n"
    "@return true if @a str is a port and false if not\n\n"
@@ -1175,7 +1179,7 @@ DefineConsoleFunction( isValidPort, bool, ( const char* str),,
 
 //----------------------------------------------------------------
 
-DefineConsoleFunction( isValidIP, bool, ( const char* str),,
+DefineEngineFunction( isValidIP, bool, ( const char* str),,
    "Returns true if the string is a valid ip address, excepts localhost.\n"
    "@param str The string to test.\n"
    "@return true if @a str is a valid ip address and false if not\n\n"
@@ -1196,7 +1200,7 @@ DefineConsoleFunction( isValidIP, bool, ( const char* str),,
 
 // Torque won't normally add another string if it already exists with another casing,
 // so this forces the addition. It should be called once near the start, such as in main.cs.
-ConsoleFunction(addCaseSensitiveStrings,void,2,0,"[string1, string2, ...]"
+DefineEngineStringlyVariadicFunction(addCaseSensitiveStrings,void,2,0,"[string1, string2, ...]"
                 "Adds case sensitive strings to the StringTable.")
 {
    for(int i = 1; i < argc; i++)
@@ -1210,7 +1214,7 @@ ConsoleFunction(addCaseSensitiveStrings,void,2,0,"[string1, string2, ...]"
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getWord, const char*, ( const char* text, S32 index ),,
+DefineEngineFunction( getWord, const char*, ( const char* text, S32 index ),,
    "Extract the word at the given @a index in the whitespace-separated list in @a text.\n"
    "Words in @a text must be separated by newlines, spaces, and/or tabs.\n"
    "@param text A whitespace-separated list of words.\n"
@@ -1231,7 +1235,7 @@ DefineConsoleFunction( getWord, const char*, ( const char* text, S32 index ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getWords, const char*, ( const char* text, S32 startIndex, S32 endIndex ), ( -1 ),
+DefineEngineFunction( getWords, const char*, ( const char* text, S32 startIndex, S32 endIndex ), ( -1 ),
    "Extract a range of words from the given @a startIndex onwards thru @a endIndex.\n"
    "Words in @a text must be separated by newlines, spaces, and/or tabs.\n"
    "@param text A whitespace-separated list of words.\n"
@@ -1258,7 +1262,7 @@ DefineConsoleFunction( getWords, const char*, ( const char* text, S32 startIndex
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( setWord, const char*, ( const char* text, S32 index, const char* replacement ),,
+DefineEngineFunction( setWord, const char*, ( const char* text, S32 index, const char* replacement ),,
    "Replace the word in @a text at the given @a index with @a replacement.\n"
    "Words in @a text must be separated by newlines, spaces, and/or tabs.\n"
    "@param text A whitespace-separated list of words.\n"
@@ -1280,7 +1284,7 @@ DefineConsoleFunction( setWord, const char*, ( const char* text, S32 index, cons
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( removeWord, const char*, ( const char* text, S32 index ),,
+DefineEngineFunction( removeWord, const char*, ( const char* text, S32 index ),,
    "Remove the word in @a text at the given @a index.\n"
    "Words in @a text must be separated by newlines, spaces, and/or tabs.\n"
    "@param text A whitespace-separated list of words.\n"
@@ -1300,7 +1304,7 @@ DefineConsoleFunction( removeWord, const char*, ( const char* text, S32 index ),
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getWordCount, S32, ( const char* text ),,
+DefineEngineFunction( getWordCount, S32, ( const char* text ),,
    "Return the number of whitespace-separated words in @a text.\n"
    "Words in @a text must be separated by newlines, spaces, and/or tabs.\n"
    "@param text A whitespace-separated list of words.\n"
@@ -1361,7 +1365,7 @@ DefineEngineFunction( weekdayNumToStr, String, ( S32 num, bool abbreviate ), (fa
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getField, const char*, ( const char* text, S32 index ),,
+DefineEngineFunction( getField, const char*, ( const char* text, S32 index ),,
    "Extract the field at the given @a index in the newline and/or tab separated list in @a text.\n"
    "Fields in @a text must be separated by newlines and/or tabs.\n"
    "@param text A list of fields separated by newlines and/or tabs.\n"
@@ -1381,7 +1385,7 @@ DefineConsoleFunction( getField, const char*, ( const char* text, S32 index ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getFields, const char*, ( const char* text, S32 startIndex, S32 endIndex ), ( -1 ),
+DefineEngineFunction( getFields, const char*, ( const char* text, S32 startIndex, S32 endIndex ), ( -1 ),
    "Extract a range of fields from the given @a startIndex onwards thru @a endIndex.\n"
    "Fields in @a text must be separated by newlines and/or tabs.\n"
    "@param text A list of fields separated by newlines and/or tabs.\n"
@@ -1407,7 +1411,7 @@ DefineConsoleFunction( getFields, const char*, ( const char* text, S32 startInde
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( setField, const char*, ( const char* text, S32 index, const char* replacement ),,
+DefineEngineFunction( setField, const char*, ( const char* text, S32 index, const char* replacement ),,
    "Replace the field in @a text at the given @a index with @a replacement.\n"
    "Fields in @a text must be separated by newlines and/or tabs.\n"
    "@param text A list of fields separated by newlines and/or tabs.\n"
@@ -1428,7 +1432,7 @@ DefineConsoleFunction( setField, const char*, ( const char* text, S32 index, con
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( removeField, const char*, ( const char* text, S32 index ),,
+DefineEngineFunction( removeField, const char*, ( const char* text, S32 index ),,
    "Remove the field in @a text at the given @a index.\n"
    "Fields in @a text must be separated by newlines and/or tabs.\n"
    "@param text A list of fields separated by newlines and/or tabs.\n"
@@ -1447,7 +1451,7 @@ DefineConsoleFunction( removeField, const char*, ( const char* text, S32 index )
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getFieldCount, S32, ( const char* text ),,
+DefineEngineFunction( getFieldCount, S32, ( const char* text ),,
    "Return the number of newline and/or tab separated fields in @a text.\n"
    "@param text A list of fields separated by newlines and/or tabs.\n"
    "@return The number of newline and/or tab sepearated elements in @a text.\n\n"
@@ -1463,7 +1467,7 @@ DefineConsoleFunction( getFieldCount, S32, ( const char* text ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getRecord, const char*, ( const char* text, S32 index ),,
+DefineEngineFunction( getRecord, const char*, ( const char* text, S32 index ),,
    "Extract the record at the given @a index in the newline-separated list in @a text.\n"
    "Records in @a text must be separated by newlines.\n"
    "@param text A list of records separated by newlines.\n"
@@ -1483,7 +1487,7 @@ DefineConsoleFunction( getRecord, const char*, ( const char* text, S32 index ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getRecords, const char*, ( const char* text, S32 startIndex, S32 endIndex ), ( -1 ),
+DefineEngineFunction( getRecords, const char*, ( const char* text, S32 startIndex, S32 endIndex ), ( -1 ),
    "Extract a range of records from the given @a startIndex onwards thru @a endIndex.\n"
    "Records in @a text must be separated by newlines.\n"
    "@param text A list of records separated by newlines.\n"
@@ -1509,7 +1513,7 @@ DefineConsoleFunction( getRecords, const char*, ( const char* text, S32 startInd
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( setRecord, const char*, ( const char* text, S32 index, const char* replacement ),,
+DefineEngineFunction( setRecord, const char*, ( const char* text, S32 index, const char* replacement ),,
    "Replace the record in @a text at the given @a index with @a replacement.\n"
    "Records in @a text must be separated by newlines.\n"
    "@param text A list of records separated by newlines.\n"
@@ -1530,7 +1534,7 @@ DefineConsoleFunction( setRecord, const char*, ( const char* text, S32 index, co
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( removeRecord, const char*, ( const char* text, S32 index ),,
+DefineEngineFunction( removeRecord, const char*, ( const char* text, S32 index ),,
    "Remove the record in @a text at the given @a index.\n"
    "Records in @a text must be separated by newlines.\n"
    "@param text A list of records separated by newlines.\n"
@@ -1549,7 +1553,7 @@ DefineConsoleFunction( removeRecord, const char*, ( const char* text, S32 index 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getRecordCount, S32, ( const char* text ),,
+DefineEngineFunction( getRecordCount, S32, ( const char* text ),,
    "Return the number of newline-separated records in @a text.\n"
    "@param text A list of records separated by newlines.\n"
    "@return The number of newline-sepearated elements in @a text.\n\n"
@@ -1565,7 +1569,7 @@ DefineConsoleFunction( getRecordCount, S32, ( const char* text ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( firstWord, const char*, ( const char* text ),,
+DefineEngineFunction( firstWord, const char*, ( const char* text ),,
    "Return the first word in @a text.\n"
    "@param text A list of words separated by newlines, spaces, and/or tabs.\n"
    "@return The word at index 0 in @a text or \"\" if @a text is empty.\n\n"
@@ -1581,7 +1585,7 @@ DefineConsoleFunction( firstWord, const char*, ( const char* text ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( restWords, const char*, ( const char* text ),,
+DefineEngineFunction( restWords, const char*, ( const char* text ),,
    "Return all but the first word in @a text.\n"
    "@param text A list of words separated by newlines, spaces, and/or tabs.\n"
    "@return @a text with the first word removed.\n\n"
@@ -1615,7 +1619,7 @@ static bool isInSet(char c, const char *set)
    return false;
 }
 
-DefineConsoleFunction( nextToken, const char*, ( const char* str1, const char* token, const char* delim), , "( string str, string token, string delimiters ) "
+DefineEngineFunction( nextToken, const char*, ( const char* str1, const char* token, const char* delim), , "( string str, string token, string delimiters ) "
    "Tokenize a string using a set of delimiting characters.\n"
    "This function first skips all leading charaters in @a str that are contained in @a delimiters. "
    "From that position, it then scans for the next character in @a str that is contained in @a delimiters and stores all characters "
@@ -1684,7 +1688,7 @@ DefineConsoleFunction( nextToken, const char*, ( const char* str1, const char* t
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getToken, const char*, ( const char* text, const char* delimiters, S32 index ),,
+DefineEngineFunction( getToken, const char*, ( const char* text, const char* delimiters, S32 index ),,
    "Extract the substring at the given @a index in the @a delimiters separated list in @a text.\n"
    "@param text A @a delimiters list of substrings.\n"
    "@param delimiters Character or characters that separate the list of substrings in @a text.\n"
@@ -1705,7 +1709,7 @@ DefineConsoleFunction( getToken, const char*, ( const char* text, const char* de
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getTokens, const char*, ( const char* text, const char* delimiters, S32 startIndex, S32 endIndex ), ( -1 ),
+DefineEngineFunction( getTokens, const char*, ( const char* text, const char* delimiters, S32 startIndex, S32 endIndex ), ( -1 ),
    "Extract a range of substrings separated by @a delimiters at the given @a startIndex onwards thru @a endIndex.\n"
    "@param text A @a delimiters list of substrings.\n"
    "@param delimiters Character or characters that separate the list of substrings in @a text.\n"
@@ -1732,7 +1736,7 @@ DefineConsoleFunction( getTokens, const char*, ( const char* text, const char* d
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( setToken, const char*, ( const char* text, const char* delimiters, S32 index, const char* replacement ),,
+DefineEngineFunction( setToken, const char*, ( const char* text, const char* delimiters, S32 index, const char* replacement ),,
    "Replace the substring in @a text separated by @a delimiters at the given @a index with @a replacement.\n"
    "@param text A @a delimiters list of substrings.\n"
    "@param delimiters Character or characters that separate the list of substrings in @a text.\n"
@@ -1754,7 +1758,7 @@ DefineConsoleFunction( setToken, const char*, ( const char* text, const char* de
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( removeToken, const char*, ( const char* text, const char* delimiters, S32 index ),,
+DefineEngineFunction( removeToken, const char*, ( const char* text, const char* delimiters, S32 index ),,
    "Remove the substring in @a text separated by @a delimiters at the given @a index.\n"
    "@param text A @a delimiters list of substrings.\n"
    "@param delimiters Character or characters that separate the list of substrings in @a text.\n"
@@ -1774,7 +1778,7 @@ DefineConsoleFunction( removeToken, const char*, ( const char* text, const char*
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getTokenCount, S32, ( const char* text, const char* delimiters),,
+DefineEngineFunction( getTokenCount, S32, ( const char* text, const char* delimiters),,
    "Return the number of @a delimiters substrings in @a text.\n"
    "@param text A @a delimiters list of substrings.\n"
    "@param delimiters Character or characters that separate the list of substrings in @a text.\n"
@@ -1824,15 +1828,16 @@ DefineEngineFunction( detag, const char*, ( const char* str ),,
       if( word == NULL )
          return "";
          
-      char* ret = Con::getReturnBuffer( dStrlen( word + 1 ) + 1 );
-      dStrcpy( ret, word + 1 );
+      dsize_t retLen = dStrlen(word + 1) + 1;
+      char* ret = Con::getReturnBuffer(retLen);
+      dStrcpy( ret, word + 1, retLen );
       return ret;
    }
    else
       return str;
 }
 
-DefineConsoleFunction( getTag, const char*, ( const char* textTagString ), , "( string textTagString ) "
+DefineEngineFunction( getTag, const char*, ( const char* textTagString ), , "( string textTagString ) "
    "@brief Extracts the tag from a tagged string\n\n"
 
    "Should only be used within the context of a function that receives a tagged "
@@ -1874,7 +1879,7 @@ DefineConsoleFunction( getTag, const char*, ( const char* textTagString ), , "( 
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( echo, void, 2, 0, "( string message... ) "
+DefineEngineStringlyVariadicFunction( echo, void, 2, 0, "( string message... ) "
    "@brief Logs a message to the console.\n\n"
    "Concatenates all given arguments to a single string and prints the string to the console. "
    "A newline is added automatically after the text.\n\n"
@@ -1889,7 +1894,7 @@ ConsoleFunction( echo, void, 2, 0, "( string message... ) "
    char *ret = Con::getReturnBuffer(len + 1);
    ret[0] = 0;
    for(i = 1; i < argc; i++)
-      dStrcat(ret, argv[i]);
+      dStrcat(ret, argv[i], len + 1);
 
    Con::printf("%s", ret);
    ret[0] = 0;
@@ -1897,7 +1902,7 @@ ConsoleFunction( echo, void, 2, 0, "( string message... ) "
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( warn, void, 2, 0, "( string message... ) "
+DefineEngineStringlyVariadicFunction( warn, void, 2, 0, "( string message... ) "
    "@brief Logs a warning message to the console.\n\n"
    "Concatenates all given arguments to a single string and prints the string to the console as a warning "
    "message (in the in-game console, these will show up using a turquoise font by default). "
@@ -1913,7 +1918,7 @@ ConsoleFunction( warn, void, 2, 0, "( string message... ) "
    char *ret = Con::getReturnBuffer(len + 1);
    ret[0] = 0;
    for(i = 1; i < argc; i++)
-      dStrcat(ret, argv[i]);
+      dStrcat(ret, argv[i], len + 1);
 
    Con::warnf(ConsoleLogEntry::General, "%s", ret);
    ret[0] = 0;
@@ -1921,7 +1926,7 @@ ConsoleFunction( warn, void, 2, 0, "( string message... ) "
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( error, void, 2, 0, "( string message... ) "
+DefineEngineStringlyVariadicFunction( error, void, 2, 0, "( string message... ) "
    "@brief Logs an error message to the console.\n\n"
    "Concatenates all given arguments to a single string and prints the string to the console as an error "
    "message (in the in-game console, these will show up using a red font by default). "
@@ -1937,7 +1942,7 @@ ConsoleFunction( error, void, 2, 0, "( string message... ) "
    char *ret = Con::getReturnBuffer(len + 1);
    ret[0] = 0;
    for(i = 1; i < argc; i++)
-      dStrcat(ret, argv[i]);
+      dStrcat(ret, argv[i], len + 1);
 
    Con::errorf(ConsoleLogEntry::General, "%s", ret);
    ret[0] = 0;
@@ -1963,7 +1968,7 @@ DefineEngineFunction( debugv, void, ( const char* variableName ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( expandEscape, const char*, ( const char* text ),,
+DefineEngineFunction( expandEscape, const char*, ( const char* text ),,
    "@brief Replace all characters in @a text that need to be escaped for the string to be a valid string literal with their "
    "respective escape sequences.\n\n"
    "All characters in @a text that cannot appear in a string literal will be replaced by an escape sequence (\\\\n, \\\\t, etc).\n\n"
@@ -1985,7 +1990,7 @@ DefineConsoleFunction( expandEscape, const char*, ( const char* text ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( collapseEscape, const char*, ( const char* text ),,
+DefineEngineFunction( collapseEscape, const char*, ( const char* text ),,
    "Replace all escape sequences in @a text with their respective character codes.\n\n"
    "This function replaces all escape sequences (\\\\n, \\\\t, etc) in the given string "
    "with the respective characters they represent.\n\n"
@@ -2041,7 +2046,7 @@ DefineEngineFunction( setLogMode, void, ( S32 mode ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( quit, void, ( ),,
+DefineEngineFunction( quit, void, ( ),,
    "Shut down the engine and exit its process.\n"
    "This function cleanly uninitializes the engine and then exits back to the system with a process "
    "exit status indicating a clean exit.\n\n"
@@ -2054,7 +2059,7 @@ DefineConsoleFunction( quit, void, ( ),,
 //-----------------------------------------------------------------------------
 
 
-DefineConsoleFunction( realQuit, void, (), , "")
+DefineEngineFunction( realQuit, void, (), , "")
 {
    Platform::postQuitMessage(0);
 }
@@ -2062,7 +2067,7 @@ DefineConsoleFunction( realQuit, void, (), , "")
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( quitWithErrorMessage, void, ( const char* message, S32 status ), (0),
+DefineEngineFunction( quitWithErrorMessage, void, ( const char* message, S32 status ), (0),
    "Display an error message box showing the given @a message and then shut down the engine and exit its process.\n"
    "This function cleanly uninitialized the engine and then exits back to the system with a process "
    "exit status indicating an error.\n\n"
@@ -2083,7 +2088,7 @@ DefineConsoleFunction( quitWithErrorMessage, void, ( const char* message, S32 st
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( quitWithStatus, void, ( S32 status ), (0),
+DefineEngineFunction( quitWithStatus, void, ( S32 status ), (0),
    "Shut down the engine and exit its process.\n"
    "This function cleanly uninitializes the engine and then exits back to the system with a given "
    "return status code.\n\n"
@@ -2231,7 +2236,7 @@ DefineEngineFunction( generateUUID, Torque::UUID, (),,
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( call, const char *, 2, 0, "( string functionName, string args... ) "
+DefineEngineStringlyVariadicFunction( call, const char *, 2, 0, "( string functionName, string args... ) "
    "Apply the given arguments to the specified global function and return the result of the call.\n\n"
    "@param functionName The name of the function to call.  This function must be in the global namespace, i.e. "
       "you cannot call a function in a namespace through #call.  Use eval() for that.\n"
@@ -2254,7 +2259,7 @@ ConsoleFunction( call, const char *, 2, 0, "( string functionName, string args..
 static U32 execDepth = 0;
 static U32 journalDepth = 1;
 
-DefineConsoleFunction( getDSOPath, const char*, ( const char* scriptFileName ),,
+DefineEngineFunction( getDSOPath, const char*, ( const char* scriptFileName ),,
    "Get the absolute path to the file in which the compiled code for the given script file will be stored.\n"
    "@param scriptFileName %Path to the .cs script file.\n"
    "@return The absolute path to the .dso file for the given script file.\n\n"
@@ -2368,12 +2373,12 @@ DefineEngineFunction( exec, bool, ( const char* fileName, bool noCalls, bool jou
    return Con::executeFile(fileName, noCalls, journalScript);
 }
 
-DefineConsoleFunction( eval, const char*, ( const char* consoleString ), , "eval(consoleString)" )
+DefineEngineFunction( eval, const char*, ( const char* consoleString ), , "eval(consoleString)" )
 {
    return Con::evaluate(consoleString, false, NULL);
 }
 
-DefineConsoleFunction( getVariable, const char*, ( const char* varName ), , "(string varName)\n" 
+DefineEngineFunction( getVariable, const char*, ( const char* varName ), , "(string varName)\n" 
    "@brief Returns the value of the named variable or an empty string if not found.\n\n"
    "@varName Name of the variable to search for\n"
    "@return Value contained by varName, \"\" if the variable does not exist\n"
@@ -2382,7 +2387,7 @@ DefineConsoleFunction( getVariable, const char*, ( const char* varName ), , "(st
    return Con::getVariable(varName);
 }
 
-DefineConsoleFunction( setVariable, void, ( const char* varName, const char* value ), , "(string varName, string value)\n" 
+DefineEngineFunction( setVariable, void, ( const char* varName, const char* value ), , "(string varName, string value)\n" 
    "@brief Sets the value of the named variable.\n\n"
    "@param varName Name of the variable to locate\n"
    "@param value New value of the variable\n"
@@ -2392,7 +2397,7 @@ DefineConsoleFunction( setVariable, void, ( const char* varName, const char* val
    return Con::setVariable(varName, value);
 }
 
-DefineConsoleFunction( isFunction, bool, ( const char* funcName ), , "(string funcName)" 
+DefineEngineFunction( isFunction, bool, ( const char* funcName ), , "(string funcName)" 
    "@brief Determines if a function exists or not\n\n"
    "@param funcName String containing name of the function\n"
    "@return True if the function exists, false if not\n"
@@ -2401,7 +2406,7 @@ DefineConsoleFunction( isFunction, bool, ( const char* funcName ), , "(string fu
    return Con::isFunction(funcName);
 }
 
-DefineConsoleFunction( getFunctionPackage, const char*, ( const char* funcName ), , "(string funcName)" 
+DefineEngineFunction( getFunctionPackage, const char*, ( const char* funcName ), , "(string funcName)" 
    "@brief Provides the name of the package the function belongs to\n\n"
    "@param funcName String containing name of the function\n"
    "@return The name of the function's package\n"
@@ -2414,7 +2419,7 @@ DefineConsoleFunction( getFunctionPackage, const char*, ( const char* funcName )
    return nse->mPackage;
 }
 
-DefineConsoleFunction( isMethod, bool, ( const char* nameSpace, const char* method ), , "(string namespace, string method)" 
+DefineEngineFunction( isMethod, bool, ( const char* nameSpace, const char* method ), , "(string namespace, string method)" 
    "@brief Determines if a class/namespace method exists\n\n"
    "@param namespace Class or namespace, such as Player\n"
    "@param method Name of the function to search for\n"
@@ -2429,7 +2434,7 @@ DefineConsoleFunction( isMethod, bool, ( const char* nameSpace, const char* meth
    return true;
 }
 
-DefineConsoleFunction( getMethodPackage, const char*, ( const char* nameSpace, const char* method ), , "(string namespace, string method)" 
+DefineEngineFunction( getMethodPackage, const char*, ( const char* nameSpace, const char* method ), , "(string namespace, string method)" 
    "@brief Provides the name of the package the method belongs to\n\n"
    "@param namespace Class or namespace, such as Player\n"
    "@param method Name of the funciton to search for\n"
@@ -2447,7 +2452,7 @@ DefineConsoleFunction( getMethodPackage, const char*, ( const char* nameSpace, c
    return nse->mPackage;
 }
 
-DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varValue ), ("") , "(string varName)" 
+DefineEngineFunction( isDefined, bool, ( const char* varName, const char* varValue ), ("") , "(string varName)" 
    "@brief Determines if a variable exists and contains a value\n"
    "@param varName Name of the variable to search for\n"
    "@return True if the variable was defined in script, false if not\n"
@@ -2585,14 +2590,14 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( isCurrentScriptToolScript, bool, (), , "()" 
+DefineEngineFunction( isCurrentScriptToolScript, bool, (), , "()" 
    "Returns true if the calling script is a tools script.\n"
    "@hide")
 {
    return Con::isCurrentScriptToolScript();
 }
 
-DefineConsoleFunction( getModNameFromPath, const char *, ( const char* path ), , "(string path)" 
+DefineEngineFunction( getModNameFromPath, const char *, ( const char* path ), , "(string path)" 
             "@brief Attempts to extract a mod directory from path. Returns empty string on failure.\n\n"
             "@param File path of mod folder\n"
             "@note This is no longer relevant in Torque 3D (which does not use mod folders), should be deprecated\n"
@@ -2604,7 +2609,7 @@ DefineConsoleFunction( getModNameFromPath, const char *, ( const char* path ), ,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( pushInstantGroup, void, ( String group ),("") , "([group])" 
+DefineEngineFunction( pushInstantGroup, void, ( String group ),("") , "([group])" 
             "@brief Pushes the current $instantGroup on a stack "
             "and sets it to the given value (or clears it).\n\n"
             "@note Currently only used for editors\n"
@@ -2617,7 +2622,7 @@ DefineConsoleFunction( pushInstantGroup, void, ( String group ),("") , "([group]
       Con::pushInstantGroup();
 }
 
-DefineConsoleFunction( popInstantGroup, void, (), , "()" 
+DefineEngineFunction( popInstantGroup, void, (), , "()" 
             "@brief Pop and restore the last setting of $instantGroup off the stack.\n\n"
             "@note Currently only used for editors\n\n"
             "@ingroup Editors\n"
@@ -2628,7 +2633,7 @@ DefineConsoleFunction( popInstantGroup, void, (), , "()"
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getPrefsPath, const char *, ( const char* relativeFileName ), (""), "([relativeFileName])" 
+DefineEngineFunction( getPrefsPath, const char *, ( const char* relativeFileName ), (""), "([relativeFileName])" 
             "@note Appears to be useless in Torque 3D, should be deprecated\n"
             "@internal")
 {
@@ -2641,31 +2646,28 @@ DefineConsoleFunction( getPrefsPath, const char *, ( const char* relativeFileNam
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( execPrefs, bool, 2, 4, "( string relativeFileName, bool noCalls=false, bool journalScript=false )"
-            "@brief Manually execute a special script file that contains game or editor preferences\n\n"
-            "@param relativeFileName Name and path to file from project folder\n"
-            "@param noCalls Deprecated\n"
-            "@param journalScript Deprecated\n"
-            "@return True if script was successfully executed\n"
-            "@note Appears to be useless in Torque 3D, should be deprecated\n"
-            "@ingroup Scripting")
+DefineEngineFunction(execPrefs, bool, (const char* relativeFileName, bool noCalls, bool journalScript),(false, false),
+   "@brief Manually execute a special script file that contains game or editor preferences\n\n"
+   "@param relativeFileName Name and path to file from project folder\n"
+   "@param noCalls Deprecated\n"
+   "@param journalScript Deprecated\n"
+   "@return True if script was successfully executed\n"
+   "@note Appears to be useless in Torque 3D, should be deprecated\n"
+   "@ingroup Scripting")
 {
-   const char *filename = Platform::getPrefsPath(argv[1]);
-   if(filename == NULL || *filename == 0)
+   if (relativeFileName == NULL || *relativeFileName == 0)
       return false;
 
    // Scripts do this a lot, so we may as well help them out
-   if(! Platform::isFile(filename) && ! Torque::FS::IsFile(filename))
+   if (!Platform::isFile(relativeFileName) && !Torque::FS::IsFile(relativeFileName))
       return true;
 
-   argv[0] = "exec";
-   argv[1] = filename;
-   return dAtob(Con::execute(argc, argv));
+   return Con::executeFile(relativeFileName, noCalls, journalScript);
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( export, void, ( const char* pattern, const char* filename, bool append ), ( "", false ),
+DefineEngineFunction( export, void, ( const char* pattern, const char* filename, bool append ), ( "", false ),
    "Write out the definitions of all global variables matching the given name @a pattern.\n"
    "If @a fileName is not \"\", the variable definitions are written to the specified file.  Otherwise the "
    "definitions will be printed to the console.\n\n"
@@ -2718,7 +2720,7 @@ DefineEngineFunction( deleteVariables, void, ( const char* pattern ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( trace, void, ( bool enable ), ( true ),
+DefineEngineFunction( trace, void, ( bool enable ), ( true ),
    "Enable or disable tracing in the script code VM.\n\n"
    "When enabled, the script code runtime will trace the invocation and returns "
    "from all functions that are called and log them to the console. This is helpful in "
@@ -2734,7 +2736,7 @@ DefineConsoleFunction( trace, void, ( bool enable ), ( true ),
 
 #if defined(TORQUE_DEBUG) || !defined(TORQUE_SHIPPING)
 
-DefineConsoleFunction( debug, void, (),,
+DefineEngineFunction( debug, void, (),,
    "Drops the engine into the native C++ debugger.\n\n"
    "This function triggers a debug break and drops the process into the IDE's debugger.  If the process is not "
    "running with a debugger attached it will generate a runtime error on most platforms.\n\n"

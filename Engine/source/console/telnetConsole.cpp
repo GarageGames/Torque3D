@@ -61,7 +61,7 @@ void TelnetConsole::destroy()
    TelConsole = NULL;
 }
 
-DefineConsoleFunction( telnetSetParameters, void, ( int port, const char* consolePass, const char* listenPass, bool remoteEcho ), ( false ),
+DefineEngineFunction( telnetSetParameters, void, ( int port, const char* consolePass, const char* listenPass, bool remoteEcho ), ( false ),
                 "@brief Initializes and open the telnet console.\n\n"
                 "@param port        Port to listen on for console connections (0 will shut down listening).\n"
                 "@param consolePass Password for read/write access to console.\n"

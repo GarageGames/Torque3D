@@ -94,7 +94,7 @@ void RedBook::setLastError(const char * error)
    if(!error || dStrlen(error) >= sizeof(smLastError))
       setLastError("Invalid error string passed");
    else
-      dStrcpy(smLastError, error);
+      dStrcpy(smLastError, error, 1024);
 }
 
 const char * RedBook::getLastError()
@@ -211,7 +211,7 @@ bool RedBook::setVolume(F32 volume)
 
 ConsoleFunctionGroupBegin( Redbook, "Control functions for Redbook audio (ie, CD audio).");
 
-DefineConsoleFunction( redbookOpen, bool, (const char * device), (""), "(string device=NULL)"
+DefineEngineFunction( redbookOpen, bool, (const char * device), (""), "(string device=NULL)"
 				"@brief Deprecated\n\n"
 				"@internal")
 {
@@ -221,28 +221,28 @@ DefineConsoleFunction( redbookOpen, bool, (const char * device), (""), "(string 
       return(RedBook::open(device));
 }
 
-DefineConsoleFunction( redbookClose, bool, (), , "Close the current Redbook device."
+DefineEngineFunction( redbookClose, bool, (), , "Close the current Redbook device."
 				"@brief Deprecated\n\n"
 				"@internal")
 {
    return(RedBook::close());
 }
 
-DefineConsoleFunction( redbookPlay, bool, (S32 track), , "(int track) Play the selected track."
+DefineEngineFunction( redbookPlay, bool, (S32 track), , "(int track) Play the selected track."
 				"@brief Deprecated\n\n"
 				"@internal")
 {
    return(RedBook::play(track));
 }
 
-DefineConsoleFunction( redbookStop, bool, (), , "Stop playing."
+DefineEngineFunction( redbookStop, bool, (), , "Stop playing."
 				"@brief Deprecated\n\n"
 				"@internal")
 {
    return(RedBook::stop());
 }
 
-DefineConsoleFunction( redbookGetTrackCount, S32, (), , "Return the number of tracks."
+DefineEngineFunction( redbookGetTrackCount, S32, (), , "Return the number of tracks."
 				"@brief Deprecated\n\n"
 				"@internal")
 {
@@ -252,7 +252,7 @@ DefineConsoleFunction( redbookGetTrackCount, S32, (), , "Return the number of tr
    return(trackCount);
 }
 
-DefineConsoleFunction( redbookGetVolume, F32, (), , "Get the volume."
+DefineEngineFunction( redbookGetVolume, F32, (), , "Get the volume."
 				"@brief Deprecated\n\n"
 				"@internal")
 {
@@ -263,28 +263,28 @@ DefineConsoleFunction( redbookGetVolume, F32, (), , "Get the volume."
       return(vol);
 }
 
-DefineConsoleFunction( redbookSetVolume, bool, (F32 volume), , "(float volume) Set playback volume."
+DefineEngineFunction( redbookSetVolume, bool, (F32 volume), , "(float volume) Set playback volume."
 				"@brief Deprecated\n\n"
 				"@internal")
 {
    return(RedBook::setVolume(volume));
 }
 
-DefineConsoleFunction( redbookGetDeviceCount, S32, (), , "get the number of redbook devices."
+DefineEngineFunction( redbookGetDeviceCount, S32, (), , "get the number of redbook devices."
 				"@brief Deprecated\n\n"
 				"@internal")
 {
    return(RedBook::getDeviceCount());
 }
 
-DefineConsoleFunction( redbookGetDeviceName, const char *, (S32 index), , "(int index) Get name of specified Redbook device."
+DefineEngineFunction( redbookGetDeviceName, const char *, (S32 index), , "(int index) Get name of specified Redbook device."
 				"@brief Deprecated\n\n"
 				"@internal")
 {
    return(RedBook::getDeviceName(index));
 }
 
-DefineConsoleFunction( redbookGetLastError, const char *, (), , "Get a string explaining the last redbook error."
+DefineEngineFunction( redbookGetLastError, const char *, (), , "Get a string explaining the last redbook error."
 				"@brief Deprecated\n\n"
 				"@internal")
 {

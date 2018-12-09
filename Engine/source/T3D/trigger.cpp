@@ -245,16 +245,16 @@ ConsoleGetType( TypeTriggerPolyhedron )
    Polyhedron* pPoly = reinterpret_cast<Polyhedron*>(dptr);
 
    // First point is corner, need to find the three vectors...`
-   Point3F origin = pPoly->pointList[0];
+   Point3F origin = pPoly->mPointList[0];
    U32 currVec = 0;
    Point3F vecs[3];
-   for (i = 0; i < pPoly->edgeList.size(); i++) {
-      const U32 *vertex = pPoly->edgeList[i].vertex;
+   for (i = 0; i < pPoly->mEdgeList.size(); i++) {
+      const U32 *vertex = pPoly->mEdgeList[i].vertex;
       if (vertex[0] == 0)
-         vecs[currVec++] = pPoly->pointList[vertex[1]] - origin;
+         vecs[currVec++] = pPoly->mPointList[vertex[1]] - origin;
       else
          if (vertex[1] == 0)
-            vecs[currVec++] = pPoly->pointList[vertex[0]] - origin;
+            vecs[currVec++] = pPoly->mPointList[vertex[0]] - origin;
    }
    AssertFatal(currVec == 3, "Internal error: Bad trigger polyhedron");
 
@@ -302,45 +302,45 @@ ConsoleSetType( TypeTriggerPolyhedron )
    // edges with CCW instead of CW order for face[0] and that it b) lets plane
    // normals face outwards rather than inwards.
 
-   pPoly->pointList.setSize(8);
-   pPoly->pointList[0] = origin;
-   pPoly->pointList[1] = origin + vecs[0];
-   pPoly->pointList[2] = origin + vecs[1];
-   pPoly->pointList[3] = origin + vecs[2];
-   pPoly->pointList[4] = origin + vecs[0] + vecs[1];
-   pPoly->pointList[5] = origin + vecs[0] + vecs[2];
-   pPoly->pointList[6] = origin + vecs[1] + vecs[2];
-   pPoly->pointList[7] = origin + vecs[0] + vecs[1] + vecs[2];
+   pPoly->mPointList.setSize(8);
+   pPoly->mPointList[0] = origin;
+   pPoly->mPointList[1] = origin + vecs[0];
+   pPoly->mPointList[2] = origin + vecs[1];
+   pPoly->mPointList[3] = origin + vecs[2];
+   pPoly->mPointList[4] = origin + vecs[0] + vecs[1];
+   pPoly->mPointList[5] = origin + vecs[0] + vecs[2];
+   pPoly->mPointList[6] = origin + vecs[1] + vecs[2];
+   pPoly->mPointList[7] = origin + vecs[0] + vecs[1] + vecs[2];
 
    Point3F normal;
-   pPoly->planeList.setSize(6);
+   pPoly->mPlaneList.setSize(6);
 
    mCross(vecs[2], vecs[0], &normal);
-   pPoly->planeList[0].set(origin, normal);
+   pPoly->mPlaneList[0].set(origin, normal);
    mCross(vecs[0], vecs[1], &normal);
-   pPoly->planeList[1].set(origin, normal);
+   pPoly->mPlaneList[1].set(origin, normal);
    mCross(vecs[1], vecs[2], &normal);
-   pPoly->planeList[2].set(origin, normal);
+   pPoly->mPlaneList[2].set(origin, normal);
    mCross(vecs[1], vecs[0], &normal);
-   pPoly->planeList[3].set(pPoly->pointList[7], normal);
+   pPoly->mPlaneList[3].set(pPoly->mPointList[7], normal);
    mCross(vecs[2], vecs[1], &normal);
-   pPoly->planeList[4].set(pPoly->pointList[7], normal);
+   pPoly->mPlaneList[4].set(pPoly->mPointList[7], normal);
    mCross(vecs[0], vecs[2], &normal);
-   pPoly->planeList[5].set(pPoly->pointList[7], normal);
+   pPoly->mPlaneList[5].set(pPoly->mPointList[7], normal);
 
-   pPoly->edgeList.setSize(12);
-   pPoly->edgeList[0].vertex[0]  = 0; pPoly->edgeList[0].vertex[1]  = 1; pPoly->edgeList[0].face[0]  = 0; pPoly->edgeList[0].face[1]  = 1;
-   pPoly->edgeList[1].vertex[0]  = 1; pPoly->edgeList[1].vertex[1]  = 5; pPoly->edgeList[1].face[0]  = 0; pPoly->edgeList[1].face[1]  = 4;
-   pPoly->edgeList[2].vertex[0]  = 5; pPoly->edgeList[2].vertex[1]  = 3; pPoly->edgeList[2].face[0]  = 0; pPoly->edgeList[2].face[1]  = 3;
-   pPoly->edgeList[3].vertex[0]  = 3; pPoly->edgeList[3].vertex[1]  = 0; pPoly->edgeList[3].face[0]  = 0; pPoly->edgeList[3].face[1]  = 2;
-   pPoly->edgeList[4].vertex[0]  = 3; pPoly->edgeList[4].vertex[1]  = 6; pPoly->edgeList[4].face[0]  = 3; pPoly->edgeList[4].face[1]  = 2;
-   pPoly->edgeList[5].vertex[0]  = 6; pPoly->edgeList[5].vertex[1]  = 2; pPoly->edgeList[5].face[0]  = 2; pPoly->edgeList[5].face[1]  = 5;
-   pPoly->edgeList[6].vertex[0]  = 2; pPoly->edgeList[6].vertex[1]  = 0; pPoly->edgeList[6].face[0]  = 2; pPoly->edgeList[6].face[1]  = 1;
-   pPoly->edgeList[7].vertex[0]  = 1; pPoly->edgeList[7].vertex[1]  = 4; pPoly->edgeList[7].face[0]  = 4; pPoly->edgeList[7].face[1]  = 1;
-   pPoly->edgeList[8].vertex[0]  = 4; pPoly->edgeList[8].vertex[1]  = 2; pPoly->edgeList[8].face[0]  = 1; pPoly->edgeList[8].face[1]  = 5;
-   pPoly->edgeList[9].vertex[0]  = 4; pPoly->edgeList[9].vertex[1]  = 7; pPoly->edgeList[9].face[0]  = 4; pPoly->edgeList[9].face[1]  = 5;
-   pPoly->edgeList[10].vertex[0] = 5; pPoly->edgeList[10].vertex[1] = 7; pPoly->edgeList[10].face[0] = 3; pPoly->edgeList[10].face[1] = 4;
-   pPoly->edgeList[11].vertex[0] = 7; pPoly->edgeList[11].vertex[1] = 6; pPoly->edgeList[11].face[0] = 3; pPoly->edgeList[11].face[1] = 5;
+   pPoly->mEdgeList.setSize(12);
+   pPoly->mEdgeList[0].vertex[0]  = 0; pPoly->mEdgeList[0].vertex[1]  = 1; pPoly->mEdgeList[0].face[0]  = 0; pPoly->mEdgeList[0].face[1]  = 1;
+   pPoly->mEdgeList[1].vertex[0]  = 1; pPoly->mEdgeList[1].vertex[1]  = 5; pPoly->mEdgeList[1].face[0]  = 0; pPoly->mEdgeList[1].face[1]  = 4;
+   pPoly->mEdgeList[2].vertex[0]  = 5; pPoly->mEdgeList[2].vertex[1]  = 3; pPoly->mEdgeList[2].face[0]  = 0; pPoly->mEdgeList[2].face[1]  = 3;
+   pPoly->mEdgeList[3].vertex[0]  = 3; pPoly->mEdgeList[3].vertex[1]  = 0; pPoly->mEdgeList[3].face[0]  = 0; pPoly->mEdgeList[3].face[1]  = 2;
+   pPoly->mEdgeList[4].vertex[0]  = 3; pPoly->mEdgeList[4].vertex[1]  = 6; pPoly->mEdgeList[4].face[0]  = 3; pPoly->mEdgeList[4].face[1]  = 2;
+   pPoly->mEdgeList[5].vertex[0]  = 6; pPoly->mEdgeList[5].vertex[1]  = 2; pPoly->mEdgeList[5].face[0]  = 2; pPoly->mEdgeList[5].face[1]  = 5;
+   pPoly->mEdgeList[6].vertex[0]  = 2; pPoly->mEdgeList[6].vertex[1]  = 0; pPoly->mEdgeList[6].face[0]  = 2; pPoly->mEdgeList[6].face[1]  = 1;
+   pPoly->mEdgeList[7].vertex[0]  = 1; pPoly->mEdgeList[7].vertex[1]  = 4; pPoly->mEdgeList[7].face[0]  = 4; pPoly->mEdgeList[7].face[1]  = 1;
+   pPoly->mEdgeList[8].vertex[0]  = 4; pPoly->mEdgeList[8].vertex[1]  = 2; pPoly->mEdgeList[8].face[0]  = 1; pPoly->mEdgeList[8].face[1]  = 5;
+   pPoly->mEdgeList[9].vertex[0]  = 4; pPoly->mEdgeList[9].vertex[1]  = 7; pPoly->mEdgeList[9].face[0]  = 4; pPoly->mEdgeList[9].face[1]  = 5;
+   pPoly->mEdgeList[10].vertex[0] = 5; pPoly->mEdgeList[10].vertex[1] = 7; pPoly->mEdgeList[10].face[0] = 3; pPoly->mEdgeList[10].face[1] = 4;
+   pPoly->mEdgeList[11].vertex[0] = 7; pPoly->mEdgeList[11].vertex[1] = 6; pPoly->mEdgeList[11].face[0] = 3; pPoly->mEdgeList[11].face[1] = 5;
 }
 
 
@@ -569,12 +569,12 @@ void Trigger::setTriggerPolyhedron(const Polyhedron& rPolyhedron)
 {
    mTriggerPolyhedron = rPolyhedron;
 
-   if (mTriggerPolyhedron.pointList.size() != 0) {
+   if (mTriggerPolyhedron.mPointList.size() != 0) {
       mObjBox.minExtents.set(1e10, 1e10, 1e10);
       mObjBox.maxExtents.set(-1e10, -1e10, -1e10);
-      for (U32 i = 0; i < mTriggerPolyhedron.pointList.size(); i++) {
-         mObjBox.minExtents.setMin(mTriggerPolyhedron.pointList[i]);
-         mObjBox.maxExtents.setMax(mTriggerPolyhedron.pointList[i]);
+      for (U32 i = 0; i < mTriggerPolyhedron.mPointList.size(); i++) {
+         mObjBox.minExtents.setMin(mTriggerPolyhedron.mPointList[i]);
+         mObjBox.maxExtents.setMax(mTriggerPolyhedron.mPointList[i]);
       }
    } else {
       mObjBox.minExtents.set(-0.5, -0.5, -0.5);
@@ -585,7 +585,7 @@ void Trigger::setTriggerPolyhedron(const Polyhedron& rPolyhedron)
    setTransform(xform);
 
    mClippedList.clear();
-   mClippedList.mPlaneList = mTriggerPolyhedron.planeList;
+   mClippedList.mPlaneList = mTriggerPolyhedron.mPlaneList;
 //   for (U32 i = 0; i < mClippedList.mPlaneList.size(); i++)
 //      mClippedList.mPlaneList[i].neg();
 
@@ -623,7 +623,7 @@ void Trigger::setTriggerPolyhedron(const Polyhedron& rPolyhedron)
 
 bool Trigger::testObject(GameBase* enter)
 {
-   if (mTriggerPolyhedron.pointList.size() == 0)
+   if (mTriggerPolyhedron.mPointList.size() == 0)
       return false;
 
    mClippedList.clear();
@@ -731,17 +731,17 @@ U32 Trigger::packUpdate(NetConnection* con, U32 mask, BitStream* stream)
    // Write the polyhedron
    if( stream->writeFlag( mask & PolyMask ) )
    {
-      stream->write(mTriggerPolyhedron.pointList.size());
-      for (i = 0; i < mTriggerPolyhedron.pointList.size(); i++)
-         mathWrite(*stream, mTriggerPolyhedron.pointList[i]);
+      stream->write(mTriggerPolyhedron.mPointList.size());
+      for (i = 0; i < mTriggerPolyhedron.mPointList.size(); i++)
+         mathWrite(*stream, mTriggerPolyhedron.mPointList[i]);
 
-      stream->write(mTriggerPolyhedron.planeList.size());
-      for (i = 0; i < mTriggerPolyhedron.planeList.size(); i++)
-         mathWrite(*stream, mTriggerPolyhedron.planeList[i]);
+      stream->write(mTriggerPolyhedron.mPlaneList.size());
+      for (i = 0; i < mTriggerPolyhedron.mPlaneList.size(); i++)
+         mathWrite(*stream, mTriggerPolyhedron.mPlaneList[i]);
 
-      stream->write(mTriggerPolyhedron.edgeList.size());
-      for (i = 0; i < mTriggerPolyhedron.edgeList.size(); i++) {
-         const Polyhedron::Edge& rEdge = mTriggerPolyhedron.edgeList[i];
+      stream->write(mTriggerPolyhedron.mEdgeList.size());
+      for (i = 0; i < mTriggerPolyhedron.mEdgeList.size(); i++) {
+         const Polyhedron::Edge& rEdge = mTriggerPolyhedron.mEdgeList[i];
 
          stream->write(rEdge.face[0]);
          stream->write(rEdge.face[1]);
@@ -779,19 +779,19 @@ void Trigger::unpackUpdate(NetConnection* con, BitStream* stream)
    {
       Polyhedron tempPH;
       stream->read(&size);
-      tempPH.pointList.setSize(size);
-      for (i = 0; i < tempPH.pointList.size(); i++)
-         mathRead(*stream, &tempPH.pointList[i]);
+      tempPH.mPointList.setSize(size);
+      for (i = 0; i < tempPH.mPointList.size(); i++)
+         mathRead(*stream, &tempPH.mPointList[i]);
 
       stream->read(&size);
-      tempPH.planeList.setSize(size);
-      for (i = 0; i < tempPH.planeList.size(); i++)
-         mathRead(*stream, &tempPH.planeList[i]);
+      tempPH.mPlaneList.setSize(size);
+      for (i = 0; i < tempPH.mPlaneList.size(); i++)
+         mathRead(*stream, &tempPH.mPlaneList[i]);
 
       stream->read(&size);
-      tempPH.edgeList.setSize(size);
-      for (i = 0; i < tempPH.edgeList.size(); i++) {
-         Polyhedron::Edge& rEdge = tempPH.edgeList[i];
+      tempPH.mEdgeList.setSize(size);
+      for (i = 0; i < tempPH.mEdgeList.size(); i++) {
+         Polyhedron::Edge& rEdge = tempPH.mEdgeList[i];
 
          stream->read(&rEdge.face[0]);
          stream->read(&rEdge.face[1]);

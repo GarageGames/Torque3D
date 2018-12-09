@@ -167,6 +167,10 @@ void GuiVariableInspector::addField(const char* name, const char* label, const c
       fieldTypeMask = TypeColorF;
    else if (newField.mFieldTypeName == StringTable->insert("ease"))
       fieldTypeMask = TypeEaseF;
+   else if (newField.mFieldTypeName == StringTable->insert("command"))
+      fieldTypeMask = TypeCommand;
+   else if (newField.mFieldTypeName == StringTable->insert("filename"))
+      fieldTypeMask = TypeStringFilename;
    else
       fieldTypeMask = -1;
 
@@ -191,7 +195,10 @@ void GuiVariableInspector::addCallbackField(const char* name, const char* label,
 
 void GuiVariableInspector::clearFields()
 {
+   mGroups.clear();
    mFields.clear();
+   clear();
+   
    update();
 }
 
@@ -209,17 +216,17 @@ void GuiVariableInspector::setFieldEnabled(const char* name, bool enabled)
    }
 }
 
-DefineConsoleMethod(GuiVariableInspector, startGroup, void, (const char* name),, "startGroup( groupName )")
+DefineEngineMethod(GuiVariableInspector, startGroup, void, (const char* name),, "startGroup( groupName )")
 {
    object->startGroup(name);
 }
 
-DefineConsoleMethod(GuiVariableInspector, endGroup, void, (),, "endGroup()")
+DefineEngineMethod(GuiVariableInspector, endGroup, void, (),, "endGroup()")
 {
    object->endGroup();
 }
 
-DefineConsoleMethod(GuiVariableInspector, addField, void, (const char* name, const char* label, const char* typeName, 
+DefineEngineMethod(GuiVariableInspector, addField, void, (const char* name, const char* label, const char* typeName, 
    const char* description, const char* defaultValue, const char* dataValues, SimObject* ownerObj),
    ("","","","","", "", nullAsType<SimObject*>()), "addField( fieldName/varName, fieldLabel, fieldTypeName, description, defaultValue, defaultValues, ownerObject )")
 {
@@ -229,7 +236,7 @@ DefineConsoleMethod(GuiVariableInspector, addField, void, (const char* name, con
    object->addField(name, label, typeName, description, defaultValue, dataValues, ownerObj);
 }
 
-DefineConsoleMethod(GuiVariableInspector, addCallbackField, void, (const char* name, const char* label, const char* typeName,
+DefineEngineMethod(GuiVariableInspector, addCallbackField, void, (const char* name, const char* label, const char* typeName,
    const char* description, const char* defaultValue, const char* dataValues, const char* callbackName, SimObject* ownerObj),
    ("", "", "", "", "", "", nullAsType<SimObject*>()), "addField( fieldName/varName, fieldLabel, fieldTypeName, description, defaultValue, defaultValues, callbackName, ownerObject )")
 {
@@ -239,22 +246,22 @@ DefineConsoleMethod(GuiVariableInspector, addCallbackField, void, (const char* n
    object->addCallbackField(name, label, typeName, description, defaultValue, dataValues, callbackName, ownerObj);
 }
 
-DefineConsoleMethod(GuiVariableInspector, update, void, (), , "update()")
+DefineEngineMethod(GuiVariableInspector, update, void, (), , "update()")
 {
    object->update();
 }
 
-DefineConsoleMethod(GuiVariableInspector, clearFields, void, (), , "clearFields()")
+DefineEngineMethod(GuiVariableInspector, clearFields, void, (), , "clearFields()")
 {
    object->clearFields();
 }
 
-DefineConsoleMethod(GuiVariableInspector, setFieldEnabled, void, (const char* fieldName, bool isEnabled), (true), "setFieldEnabled( fieldName, isEnabled )")
+DefineEngineMethod(GuiVariableInspector, setFieldEnabled, void, (const char* fieldName, bool isEnabled), (true), "setFieldEnabled( fieldName, isEnabled )")
 {
    object->setFieldEnabled(fieldName, isEnabled);
 }
 
-DefineConsoleMethod( GuiVariableInspector, loadVars, void, ( const char * searchString ), , "loadVars( searchString )" )
+DefineEngineMethod( GuiVariableInspector, loadVars, void, ( const char * searchString ), , "loadVars( searchString )" )
 {
    object->loadVars( searchString );
 }

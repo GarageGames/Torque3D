@@ -331,7 +331,7 @@ extern void unlockDispatcherMutex()
 
 using namespace Dispatcher;
 
-DefineConsoleFunction( isQueueRegistered, bool, (const char * queueName), , "(string queueName)"
+DefineEngineFunction( isQueueRegistered, bool, (const char * queueName), , "(string queueName)"
 				"@brief Determines if a dispatcher queue exists\n\n"
 				"@param queueName String containing the name of queue\n"
 				"@ingroup Messaging")
@@ -339,7 +339,7 @@ DefineConsoleFunction( isQueueRegistered, bool, (const char * queueName), , "(st
    return Dispatcher::isQueueRegistered(queueName);
 }
 
-DefineConsoleFunction( registerMessageQueue, void, (const char *queueName), , "(string queueName)"
+DefineEngineFunction( registerMessageQueue, void, (const char *queueName), , "(string queueName)"
 				"@brief Registeres a dispatcher queue\n\n"
 				"@param queueName String containing the name of queue\n"
 				"@ingroup Messaging")
@@ -347,7 +347,7 @@ DefineConsoleFunction( registerMessageQueue, void, (const char *queueName), , "(
    return Dispatcher::registerMessageQueue(queueName);
 }
 
-DefineConsoleFunction( unregisterMessageQueue, void, (const char *queueName), , "(string queueName)"
+DefineEngineFunction( unregisterMessageQueue, void, (const char *queueName), , "(string queueName)"
 				"@brief Unregisters a dispatcher queue\n\n"
 				"@param queueName String containing the name of queue\n"
 				"@ingroup Messaging")
@@ -357,7 +357,7 @@ DefineConsoleFunction( unregisterMessageQueue, void, (const char *queueName), , 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( registerMessageListener, bool, (const char *queueName, const char *listenerName), , "(string queueName, string listener)"
+DefineEngineFunction( registerMessageListener, bool, (const char *queueName, const char *listenerName), , "(string queueName, string listener)"
 				"@brief Registers an event message\n\n"
 				"@param queueName String containing the name of queue to attach listener to\n"
 				"@param listener Name of event messenger\n"
@@ -373,7 +373,7 @@ DefineConsoleFunction( registerMessageListener, bool, (const char *queueName, co
    return Dispatcher::registerMessageListener(queueName, listener);
 }
 
-DefineConsoleFunction( unregisterMessageListener, void, (const char *queueName, const char *listenerName), , "(string queueName, string listener)"
+DefineEngineFunction( unregisterMessageListener, void, (const char *queueName, const char *listenerName), , "(string queueName, string listener)"
 				"@brief Unregisters an event message\n\n"
 				"@param queueName String containing the name of queue\n"
 				"@param listener Name of event messenger\n"
@@ -391,7 +391,7 @@ DefineConsoleFunction( unregisterMessageListener, void, (const char *queueName, 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( dispatchMessage, bool, (const char *queueName, const char *message, const char *data), (""), "(string queueName, string message, string data)"
+DefineEngineFunction( dispatchMessage, bool, (const char *queueName, const char *message, const char *data), (""), "(string queueName, string message, string data)"
 				"@brief Dispatch a message to a queue\n\n"
 				"@param queueName Queue to dispatch the message to\n"
 				"@param message Message to dispatch\n"
@@ -403,7 +403,7 @@ DefineConsoleFunction( dispatchMessage, bool, (const char *queueName, const char
    return Dispatcher::dispatchMessage(queueName, message, data);
 }
 
-DefineConsoleFunction( dispatchMessageObject, bool, (const char *queueName, const char *message), ("", ""), "(string queueName, string message)"
+DefineEngineFunction( dispatchMessageObject, bool, (const char *queueName, const char *message), ("", ""), "(string queueName, string message)"
 				"@brief Dispatch a message object to a queue\n\n"
 				"@param queueName Queue to dispatch the message to\n"
 				"@param message Message to dispatch\n"

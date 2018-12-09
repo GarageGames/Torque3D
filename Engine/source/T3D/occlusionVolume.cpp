@@ -167,11 +167,11 @@ void OcclusionVolume::buildSilhouette( const SceneCameraState& cameraState, Vect
 
    if( mTransformDirty )
    {
-      const U32 numPoints = mPolyhedron.getNumPoints();
+      const U32 numPolyPoints = mPolyhedron.getNumPoints();
       const PolyhedronType::PointType* points = getPolyhedron().getPoints();
 
-      mWSPoints.setSize( numPoints );
-      for( U32 i = 0; i < numPoints; ++ i )
+      mWSPoints.setSize(numPolyPoints);
+      for( U32 i = 0; i < numPolyPoints; ++ i )
       {
          Point3F p = points[ i ];
          p.convolve( getScale() );

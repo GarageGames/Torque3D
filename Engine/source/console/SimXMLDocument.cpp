@@ -571,7 +571,7 @@ DefineEngineMethod( SimXMLDocument, attribute, const char*, ( const char* attrib
 }
 
 // These two methods don't make a lot of sense the way TS works.  Leaving them in for backwards-compatibility.
-DefineConsoleMethod( SimXMLDocument, attributeF32, F32, (const char * attributeName), , "(string attributeName)"
+DefineEngineMethod( SimXMLDocument, attributeF32, F32, (const char * attributeName), , "(string attributeName)"
    "@brief Get float attribute from the current Element on the stack.\n\n"
    "@param attributeName Name of attribute to retrieve.\n"
    "@return The value of the given attribute in the form of a float.\n"
@@ -580,7 +580,7 @@ DefineConsoleMethod( SimXMLDocument, attributeF32, F32, (const char * attributeN
    return dAtof( object->attribute( attributeName ) );
 }
 
-DefineConsoleMethod(SimXMLDocument, attributeS32, S32, (const char * attributeName), , "(string attributeName)"
+DefineEngineMethod(SimXMLDocument, attributeS32, S32, (const char * attributeName), , "(string attributeName)"
    "@brief Get int attribute from the current Element on the stack.\n\n"
    "@param attributeName Name of attribute to retrieve.\n"
    "@return The value of the given attribute in the form of an integer.\n"
@@ -833,7 +833,7 @@ void SimXMLDocument::setObjectAttributes(const char* objectID)
             continue;
 
          FrameTemp<char> valCopy( dStrlen( val ) + 1 );
-         dStrcpy( (char *)valCopy, val );
+         dStrcpy( (char *)valCopy, val, valCopy.size() );
 
          if (!pObject->writeField(itr->pFieldname, valCopy))
             continue;
@@ -873,7 +873,7 @@ void SimXMLDocument::setObjectAttributes(const char* objectID)
    //      continue;
 
    //   FrameTemp<char> valCopy( dStrlen( val ) + 1 );
-   //   dStrcpy( (char *)valCopy, val );
+   //   dStrcpy( (char *)valCopy, val, valCopy.size() );
 
    //   if (!pObject->writeField(itr->pFieldname, valCopy))
    //      continue;

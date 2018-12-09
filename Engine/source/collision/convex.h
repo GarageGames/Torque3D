@@ -100,11 +100,11 @@ struct CollisionState
 {
    CollisionStateList* mLista;
    CollisionStateList* mListb;
-   Convex* a;
-   Convex* b;
+   Convex* mA;
+   Convex* mB;
 
-   F32 dist;            // Current estimated distance
-   VectorF v;           // Vector between closest points
+   F32 mDist;            // Current estimated distance
+   VectorF mDistvec;     // Vector between closest points
 
    //
    CollisionState();

@@ -71,7 +71,7 @@ public:
       static char buffer[512];
       dSprintf(buffer, sizeof(buffer), "%s - \"", getClassName());
       expandEscape(buffer + dStrlen(buffer), mString.getString());
-      dStrcat(buffer, "\"");
+      dStrcat(buffer, "\"", 512);
       return buffer;
    }
 #endif

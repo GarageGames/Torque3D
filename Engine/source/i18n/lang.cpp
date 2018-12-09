@@ -42,8 +42,9 @@ LangFile::LangFile(const UTF8 *langName /* = NULL */)
 
 	if(langName)
 	{
-		mLangName = new UTF8 [dStrlen(langName) + 1];
-		dStrcpy(mLangName, langName);
+		dsize_t langNameLen = dStrlen(langName) + 1;
+		mLangName = new UTF8 [langNameLen];
+		dStrcpy(mLangName, langName, langNameLen);
 	}
 	else
 		mLangName = NULL;
@@ -136,8 +137,9 @@ const UTF8 * LangFile::getString(U32 id)
 
 U32 LangFile::addString(const UTF8 *str)
 {
-	UTF8 *newstr = new UTF8 [dStrlen(str) + 1];
-	dStrcpy(newstr, str);
+	dsize_t newstrLen = dStrlen(str) + 1;
+	UTF8 *newstr = new UTF8 [newstrLen];
+	dStrcpy(newstr, str, newstrLen);
 	mStringTable.push_back(newstr);
 	return mStringTable.size() - 1;
 }
@@ -156,8 +158,9 @@ void LangFile::setString(U32 id, const UTF8 *str)
 
    SAFE_DELETE_ARRAY(mStringTable[id]);
 
-	UTF8 *newstr = new UTF8 [dStrlen(str) + 1];
-	dStrcpy(newstr, str);
+	dsize_t newstrLen = dStrlen(str) + 1;
+	UTF8 *newstr = new UTF8 [newstrLen];
+	dStrcpy(newstr, str, newstrLen);
 	mStringTable[id] = newstr;
 }
 
@@ -166,8 +169,9 @@ void LangFile::setLangName(const UTF8 *newName)
 	if(mLangName)
 		delete [] mLangName;
 	
-	mLangName = new UTF8 [dStrlen(newName) + 1];
-	dStrcpy(mLangName, newName);
+	dsize_t langNameLen = dStrlen(newName) + 1;
+	mLangName = new UTF8 [langNameLen];
+	dStrcpy(mLangName, newName, langNameLen);
 }
 
 void LangFile::setLangFile(const UTF8 *langFile)
@@ -175,8 +179,9 @@ void LangFile::setLangFile(const UTF8 *langFile)
 	if(mLangFile)
 		delete [] mLangFile;
 	
-	mLangFile = new UTF8 [dStrlen(langFile) + 1];
-	dStrcpy(mLangFile, langFile);
+	dsize_t langFileLen = dStrlen(langFile) + 1;
+	mLangFile = new UTF8 [langFileLen];
+	dStrcpy(mLangFile, langFile, langFileLen);
 }
 
 bool LangFile::activateLanguage()
@@ -324,7 +329,7 @@ void LangTable::setCurrentLanguage(S32 langid)
 
 
 
-DefineConsoleMethod(LangTable, addLanguage, S32, (String filename, String languageName), ("", ""), 
+DefineEngineMethod(LangTable, addLanguage, S32, (String filename, String languageName), ("", ""), 
 			  "(string filename, [string languageName])"
 			  "@brief Adds a language to the table\n\n"
 			  "@param filename Name and path to the language file\n"
@@ -338,7 +343,7 @@ DefineConsoleMethod(LangTable, addLanguage, S32, (String filename, String langua
 	return object->addLanguage(scriptFilenameBuffer, (const UTF8*)languageName);
 }
 
-DefineConsoleMethod(LangTable, getString, const char *, (U32 id), , 
+DefineEngineMethod(LangTable, getString, const char *, (U32 id), , 
 			  "(string filename)"
 			  "@brief Grabs a string from the specified table\n\n"
 			  "If an invalid is passed, the function will attempt to "
@@ -349,22 +354,23 @@ DefineConsoleMethod(LangTable, getString, const char *, (U32 id), ,
 	const char * str =	(const char*)object->getString(id);
 	if(str != NULL)
 	{
-		char * ret = Con::getReturnBuffer(dStrlen(str) + 1);
-		dStrcpy(ret, str);
+		dsize_t retLen = dStrlen(str) + 1;
+		char * ret = Con::getReturnBuffer(retLen);
+		dStrcpy(ret, str, retLen);
 		return ret;
 	}
 	
 	return "";
 }
 
-DefineConsoleMethod(LangTable, setDefaultLanguage, void, (S32 langId), , "(int language)"
+DefineEngineMethod(LangTable, setDefaultLanguage, void, (S32 langId), , "(int language)"
 			  "@brief Sets the default language table\n\n"
 			  "@param language ID of the table\n")
 {
 	object->setDefaultLanguage(langId);
 }
 
-DefineConsoleMethod(LangTable, setCurrentLanguage, void, (S32 langId), , 
+DefineEngineMethod(LangTable, setCurrentLanguage, void, (S32 langId), , 
 			  "(int language)"
 			  "@brief Sets the current language table for grabbing text\n\n"
 			  "@param language ID of the table\n")
@@ -372,14 +378,14 @@ DefineConsoleMethod(LangTable, setCurrentLanguage, void, (S32 langId), ,
 	object->setCurrentLanguage(langId);
 }
 
-DefineConsoleMethod(LangTable, getCurrentLanguage, S32, (), , "()"
+DefineEngineMethod(LangTable, getCurrentLanguage, S32, (), , "()"
 			  "@brief Get the ID of the current language table\n\n"
 			  "@return Numerical ID of the current language table")
 {
 	return object->getCurrentLanguage();
 }
 
-DefineConsoleMethod(LangTable, getLangName, const char *, (S32 langId), , "(int language)"
+DefineEngineMethod(LangTable, getLangName, const char *, (S32 langId), , "(int language)"
 			  "@brief Return the readable name of the language table\n\n"
 			  "@param language Numerical ID of the language table to access\n\n"
 			  "@return String containing the name of the table, NULL if ID was invalid or name was never specified")
@@ -387,15 +393,16 @@ DefineConsoleMethod(LangTable, getLangName, const char *, (S32 langId), , "(int 
 	const char * str = (const char*)object->getLangName(langId);
 	if(str != NULL)
 	{
-		char * ret = Con::getReturnBuffer(dStrlen(str) + 1);
-		dStrcpy(ret, str);
+		dsize_t retLen = dStrlen(str) + 1;
+		char * ret = Con::getReturnBuffer(retLen);
+		dStrcpy(ret, str, retLen);
 		return ret;
 	}
 	
 	return "";
 }
 
-DefineConsoleMethod(LangTable, getNumLang, S32, (), , "()"
+DefineEngineMethod(LangTable, getNumLang, S32, (), , "()"
 			  "@brief Used to find out how many languages are in the table\n\n"
 			  "@return Size of the vector containing the languages, numerical")
 {
@@ -414,7 +421,7 @@ UTF8 *sanitiseVarName(const UTF8 *varName, UTF8 *buffer, U32 bufsize)
 		return NULL;
 	}
 	
-	dStrcpy(buffer, (const UTF8*)"I18N::");
+	dStrcpy(buffer, (const UTF8*)"I18N::", bufsize);
 	
 	UTF8 *dptr = buffer + 6;
 	const UTF8 *sptr = varName;
@@ -501,14 +508,15 @@ bool compiledFileNeedsUpdate(UTF8* filename)
    return false;
 }
 
-ConsoleFunction(CompileLanguage, void, 2, 3, "(string inputFile, [bool createMap]) Compiles a LSO language file."
+DefineEngineFunction(CompileLanguage, void, (const char* inputFile, bool createMap), (false), 
+   "@brief Compiles a LSO language file."
    " if createIndex is true, will also create languageMap.cs with"
    " the global variables for each string index."
    " The input file must follow this example layout:"
    " TXT_HELLO_WORLD = Hello world in english!")
 {
    UTF8 scriptFilenameBuffer[1024];
-   Con::expandScriptFilename((char*)scriptFilenameBuffer, sizeof(scriptFilenameBuffer), argv[1]);
+   Con::expandScriptFilename((char*)scriptFilenameBuffer, sizeof(scriptFilenameBuffer), inputFile);
 
    if (!Torque::FS::IsFile(scriptFilenameBuffer))
    {
@@ -525,7 +533,6 @@ ConsoleFunction(CompileLanguage, void, 2, 3, "(string inputFile, [bool createMap
 
    if (compiledFileNeedsUpdate(scriptFilenameBuffer))
    {
-      bool createMap = argc > 2 ? dAtob(argv[2]) : false;
       FileStream *mapStream = NULL;
       if (createMap)
       {

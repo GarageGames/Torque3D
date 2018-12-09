@@ -508,10 +508,10 @@ void Ribbon::prepRenderImage(SceneRenderState *state)
 
    // Set up our vertex buffer and primitive buffer
    if(mUpdateBuffers)
-      createBuffers(state, verts, primBuffer, segments);
+      createBuffers(state, mVerts, mPrimBuffer, segments);
 
-   ri->vertBuff = &verts;
-   ri->primBuff = &primBuffer;
+   ri->vertBuff = &mVerts;
+   ri->primBuff = &mPrimBuffer;
    ri->visibility = 1.0f;
 
    ri->prim = renderPass->allocPrim();

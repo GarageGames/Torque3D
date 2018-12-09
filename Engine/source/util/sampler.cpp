@@ -394,7 +394,7 @@ SAMPLE_FUNC( const char* );
 //	Console Functions.
 //--------------------------------------------------------------------------------
 
-DefineConsoleFunction( beginSampling, void, (const char * location, const char * backend), ("CSV"), "(location, [backend]) -"
+DefineEngineFunction( beginSampling, void, (const char * location, const char * backend), ("CSV"), "(location, [backend]) -"
 				"@brief Takes a string informing the backend where to store "
 				"sample data and optionally a name of the specific logging "
 				"backend to use.  The default is the CSV backend. In most "
@@ -408,14 +408,14 @@ DefineConsoleFunction( beginSampling, void, (const char * location, const char *
    beginSampling( location, backend );
 }
 
-DefineConsoleFunction( stopSampling, void, (), , "()"
+DefineEngineFunction( stopSampling, void, (), , "()"
 				"@brief Stops the rendering sampler\n\n"
 				"@ingroup Rendering\n")
 {
    stopSampling();
 }
 
-DefineConsoleFunction( enableSamples, void, (const char * pattern, bool state), (true), "(pattern, [state]) -"
+DefineEngineFunction( enableSamples, void, (const char * pattern, bool state), (true), "(pattern, [state]) -"
 				"@brief Enable sampling for all keys that match the given name "
 				"pattern. Slashes are treated as separators.\n\n"
 				"@ingroup Rendering")

@@ -1,4 +1,4 @@
-$PostFXManager::Settings::ColorCorrectionRamp = "core/images/null_color_ramp.png";
+$PostFXManager::Settings::ColorCorrectionRamp = "core/postFX/images/null_color_ramp.png";
 $PostFXManager::Settings::DOF::BlurCurveFar = "";
 $PostFXManager::Settings::DOF::BlurCurveNear = "";
 $PostFXManager::Settings::DOF::BlurMax = "";

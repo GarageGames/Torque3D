@@ -47,7 +47,7 @@ WindEmitter::WindEmitter()
 
 WindEmitter::~WindEmitter()
 {
-   WindEmitterList::iterator iter = find( smAllEmitters.begin(), smAllEmitters.end(), this );
+   WindEmitterList::iterator iter = T3D::find( smAllEmitters.begin(), smAllEmitters.end(), this );
    smAllEmitters.erase( iter );
 }
 

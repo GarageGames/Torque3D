@@ -215,8 +215,9 @@ S32 dStrnatcasecmp(const nat_char* a, const nat_char* b) {
 
 char *dStrdup_r(const char *src, const char *fileName, dsize_t lineNumber)
 {
-   char *buffer = (char *) dMalloc_r(dStrlen(src) + 1, fileName, lineNumber);
-   dStrcpy(buffer, src);
+   dsize_t bufferLen = dStrlen(src) + 1;
+   char *buffer = (char *) dMalloc_r(bufferLen, fileName, lineNumber);
+   dStrcpy(buffer, src, bufferLen);
    return buffer;
 }
 
@@ -379,6 +380,67 @@ char* dStrlwr(char *str)
    }
    return saveStr;
 #endif
+}
+
+//------------------------------------------------------------------------------
+
+S32 dStrlcat(char *dst, const char *src, dsize_t dstSize)
+{
+   //TODO: Do other platforms support strlcat in their libc
+#ifdef TORQUE_OS_MAC
+   S32 len = strlcat(dst, src, dstSize);
+
+   AssertWarn(len < dstSize, "Buffer too small in call to dStrlcat!");
+
+   return len;
+#else //TORQUE_OS_MAC
+   S32 dstLen = dStrlen(dst);
+   S32 srcLen = dStrlen(src);
+   S32 copyLen = srcLen;
+
+   //Check for buffer overflow and don't allow it. Warn on debug so we can fix it
+   AssertWarn(dstLen + copyLen < dstSize, "Buffer too small in call to dStrlcat!");
+   if (dstLen + copyLen + 1 > dstSize)
+   {
+      copyLen = dstSize - dstLen - 1;
+   }
+
+   //Copy src after dst and null terminate
+   memcpy(dst + dstLen, src, copyLen);
+   dst[dstLen + copyLen] = 0;
+
+   //Return the length of the string we would have generated
+   return dstLen + srcLen;
+#endif //TORQUE_OS_MAC
+}
+
+S32 dStrlcpy(char *dst, const char *src, dsize_t dstSize)
+{
+   //TODO: Do other platforms support strlcpy in their libc
+#ifdef TORQUE_OS_MAC
+   S32 len = strlcpy(dst, src, dstSize);
+
+   AssertWarn(len < dstSize, "Buffer too small in call to dStrlcpy!");
+
+   return len;
+#else //TORQUE_OS_MAC
+   S32 srcLen = dStrlen(src);
+   S32 copyLen = srcLen;
+
+   //Check for buffer overflow and don't allow it. Warn on debug so we can fix it
+   AssertWarn(copyLen < dstSize, "Buffer too small in call to dStrlcpy!");
+   if (srcLen + 1 > dstSize)
+   {
+      copyLen = dstSize - 1;
+   }
+
+   //Copy src and null terminate
+   memcpy(dst, src, copyLen);
+   dst[copyLen] = 0;
+
+   //Return the length of the string we would have generated
+   return srcLen;
+#endif //TORQUE_OS_MAC
 }
 
 //------------------------------------------------------------------------------

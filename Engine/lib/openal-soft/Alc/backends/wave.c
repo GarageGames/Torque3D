@@ -27,6 +27,7 @@
 
 #include "alMain.h"
 #include "alu.h"
+#include "alconfig.h"
 #include "threads.h"
 #include "compat.h"
 
@@ -76,16 +77,15 @@ typedef struct ALCwaveBackend {
     ALvoid *mBuffer;
     ALuint mSize;
 
-    volatile int killNow;
+    ATOMIC(ALenum) killNow;
     althrd_t thread;
 } ALCwaveBackend;
 
 static int ALCwaveBackend_mixerProc(void *ptr);
 
 static void ALCwaveBackend_Construct(ALCwaveBackend *self, ALCdevice *device);
-static DECLARE_FORWARD(ALCwaveBackend, ALCbackend, void, Destruct)
+static void ALCwaveBackend_Destruct(ALCwaveBackend *self);
 static ALCenum ALCwaveBackend_open(ALCwaveBackend *self, const ALCchar *name);
-static void ALCwaveBackend_close(ALCwaveBackend *self);
 static ALCboolean ALCwaveBackend_reset(ALCwaveBackend *self);
 static ALCboolean ALCwaveBackend_start(ALCwaveBackend *self);
 static void ALCwaveBackend_stop(ALCwaveBackend *self);
@@ -110,9 +110,17 @@ static void ALCwaveBackend_Construct(ALCwaveBackend *self, ALCdevice *device)
     self->mBuffer = NULL;
     self->mSize = 0;
 
-    self->killNow = 1;
+    ATOMIC_INIT(&self->killNow, AL_TRUE);
 }
 
+static void ALCwaveBackend_Destruct(ALCwaveBackend *self)
+{
+    if(self->mFile)
+        fclose(self->mFile);
+    self->mFile = NULL;
+
+    ALCbackend_Destruct(STATIC_CAST(ALCbackend, self));
+}
 
 static int ALCwaveBackend_mixerProc(void *ptr)
 {
@@ -127,7 +135,7 @@ static int ALCwaveBackend_mixerProc(void *ptr)
 
     althrd_setname(althrd_current(), MIXER_THREAD_NAME);
 
-    frameSize = FrameSizeFromDevFmt(device->FmtChans, device->FmtType);
+    frameSize = FrameSizeFromDevFmt(device->FmtChans, device->FmtType, device->AmbiOrder);
 
     done = 0;
     if(altimespec_get(&start, AL_TIME_UTC) != AL_TIME_UTC)
@@ -135,7 +143,8 @@ static int ALCwaveBackend_mixerProc(void *ptr)
         ERR("Failed to get starting time\n");
         return 1;
     }
-    while(!self->killNow && device->Connected)
+    while(!ATOMIC_LOAD(&self->killNow, almemory_order_acquire) &&
+          ATOMIC_LOAD(&device->Connected, almemory_order_acquire))
     {
         if(altimespec_get(&now, AL_TIME_UTC) != AL_TIME_UTC)
         {
@@ -157,7 +166,9 @@ static int ALCwaveBackend_mixerProc(void *ptr)
             al_nssleep(restTime);
         else while(avail-done >= device->UpdateSize)
         {
+            ALCwaveBackend_lock(self);
             aluMixData(device, self->mBuffer, device->UpdateSize);
+            ALCwaveBackend_unlock(self);
             done += device->UpdateSize;
 
             if(!IS_LITTLE_ENDIAN)
@@ -194,7 +205,7 @@ static int ALCwaveBackend_mixerProc(void *ptr)
             {
                 ERR("Error writing to file\n");
                 ALCdevice_Lock(device);
-                aluHandleDisconnect(device);
+                aluHandleDisconnect(device, "Failed to write playback samples");
                 ALCdevice_Unlock(device);
                 break;
             }
@@ -226,16 +237,9 @@ static ALCenum ALCwaveBackend_open(ALCwaveBackend *self, const ALCchar *name)
     }
 
     device = STATIC_CAST(ALCbackend, self)->mDevice;
-    al_string_copy_cstr(&device->DeviceName, name);
+    alstr_copy_cstr(&device->DeviceName, name);
 
     return ALC_NO_ERROR;
-}
-
-static void ALCwaveBackend_close(ALCwaveBackend *self)
-{
-    if(self->mFile)
-        fclose(self->mFile);
-    self->mFile = NULL;
 }
 
 static ALCboolean ALCwaveBackend_reset(ALCwaveBackend *self)
@@ -249,7 +253,10 @@ static ALCboolean ALCwaveBackend_reset(ALCwaveBackend *self)
     clearerr(self->mFile);
 
     if(GetConfigValueBool(NULL, "wave", "bformat", 0))
-        device->FmtChans = DevFmtAmbi1;
+    {
+        device->FmtChans = DevFmtAmbi3D;
+        device->AmbiOrder = 1;
+    }
 
     switch(device->FmtType)
     {
@@ -277,24 +284,23 @@ static ALCboolean ALCwaveBackend_reset(ALCwaveBackend *self)
         case DevFmtX51Rear: chanmask = 0x01 | 0x02 | 0x04 | 0x08 | 0x010 | 0x020; break;
         case DevFmtX61: chanmask = 0x01 | 0x02 | 0x04 | 0x08 | 0x100 | 0x200 | 0x400; break;
         case DevFmtX71: chanmask = 0x01 | 0x02 | 0x04 | 0x08 | 0x010 | 0x020 | 0x200 | 0x400; break;
-        case DevFmtAmbi1:
-        case DevFmtAmbi2:
-        case DevFmtAmbi3:
+        case DevFmtAmbi3D:
             /* .amb output requires FuMa */
-            device->AmbiFmt = AmbiFormat_FuMa;
+            device->AmbiLayout = AmbiLayout_FuMa;
+            device->AmbiScale = AmbiNorm_FuMa;
             isbformat = 1;
             chanmask = 0;
             break;
     }
     bits = BytesFromDevFmt(device->FmtType) * 8;
-    channels = ChannelsFromDevFmt(device->FmtChans);
+    channels = ChannelsFromDevFmt(device->FmtChans, device->AmbiOrder);
 
-    fprintf(self->mFile, "RIFF");
+    fputs("RIFF", self->mFile);
     fwrite32le(0xFFFFFFFF, self->mFile); // 'RIFF' header len; filled in at close
 
-    fprintf(self->mFile, "WAVE");
+    fputs("WAVE", self->mFile);
 
-    fprintf(self->mFile, "fmt ");
+    fputs("fmt ", self->mFile);
     fwrite32le(40, self->mFile); // 'fmt ' header len; 40 bytes for EXTENSIBLE
 
     // 16-bit val, format type id (extensible: 0xFFFE)
@@ -316,11 +322,12 @@ static ALCboolean ALCwaveBackend_reset(ALCwaveBackend *self)
     // 32-bit val, channel mask
     fwrite32le(chanmask, self->mFile);
     // 16 byte GUID, sub-type format
-    val = fwrite(((bits==32) ? (isbformat ? SUBTYPE_BFORMAT_FLOAT : SUBTYPE_FLOAT) :
-                               (isbformat ? SUBTYPE_BFORMAT_PCM : SUBTYPE_PCM)), 1, 16, self->mFile);
+    val = fwrite((device->FmtType == DevFmtFloat) ?
+                 (isbformat ? SUBTYPE_BFORMAT_FLOAT : SUBTYPE_FLOAT) :
+                 (isbformat ? SUBTYPE_BFORMAT_PCM : SUBTYPE_PCM), 1, 16, self->mFile);
     (void)val;
 
-    fprintf(self->mFile, "data");
+    fputs("data", self->mFile);
     fwrite32le(0xFFFFFFFF, self->mFile); // 'data' header len; filled in at close
 
     if(ferror(self->mFile))
@@ -339,7 +346,9 @@ static ALCboolean ALCwaveBackend_start(ALCwaveBackend *self)
 {
     ALCdevice *device = STATIC_CAST(ALCbackend, self)->mDevice;
 
-    self->mSize = device->UpdateSize * FrameSizeFromDevFmt(device->FmtChans, device->FmtType);
+    self->mSize = device->UpdateSize * FrameSizeFromDevFmt(
+        device->FmtChans, device->FmtType, device->AmbiOrder
+    );
     self->mBuffer = malloc(self->mSize);
     if(!self->mBuffer)
     {
@@ -347,7 +356,7 @@ static ALCboolean ALCwaveBackend_start(ALCwaveBackend *self)
         return ALC_FALSE;
     }
 
-    self->killNow = 0;
+    ATOMIC_STORE(&self->killNow, AL_FALSE, almemory_order_release);
     if(althrd_create(&self->thread, ALCwaveBackend_mixerProc, self) != althrd_success)
     {
         free(self->mBuffer);
@@ -365,10 +374,8 @@ static void ALCwaveBackend_stop(ALCwaveBackend *self)
     long size;
     int res;
 
-    if(self->killNow)
+    if(ATOMIC_EXCHANGE(&self->killNow, AL_TRUE, almemory_order_acq_rel))
         return;
-
-    self->killNow = 1;
     althrd_join(self->thread, &res);
 
     free(self->mBuffer);

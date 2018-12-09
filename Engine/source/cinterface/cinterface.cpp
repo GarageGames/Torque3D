@@ -19,448 +19,78 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+#include "cinterface.h"
 
-#include "platform/platform.h"
 #include "console/compiler.h"
-#include "console/consoleInternal.h"
-#include "console/engineAPI.h"
-#include "core/util/tDictionary.h"
-#include "core/strings/stringFunctions.h"
-#include "app/mainLoop.h"
 #include "windowManager/platformWindow.h"
-#include "windowManager/platformWindowMgr.h"
 
-#ifdef TORQUE_OS_WIN
-#include "windowManager/win32/win32Window.h"
-#include "windowManager/win32/winDispatch.h"
-extern void createFontInit(void);
-extern void createFontShutdown(void);   
-#endif
-
-#if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-   extern S32 CreateMiniDump(LPEXCEPTION_POINTERS ExceptionInfo);
-#endif
-
-static HashTable<StringTableEntry,StringTableEntry> gSecureScript;
-
-extern bool LinkConsoleFunctions;
-
-extern "C" {
-
-   // reset the engine, unloading any current level and returning to the main menu
-	void torque_reset()
-	{
-		Con::evaluate("disconnect();");
-	}
-
-   // initialize Torque 3D including argument handling
-	S32 torque_engineinit(S32 argc, const char **argv)
-	{
-
-#if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-      __try {
-#endif
-
-		LinkConsoleFunctions = true;
-
-#if defined(_MSC_VER)
-		createFontInit();
-#endif
-
-		// Initialize the subsystems.
-		StandardMainLoop::init();
-
-		// Handle any command line args.
-		if(!StandardMainLoop::handleCommandLine(argc, argv))
-		{
-			Platform::AlertOK("Error", "Failed to initialize game, shutting down.");
-			return false;
-		}
-
-#if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-      }
-
-		__except( CreateMiniDump(GetExceptionInformation()) )
-		{
-			_exit(0);
-		}
-#endif
-
-      return true;
-
-	}
-
-   // tick Torque 3D's main loop
-	S32 torque_enginetick()
-	{
-
-#if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-      __try {
-#endif
-
-		bool ret = StandardMainLoop::doMainLoop(); 
-      return ret;
-
-#if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-      }
-		__except( CreateMiniDump(GetExceptionInformation()) )
-		{
-			_exit(0);
-		}
-#endif
-
-      
-
-	}
-
-	S32 torque_getreturnstatus()
-	{
-		return StandardMainLoop::getReturnStatus();
-	}
-
-   // signal an engine shutdown (as with the quit(); console command)
-	void torque_enginesignalshutdown()
-	{
-		Con::evaluate("quit();");
-	}
-
-   // shutdown the engine
-	S32 torque_engineshutdown()
-	{
-
-#if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-      __try {
-#endif
-
-		// Clean everything up.
-		StandardMainLoop::shutdown();
-
-#if defined(_MSC_VER)
-		createFontShutdown();
-#endif
-
-#if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-      }
-
-		__except( CreateMiniDump(GetExceptionInformation()) )
-		{
-			_exit(0);
-		}
-#endif
-
-		// Return.  
-		return true;
-
-	}
-
-	bool torque_isdebugbuild()
-	{
-#ifdef _DEBUG
-		return true;
-#else
-		return false;
-#endif
-
-	}
-
-	S32 torque_getconsolebool(const char* name)
-	{
-		return Con::getBoolVariable(name);
-	}
-
-	void torque_setconsolebool(const char* name, bool value)
-	{
-		Con::setBoolVariable(name, value);
-	}
-
-	static char* gExecutablePath = NULL;
-
-	const char* torque_getexecutablepath()
-	{
-		return gExecutablePath;
-	} 
-
-	void torque_setexecutablepath(const char* directory)
-	{
-		gExecutablePath = new char[strlen(directory)+1];
-		strcpy(gExecutablePath, directory);
-	} 
-
-   // set Torque 3D into web deployment mode (disable fullscreen exlusive mode, etc)
-	void torque_setwebdeployment()
-	{
-		Platform::setWebDeployment(true);
-	}
-
-   // Get a console variable
-	const char* torque_getvariable(const char* name)
-	{
-		return Con::getVariable(StringTable->insert(name));
-	}
-
-   // Set a console variable
-	void torque_setvariable(const char* name, const char* value)
-	{
-		Con::setVariable(StringTable->insert(name), StringTable->insert(value));
-	}
-
-	static Namespace::Entry* GetEntry(const char* nameSpace, const char* name)                                          
-	{
-		Namespace* ns = NULL;
-
-		if (!nameSpace || !dStrlen(nameSpace))
-			ns = Namespace::mGlobalNamespace;
-		else
-		{
-			nameSpace = StringTable->insert(nameSpace);
-			ns = Namespace::find(nameSpace); //can specify a package here, maybe need, maybe not
-		}
-
-		if (!ns)
-			return NULL;
-
-		name = StringTable->insert(name);
-
-		Namespace::Entry* entry = ns->lookupRecursive(name);
-
-		return entry;
-	}
-
-   // Export a function to the Torque 3D console system which matches the StringCallback function prototype
-   // specify the nameSpace, functionName, usage, min and max arguments 
-	void torque_exportstringcallback(StringCallback cb, const char *nameSpace, const char *funcName, const char* usage,  S32 minArgs, S32 maxArgs)
-	{
-		if (!nameSpace || !dStrlen(nameSpace))
-			Con::addCommand(funcName, cb, usage, minArgs + 1, maxArgs + 1);
-		else
-			Con::addCommand(nameSpace, funcName, cb, usage, minArgs + 1, maxArgs + 1);
-	}
-
-	void torque_callvoidfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
-	{
-
-		Namespace::Entry* entry = GetEntry(nameSpace, name);
-
-		if (!entry)
-			return;
-
-		StringStackConsoleWrapper args(argc, argv);
-		entry->cb.mVoidCallbackFunc(NULL, args.count(), args);
-	}
-
-	F32 torque_callfloatfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
-	{
-
-		Namespace::Entry* entry = GetEntry(nameSpace, name);
-
-		if (!entry)
-			return 0.0f;
-
-		StringStackConsoleWrapper args(argc, argv);
-		return entry->cb.mFloatCallbackFunc(NULL, args.count(), args);
-	}
-
-	S32 torque_callintfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
-	{
-
-		Namespace::Entry* entry = GetEntry(nameSpace, name);
-
-		if (!entry)
-			return 0;
-
-		StringStackConsoleWrapper args(argc, argv);
-		return entry->cb.mIntCallbackFunc(NULL, args.count(), args);
-	}
-
-
-	const char * torque_callstringfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
-	{
-		Namespace::Entry* entry = GetEntry(nameSpace, name);
-
-		if (!entry)
-			return "";
-
-		StringStackConsoleWrapper args(argc, argv);
-		return entry->cb.mStringCallbackFunc(NULL, args.count(), args);
-	}
-
-	bool torque_callboolfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
-	{
-		Namespace::Entry* entry = GetEntry(nameSpace, name);
-
-		if (!entry)
-			return false;
-
-		StringStackConsoleWrapper args(argc, argv);
-		return entry->cb.mBoolCallbackFunc(NULL, args.count(), args);
-	}
-
-
-	const char * torque_callscriptfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
-	{
-		Namespace::Entry* entry = GetEntry(nameSpace, name);
-
-		if (!entry)
-			return "";
-
-		if(!entry->mFunctionOffset)
-			return "";
-
-		StringStackConsoleWrapper args(argc, argv);
-		const char* ret = entry->mCode->exec(entry->mFunctionOffset, StringTable->insert(name), entry->mNamespace, args.count(), args, false, entry->mPackage);
-
-		if (!ret || !dStrlen(ret))
-			return "";
-
-		return ret;
-
-	}
-
-
-   // Call a TorqueScript console function that has been marked as secure
-	const char* torque_callsecurefunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
-	{
-		static const char* invalidChars = "()=:{}";
-		String s = nameSpace;
-		s += "::";
-		s += name;
-		s = String::ToUpper(s);
-
-		if (!gSecureScript.count(StringTable->insert(s.c_str())))
-		{
-			Con::warnf("\nAttempt to call insecure script: %s\n", s.c_str());
-			return "";
-		}
-
-		// scan through for invalid characters
-		for (S32 i = 0; i < argc ; i++)
-			for (S32 j = 0; j < dStrlen(invalidChars) ; j++)
-				for (S32 k = 0; k < dStrlen(argv[i]); k++)
-					if (invalidChars[j] == argv[i][k])
-					{
-						Con::warnf("\nInvalid parameter passed to secure script: %s, %s\n", s.c_str(), argv[i]);
-						return "";
-					}
-
-					Namespace::Entry* entry = GetEntry(nameSpace, name);
-
-					if (!entry)
-						return "";
-
-					static char returnBuffer[32];
-
-					switch(entry->mType)
-					{
-					case Namespace::Entry::ConsoleFunctionType:
-						return torque_callscriptfunction(nameSpace, name, argc, argv);
-
-					case Namespace::Entry::StringCallbackType:
-						return torque_callstringfunction(nameSpace, name, argc, argv);
-
-					case Namespace::Entry::IntCallbackType:
-						dSprintf(returnBuffer, sizeof(returnBuffer), "%d", torque_callintfunction(nameSpace, name, argc, argv));
-						return returnBuffer;
-
-					case Namespace::Entry::FloatCallbackType:
-						dSprintf(returnBuffer, sizeof(returnBuffer), "%g", torque_callfloatfunction(nameSpace, name, argc, argv));
-						return returnBuffer;
-
-					case Namespace::Entry::VoidCallbackType:
-						torque_callvoidfunction(nameSpace, name, argc, argv);
-						return "";
-
-					case Namespace::Entry::BoolCallbackType:
-						dSprintf(returnBuffer, sizeof(returnBuffer), "%d", (U32) torque_callboolfunction(nameSpace, name, argc, argv));
-						return returnBuffer;
-					};
-
-					return "";
-
-	}
-
-   // Set a TorqueScript console function as secure and available for JavaScript via the callScript plugin method
-	void torque_addsecurefunction(const char* nameSpace, const char* fname)
-	{
-		String s = nameSpace;
-		s += "::";
-		s += fname;
-		s = String::ToUpper(s);
-
-		gSecureScript.insertEqual(StringTable->insert(s.c_str()), StringTable->insert(s.c_str()));
-	}
-
-
-   // Evaluate arbitrary TorqueScript (ONLY CALL torque_evaluate FROM TRUSTED CODE!!!)
-	const char* torque_evaluate(const char* code)
-	{
-		return Con::evaluate(code);
-	}
-
-   // resize the Torque 3D child window to the specified width and height
-	void torque_resizewindow(S32 width, S32 height)
-	{
-		if (PlatformWindowManager::get() && PlatformWindowManager::get()->getFirstWindow())
-			PlatformWindowManager::get()->getFirstWindow()->setSize(Point2I(width,height));
-	}
-
-#if defined(TORQUE_OS_WIN) && !defined(TORQUE_SDL)
-   // retrieve the hwnd of our render window
-   void* torque_gethwnd()
-   {
-      if (PlatformWindowManager::get() && PlatformWindowManager::get()->getFirstWindow())
-      {
-         Win32Window* w = (Win32Window*) PlatformWindowManager::get()->getFirstWindow();
-         return (void *) w->getHWND();
-      }
-
-      return NULL;
-   }
-
-   // directly add a message to the Torque 3D event queue, bypassing the Windows event queue
-   // this is useful in the case of the IE plugin, where we are hooking into an application 
-   // level message, and posting to the windows queue would cause a hang
-   void torque_directmessage(U32 message, U32 wparam, U32 lparam)
-   {
-      if (PlatformWindowManager::get() && PlatformWindowManager::get()->getFirstWindow())
-      {
-         Win32Window* w = (Win32Window*) PlatformWindowManager::get()->getFirstWindow();
-         Dispatch(DelayedDispatch,w->getHWND(),message,wparam,lparam);
-      }      
-   }
-   
-#endif
-}
-
-// This function is solely to test the TorqueScript <-> Javascript binding
-// By default, it is marked as secure by the web plugins and then can be called from
-// Javascript on the web page to ensure that function calls across the language
-// boundry are working with arguments and return values
-DefineConsoleFunction( testJavaScriptBridge, const char *, (const char* arg1, const char* arg2, const char* arg3), , "testBridge(arg1, arg2, arg3)")
+CInterface& CInterface::GetCInterface()
 {
-	S32 failed = 0;
-		if (dStrcmp(arg1,"one"))
-			failed = 2;
-		if (dStrcmp(arg2,"two"))
-			failed = 2;
-		if (dStrcmp(arg3,"three"))
-			failed = 2;
-	
-
-	//attempt to call from TorqueScript -> JavaScript
-	const char* jret = Con::evaluate("JS::bridgeCallback(\"one\",\"two\",\"three\");");
-
-	if (dStrcmp(jret,"42"))
-		failed = 3;
-
-	static const U32 bufSize = 256;
-	char *ret = Con::getReturnBuffer(bufSize);
-
-	dSprintf(ret, bufSize, "%i", failed);
-
-	return ret;
+   static CInterface INSTANCE;
+   return INSTANCE;
 }
 
+bool CInterface::isMethod(const char* className, const char* methodName)
+{
+   return GetCInterface()._isMethod(className, methodName);
+}
 
+const char* CInterface::CallFunction(const char* nameSpace, const char* name, const char **argv, int argc, bool *result)
+{
+   return GetCInterface()._CallFunction(nameSpace, name, argv, argc, result);
+}
 
+const char* CInterface::CallMethod(SimObject* obj, const char* name, const char **argv, int argc, bool *res)
+{
+   return GetCInterface()._CallMethod(obj->getClassName(), obj->getClassNamespace(), obj->getId(), name, argv, argc, res);
+}
 
+void CInterface::CallMain(bool *res)
+{
+   GetCInterface()._CallMain(res);
+}
 
+bool CInterface::_isMethod(const char* className, const char* methodName) const
+{
+   if (mIsMethodCallback)
+      return mIsMethodCallback(className, methodName);
+
+   return NULL;
+}
+
+const char* CInterface::_CallFunction(const char* nameSpace, const char* name, const char **argv, int argc, bool *result) const
+{
+   if (mFunctionCallback)
+      return mFunctionCallback(nameSpace, name, argv, argc, result);
+
+   *result = false;
+   return NULL;
+}
+
+const char* CInterface::_CallMethod(const char* className, const char* classNamespace, U32 object, const char* name, const char **argv, int argc, bool *res) const
+{
+   if (mMethodCallback)
+      return mMethodCallback(className, classNamespace, object, name, argv, argc, res);
+
+   *res = false;
+   return NULL;
+}
+
+void CInterface::_CallMain(bool *res) const
+{
+   if (mMainCallback)
+   {
+      *res = true;
+      mMainCallback();
+      return;
+   }
+
+   *res = false;
+}
+
+TORQUE_API void SetCallbacks(void* ptr, void* methodPtr, void* isMethodPtr, void* mainPtr) {
+   CInterface::GetCInterface().SetCallFunctionCallback(ptr);
+   CInterface::GetCInterface().SetCallMethodCallback(methodPtr);
+   CInterface::GetCInterface().SetCallIsMethodCallback(isMethodPtr);
+   CInterface::GetCInterface().SetMainCallback(mainPtr);
+}

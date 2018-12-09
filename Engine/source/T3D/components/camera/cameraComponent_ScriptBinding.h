@@ -24,13 +24,14 @@
 #include "T3D/components/camera/cameraComponent.h"
 
 //Basically, this only exists for backwards compatibility for parts of the editors
-ConsoleMethod(CameraComponent, getMode, const char*, 2, 2, "() - We get the first behavior of the requested type on our owner object.\n"
+DefineEngineMethod(CameraComponent, getMode, const char*, (),, 
+   "@brief We get the first behavior of the requested type on our owner object.\n"
    "@return (string name) The type of the behavior we're requesting")
 {
    return "fly";
 }
 
-DefineConsoleMethod(CameraComponent, getForwardVector, VectorF, (), ,
+DefineEngineMethod(CameraComponent, getForwardVector, VectorF, (), ,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -44,7 +45,7 @@ DefineConsoleMethod(CameraComponent, getForwardVector, VectorF, (), ,
    return returnVec;
 }
 
-DefineConsoleMethod(CameraComponent, getRightVector, VectorF, (), ,
+DefineEngineMethod(CameraComponent, getRightVector, VectorF, (), ,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -58,7 +59,7 @@ DefineConsoleMethod(CameraComponent, getRightVector, VectorF, (), ,
    return returnVec;
 }
 
-DefineConsoleMethod(CameraComponent, getUpVector, VectorF, (), ,
+DefineEngineMethod(CameraComponent, getUpVector, VectorF, (), ,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -72,14 +73,14 @@ DefineConsoleMethod(CameraComponent, getUpVector, VectorF, (), ,
    return returnVec;
 }
 
-DefineConsoleMethod(CameraComponent, setForwardVector, void, (VectorF newForward), (VectorF(0, 0, 0)),
+DefineEngineMethod(CameraComponent, setForwardVector, void, (VectorF newForward), (VectorF(0, 0, 0)),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
    object->setForwardVector(newForward);
 }
 
-DefineConsoleMethod(CameraComponent, getWorldPosition, Point3F, (), ,
+DefineEngineMethod(CameraComponent, getWorldPosition, Point3F, (), ,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {

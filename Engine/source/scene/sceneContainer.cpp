@@ -60,26 +60,26 @@ static Box3F sBoundingBox;
 
 SceneContainer::Link::Link()
 {
-   next = prev = this;
+	mNext = mPrev = this;
 }
 
 //-----------------------------------------------------------------------------
 
 void SceneContainer::Link::unlink()
 {
-   next->prev = prev;
-   prev->next = next;
-   next = prev = this;
+   mNext->mPrev = mPrev;
+   mPrev->mNext = mNext;
+   mNext = mPrev = this;
 }
 
 //-----------------------------------------------------------------------------
 
 void SceneContainer::Link::linkAfter(SceneContainer::Link* ptr)
 {
-   next = ptr->next;
-   next->prev = this;
-   prev = ptr;
-   prev->next = this;
+   mNext = ptr->mNext;
+   mNext->mPrev = this;
+   mPrev = ptr;
+   mPrev->mNext = this;
 }
 
 //=============================================================================
@@ -93,8 +93,8 @@ SceneContainer::SceneContainer()
    mSearchInProgress = false;
    mCurrSeqKey = 0;
 
-   mEnd.next = mEnd.prev = &mStart;
-   mStart.next = mStart.prev = &mEnd;
+   mEnd.mNext = mEnd.mPrev = &mStart;
+   mStart.mNext = mStart.mPrev = &mEnd;
 
    mBinArray = new SceneObjectRef[csmNumBins * csmNumBins];
    for (U32 i = 0; i < csmNumBins; i++) 
@@ -183,7 +183,7 @@ bool SceneContainer::removeObject(SceneObject* obj)
    // Remove water and physical zone types from the special vector.
    if ( obj->getTypeMask() & ( WaterObjectType | PhysicalZoneObjectType ) )
    {
-      Vector<SceneObject*>::iterator iter = find( mWaterAndZones.begin(), mWaterAndZones.end(), obj );
+      Vector<SceneObject*>::iterator iter = T3D::find( mWaterAndZones.begin(), mWaterAndZones.end(), obj );
       if( iter != mTerrains.end() )
          mWaterAndZones.erase_fast(iter);
    }
@@ -191,7 +191,7 @@ bool SceneContainer::removeObject(SceneObject* obj)
    // Remove terrain objects from special vector.
    if( obj->getTypeMask() & TerrainObjectType )
    {
-      Vector< SceneObject* >::iterator iter = find( mTerrains.begin(), mTerrains.end(), obj );
+      Vector< SceneObject* >::iterator iter = T3D::find( mTerrains.begin(), mTerrains.end(), obj );
       if( iter != mTerrains.end() )
          mTerrains.erase_fast(iter);
    }
@@ -586,10 +586,10 @@ void SceneContainer::polyhedronFindObjects(const Polyhedron& polyhedron, U32 mas
    Box3F box;
    box.minExtents.set(1e9, 1e9, 1e9);
    box.maxExtents.set(-1e9, -1e9, -1e9);
-   for (i = 0; i < polyhedron.pointList.size(); i++)
+   for (i = 0; i < polyhedron.mPointList.size(); i++)
    {
-      box.minExtents.setMin(polyhedron.pointList[i]);
-      box.maxExtents.setMax(polyhedron.pointList[i]);
+      box.minExtents.setMin(polyhedron.mPointList[i]);
+      box.maxExtents.setMax(polyhedron.mPointList[i]);
    }
 
    if (  mask == WaterObjectType || 
@@ -760,7 +760,7 @@ void SceneContainer::findObjectList( const Frustum &frustum, U32 mask, Vector<Sc
 
 void SceneContainer::findObjectList( U32 mask, Vector<SceneObject*> *outFound )
 {
-   for ( Link* itr = mStart.next; itr != &mEnd; itr = itr->next )
+   for ( Link* itr = mStart.mNext; itr != &mEnd; itr = itr->mNext)
    {
       SceneObject* ptr = static_cast<SceneObject*>( itr );
       if ( ( ptr->getTypeMask() & mask ) != 0 )
@@ -772,7 +772,7 @@ void SceneContainer::findObjectList( U32 mask, Vector<SceneObject*> *outFound )
 
 void SceneContainer::findObjects( U32 mask, FindCallback callback, void *key )
 {
-   for (Link* itr = mStart.next; itr != &mEnd; itr = itr->next) {
+   for (Link* itr = mStart.mNext; itr != &mEnd; itr = itr->mNext) {
       SceneObject* ptr = static_cast<SceneObject*>(itr);
       if ((ptr->getTypeMask() & mask) != 0 && !ptr->mCollisionCount)
          (*callback)(ptr,key);
@@ -859,10 +859,10 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
    F32 currentT = 2.0;
    mCurrSeqKey++;
 
-   SceneObjectRef* chain = mOverflowBin.nextInBin;
-   while (chain)
+   SceneObjectRef* overflowChain = mOverflowBin.nextInBin;
+   while (overflowChain)
    {
-      SceneObject* ptr = chain->object;
+      SceneObject* ptr = overflowChain->object;
       if (ptr->getContainerSeqKey() != mCurrSeqKey)
       {
          ptr->setContainerSeqKey(mCurrSeqKey);
@@ -897,7 +897,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
             }
          }
       }
-      chain = chain->nextInBin;
+	  overflowChain = overflowChain->nextInBin;
    }
 
    // These are just for rasterizing the line against the grid.  We want the x coord
@@ -1138,7 +1138,7 @@ bool SceneContainer::collideBox(const Point3F &start, const Point3F &end, U32 ma
    AssertFatal( info->userData == NULL, "SceneContainer::collideBox - RayInfo->userData cannot be used here!" );
 
    F32 currentT = 2;
-   for (Link* itr = mStart.next; itr != &mEnd; itr = itr->next)
+   for (Link* itr = mStart.mNext; itr != &mEnd; itr = itr->mNext)
    {
       SceneObject* ptr = static_cast<SceneObject*>(itr);
       if (ptr->getTypeMask() & mask && !ptr->mCollisionCount)

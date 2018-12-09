@@ -34,7 +34,6 @@ EditorSettings.setDefaultValue(  "orthoFOV",                "50" );
 EditorSettings.setDefaultValue(  "orthoShowGrid",           "1" );
 EditorSettings.setDefaultValue(  "currentEditor",           "WorldEditorInspectorPlugin" );
 EditorSettings.setDefaultValue(  "newLevelFile",            "tools/levels/BlankRoom.mis" );
-EditorSettings.setDefaultValue(  "newGameObjectDir",        "scripts/server/gameObjects" );
 
 if( isFile( "C:/Program Files/Torsion/Torsion.exe" ) )
    EditorSettings.setDefaultValue(  "torsionPath",          "C:/Program Files/Torsion/Torsion.exe" );
@@ -128,7 +127,7 @@ EditorSettings.setDefaultValue(  "renderInfoText",          "1"               );
 
 EditorSettings.beginGroup( "Grid" );
 EditorSettings.setDefaultValue(  "gridColor",               "255 255 255 20"  );
-EditorSettings.setDefaultValue(  "gridSize",                "10 10 10"        );
+EditorSettings.setDefaultValue(  "gridSize",                "1 1 1"        );
 EditorSettings.setDefaultValue(  "snapToGrid",              "0"               ); //<-- Not currently used
 EditorSettings.setDefaultValue(  "renderPlane",             "0"               );
 EditorSettings.setDefaultValue(  "renderPlaneHashes",       "0"               );

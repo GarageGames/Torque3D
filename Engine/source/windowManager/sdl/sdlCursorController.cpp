@@ -41,7 +41,8 @@ static struct { U32 id; SDL_SystemCursor resourceID; SDL_Cursor *cursor;} sgCurs
    { PlatformCursorController::curResizeNESW,  SDL_SYSTEM_CURSOR_SIZENESW,    NULL },
    { PlatformCursorController::curResizeNWSE,  SDL_SYSTEM_CURSOR_SIZENWSE,    NULL },
    { PlatformCursorController::curHand,        SDL_SYSTEM_CURSOR_HAND,        NULL },
-   { 0,                                        SDL_SYSTEM_CURSOR_NO,          NULL },
+   { PlatformCursorController::curWaitArrow,   SDL_SYSTEM_CURSOR_WAITARROW,   NULL },
+   { PlatformCursorController::curNoNo,        SDL_SYSTEM_CURSOR_NO,          NULL },
 };
 
 
@@ -90,7 +91,7 @@ void PlatformCursorControllerSDL::setCursorShape(U32 cursorID)
 {
    SDL_Cursor* cursor = NULL;
 
-   for(S32 i = 0; sgCursorShapeMap[i].resourceID != SDL_SYSTEM_CURSOR_NO; ++i)
+   for(S32 i = 0; i < numPlatformCursors; ++i)
    {
       if(cursorID == sgCursorShapeMap[i].id)
       {  

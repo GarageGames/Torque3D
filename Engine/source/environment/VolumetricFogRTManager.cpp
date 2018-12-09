@@ -283,7 +283,7 @@ VolumetricFogRTManager* VolumetricFogRTManager::get()
    return gVolumetricFogRTManager;
 }
    
-DefineConsoleFunction(SetFogVolumeQuality, S32, (U32 new_quality), ,
+DefineEngineFunction(SetFogVolumeQuality, S32, (U32 new_quality), ,
 "@brief Resizes the rendertargets of the Volumetric Fog object.\n"
 "@params new_quality new quality for the rendertargets 1 = full size, 2 = halfsize, 3 = 1/3, 4 = 1/4 ...")
 {

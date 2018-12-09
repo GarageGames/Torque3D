@@ -535,10 +535,10 @@ void GuiNavEditorCtrl::renderScene(const RectI & updateRect)
          GFXStateBlockDesc desc;
          desc.setBlend(false);
          desc.setZReadWrite(true ,true);
-         MatrixF mat(true);
-         mat.setPosition(mLinkStart);
+         MatrixF linkMat(true);
+		 linkMat.setPosition(mLinkStart);
          Point3F scale(0.8f, 0.8f, 0.8f);
-         GFX->getDrawUtil()->drawTransform(desc, mat, &scale);
+         GFX->getDrawUtil()->drawTransform(desc, linkMat, &scale);
       }
    }
 
@@ -627,13 +627,12 @@ void GuiNavEditorCtrl::_prepRenderImage(SceneManager* sceneGraph, const SceneRen
    }*/
 }
 
-ConsoleMethod(GuiNavEditorCtrl, getMode, const char*, 2, 2, "")
+DefineEngineMethod(GuiNavEditorCtrl, getMode, const char*, (), , "")
 {
    return object->getMode();
 }
 
-ConsoleMethod(GuiNavEditorCtrl, setMode, void, 3, 3, "setMode(String mode)")
+DefineEngineMethod(GuiNavEditorCtrl, setMode, void, (String mode),, "setMode(String mode)")
 {
-   String newMode = (argv[2]);
-   object->setMode(newMode);
+   object->setMode(mode);
 }

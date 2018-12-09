@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _GUICONTROL_H_
 #define _GUICONTROL_H_
 
@@ -822,6 +827,10 @@ class GuiControl : public SimGroup
       
       void inspectPostApply();
       void inspectPreApply();
+protected:
+      F32 fade_amt;
+public:
+      void setFadeAmount(F32 amt) { fade_amt = amt; }
 };
 
 typedef GuiControl::horizSizingOptions GuiHorizontalSizing;

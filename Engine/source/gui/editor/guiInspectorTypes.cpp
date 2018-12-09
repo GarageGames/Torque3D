@@ -601,13 +601,12 @@ void GuiInspectorTypeFileName::updateValue()
    }
 }
 
-ConsoleMethod( GuiInspectorTypeFileName, apply, void, 3,3, "apply(newValue);" )
+DefineEngineMethod(GuiInspectorTypeFileName, apply, void, (String path), , "")
 {
-   String path( (const char*)argv[2] );
-   if ( path.isNotEmpty() )
-      path = Platform::makeRelativePathName( path, Platform::getMainDotCsDir() );
-      
-   object->setData( path.c_str() );
+   if (path.isNotEmpty())
+      path = Platform::makeRelativePathName(path, Platform::getMainDotCsDir());
+
+   object->setData(path.c_str());
 }
 
 
@@ -1035,7 +1034,6 @@ GuiControl* GuiInspectorTypeEaseF::constructEditControl()
    mBrowseButton = new GuiButtonCtrl();
    {
       RectI browseRect( Point2I( ( getLeft() + getWidth()) - 26, getTop() + 2), Point2I(20, getHeight() - 4) );
-      char szBuffer[512];
       dSprintf( szBuffer, sizeof( szBuffer ), "GetEaseF(%d.getText(), \"%d.apply\", %d.getRoot());", retCtrl->getId(), getId(), getId() );
       mBrowseButton->setField( "Command", szBuffer );
       mBrowseButton->setField( "text", "E" );
@@ -1502,7 +1500,7 @@ void GuiInspectorTypeBitMask32::updateData()
    setData( data );   
 }
 
-ConsoleMethod( GuiInspectorTypeBitMask32, applyBit, void, 2,2, "apply();" )
+DefineEngineMethod( GuiInspectorTypeBitMask32, applyBit, void, (),, "" )
 {
    object->updateData();
 }

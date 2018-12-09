@@ -137,7 +137,7 @@ bool TerrainBlock::exportLayerMaps( const UTF8 *filePrefix, const String &format
    return true;
 }
 
-DefineConsoleMethod( TerrainBlock, exportHeightMap, bool, (const char * fileNameStr, const char * format), ( "png"), "(string filename, [string format]) - export the terrain block's heightmap to a bitmap file (default: png)" )
+DefineEngineMethod( TerrainBlock, exportHeightMap, bool, (const char * fileNameStr, const char * format), ( "png"), "(string filename, [string format]) - export the terrain block's heightmap to a bitmap file (default: png)" )
 {
    UTF8 fileName[1024];
    Con::expandScriptFilename( fileName, sizeof( fileName ), fileNameStr );
@@ -145,7 +145,7 @@ DefineConsoleMethod( TerrainBlock, exportHeightMap, bool, (const char * fileName
    return object->exportHeightMap( fileName, format );
 }
 
-DefineConsoleMethod( TerrainBlock, exportLayerMaps, bool, (const char * filePrefixStr, const char * format), ( "png"), "(string filePrefix, [string format]) - export the terrain block's layer maps to bitmap files (default: png)" )
+DefineEngineMethod( TerrainBlock, exportLayerMaps, bool, (const char * filePrefixStr, const char * format), ( "png"), "(string filePrefix, [string format]) - export the terrain block's layer maps to bitmap files (default: png)" )
 {
    UTF8 filePrefix[1024];
    Con::expandScriptFilename( filePrefix, sizeof( filePrefix ), filePrefixStr );

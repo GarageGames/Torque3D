@@ -54,6 +54,23 @@
 #include "console/consoleTypes.h"
 #endif
 
+#ifndef _AUTOLOAD_ASSETS_H_
+#include "assets/autoloadAssets.h"
+#endif
+
+#ifndef COMPONENTASSET_H
+#include "T3D/assets/ComponentAsset.h"
+#endif
+#ifndef GUI_ASSET_H
+#include "T3D/assets/GUIAsset.h"
+#endif
+#ifndef SCRIPT_ASSET_H
+#include "T3D/assets/ScriptAsset.h"
+#endif
+#ifndef MATERIALASSET_H
+#include "T3D/assets/MaterialAsset.h"
+#endif
+
 // Script bindings.
 #include "assetManager_ScriptBinding.h"
 
@@ -202,6 +219,69 @@ bool AssetManager::addModuleDeclaredAssets( ModuleDefinition* pModuleDefinition 
     return true;
 }
 
+bool AssetManager::loadModuleAutoLoadAssets(ModuleDefinition* pModuleDefinition)
+{
+   // Debug Profiling.
+   PROFILE_SCOPE(AssetManager_loadModuleAutoLoadAssets);
+
+   // Sanity!
+   AssertFatal(pModuleDefinition != NULL, "Cannot auto load assets using a NULL module definition");
+
+   // Does the module have any assets associated with it?
+   if (pModuleDefinition->getModuleAssets().empty())
+   {
+      // Yes, so warn.
+      Con::warnf("Asset Manager: Cannot auto load assets to module '%s' as it has no existing assets.", pModuleDefinition->getSignature());
+      return false;
+   }
+
+   U32 assetCount = pModuleDefinition->getModuleAssets().size();
+
+   // Iterate the module definition children.
+   for (SimSet::iterator itr = pModuleDefinition->begin(); itr != pModuleDefinition->end(); ++itr)
+   {
+      // Fetch the declared assets.
+      AutoloadAssets* pAutoloadAssets = dynamic_cast<AutoloadAssets*>(*itr);
+
+      // Skip if it's not a declared assets location.
+      if (pAutoloadAssets == NULL)
+         continue;
+
+      for (U32 i = 0; i < assetCount; ++i)
+      {
+         AssetDefinition* assetDef = pModuleDefinition->getModuleAssets()[i];
+
+         if (assetDef->mAssetType == pAutoloadAssets->getAssetType())
+         {
+            //TODO: this is stupid and ugly, need to properly automagically parse the class for registration
+            AssetBase* assetBase = nullptr;
+
+            if (assetDef->mAssetType == StringTable->insert("ComponentAsset"))
+            {
+               assetBase = mTaml.read<ComponentAsset>(assetDef->mAssetBaseFilePath);
+            }
+            else if (assetDef->mAssetType == StringTable->insert("GUIAsset"))
+            {
+               assetBase = mTaml.read<GUIAsset>(assetDef->mAssetBaseFilePath);
+            }
+            else if (assetDef->mAssetType == StringTable->insert("ScriptAsset"))
+            {
+               assetBase = mTaml.read<ScriptAsset>(assetDef->mAssetBaseFilePath);
+            }
+            else if (assetDef->mAssetType == StringTable->insert("MaterialAsset"))
+            {
+               assetBase = mTaml.read<MaterialAsset>(assetDef->mAssetBaseFilePath);
+            }
+
+            //load the asset now if valid
+            if (assetBase)
+               addPrivateAsset(assetBase);
+         }
+      }
+   }
+
+   return true;
+}
 //-----------------------------------------------------------------------------
 
 bool AssetManager::addDeclaredAsset( ModuleDefinition* pModuleDefinition, const char* pAssetFilePath )
@@ -1273,10 +1353,10 @@ bool AssetManager::refreshAsset( const char* pAssetId )
                 }
 
                 // Refresh depended-on assets.
-                for ( Vector<typeAssetId>::iterator isDependedOnItr = dependedOn.begin(); isDependedOnItr != dependedOn.end(); ++isDependedOnItr )
+                for ( Vector<typeAssetId>::iterator refreshItr = dependedOn.begin(); refreshItr != dependedOn.end(); ++refreshItr)
                 {
                     // Refresh dependency asset.
-                    refreshAsset( *isDependedOnItr );
+                    refreshAsset( *refreshItr);
                 }
             }
         }
@@ -2310,6 +2390,13 @@ S32 AssetManager::findAssetLooseFile( AssetQuery* pAssetQuery, const char* pLoos
 
 //-----------------------------------------------------------------------------
 
+AssetManager::typeAssetDependsOnHash* AssetManager::getDependedOnAssets()
+{
+   // Find any asset dependencies.
+   return &mAssetDependsOn;
+}
+//-----------------------------------------------------------------------------
+
 bool AssetManager::scanDeclaredAssets( const char* pPath, const char* pExtension, const bool recurse, ModuleDefinition* pModuleDefinition )
 {
     // Debug Profiling.
@@ -2973,6 +3060,9 @@ void AssetManager::onModulePreLoad( ModuleDefinition* pModuleDefinition )
 
     // Add module declared assets.
     addModuleDeclaredAssets( pModuleDefinition );
+
+    // Load any auto-loaded asset types
+    loadModuleAutoLoadAssets(pModuleDefinition);
 
     // Is an asset tags manifest specified?
     if ( pModuleDefinition->getAssetTagsManifest() != StringTable->EmptyString() )

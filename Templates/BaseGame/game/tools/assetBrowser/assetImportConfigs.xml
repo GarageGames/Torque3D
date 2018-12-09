@@ -1,0 +1,18 @@
+<AssetImportConfigs>
+    <Config Name="TestConfig">
+        <Mesh ImportMesh="1" DoUpAxisOverride="0" UpAxisOverride="Z_AXIS" DoScaleOverride="0" ScaleOverride="1" IgnoreNodeScale="0" AdjustCenter="0" AdjustFloor="1" CollapseSubmeshes="0" LODType="TrailingNumber" ImportedNodes="" IgnoreNodes="" ImportMeshes="" IgnoreMeshes="" />
+        <Materials ImportMaterials="1" CreateComposites="1" UseDiffuseSuffixOnOriginImg="1" UseExistingMaterials="1" />
+        <Animations ImportAnimations="1" SeparateAnimations="1" SeparateAnimationPrefix="" />
+        <Collisions GenerateCollisions="1" GenCollisionType="CollisionMesh" CollisionMeshPrefix="Col" GenerateLOSCollisions="1" GenLOSCollisionType="CollisionMesh" LOSCollisionMeshPrefix="LOS" />
+        <Images ImageType="N/A" DiffuseTypeSuffixes="_ALBEDO,_DIFFUSE,_ALB,_DIF,_COLOR,_COL" NormalTypeSuffixes="_NORMAL,_NORM" SpecularTypeSuffixes="_SPECULAR,_SPEC" MetalnessTypeSuffixes="_METAL,_MET,_METALNESS,_METALLIC" RoughnessTypeSuffixes="_ROUGH,_ROUGHNESS" SmoothnessTypeSuffixes="_SMOOTH,_SMOOTHNESS" AOTypeSuffixes="_AO,_AMBIENT,_AMBIENTOCCLUSION" CompositeTypeSuffixes="_COMP,_COMPOSITE" TextureFilteringMode="Bilinear" UseMips="1" IsHDR="0" Scaling="1" Compressed="0" GenerateMaterialOnImport="1" PopulateMaterialMaps="1" />
+        <Sounds VolumeAdjust="1" PitchAdjust="1" Compressed="0" />
+    </Config>
+    <Config Name="SecondTest">
+        <Mesh ImportMesh="1" DoUpAxisOverride="0" UpAxisOverride="Z_AXIS" DoScaleOverride="0" ScaleOverride="1" IgnoreNodeScale="0" AdjustCenter="0" AdjustFloor="0" CollapseSubmeshes="0" LODType="TrailingNumber" ImportedNodes="" IgnoreNodes="" ImportMeshes="" IgnoreMeshes="" />
+        <Materials ImportMaterials="1" CreateComposites="1" UseDiffuseSuffixOnOriginImg="" UseExistingMaterials="" />
+        <Animations ImportAnimations="1" SeparateAnimations="1" SeparateAnimationPrefix="" />
+        <Collisions GenerateCollisions="1" GenCollisionType="CollisionMesh" CollisionMeshPrefix="Col" GenerateLOSCollisions="1" GenLOSCollisionType="CollisionMesh" LOSCollisionMeshPrefix="LOS" />
+        <Images ImageType="N/A" DiffuseTypeSuffixes="_ALBEDO,_DIFFUSE,_ALB,_DIF,_COLOR,_COL" NormalTypeSuffixes="_NORMAL,_NORM" SpecularTypeSuffixes="_SPECULAR,_SPEC" MetalnessTypeSuffixes="_METAL,_MET,_METALNESS,_METALLIC" RoughnessTypeSuffixes="_ROUGH,_ROUGHNESS" SmoothnessTypeSuffixes="_SMOOTH,_SMOOTHNESS" AOTypeSuffixes="_AO,_AMBIENT,_AMBIENTOCCLUSION" CompositeTypeSuffixes="_COMP,_COMPOSITE" TextureFilteringMode="Bilinear" UseMips="1" IsHDR="0" Scaling="1" Compressed="0" GenerateMaterialOnImport="" PopulateMaterialMaps="" />
+        <Sounds VolumeAdjust="1" PitchAdjust="1" Compressed="0" />
+    </Config>
+</AssetImportConfigs>

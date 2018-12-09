@@ -54,7 +54,7 @@ SceneManager* ShadowManager::getSceneManager()
 //------------------------------------------------------------------------------
 
 // Runtime switching of shadow systems.  Requires correct world to be pushed at console.
-DefineConsoleFunction( setShadowManager, bool, (const char* sShadowSystemName), (""), "string sShadowSystemName")
+DefineEngineFunction( setShadowManager, bool, (const char* sShadowSystemName), (""), "string sShadowSystemName")
 {
    /*
    // Make sure this new one exists

@@ -64,17 +64,17 @@ void SimResponseCurve::clear()
    mCurve.clear();
 }
 
-DefineConsoleMethod( SimResponseCurve, addPoint, void, ( F32 value, F32 time ), , "addPoint( F32 value, F32 time )" )
+DefineEngineMethod( SimResponseCurve, addPoint, void, ( F32 value, F32 time ), , "addPoint( F32 value, F32 time )" )
 {
    object->addPoint( value, time );
 }
 
-DefineConsoleMethod( SimResponseCurve, getValue, F32, ( F32 time ), , "getValue( F32 time )" )
+DefineEngineMethod( SimResponseCurve, getValue, F32, ( F32 time ), , "getValue( F32 time )" )
 {
    return object->getValue( time );
 }
 
-DefineConsoleMethod( SimResponseCurve, clear, void, (), , "clear()" )
+DefineEngineMethod( SimResponseCurve, clear, void, (), , "clear()" )
 {
    object->clear();
 }

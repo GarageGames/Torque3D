@@ -122,7 +122,7 @@ void TSMesh::innerRender( TSVertexBufferHandle &vb, GFXPrimitiveBufferHandle &pb
    GFX->setVertexBuffer( vb );
    GFX->setPrimitiveBuffer( pb );
    
-   for( U32 p = 0; p < primitives.size(); p++ )
+   for( U32 p = 0; p < mPrimitives.size(); p++ )
       GFX->drawPrimitive( p );
 }
 
@@ -223,9 +223,9 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
    // NOTICE: SFXBB is removed and refraction is disabled!
    //coreRI->backBuffTex = GFX->getSfxBackBuffer();
 
-   for ( S32 i = 0; i < primitives.size(); i++ )
+   for ( S32 i = 0; i < mPrimitives.size(); i++ )
    {
-      const TSDrawPrimitive &draw = primitives[i];
+      const TSDrawPrimitive &draw = mPrimitives[i];
 
       // We need to have a material.
       if ( draw.matIndex & TSDrawPrimitive::NoMaterial )
@@ -253,7 +253,7 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
 #ifndef TORQUE_OS_MAC
 
       // Get the instancing material if this mesh qualifies.
-      if ( meshType != SkinMeshType && pb->mPrimitiveArray[i].numVertices < smMaxInstancingVerts )
+      if (mMeshType != SkinMeshType && pb->mPrimitiveArray[i].numVertices < smMaxInstancingVerts )
          if (matInst && !matInst->getFeatures().hasFeature(MFT_HardwareSkinning))
             matInst = InstancingMaterialHook::getInstancingMat( matInst );
 
@@ -293,13 +293,13 @@ const Point3F * TSMesh::getNormals( S32 firstVert )
    if ( getFlags( UseEncodedNormals ) )
    {
       gNormalStore.setSize( vertsPerFrame );
-      for ( S32 i = 0; i < encodedNorms.size(); i++ )
-         gNormalStore[i] = decodeNormal( encodedNorms[ i + firstVert ] );
+      for ( S32 i = 0; i < mEncodedNorms.size(); i++ )
+         gNormalStore[i] = decodeNormal(mEncodedNorms[ i + firstVert ] );
 
       return gNormalStore.address();
    }
 
-   return &norms[firstVert];
+   return &mNorms[firstVert];
 }
 
 //-----------------------------------------------------
@@ -352,28 +352,28 @@ bool TSMesh::buildPolyList( S32 frame, AbstractPolyList *polyList, U32 &surfaceK
             {
                // Don't use vertex() method as we want to retain the original indices
                OptimizedPolyList::VertIndex vert;
-               vert.vertIdx   = opList->insertPoint( verts[ i + firstVert ] );
-               vert.normalIdx = opList->insertNormal( norms[ i + firstVert ] );
-               vert.uv0Idx    = opList->insertUV0( tverts[ i + firstVert ] );
+               vert.vertIdx   = opList->insertPoint( mVerts[ i + firstVert ] );
+               vert.normalIdx = opList->insertNormal( mNorms[ i + firstVert ] );
+               vert.uv0Idx    = opList->insertUV0( mTverts[ i + firstVert ] );
                if ( hasTVert2 )
-                  vert.uv1Idx = opList->insertUV1( tverts2[ i + firstVert ] );
+                  vert.uv1Idx = opList->insertUV1(mTverts[ i + firstVert ] );
 
                opList->mVertexList.push_back( vert );
             }
          }
          else
          {
-            base = polyList->addPointAndNormal( verts[firstVert], norms[firstVert] );
+            base = polyList->addPointAndNormal( mVerts[firstVert], mNorms[firstVert] );
             for ( i = 1; i < vertsPerFrame; i++ )
-               polyList->addPointAndNormal( verts[ i + firstVert ], norms[ i + firstVert ] );
+               polyList->addPointAndNormal(mVerts[ i + firstVert ], mNorms[ i + firstVert ] );
          }
       }
    }
 
    // add the polys...
-   for ( i = 0; i < primitives.size(); i++ )
+   for ( i = 0; i < mPrimitives.size(); i++ )
    {
-      TSDrawPrimitive & draw = primitives[i];
+      TSDrawPrimitive & draw = mPrimitives[i];
       U32 start = draw.start;
 
       AssertFatal( draw.matIndex & TSDrawPrimitive::Indexed,"TSMesh::buildPolyList (1)" );
@@ -386,9 +386,9 @@ bool TSMesh::buildPolyList( S32 frame, AbstractPolyList *polyList, U32 &surfaceK
       {
          for ( S32 j = 0; j < draw.numElements; )
          {
-            U32 idx0 = base + indices[start + j + 0];
-            U32 idx1 = base + indices[start + j + 1];
-            U32 idx2 = base + indices[start + j + 2];
+            U32 idx0 = base + mIndices[start + j + 0];
+            U32 idx1 = base + mIndices[start + j + 1];
+            U32 idx2 = base + mIndices[start + j + 2];
             polyList->begin(material,surfaceKey++);
             polyList->vertex( idx0 );
             polyList->vertex( idx1 );
@@ -402,16 +402,16 @@ bool TSMesh::buildPolyList( S32 frame, AbstractPolyList *polyList, U32 &surfaceK
       {
          AssertFatal( (draw.matIndex & TSDrawPrimitive::TypeMask) == TSDrawPrimitive::Strip,"TSMesh::buildPolyList (2)" );
 
-         U32 idx0 = base + indices[start + 0];
+         U32 idx0 = base + mIndices[start + 0];
          U32 idx1;
-         U32 idx2 = base + indices[start + 1];
+         U32 idx2 = base + mIndices[start + 1];
          U32 * nextIdx = &idx1;
          for ( S32 j = 2; j < draw.numElements; j++ )
          {
             *nextIdx = idx2;
             // nextIdx = (j%2)==0 ? &idx0 : &idx1;
             nextIdx = (U32*) ( (dsize_t)nextIdx ^ (dsize_t)&idx0 ^ (dsize_t)&idx1);
-            idx2 = base + indices[start + j];
+            idx2 = base + mIndices[start + j];
             if ( idx0 == idx1 || idx0 == idx2 || idx1 == idx2 )
                continue;
 
@@ -440,9 +440,9 @@ bool TSMesh::getFeatures( S32 frame, const MatrixF& mat, const VectorF&, ConvexF
    }
 
    // add the polys...
-   for ( i = 0; i < primitives.size(); i++ )
+   for ( i = 0; i < mPrimitives.size(); i++ )
    {
-      TSDrawPrimitive & draw = primitives[i];
+      TSDrawPrimitive & draw = mPrimitives[i];
       U32 start = draw.start;
 
       AssertFatal( draw.matIndex & TSDrawPrimitive::Indexed,"TSMesh::buildPolyList (1)" );
@@ -452,24 +452,24 @@ bool TSMesh::getFeatures( S32 frame, const MatrixF& mat, const VectorF&, ConvexF
       {
          for ( S32 j = 0; j < draw.numElements; j += 3 )
          {
-            PlaneF plane( cf->mVertexList[base + indices[start + j + 0]],
-                          cf->mVertexList[base + indices[start + j + 1]],
-                          cf->mVertexList[base + indices[start + j + 2]]);
+            PlaneF plane( cf->mVertexList[base + mIndices[start + j + 0]],
+                          cf->mVertexList[base + mIndices[start + j + 1]],
+                          cf->mVertexList[base + mIndices[start + j + 2]]);
 
             cf->mFaceList.increment();
 
             ConvexFeature::Face& lastFace = cf->mFaceList.last();
             lastFace.normal = plane;
 
-            lastFace.vertex[0] = base + indices[start + j + 0];
-            lastFace.vertex[1] = base + indices[start + j + 1];
-            lastFace.vertex[2] = base + indices[start + j + 2];
+            lastFace.vertex[0] = base + mIndices[start + j + 0];
+            lastFace.vertex[1] = base + mIndices[start + j + 1];
+            lastFace.vertex[2] = base + mIndices[start + j + 2];
 
             for ( U32 l = 0; l < 3; l++ ) 
             {
                U32 newEdge0, newEdge1;
-               U32 zero = base + indices[start + j + l];
-               U32 one  = base + indices[start + j + ((l+1)%3)];
+               U32 zero = base + mIndices[start + j + l];
+               U32 one  = base + mIndices[start + j + ((l+1)%3)];
                newEdge0 = getMin( zero, one );
                newEdge1 = getMax( zero, one );
                bool found = false;
@@ -496,15 +496,15 @@ bool TSMesh::getFeatures( S32 frame, const MatrixF& mat, const VectorF&, ConvexF
       {
          AssertFatal( (draw.matIndex & TSDrawPrimitive::TypeMask) == TSDrawPrimitive::Strip,"TSMesh::buildPolyList (2)" );
 
-         U32 idx0 = base + indices[start + 0];
+         U32 idx0 = base + mIndices[start + 0];
          U32 idx1;
-         U32 idx2 = base + indices[start + 1];
+         U32 idx2 = base + mIndices[start + 1];
          U32 * nextIdx = &idx1;
          for ( S32 j = 2; j < draw.numElements; j++ )
          {
             *nextIdx = idx2;
             nextIdx = (U32*) ( (dsize_t)nextIdx ^ (dsize_t)&idx0 ^ (dsize_t)&idx1);
-            idx2 = base + indices[start + j];
+            idx2 = base + mIndices[start + j];
             if ( idx0 == idx1 || idx0 == idx2 || idx1 == idx2 )
                continue;
 
@@ -627,7 +627,7 @@ void TSMesh::support( S32 frame, const Point3F &v, F32 *currMaxDP, Point3F *curr
 
 bool TSMesh::castRay( S32 frame, const Point3F & start, const Point3F & end, RayInfo * rayInfo, TSMaterialList* materials )
 {
-   if ( planeNormals.empty() )
+   if ( mPlaneNormals.empty() )
       buildConvexHull(); // if haven't done it yet...
 
    // Keep track of startTime and endTime.  They start out at just under 0 and just over 1, respectively.
@@ -657,15 +657,15 @@ bool TSMesh::castRay( S32 frame, const Point3F & start, const Point3F & end, Ray
    S32 * pplane = &curPlane;
    bool * pfound = &found;
 
-   S32 startPlane = frame * planesPerFrame;
-   for ( S32  i = startPlane; i < startPlane + planesPerFrame; i++ )
+   S32 startPlane = frame * mPlanesPerFrame;
+   for ( S32  i = startPlane; i < startPlane + mPlanesPerFrame; i++ )
    {
       // if start & end outside, no collision
       // if start & end inside, continue
       // if start outside, end inside, or visa versa, find intersection of line with plane
       //    then update intersection of line with hull (using startTime and endTime)
-      F32 dot1 = mDot( planeNormals[i], start ) - planeConstants[i];
-      F32 dot2 = mDot( planeNormals[i], end) - planeConstants[i];
+      F32 dot1 = mDot(mPlaneNormals[i], start ) - mPlaneConstants[i];
+      F32 dot2 = mDot(mPlaneNormals[i], end) - mPlaneConstants[i];
       if ( dot1 * dot2 > 0.0f )
       {
          // same side of the plane...which side -- dot==0 considered inside
@@ -747,10 +747,10 @@ bool TSMesh::castRay( S32 frame, const Point3F & start, const Point3F & end, Ray
    // setup rayInfo
    if ( found && rayInfo )
    {
-      curMaterial       = planeMaterials[ curPlane - startPlane ];
+      curMaterial       = mPlaneMaterials[ curPlane - startPlane ];
 
       rayInfo->t        = (F32)startNum/(F32)startDen; // finally divide...
-      rayInfo->normal   = planeNormals[curPlane];
+      rayInfo->normal   = mPlaneNormals[curPlane];
 
       if (materials && materials->size() > 0)
          rayInfo->material = materials->getMaterialInst( curMaterial );
@@ -785,9 +785,9 @@ bool TSMesh::castRayRendered( S32 frame, const Point3F & start, const Point3F & 
    BaseMatInstance* bestMaterial = NULL;
 	Point3F dir = end - start;
 
-   for ( S32 i = 0; i < primitives.size(); i++ )
+   for ( S32 i = 0; i < mPrimitives.size(); i++ )
    {
-      TSDrawPrimitive & draw = primitives[i];
+      TSDrawPrimitive & draw = mPrimitives[i];
       U32 drawStart = draw.start;
 
       AssertFatal( draw.matIndex & TSDrawPrimitive::Indexed,"TSMesh::castRayRendered (1)" );
@@ -802,9 +802,9 @@ bool TSMesh::castRayRendered( S32 frame, const Point3F & start, const Point3F & 
       {
          for ( S32 j = 0; j < draw.numElements-2; j += 3 )
          {
-            idx0 = indices[drawStart + j + 0];
-            idx1 = indices[drawStart + j + 1];
-            idx2 = indices[drawStart + j + 2];
+            idx0 = mIndices[drawStart + j + 0];
+            idx1 = mIndices[drawStart + j + 1];
+            idx2 = mIndices[drawStart + j + 2];
 
 			   F32 cur_t = 0;
 			   Point2F b;
@@ -828,15 +828,15 @@ bool TSMesh::castRayRendered( S32 frame, const Point3F & start, const Point3F & 
       {
          AssertFatal( (draw.matIndex & TSDrawPrimitive::TypeMask) == TSDrawPrimitive::Strip,"TSMesh::castRayRendered (2)" );
 
-         idx0 = indices[drawStart + 0];
-         idx2 = indices[drawStart + 1];
+         idx0 = mIndices[drawStart + 0];
+         idx2 = mIndices[drawStart + 1];
          U32 * nextIdx = &idx1;
          for ( S32 j = 2; j < draw.numElements; j++ )
          {
             *nextIdx = idx2;
             // nextIdx = (j%2)==0 ? &idx0 : &idx1;
             nextIdx = (U32*) ( (dsize_t)nextIdx ^ (dsize_t)&idx0 ^ (dsize_t)&idx1);
-            idx2 = indices[drawStart + j];
+            idx2 = mIndices[drawStart + j];
             if ( idx0 == idx1 || idx0 == idx2 || idx1 == idx2 )
                continue;
 
@@ -927,35 +927,35 @@ bool TSMesh::addToHull( U32 idx0, U32 idx1, U32 idx2 )
 
    normal.normalize();
    F32 k = mDot( normal, mVertexData.getBase(idx0).vert() );
-   for ( S32 i = 0; i < planeNormals.size(); i++ ) 
+   for ( S32 i = 0; i < mPlaneNormals.size(); i++ )
    {
-      if ( mDot( planeNormals[i], normal ) > 0.99f && mFabs( k-planeConstants[i] ) < 0.01f )
+      if ( mDot(mPlaneNormals[i], normal ) > 0.99f && mFabs( k- mPlaneConstants[i] ) < 0.01f )
          return false;          // this is a repeat...
    }
    // new plane, add it to the list...
-   planeNormals.push_back( normal );
-   planeConstants.push_back( k );
+   mPlaneNormals.push_back( normal );
+   mPlaneConstants.push_back( k );
    return true;
 }
 
 bool TSMesh::buildConvexHull()
 {
    // already done, return without error
-   if ( planeNormals.size() )
+   if (mPlaneNormals.size() )
       return true;
 
    bool error = false;
 
    // should probably only have 1 frame, but just in case...
-   planesPerFrame = 0;
+   mPlanesPerFrame = 0;
    S32 frame, i, j;
    for ( frame = 0; frame < numFrames; frame++ )
    {
       S32 firstVert  = vertsPerFrame * frame;
-      S32 firstPlane = planeNormals.size();
-      for ( i = 0; i < primitives.size(); i++ )
+      S32 firstPlane = mPlaneNormals.size();
+      for ( i = 0; i < mPrimitives.size(); i++ )
       {
-         TSDrawPrimitive & draw = primitives[i];
+         TSDrawPrimitive & draw = mPrimitives[i];
          U32 start = draw.start;
 
          AssertFatal( draw.matIndex & TSDrawPrimitive::Indexed,"TSMesh::buildConvexHull (1)" );
@@ -964,71 +964,71 @@ bool TSMesh::buildConvexHull()
          if ( (draw.matIndex & TSDrawPrimitive::TypeMask) == TSDrawPrimitive::Triangles )
          {
             for ( j = 0;  j < draw.numElements; j += 3 )
-               if ( addToHull(   indices[start + j + 0] + firstVert, 
-                                 indices[start + j + 1] + firstVert, 
-                                 indices[start + j + 2] + firstVert ) && frame == 0 )
-                  planeMaterials.push_back( draw.matIndex & TSDrawPrimitive::MaterialMask );
+               if ( addToHull(   mIndices[start + j + 0] + firstVert, 
+                                 mIndices[start + j + 1] + firstVert, 
+                                 mIndices[start + j + 2] + firstVert ) && frame == 0 )
+				   mPlaneMaterials.push_back( draw.matIndex & TSDrawPrimitive::MaterialMask );
          }
          else
          {
             AssertFatal( (draw.matIndex&TSDrawPrimitive::Strip) == TSDrawPrimitive::Strip,"TSMesh::buildConvexHull (2)" );
 
-            U32 idx0 = indices[start + 0] + firstVert;
+            U32 idx0 = mIndices[start + 0] + firstVert;
             U32 idx1;
-            U32 idx2 = indices[start + 1] + firstVert;
+            U32 idx2 = mIndices[start + 1] + firstVert;
             U32 * nextIdx = &idx1;
             for ( j = 2; j < draw.numElements; j++ )
             {
                *nextIdx = idx2;
 //               nextIdx = (j%2)==0 ? &idx0 : &idx1;
                nextIdx = (U32*) ( (dsize_t)nextIdx ^ (dsize_t)&idx0 ^ (dsize_t)&idx1 );
-               idx2 = indices[start + j] + firstVert;
+               idx2 = mIndices[start + j] + firstVert;
                if ( addToHull( idx0, idx1, idx2 ) && frame == 0 )
-                  planeMaterials.push_back( draw.matIndex & TSDrawPrimitive::MaterialMask );
+				   mPlaneMaterials.push_back( draw.matIndex & TSDrawPrimitive::MaterialMask );
             }
          }
       }
       // make sure all the verts on this frame are inside all the planes
       for ( i = 0; i < vertsPerFrame; i++ )
-         for ( j = firstPlane; j < planeNormals.size(); j++ )
-            if ( mDot( mVertexData.getBase(firstVert + i).vert(), planeNormals[j] ) - planeConstants[j] < 0.01 ) // .01 == a little slack
+         for ( j = firstPlane; j < mPlaneNormals.size(); j++ )
+            if ( mDot( mVertexData.getBase(firstVert + i).vert(), mPlaneNormals[j] ) - mPlaneConstants[j] < 0.01 ) // .01 == a little slack
                error = true;
 
       if ( frame == 0 )
-         planesPerFrame = planeNormals.size();
+		  mPlanesPerFrame = mPlaneNormals.size();
 
-      if ( (frame + 1) * planesPerFrame != planeNormals.size() )
+      if ( (frame + 1) * mPlanesPerFrame != mPlaneNormals.size() )
       {
          // eek, not all frames have same number of planes...
-         while ( (frame + 1) * planesPerFrame > planeNormals.size() )
+         while ( (frame + 1) * mPlanesPerFrame > mPlaneNormals.size() )
          {
             // we're short, duplicate last plane till we match
-            U32 sz = planeNormals.size();
-            planeNormals.increment();
-            planeNormals.last() = planeNormals[sz-1];
-            planeConstants.increment();
-            planeConstants.last() = planeConstants[sz-1];
+            U32 sz = mPlaneNormals.size();
+			mPlaneNormals.increment();
+			mPlaneNormals.last() = mPlaneNormals[sz-1];
+			mPlaneConstants.increment();
+			mPlaneConstants.last() = mPlaneConstants[sz-1];
          }
-         while ( (frame + 1) * planesPerFrame < planeNormals.size() )
+         while ( (frame + 1) * mPlanesPerFrame < mPlaneNormals.size() )
          {
             // harsh -- last frame has more than other frames
             // duplicate last plane in each frame
             for ( S32 k = frame - 1; k >= 0; k-- )
             {
-               planeNormals.insert( k * planesPerFrame + planesPerFrame );
-               planeNormals[k * planesPerFrame + planesPerFrame] = planeNormals[k * planesPerFrame + planesPerFrame - 1];
-               planeConstants.insert( k * planesPerFrame + planesPerFrame );
-               planeConstants[k * planesPerFrame + planesPerFrame] = planeConstants[k * planesPerFrame + planesPerFrame - 1];
+				mPlaneNormals.insert( k * mPlanesPerFrame + mPlanesPerFrame );
+				mPlaneNormals[k * mPlanesPerFrame + mPlanesPerFrame] = mPlaneNormals[k * mPlanesPerFrame + mPlanesPerFrame - 1];
+				mPlaneConstants.insert( k * mPlanesPerFrame + mPlanesPerFrame );
+				mPlaneConstants[k * mPlanesPerFrame + mPlanesPerFrame] = mPlaneConstants[k * mPlanesPerFrame + mPlanesPerFrame - 1];
                if ( k == 0 )
                {
-                  planeMaterials.increment();
-                  planeMaterials.last() = planeMaterials[planeMaterials.size() - 2];
+				   mPlaneMaterials.increment();
+				   mPlaneMaterials.last() = mPlaneMaterials[mPlaneMaterials.size() - 2];
                }
             }
-            planesPerFrame++;
+			mPlanesPerFrame++;
          }
       }
-      AssertFatal( (frame + 1) * planesPerFrame == planeNormals.size(),"TSMesh::buildConvexHull (3)" );
+      AssertFatal( (frame + 1) * mPlanesPerFrame == mPlaneNormals.size(),"TSMesh::buildConvexHull (3)" );
    }
    return !error;
 }
@@ -1051,7 +1051,7 @@ void TSMesh::computeBounds( const MatrixF &transform, Box3F &bounds, S32 frame, 
 
    AssertFatal(!mVertexData.isReady()  || (mVertexData.isReady() && mNumVerts == mVertexData.size() && mNumVerts == vertsPerFrame), "vertex number mismatch");
 
-   if(verts.size() == 0 && mVertexData.isReady() && mVertexData.size() > 0)
+   if(mVerts.size() == 0 && mVertexData.isReady() && mVertexData.size() > 0)
    {
       baseVert = &mVertexData.getBase(0).vert();
       stride = mVertexData.vertSize();
@@ -1066,11 +1066,11 @@ void TSMesh::computeBounds( const MatrixF &transform, Box3F &bounds, S32 frame, 
    }
    else
    {
-      baseVert = verts.address();
+      baseVert = mVerts.address();
       stride = sizeof(Point3F);
 
       if ( frame < 0 )
-         numVerts = verts.size();
+         numVerts = mVerts.size();
       else
       {
          baseVert += frame * vertsPerFrame;
@@ -1131,27 +1131,27 @@ void TSMesh::computeBounds( const Point3F *v, S32 numVerts, S32 stride, const Ma
 S32 TSMesh::getNumPolys() const
 {
    S32 count = 0;
-   for ( S32 i = 0; i < primitives.size(); i++ )
+   for ( S32 i = 0; i < mPrimitives.size(); i++ )
    {
-      switch (primitives[i].matIndex & TSDrawPrimitive::TypeMask)
+      switch (mPrimitives[i].matIndex & TSDrawPrimitive::TypeMask)
       {
          case TSDrawPrimitive::Triangles:
-            count += primitives[i].numElements / 3;
+            count += mPrimitives[i].numElements / 3;
             break;
 
          case TSDrawPrimitive::Fan:
-            count += primitives[i].numElements - 2;
+            count += mPrimitives[i].numElements - 2;
             break;
 
          case TSDrawPrimitive::Strip:
             // Don't count degenerate triangles
-            for ( S32 j = primitives[i].start;
-                  j < primitives[i].start+primitives[i].numElements-2;
+            for ( S32 j = mPrimitives[i].start;
+                  j < mPrimitives[i].start+ mPrimitives[i].numElements-2;
                   j++ )
             {
-               if ((indices[j] != indices[j+1]) &&
-                   (indices[j] != indices[j+2]) &&
-                   (indices[j+1] != indices[j+2]))
+               if ((mIndices[j] != mIndices[j+1]) &&
+                   (mIndices[j] != mIndices[j+2]) &&
+                   (mIndices[j+1] != mIndices[j+2]))
                   count++;
             }
             break;
@@ -1162,12 +1162,12 @@ S32 TSMesh::getNumPolys() const
 
 //-----------------------------------------------------
 
-TSMesh::TSMesh() : meshType( StandardMeshType )
+TSMesh::TSMesh() : mMeshType( StandardMeshType )
 {
-   VECTOR_SET_ASSOCIATION( planeNormals );
-   VECTOR_SET_ASSOCIATION( planeConstants );
-   VECTOR_SET_ASSOCIATION( planeMaterials );
-   parentMesh = -1;
+   VECTOR_SET_ASSOCIATION(mPlaneNormals );
+   VECTOR_SET_ASSOCIATION(mPlaneConstants );
+   VECTOR_SET_ASSOCIATION(mPlaneMaterials );
+   mParentMesh = -1;
 
    mOptTree = NULL;
    mOpMeshInterface = NULL;
@@ -1181,7 +1181,7 @@ TSMesh::TSMesh() : meshType( StandardMeshType )
    mVertSize = 0;
    mVertOffset = 0;
 
-   parentMeshObject = NULL;
+   mParentMeshObject = NULL;
 }
 
 //-----------------------------------------------------
@@ -1326,8 +1326,8 @@ void TSSkinMesh::createSkinBatchData()
    }
    else
    {
-      batchData.initialNorms = norms;
-      batchData.initialVerts = verts;
+      batchData.initialNorms = mNorms;
+      batchData.initialVerts = mVerts;
    }
 
    // Build the batch operations
@@ -1546,10 +1546,10 @@ void TSSkinMesh::computeBounds( const MatrixF &transform, Box3F &bounds, S32 fra
 {
    TORQUE_UNUSED(frame);
 
-   if (verts.size() != 0)
+   if (mVerts.size() != 0)
    {
       // Use unskinned verts
-      TSMesh::computeBounds( verts.address(), verts.size(), sizeof(Point3F), transform, bounds, center, radius );
+      TSMesh::computeBounds(mVerts.address(), mVerts.size(), sizeof(Point3F), transform, bounds, center, radius );
    }
    else if (frame <= 0 && batchData.initialVerts.size() > 0)
    {
@@ -2368,10 +2368,10 @@ void TSMesh::dumpPrimitives(U32 startVertex, U32 startIndex, GFXPrimitive *piArr
    // go through and create PrimitiveInfo array
    GFXPrimitive pInfo;
 
-   U32 primitivesSize = primitives.size();
+   U32 primitivesSize = mPrimitives.size();
    for (U32 i = 0; i < primitivesSize; i++)
    {
-      const TSDrawPrimitive & draw = primitives[i];
+      const TSDrawPrimitive & draw = mPrimitives[i];
 
       GFXPrimitiveType drawType = getDrawType(draw.matIndex >> 30);
 
@@ -2382,7 +2382,7 @@ void TSMesh::dumpPrimitives(U32 startVertex, U32 startIndex, GFXPrimitive *piArr
          pInfo.numPrimitives = draw.numElements / 3;
          pInfo.startIndex = startIndex + draw.start;
          // Use the first index to determine which 16-bit address space we are operating in
-         pInfo.startVertex = (indices[draw.start] & 0xFFFF0000); // TODO: figure out a good solution for this
+         pInfo.startVertex = (mIndices[draw.start] & 0xFFFF0000); // TODO: figure out a good solution for this
          pInfo.minIndex = 0; // minIndex are zero based index relative to startVertex. See @GFXDevice
          pInfo.numVertices = getMin((U32)0x10000, mNumVerts - pInfo.startVertex);
          pInfo.startVertex += startVertex;
@@ -2393,7 +2393,7 @@ void TSMesh::dumpPrimitives(U32 startVertex, U32 startIndex, GFXPrimitive *piArr
          pInfo.numPrimitives = draw.numElements - 2;
          pInfo.startIndex = startIndex + draw.start;
          // Use the first index to determine which 16-bit address space we are operating in
-         pInfo.startVertex = (indices[draw.start] & 0xFFFF0000); // TODO: figure out a good solution for this
+         pInfo.startVertex = (mIndices[draw.start] & 0xFFFF0000); // TODO: figure out a good solution for this
          pInfo.minIndex = 0; // minIndex are zero based index relative to startVertex. See @GFXDevice
          pInfo.numVertices = getMin((U32)0x10000, mNumVerts - pInfo.startVertex);
          pInfo.startVertex += startVertex;
@@ -2406,7 +2406,7 @@ void TSMesh::dumpPrimitives(U32 startVertex, U32 startIndex, GFXPrimitive *piArr
       *piArray++ = pInfo;
    }
 
-   dCopyArray(ibIndices, indices.address(), indices.size());
+   dCopyArray(ibIndices, mIndices.address(), mIndices.size());
 }
 
 void TSMesh::assemble( bool skip )
@@ -2415,7 +2415,7 @@ void TSMesh::assemble( bool skip )
 
    numFrames = tsalloc.get32();
    numMatFrames = tsalloc.get32();
-   parentMesh = tsalloc.get32();
+   mParentMesh = tsalloc.get32();
    tsalloc.get32( (S32*)&mBounds, 6 );
    tsalloc.get32( (S32*)&mCenter, 3 );
    mRadius = (F32)tsalloc.get32();
@@ -2435,51 +2435,51 @@ void TSMesh::assemble( bool skip )
    }
 
    S32 numVerts = tsalloc.get32();
-   S32 *ptr32 = getSharedData32( parentMesh, 3 * numVerts, (S32**)smVertsList.address(), skip );
-   verts.set( (Point3F*)ptr32, numVerts );
+   S32 *ptr32 = getSharedData32(mParentMesh, 3 * numVerts, (S32**)smVertsList.address(), skip );
+   mVerts.set( (Point3F*)ptr32, numVerts );
 
    S32 numTVerts = tsalloc.get32();
-   ptr32 = getSharedData32( parentMesh, 2 * numTVerts, (S32**)smTVertsList.address(), skip );
-   tverts.set( (Point2F*)ptr32, numTVerts );
+   ptr32 = getSharedData32(mParentMesh, 2 * numTVerts, (S32**)smTVertsList.address(), skip );
+   mTverts.set( (Point2F*)ptr32, numTVerts );
 
    if ( TSShape::smReadVersion > 25 )
    {
       numTVerts = tsalloc.get32();
-      ptr32 = getSharedData32( parentMesh, 2 * numTVerts, (S32**)smTVerts2List.address(), skip );
-      tverts2.set( (Point2F*)ptr32, numTVerts );
+      ptr32 = getSharedData32(mParentMesh, 2 * numTVerts, (S32**)smTVerts2List.address(), skip );
+      mTverts2.set( (Point2F*)ptr32, numTVerts );
 
       S32 numVColors = tsalloc.get32();
-      ptr32 = getSharedData32( parentMesh, numVColors, (S32**)smColorsList.address(), skip );
-      colors.set( (ColorI*)ptr32, numVColors );
+      ptr32 = getSharedData32(mParentMesh, numVColors, (S32**)smColorsList.address(), skip );
+      mColors.set( (ColorI*)ptr32, numVColors );
    }
 
    S8 *ptr8;
    if ( TSShape::smReadVersion > 21 && TSMesh::smUseEncodedNormals)
    {
       // we have encoded normals and we want to use them...
-      if ( parentMesh < 0 )
+      if (mParentMesh < 0 )
          tsalloc.getPointer32( numVerts * 3 ); // adva  nce past norms, don't use
-      norms.set( NULL, 0 );
+      mNorms.set( NULL, 0 );
 
-      ptr8 = getSharedData8( parentMesh, numVerts, (S8**)smEncodedNormsList.address(), skip );
-      encodedNorms.set( ptr8, numVerts );
+      ptr8 = getSharedData8(mParentMesh, numVerts, (S8**)smEncodedNormsList.address(), skip );
+      mEncodedNorms.set( ptr8, numVerts );
    }
    else if ( TSShape::smReadVersion > 21 )
    {
       // we have encoded normals but we don't want to use them...
-      ptr32 = getSharedData32( parentMesh, 3 * numVerts, (S32**)smNormsList.address(), skip );
-      norms.set( (Point3F*)ptr32, numVerts );
+      ptr32 = getSharedData32(mParentMesh, 3 * numVerts, (S32**)smNormsList.address(), skip );
+      mNorms.set( (Point3F*)ptr32, numVerts );
 
-      if ( parentMesh < 0 )
+      if (mParentMesh < 0 )
          tsalloc.getPointer8( numVerts ); // advance past encoded normls, don't use
-      encodedNorms.set( NULL, 0 );
+      mEncodedNorms.set( NULL, 0 );
    }
    else
    {
       // no encoded normals...
-      ptr32 = getSharedData32( parentMesh, 3 * numVerts, (S32**)smNormsList.address(), skip );
-      norms.set( (Point3F*)ptr32, numVerts );
-      encodedNorms.set( NULL, 0 );
+      ptr32 = getSharedData32(mParentMesh, 3 * numVerts, (S32**)smNormsList.address(), skip );
+      mNorms.set( (Point3F*)ptr32, numVerts );
+      mEncodedNorms.set( NULL, 0 );
    }
 
    // copy the primitives and indices...how we do this depends on what
@@ -2553,8 +2553,8 @@ void TSMesh::assemble( bool skip )
    AssertFatal(chkPrim==szPrimOut && chkInd==szIndOut,"TSMesh::primitive conversion");
 
    // store output
-   primitives.set(primOut, szPrimOut);
-   indices.set(indOut, szIndOut);
+   mPrimitives.set(primOut, szPrimOut);
+   mIndices.set(indOut, szIndOut);
 
    // delete temporary arrays if necessary
    if (deleteInputArrays)
@@ -2569,7 +2569,7 @@ void TSMesh::assemble( bool skip )
 
    vertsPerFrame = tsalloc.get32();
    U32 flags = (U32)tsalloc.get32();
-   if ( encodedNorms.size() )
+   if ( mEncodedNorms.size() )
       flags |= UseEncodedNormals;
    
    setFlags( flags );
@@ -2577,9 +2577,9 @@ void TSMesh::assemble( bool skip )
    // Set color & tvert2 flags if we have an old version
    if (TSShape::smReadVersion < 27)
    {
-      if (colors.size() > 0) setFlags(HasColor);
-      if (tverts2.size() > 0) setFlags(HasTVert2);
-      mNumVerts = verts.size();
+      if (mColors.size() > 0) setFlags(HasColor);
+      if (mTverts2.size() > 0) setFlags(HasTVert2);
+      mNumVerts = mVerts.size();
    }
 
    tsalloc.checkGuard();
@@ -2587,7 +2587,7 @@ void TSMesh::assemble( bool skip )
    if ( tsalloc.allocShape32( 0 ) && TSShape::smReadVersion < 19 )
       computeBounds(); // only do this if we copied the data...
 
-   createTangents(verts, norms);
+   createTangents(mVerts, mNorms);
 }
 
 void TSMesh::disassemble()
@@ -2596,7 +2596,7 @@ void TSMesh::disassemble()
 
    tsalloc.set32( numFrames );
    tsalloc.set32( numMatFrames );
-   tsalloc.set32( parentMesh );
+   tsalloc.set32(mParentMesh);
    tsalloc.copyToBuffer32( (S32*)&mBounds, 6 );
    tsalloc.copyToBuffer32( (S32*)&mCenter, 3 );
    tsalloc.set32( (S32)mRadius );
@@ -2636,39 +2636,39 @@ void TSMesh::disassemble()
    else
    {
       // verts...
-      tsalloc.set32(verts.size());
-      if (parentMesh < 0)
-         tsalloc.copyToBuffer32((S32*)verts.address(), 3 * verts.size()); // if no parent mesh, then save off our verts
+      tsalloc.set32(mVerts.size());
+      if (mParentMesh < 0)
+         tsalloc.copyToBuffer32((S32*)mVerts.address(), 3 * mVerts.size()); // if no parent mesh, then save off our verts
 
       // tverts...
-      tsalloc.set32(tverts.size());
-      if (parentMesh < 0)
-         tsalloc.copyToBuffer32((S32*)tverts.address(), 2 * tverts.size()); // if no parent mesh, then save off our tverts
+      tsalloc.set32(mTverts.size());
+      if (mParentMesh < 0)
+         tsalloc.copyToBuffer32((S32*)mTverts.address(), 2 * mTverts.size()); // if no parent mesh, then save off our tverts
 
       if (TSShape::smVersion > 25)
       {
          // tverts2...
-         tsalloc.set32(tverts2.size());
-         if (parentMesh < 0)
-            tsalloc.copyToBuffer32((S32*)tverts2.address(), 2 * tverts2.size()); // if no parent mesh, then save off our tverts
+         tsalloc.set32(mTverts2.size());
+         if (mParentMesh < 0)
+            tsalloc.copyToBuffer32((S32*)mTverts2.address(), 2 * mTverts2.size()); // if no parent mesh, then save off our tverts
 
                                                                                  // colors
-         tsalloc.set32(colors.size());
-         if (parentMesh < 0)
-            tsalloc.copyToBuffer32((S32*)colors.address(), colors.size()); // if no parent mesh, then save off our tverts
+         tsalloc.set32(mColors.size());
+         if (mParentMesh < 0)
+            tsalloc.copyToBuffer32((S32*)mColors.address(), mColors.size()); // if no parent mesh, then save off our tverts
       }
 
       // norms...
-      if (parentMesh < 0) // if no parent mesh, then save off our norms
-         tsalloc.copyToBuffer32((S32*)norms.address(), 3 * norms.size()); // norms.size()==verts.size() or error...
+      if (mParentMesh < 0) // if no parent mesh, then save off our norms
+         tsalloc.copyToBuffer32((S32*)mNorms.address(), 3 * mNorms.size()); // norms.size()==verts.size() or error...
 
                                                                           // encoded norms...
-      if (parentMesh < 0)
+      if (mParentMesh < 0)
       {
          // if no parent mesh, compute encoded normals and copy over
-         for (S32 i = 0; i < norms.size(); i++)
+         for (S32 i = 0; i < mNorms.size(); i++)
          {
-            U8 normIdx = encodedNorms.size() ? encodedNorms[i] : encodeNormal(norms[i]);
+            U8 normIdx = mEncodedNorms.size() ? mEncodedNorms[i] : encodeNormal(mNorms[i]);
             tsalloc.copyToBuffer8((S8*)&normIdx, 1);
          }
       }
@@ -2676,17 +2676,17 @@ void TSMesh::disassemble()
 
    // optimize triangle draw order during disassemble
    {
-      FrameTemp<TriListOpt::IndexType> tmpIdxs(indices.size());
-      for ( S32 i = 0; i < primitives.size(); i++ )
+      FrameTemp<TriListOpt::IndexType> tmpIdxs(mIndices.size());
+      for ( S32 i = 0; i < mPrimitives.size(); i++ )
       {
-         const TSDrawPrimitive& prim = primitives[i];
+         const TSDrawPrimitive& prim = mPrimitives[i];
 
          // only optimize triangle lists (strips and fans are assumed to be already optimized)
          if ( (prim.matIndex & TSDrawPrimitive::TypeMask) == TSDrawPrimitive::Triangles )
          {
-            TriListOpt::OptimizeTriangleOrdering(verts.size(), prim.numElements,
-               indices.address() + prim.start, tmpIdxs.address());
-            dCopyArray(indices.address() + prim.start, tmpIdxs.address(), 
+            TriListOpt::OptimizeTriangleOrdering(mVerts.size(), prim.numElements,
+				mIndices.address() + prim.start, tmpIdxs.address());
+            dCopyArray(mIndices.address() + prim.start, tmpIdxs.address(),
                prim.numElements);
          }
       }
@@ -2695,32 +2695,32 @@ void TSMesh::disassemble()
    if (TSShape::smVersion > 25)
    {
       // primitives...
-      tsalloc.set32( primitives.size() );
-      tsalloc.copyToBuffer32((S32*)primitives.address(),3*primitives.size());
+      tsalloc.set32(mPrimitives.size() );
+      tsalloc.copyToBuffer32((S32*)mPrimitives.address(),3* mPrimitives.size());
 
       // indices...
-      tsalloc.set32(indices.size());
-      tsalloc.copyToBuffer32((S32*)indices.address(),indices.size());
+      tsalloc.set32(mIndices.size());
+      tsalloc.copyToBuffer32((S32*)mIndices.address(),mIndices.size());
    }
    else
    {
       // primitives
-      tsalloc.set32( primitives.size() );
-      for (S32 i=0; i<primitives.size(); i++)
+      tsalloc.set32(mPrimitives.size() );
+      for (S32 i=0; i<mPrimitives.size(); i++)
       {
-         S16 start = (S16)primitives[i].start;
-         S16 numElements = (S16)primitives[i].numElements;
+         S16 start = (S16)mPrimitives[i].start;
+         S16 numElements = (S16)mPrimitives[i].numElements;
 
          tsalloc.copyToBuffer16(&start, 1);
          tsalloc.copyToBuffer16(&numElements, 1);
-         tsalloc.copyToBuffer32(&(primitives[i].matIndex), 1);
+         tsalloc.copyToBuffer32(&(mPrimitives[i].matIndex), 1);
       }
 
       // indices
-      tsalloc.set32(indices.size());
-      Vector<S16> s16_indices(indices.size());
-      for (S32 i=0; i<indices.size(); i++)
-         s16_indices.push_back((S16)indices[i]);
+      tsalloc.set32(mIndices.size());
+      Vector<S16> s16_indices(mIndices.size());
+      for (S32 i=0; i<mIndices.size(); i++)
+         s16_indices.push_back((S16)mIndices[i]);
       tsalloc.copyToBuffer16(s16_indices.address(), s16_indices.size());
    }
 
@@ -2760,76 +2760,76 @@ void TSSkinMesh::assemble( bool skip )
    {
       sz = tsalloc.get32();
       S32 numVerts = sz;
-      ptr32 = getSharedData32(parentMesh, 3 * numVerts, (S32**)smVertsList.address(), skip);
+      ptr32 = getSharedData32(mParentMesh, 3 * numVerts, (S32**)smVertsList.address(), skip);
       batchData.initialVerts.set((Point3F*)ptr32, sz);
 
       S8 * ptr8;
       if (TSShape::smReadVersion > 21 && TSMesh::smUseEncodedNormals)
       {
          // we have encoded normals and we want to use them...
-         if (parentMesh < 0)
+         if (mParentMesh < 0)
             tsalloc.getPointer32(numVerts * 3); // advance past norms, don't use
          batchData.initialNorms.set(NULL, 0);
 
-         ptr8 = getSharedData8(parentMesh, numVerts, (S8**)smEncodedNormsList.address(), skip);
-         encodedNorms.set(ptr8, numVerts);
+         ptr8 = getSharedData8(mParentMesh, numVerts, (S8**)smEncodedNormsList.address(), skip);
+         mEncodedNorms.set(ptr8, numVerts);
          // Note: we don't set the encoded normals flag because we handle them in updateSkin and
          //       hide the fact that we are using them from base class (TSMesh)
       }
       else if (TSShape::smReadVersion > 21)
       {
          // we have encoded normals but we don't want to use them...
-         ptr32 = getSharedData32(parentMesh, 3 * numVerts, (S32**)smNormsList.address(), skip);
+         ptr32 = getSharedData32(mParentMesh, 3 * numVerts, (S32**)smNormsList.address(), skip);
          batchData.initialNorms.set((Point3F*)ptr32, numVerts);
 
-         if (parentMesh < 0)
+         if (mParentMesh < 0)
             tsalloc.getPointer8(numVerts); // advance past encoded normls, don't use
 
-         encodedNorms.set(NULL, 0);
+		 mEncodedNorms.set(NULL, 0);
       }
       else
       {
          // no encoded normals...
-         ptr32 = getSharedData32(parentMesh, 3 * numVerts, (S32**)smNormsList.address(), skip);
+         ptr32 = getSharedData32(mParentMesh, 3 * numVerts, (S32**)smNormsList.address(), skip);
          batchData.initialNorms.set((Point3F*)ptr32, numVerts);
-         encodedNorms.set(NULL, 0);
+		 mEncodedNorms.set(NULL, 0);
       }
 
       // Sometimes we'll have a mesh with 0 verts but initialVerts is set,
       // so set these accordingly
-      if (verts.size() == 0)
+      if (mVerts.size() == 0)
       {
-         verts = batchData.initialVerts;
+		  mVerts = batchData.initialVerts;
       }
 
-      if (norms.size() == 0)
+      if (mNorms.size() == 0)
       {
-         norms = batchData.initialNorms;
+		  mNorms = batchData.initialNorms;
       }
    }
    else
    {
       // Set from the mesh data
-      batchData.initialVerts = verts;
-      batchData.initialNorms = norms;
+      batchData.initialVerts = mVerts;
+      batchData.initialNorms = mNorms;
    }
 
    sz = tsalloc.get32();
-   ptr32 = getSharedData32( parentMesh, 16 * sz, (S32**)smInitTransformList.address(), skip );
+   ptr32 = getSharedData32(mParentMesh, 16 * sz, (S32**)smInitTransformList.address(), skip );
    batchData.initialTransforms.set( ptr32, sz );
 
    sz = tsalloc.get32();
-   ptr32 = getSharedData32( parentMesh, sz, (S32**)smVertexIndexList.address(), skip );
+   ptr32 = getSharedData32(mParentMesh, sz, (S32**)smVertexIndexList.address(), skip );
    vertexIndex.set( ptr32, sz );
 
-   ptr32 = getSharedData32( parentMesh, sz, (S32**)smBoneIndexList.address(), skip );
+   ptr32 = getSharedData32(mParentMesh, sz, (S32**)smBoneIndexList.address(), skip );
    boneIndex.set( ptr32, sz );
 
-   ptr32 = getSharedData32( parentMesh, sz, (S32**)smWeightList.address(), skip );
+   ptr32 = getSharedData32(mParentMesh, sz, (S32**)smWeightList.address(), skip );
    weight.set( (F32*)ptr32, sz );
 
    sz = tsalloc.get32();
-   ptr32 = getSharedData32( parentMesh, sz, (S32**)smNodeIndexList.address(), skip );
+   ptr32 = getSharedData32(mParentMesh, sz, (S32**)smNodeIndexList.address(), skip );
    batchData.nodeIndex.set( ptr32, sz );
 
    tsalloc.checkGuard();
@@ -2883,24 +2883,24 @@ void TSSkinMesh::disassemble()
    {
       tsalloc.set32(batchData.initialVerts.size());
       // if we have no parent mesh, then save off our verts & norms
-      if (parentMesh < 0)
+      if (mParentMesh < 0)
       {
-         tsalloc.copyToBuffer32((S32*)verts.address(), 3 * verts.size());
+         tsalloc.copyToBuffer32((S32*)mVerts.address(), 3 * mVerts.size());
 
          // no longer do this here...let tsmesh handle this
-         tsalloc.copyToBuffer32((S32*)norms.address(), 3 * norms.size());
+         tsalloc.copyToBuffer32((S32*)mNorms.address(), 3 * mNorms.size());
 
          // if no parent mesh, compute encoded normals and copy over
-         for (S32 i = 0; i < norms.size(); i++)
+         for (S32 i = 0; i < mNorms.size(); i++)
          {
-            U8 normIdx = encodedNorms.size() ? encodedNorms[i] : encodeNormal(norms[i]);
+            U8 normIdx = mEncodedNorms.size() ? mEncodedNorms[i] : encodeNormal(mNorms[i]);
             tsalloc.copyToBuffer8((S8*)&normIdx, 1);
          }
       }
    }
 
    tsalloc.set32( batchData.initialTransforms.size() );
-   if ( parentMesh < 0 )
+   if (mParentMesh < 0 )
       tsalloc.copyToBuffer32( (S32*)batchData.initialTransforms.address(), batchData.initialTransforms.size() * 16 );
 
    if (!mVertexData.isReady())
@@ -2920,7 +2920,7 @@ void TSSkinMesh::disassemble()
 
    if (TSShape::smVersion < 27)
    {
-      if (parentMesh < 0)
+      if (mParentMesh < 0)
       {
          tsalloc.copyToBuffer32((S32*)vertexIndex.address(), vertexIndex.size());
 
@@ -2931,7 +2931,7 @@ void TSSkinMesh::disassemble()
    }
 
    tsalloc.set32( batchData.nodeIndex.size() );
-   if ( parentMesh < 0 )
+   if (mParentMesh < 0 )
       tsalloc.copyToBuffer32( (S32*)batchData.nodeIndex.address(), batchData.nodeIndex.size() );
 
    tsalloc.setGuard();
@@ -2939,7 +2939,7 @@ void TSSkinMesh::disassemble()
 
 TSSkinMesh::TSSkinMesh()
 {
-   meshType = SkinMeshType;
+   mMeshType = SkinMeshType;
    batchData.initialized = false;
    maxBones = -1;
 }
@@ -2958,9 +2958,9 @@ inline void TSMesh::findTangent( U32 index1,
    const Point3F &v2 = _verts[index2];
    const Point3F &v3 = _verts[index3];
 
-   const Point2F &w1 = tverts[index1];
-   const Point2F &w2 = tverts[index2];
-   const Point2F &w3 = tverts[index3];
+   const Point2F &w1 = mTverts[index1];
+   const Point2F &w2 = mTverts[index2];
+   const Point2F &w3 = mTverts[index3];
 
    F32 x1 = v2.x - v1.x;
    F32 x2 = v3.x - v1.x;
@@ -3025,17 +3025,17 @@ void TSMesh::createTangents(const Vector<Point3F> &_verts, const Vector<Point3F>
    Point3F *tan1 = tan0.address() + numVerts;
    dMemset( tan0.address(), 0, sizeof(Point3F) * 2 * numVerts );
    
-   U32   numPrimatives = primitives.size();
+   U32   numPrimatives = mPrimitives.size();
 
    for (S32 i = 0; i < numPrimatives; i++ )
    {
-      const TSDrawPrimitive & draw = primitives[i];
+      const TSDrawPrimitive & draw = mPrimitives[i];
       GFXPrimitiveType drawType = getDrawType( draw.matIndex >> 30 );
 
       U32 p1Index = 0;
       U32 p2Index = 0;
 
-      U32 *baseIdx = &indices[draw.start];
+      U32 *baseIdx = &mIndices[draw.start];
 
       const U32 numElements = (U32)draw.numElements;
 
@@ -3066,7 +3066,7 @@ void TSMesh::createTangents(const Vector<Point3F> &_verts, const Vector<Point3F>
       }
    }
 
-   tangents.setSize( numVerts );
+   mTangents.setSize( numVerts );
 
    // fill out final info from accumulated basis data
    for( U32 i = 0; i < numVerts; i++ )
@@ -3077,12 +3077,12 @@ void TSMesh::createTangents(const Vector<Point3F> &_verts, const Vector<Point3F>
 
       Point3F tempPt = t - n * mDot( n, t );
       tempPt.normalize();
-      tangents[i] = tempPt;
+	  mTangents[i] = tempPt;
 
       Point3F cp;
       mCross( n, t, &cp );
       
-      tangents[i].w = (mDot( cp, b ) < 0.0f) ? -1.0f : 1.0f;
+	  mTangents[i].w = (mDot( cp, b ) < 0.0f) ? -1.0f : 1.0f;
    }
 }
 
@@ -3090,7 +3090,7 @@ void TSMesh::convertToVertexData()
 {
    if (!mVertexData.isReady())
    {
-      _convertToVertexData(mVertexData, verts, norms);
+      _convertToVertexData(mVertexData, mVerts, mNorms);
    }
 }
 
@@ -3111,39 +3111,39 @@ void TSSkinMesh::convertToVertexData()
 
 void TSMesh::copySourceVertexDataFrom(const TSMesh* srcMesh)
 {
-   verts = srcMesh->verts;
-   tverts = srcMesh->tverts;
-   norms = srcMesh->norms;
-   colors = srcMesh->colors;
-   tverts2 = srcMesh->tverts2;
+   mVerts = srcMesh->mVerts;
+   mTverts = srcMesh->mTverts;
+   mNorms = srcMesh->mNorms;
+   mColors = srcMesh->mColors;
+   mTverts2 = srcMesh->mTverts2;
 
-   if (verts.size() == 0)
+   if (mVerts.size() == 0)
    {
       bool hasTVert2 = srcMesh->getHasTVert2();
       bool hasColor = srcMesh->getHasColor();
 
-      verts.setSize(srcMesh->mNumVerts);
-      tverts.setSize(srcMesh->mNumVerts);
-      norms.setSize(srcMesh->mNumVerts);
+	  mVerts.setSize(srcMesh->mNumVerts);
+      mTverts.setSize(srcMesh->mNumVerts);
+      mNorms.setSize(srcMesh->mNumVerts);
 
       if (hasColor)
-         colors.setSize(mNumVerts);
+         mColors.setSize(mNumVerts);
       if (hasTVert2)
-         tverts2.setSize(mNumVerts);
+         mTverts2.setSize(mNumVerts);
 
       // Fill arrays
       for (U32 i = 0; i < mNumVerts; i++)
       {
          const __TSMeshVertexBase &cv = srcMesh->mVertexData.getBase(i);
          const __TSMeshVertex_3xUVColor &cvc = srcMesh->mVertexData.getColor(i);
-         verts[i] = cv.vert();
-         tverts[i] = cv.tvert();
-         norms[i] = cv.normal();
+         mVerts[i] = cv.vert();
+         mTverts[i] = cv.tvert();
+         mNorms[i] = cv.normal();
 
          if (hasColor)
-            cvc.color().getColor(&colors[i]);
+            cvc.color().getColor(&mColors[i]);
          if (hasTVert2)
-            tverts2[i] = cvc.tvert2();
+            mTverts2[i] = cvc.tvert2();
       }
    }
 }
@@ -3173,21 +3173,21 @@ void TSSkinMesh::copySourceVertexDataFrom(const TSMesh* srcMesh)
 
 U32 TSMesh::getNumVerts()
 {
-   return mVertexData.isReady() ? mNumVerts : verts.size();
+   return mVertexData.isReady() ? mNumVerts : mVerts.size();
 }
 
 void TSMesh::_convertToVertexData(TSMeshVertexArray &outArray, const Vector<Point3F> &_verts, const Vector<Point3F> &_norms)
 {
    // Update tangents list
-   createTangents(verts, norms);
+   createTangents(mVerts, mNorms);
 
    AssertFatal(_verts.size() == mNumVerts, "vert count mismatch");
-   AssertFatal(!getHasColor() || colors.size() == _verts.size(), "Vector of color elements should be the same size as other vectors");
-   AssertFatal(!getHasTVert2() || tverts2.size() == _verts.size(), "Vector of tvert2 elements should be the same size as other vectors");
+   AssertFatal(!getHasColor() || mColors.size() == _verts.size(), "Vector of color elements should be the same size as other vectors");
+   AssertFatal(!getHasTVert2() || mTverts2.size() == _verts.size(), "Vector of tvert2 elements should be the same size as other vectors");
 
    AssertFatal(!outArray.isReady(), "Mesh already converted to aligned data! Re-check code!");
    AssertFatal(_verts.size() == _norms.size() &&
-      _verts.size() == tangents.size(),
+      _verts.size() == mTangents.size(),
       "Vectors: verts, norms, tangents must all be the same size");
    AssertFatal(mVertSize == outArray.vertSize(), "Size inconsistency");
 
@@ -3206,18 +3206,18 @@ void TSMesh::_convertToVertexData(TSMeshVertexArray &outArray, const Vector<Poin
       __TSMeshVertexBase &v = outArray.getBase(i);
       v.vert(_verts[i]);
       v.normal(_norms[i]);
-      v.tangent(tangents[i]);
+      v.tangent(mTangents[i]);
 
-      if (i < tverts.size())
-         v.tvert(tverts[i]);
+      if (i < mTverts.size())
+         v.tvert(mTverts[i]);
 
       if (hasTVert2 || hasColor)
       {
          __TSMeshVertex_3xUVColor &vc = outArray.getColor(i);
-         if (hasTVert2 && i < tverts2.size())
-            vc.tvert2(tverts2[i]);
-         if (hasColor && i < colors.size())
-            vc.color(colors[i]);
+         if (hasTVert2 && i < mTverts2.size())
+            vc.tvert2(mTverts2[i]);
+         if (hasColor && i < mColors.size())
+            vc.color(mColors[i]);
       }
 
       // NOTE: skin verts are set later on for the skinned mesh, otherwise we'll set the default (i.e. 0) if we need one for a rigid mesh
@@ -3231,7 +3231,7 @@ void TSMesh::_convertToVertexData(TSMeshVertexArray &outArray, const Vector<Poin
 
 void TSMesh::makeEditable()
 {
-   bool hasVerts = verts.size() != 0;
+   bool hasVerts = mVerts.size() != 0;
 
    if(mVertexData.isReady() && !hasVerts)
    {
@@ -3282,7 +3282,7 @@ void TSSkinMesh::addWeightsFromVertexBuffer()
 
 void TSSkinMesh::makeEditable()
 {
-   bool hasVerts = verts.size() != 0;
+   bool hasVerts = mVerts.size() != 0;
 
    // Reconstruct bone mapping
    if (mVertexData.isReady() && !hasVerts)
@@ -3307,36 +3307,36 @@ void TSSkinMesh::makeEditable()
 
 void TSMesh::clearEditable()
 {
-   if (verts.size() == 0)
+   if (mVerts.size() == 0)
       return;
 
-   if (colors.empty())
+   if (mColors.empty())
       clearFlags(HasColor);
    else
       setFlags(HasColor);
 
-   if (tverts2.empty())
+   if (mTverts2.empty())
       clearFlags(HasTVert2);
    else
       setFlags(HasTVert2);
 
-   verts.free_memory();
-   norms.free_memory();
-   tangents.free_memory();
-   tverts.free_memory();
-   tverts2.free_memory();
-   colors.free_memory();
+   mVerts.free_memory();
+   mNorms.free_memory();
+   mTangents.free_memory();
+   mTverts.free_memory();
+   mTverts2.free_memory();
+   mColors.free_memory();
 }
 
 void TSMesh::updateMeshFlags()
 {
    // Make sure flags are correct
-   if (colors.empty())
+   if (mColors.empty())
       clearFlags(HasColor);
    else
       setFlags(HasColor);
 
-   if (tverts2.empty())
+   if (mTverts2.empty())
       clearFlags(HasTVert2);
    else
       setFlags(HasTVert2);

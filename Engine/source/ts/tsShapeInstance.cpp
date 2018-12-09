@@ -307,16 +307,19 @@ void TSShapeInstance::reSkin( String newBaseName, String oldBaseName )
    {
       // Try changing base
       const String &pName = materialNames[i];
-      if ( pName.compare( oldBaseName, oldBaseNameLength, String::NoCase ) == 0 )
-      {
-         String newName( pName );
-         newName.replace( 0, oldBaseNameLength, newBaseName );
-         pMatList->renameMaterial( i, newName );
-      }
+	  String newName( String::ToLower(pName) );
+	  newName.replace( String::ToLower(oldBaseName), String::ToLower(newBaseName) );
+	  pMatList->renameMaterial( i, newName );
    }
 
    // Initialize the material instances
    initMaterialList();
+}
+
+void TSShapeInstance::resetMaterialList()
+{
+	TSMaterialList* oMatlist = mShape->materialList;
+	setMaterialList(oMatlist);
 }
 
 //-------------------------------------------------------------------------------------
@@ -662,7 +665,7 @@ S32 TSShapeInstance::setDetailFromDistance( const SceneRenderState *state, F32 s
 
    // We're inlining SceneRenderState::projectRadius here to 
    // skip the unnessasary divide by zero protection.
-   F32 pixelRadius = ( mShape->radius / scaledDistance ) * state->getWorldToScreenScale().y * pixelScale;
+   F32 pixelRadius = ( mShape->mRadius / scaledDistance ) * state->getWorldToScreenScale().y * pixelScale;
    F32 pixelSize = pixelRadius * smDetailAdjust;
 
    if ( pixelSize < smSmallestVisiblePixelSize ) {

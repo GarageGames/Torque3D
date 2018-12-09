@@ -145,7 +145,7 @@ void CompoundUndoAction::onDeleteNotify( SimObject* object )
    Parent::onDeleteNotify( object );
 }
 
-DefineConsoleMethod( CompoundUndoAction, addAction, void, (const char * objName), , "addAction( UndoAction )" )
+DefineEngineMethod( CompoundUndoAction, addAction, void, (const char * objName), , "addAction( UndoAction )" )
 {
    UndoAction *action;
    if ( Sim::findObject( objName, action ) )
@@ -206,7 +206,7 @@ UndoManager& UndoManager::getDefaultManager()
    return *defaultMan;
 }
 
-DefineConsoleMethod(UndoManager, clearAll, void, (),, "Clears the undo manager.")
+DefineEngineMethod(UndoManager, clearAll, void, (),, "Clears the undo manager.")
 {
    object->clearAll();
 }
@@ -344,7 +344,7 @@ void UndoManager::redo()
    (*react).redo();
 }
 
-DefineConsoleMethod(UndoManager, getUndoCount, S32, (),, "")
+DefineEngineMethod(UndoManager, getUndoCount, S32, (),, "")
 {
    return object->getUndoCount();
 }
@@ -354,7 +354,7 @@ S32 UndoManager::getUndoCount()
    return mUndoStack.size();
 }
 
-DefineConsoleMethod(UndoManager, getUndoName, const char*, (S32 index), , "(index)")
+DefineEngineMethod(UndoManager, getUndoName, const char*, (S32 index), , "(index)")
 {
    return object->getUndoName(index);
 }
@@ -367,7 +367,7 @@ const char* UndoManager::getUndoName(S32 index)
    return NULL;
 }
 
-DefineConsoleMethod(UndoManager, getUndoAction, S32, (S32 index), , "(index)")
+DefineEngineMethod(UndoManager, getUndoAction, S32, (S32 index), , "(index)")
 {
    UndoAction * action = object->getUndoAction(index);
    if ( !action )
@@ -386,7 +386,7 @@ UndoAction* UndoManager::getUndoAction(S32 index)
    return NULL;
 }
 
-DefineConsoleMethod(UndoManager, getRedoCount, S32, (),, "")
+DefineEngineMethod(UndoManager, getRedoCount, S32, (),, "")
 {
    return object->getRedoCount();
 }
@@ -396,7 +396,7 @@ S32 UndoManager::getRedoCount()
    return mRedoStack.size();
 }
 
-DefineConsoleMethod(UndoManager, getRedoName, const char*, (S32 index), , "(index)")
+DefineEngineMethod(UndoManager, getRedoName, const char*, (S32 index), , "(index)")
 {
    return object->getRedoName(index);
 }
@@ -409,7 +409,7 @@ const char* UndoManager::getRedoName(S32 index)
    return NULL;
 }
 
-DefineConsoleMethod(UndoManager, getRedoAction, S32, (S32 index), , "(index)")
+DefineEngineMethod(UndoManager, getRedoAction, S32, (S32 index), , "(index)")
 {
    UndoAction * action = object->getRedoAction(index);
 
@@ -501,7 +501,7 @@ void UndoManager::popCompound( bool discard )
 }
 
 //-----------------------------------------------------------------------------
-DefineConsoleMethod(UndoAction, addToManager, void, (const char * undoManager), (""), "action.addToManager([undoManager])")
+DefineEngineMethod(UndoAction, addToManager, void, (const char * undoManager), (""), "action.addToManager([undoManager])")
 {
    UndoManager *theMan = NULL;
    if (!String::isEmpty(undoManager))
@@ -515,55 +515,57 @@ DefineConsoleMethod(UndoAction, addToManager, void, (const char * undoManager), 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( UndoAction, undo, void, (),, "() - Undo action contained in undo." )
+DefineEngineMethod( UndoAction, undo, void, (),, "() - Undo action contained in undo." )
 {
    object->undo();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( UndoAction, redo, void, (),, "() - Reo action contained in undo." )
+DefineEngineMethod( UndoAction, redo, void, (),, "() - Reo action contained in undo." )
 {
    object->redo();
 }
 
 //-----------------------------------------------------------------------------
-DefineConsoleMethod(UndoManager, undo, void, (),, "UndoManager.undo();")
+DefineEngineMethod(UndoManager, undo, void, (),, "UndoManager.undo();")
 {
    object->undo();
 }
 
 //-----------------------------------------------------------------------------
-DefineConsoleMethod(UndoManager, redo, void, (),, "UndoManager.redo();")
+DefineEngineMethod(UndoManager, redo, void, (),, "UndoManager.redo();")
 {
    object->redo();
 }
 
 //-----------------------------------------------------------------------------
-DefineConsoleMethod(UndoManager, getNextUndoName, const char *, (),, "UndoManager.getNextUndoName();")
+DefineEngineMethod(UndoManager, getNextUndoName, const char *, (),, "UndoManager.getNextUndoName();")
 {
    const char *name = object->getNextUndoName();
    if(!name)
       return NULL;
-   char *ret = Con::getReturnBuffer(dStrlen(name) + 1);
-   dStrcpy(ret, name);
+   dsize_t retLen = dStrlen(name) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, name, retLen);
    return ret;
 }
 
 //-----------------------------------------------------------------------------
-DefineConsoleMethod(UndoManager, getNextRedoName, const char *, (),, "UndoManager.getNextRedoName();")
+DefineEngineMethod(UndoManager, getNextRedoName, const char *, (),, "UndoManager.getNextRedoName();")
 {
    const char *name = object->getNextRedoName();
    if(!name)
       return NULL;
-   char *ret = Con::getReturnBuffer(dStrlen(name) + 1);
-   dStrcpy(ret, name);
+   dsize_t retLen = dStrlen(name) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, name, retLen);
    return ret;
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( UndoManager, pushCompound, const char*, ( String name ), ("\"\""), "( string name=\"\" ) - Push a CompoundUndoAction onto the compound stack for assembly." )
+DefineEngineMethod( UndoManager, pushCompound, const char*, ( String name ), ("\"\""), "( string name=\"\" ) - Push a CompoundUndoAction onto the compound stack for assembly." )
 {
       
    CompoundUndoAction* action = object->pushCompound( name );
@@ -578,7 +580,7 @@ DefineConsoleMethod( UndoManager, pushCompound, const char*, ( String name ), ("
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( UndoManager, popCompound, void, ( bool discard ), (false), "( bool discard=false ) - Pop the current CompoundUndoAction off the stack." )
+DefineEngineMethod( UndoManager, popCompound, void, ( bool discard ), (false), "( bool discard=false ) - Pop the current CompoundUndoAction off the stack." )
 {
    if( !object->getCompoundStackDepth() )
    {

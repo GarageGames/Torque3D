@@ -37,7 +37,7 @@
 #import "core/strings/stringFunctions.h"
 #import "console/console.h"
 #import "platform/profiler.h"
-#import "cinterface/cinterface.h"
+#import "cinterface/c_controlInterface.h"
 #import "core/volume.h"
 
 //TODO: file io still needs some work...
@@ -894,7 +894,7 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
          {
             char child[1024];
             if ( (basePath[dStrlen(basePath) - 1]) == '/')
-               dStrcpy (child, d->d_name);
+               dStrcpy (child, d->d_name, 1024);
             else
                dSprintf(child, 1024, "/%s", d->d_name);
             if (currentDepth < recurseDepth || recurseDepth == -1)

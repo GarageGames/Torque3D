@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -239,7 +239,7 @@ WatchJoystick(SDL_Joystick * joystick)
 int
 main(int argc, char *argv[])
 {
-    const char *name;
+    const char *name, *type;
     int i;
     SDL_Joystick *joystick;
 
@@ -268,12 +268,46 @@ main(int argc, char *argv[])
             SDL_assert(SDL_JoystickFromInstanceID(SDL_JoystickInstanceID(joystick)) == joystick);
             SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joystick),
                                       guid, sizeof (guid));
+            switch (SDL_JoystickGetType(joystick)) {
+            case SDL_JOYSTICK_TYPE_GAMECONTROLLER:
+                type = "Game Controller";
+                break;
+            case SDL_JOYSTICK_TYPE_WHEEL:
+                type = "Wheel";
+                break;
+            case SDL_JOYSTICK_TYPE_ARCADE_STICK:
+                type = "Arcade Stick";
+                break;
+            case SDL_JOYSTICK_TYPE_FLIGHT_STICK:
+                type = "Flight Stick";
+                break;
+            case SDL_JOYSTICK_TYPE_DANCE_PAD:
+                type = "Dance Pad";
+                break;
+            case SDL_JOYSTICK_TYPE_GUITAR:
+                type = "Guitar";
+                break;
+            case SDL_JOYSTICK_TYPE_DRUM_KIT:
+                type = "Drum Kit";
+                break;
+            case SDL_JOYSTICK_TYPE_ARCADE_PAD:
+                type = "Arcade Pad";
+                break;
+            case SDL_JOYSTICK_TYPE_THROTTLE:
+                type = "Throttle";
+                break;
+            default:
+                type = "Unknown";
+                break;
+            }
+            SDL_Log("       type: %s\n", type);
             SDL_Log("       axes: %d\n", SDL_JoystickNumAxes(joystick));
             SDL_Log("      balls: %d\n", SDL_JoystickNumBalls(joystick));
             SDL_Log("       hats: %d\n", SDL_JoystickNumHats(joystick));
             SDL_Log("    buttons: %d\n", SDL_JoystickNumButtons(joystick));
             SDL_Log("instance id: %d\n", SDL_JoystickInstanceID(joystick));
             SDL_Log("       guid: %s\n", guid);
+            SDL_Log("    VID/PID: 0x%.4x/0x%.4x\n", SDL_JoystickGetVendor(joystick), SDL_JoystickGetProduct(joystick));
             SDL_JoystickClose(joystick);
         }
     }
@@ -320,6 +354,7 @@ main(int argc, char *argv[])
                     || (event.type == SDL_MOUSEBUTTONDOWN)) {
                     keepGoing = SDL_FALSE;
                 } else if (event.type == SDL_JOYDEVICEADDED) {
+                    device = event.jdevice.which;
                     joystick = SDL_JoystickOpen(device);
                     if (joystick != NULL) {
                         SDL_assert(SDL_JoystickFromInstanceID(SDL_JoystickInstanceID(joystick)) == joystick);
@@ -344,3 +379,5 @@ main(int argc, char *argv[])
 }
 
 #endif
+
+/* vi: set ts=4 sw=4 expandtab: */

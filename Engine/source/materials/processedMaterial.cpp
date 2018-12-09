@@ -103,7 +103,7 @@ ProcessedMaterial::ProcessedMaterial()
 
 ProcessedMaterial::~ProcessedMaterial()
 {
-   for_each( mPasses.begin(), mPasses.end(), delete_pointer() );
+	T3D::for_each( mPasses.begin(), mPasses.end(), T3D::delete_pointer() );
 }
 
 void ProcessedMaterial::_setBlendState(Material::BlendOp blendOp, GFXStateBlockDesc& desc )
@@ -456,7 +456,7 @@ void ProcessedMaterial::_setStageData()
       // SpecularMap
       if( mMaterial->mSpecularMapFilename[i].isNotEmpty() )
       {
-         mStages[i].setTex( MFT_SpecularMap, _createTexture( mMaterial->mSpecularMapFilename[i], &GFXStaticTextureProfile) );
+         mStages[i].setTex( MFT_SpecularMap, _createTexture( mMaterial->mSpecularMapFilename[i], &GFXStaticTextureSRGBProfile) );
          if(!mStages[i].getTex( MFT_SpecularMap ))
             mMaterial->logError("Failed to load specular map %s for stage %i", _getTexturePath(mMaterial->mSpecularMapFilename[i]).c_str(), i);
       }

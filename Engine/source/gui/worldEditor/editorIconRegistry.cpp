@@ -23,7 +23,7 @@
 #include "platform/platform.h"
 #include "gui/worldEditor/editorIconRegistry.h"
 
-#include "console/console.h"
+#include "console/engineAPI.h"
 #include "console/simBase.h"
 
 
@@ -35,6 +35,8 @@ ConsoleDoc(
    "It is typically used by the editors, not intended for actual game development\n\n"
    "@internal"
 );
+
+IMPLEMENT_STATIC_CLASS(EditorIconRegistry,, "");
 
 EditorIconRegistry::EditorIconRegistry()
 {
@@ -168,51 +170,42 @@ void EditorIconRegistry::clear()
    mDefaultIcon.free();
 }
 
-ConsoleStaticMethod( EditorIconRegistry, add, void, 3, 4, "( String className, String imageFile [, bool overwrite = true] )"
+DefineEngineStaticMethod( EditorIconRegistry, add, void, (String className, String imageFile, bool overwrite), (true),
 					"@internal")
 {
-   bool overwrite = true;
-   if ( argc > 3 )
-      overwrite = dAtob( argv[3] );
-
-   gEditorIcons.add( argv[1], argv[2], overwrite );
+   gEditorIcons.add( className, imageFile, overwrite );
 }
 
-ConsoleStaticMethod( EditorIconRegistry, loadFromPath, void, 2, 3, "( String imagePath [, bool overwrite = true] )"
+DefineEngineStaticMethod( EditorIconRegistry, loadFromPath, void, (String imagePath, bool overwrite), (true),
 					"@internal")
 {
-   bool overwrite = true;
-   if ( argc > 2 )
-      overwrite = dAtob( argv[2] );
-
-   gEditorIcons.loadFromPath( argv[1], overwrite );
+   gEditorIcons.loadFromPath( imagePath, overwrite );
 }
 
-ConsoleStaticMethod( EditorIconRegistry, clear, void, 1, 1, "" 
+DefineEngineStaticMethod( EditorIconRegistry, clear, void, (),,
 					"@internal")
 {
    gEditorIcons.clear();
 }
 
-ConsoleStaticMethod( EditorIconRegistry, findIconByClassName, const char*, 2, 2, "( String className )\n"
-   "Returns the file path to the icon file if found." 
+DefineEngineStaticMethod( EditorIconRegistry, findIconByClassName, const char*, (String className),,
+   "@brief Returns the file path to the icon file if found." 
    "@internal")
 {
-   GFXTexHandle icon = gEditorIcons.findIcon( argv[1] );
+   GFXTexHandle icon = gEditorIcons.findIcon( className );
    if ( icon.isNull() )
       return NULL;
 
    return icon->mPath;
 }
 
-ConsoleStaticMethod( EditorIconRegistry, findIconBySimObject, const char*, 2, 2, "( SimObject )\n"
+DefineEngineStaticMethod( EditorIconRegistry, findIconBySimObject, const char*, (SimObject* obj),,
    "Returns the file path to the icon file if found." 
    "@internal")
 {
-   SimObject *obj = NULL;
-   if ( !Sim::findObject( argv[1], obj ) )
+   if ( !obj )
    {
-      Con::warnf( "EditorIconRegistry::findIcon, parameter %d was not a SimObject!", (const char*)argv[1] );
+      Con::warnf( "EditorIconRegistry::findIcon, parameter was not a SimObject!");
       return NULL;
    }
 

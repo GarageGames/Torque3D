@@ -480,7 +480,7 @@ static U32 sgStringInstances;
 
 
 #endif
-DefineConsoleFunction( dumpStringMemStats, void, (), , "()"
+DefineEngineFunction( dumpStringMemStats, void, (), , "()"
 				"@brief Dumps information about String memory usage\n\n"
 				"@ingroup Debugging\n"
 				"@ingroup Strings\n")

@@ -166,6 +166,8 @@ public:
     inline void             setAssetTagsManifest( const char* pTagsAssetManifest ) { if ( checkUnlocked() ) { mAssetTagsManifest = StringTable->insert(pTagsAssetManifest); } }
     inline StringTableEntry getAssetTagsManifest( void ) const                  { return mAssetTagsManifest; }
     inline typeModuleAssetsVector& getModuleAssets( void )                      { return mModuleAssets; }
+    void                    addDeclaredAsset(AssetDefinition* asset)            { mModuleAssets.push_back(asset); }
+
 
     /// Module location.
     inline void             setModulePath( const char* pModulePath )            { if ( checkUnlocked() ) { mModulePath = StringTable->insert(pModulePath); } }
@@ -252,11 +254,11 @@ protected:
             for ( U32 dependencyIndex = 0; dependencyIndex < dependencyWordCount; ++dependencyIndex )
             {
                 // Fetch slot.
-                dStrcpy( slotUnit, StringUnit::getUnit( pDependencyValue, dependencyIndex, "," ) );
+                dStrcpy( slotUnit, StringUnit::getUnit( pDependencyValue, dependencyIndex, "," ), 256 );
         
                 // Fetch slot name and value.
-                dStrcpy( slotName, StringUnit::getUnit( slotUnit, 0, "=" ) );
-                dStrcpy( slotValue, StringUnit::getUnit( slotUnit, 1, "=" ) );
+                dStrcpy( slotName, StringUnit::getUnit( slotUnit, 0, "=" ), 256 );
+                dStrcpy( slotValue, StringUnit::getUnit( slotUnit, 1, "=" ), 256 );
 
                 // Fetch module Id.
                 StringTableEntry moduleId = StringTable->insert( slotName );

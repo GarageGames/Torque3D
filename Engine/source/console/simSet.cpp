@@ -118,7 +118,7 @@ IMPLEMENT_CALLBACK( SimSet, onObjectRemoved, void, ( SimObject* object ), ( obje
 
 SimSet::SimSet()
 {
-   VECTOR_SET_ASSOCIATION( objectList );
+   VECTOR_SET_ASSOCIATION(mObjectList);
    mMutex = Mutex::createMutex();
 }
 
@@ -139,7 +139,7 @@ void SimSet::addObject( SimObject* obj )
       
    lock();
    
-   const bool added = objectList.pushBack( obj );
+   const bool added = mObjectList.pushBack( obj );
    if( added )
       deleteNotify( obj );
    
@@ -159,7 +159,7 @@ void SimSet::removeObject( SimObject* obj )
 {
    lock();
    
-   const bool removed = objectList.remove( obj );
+   const bool removed = mObjectList.remove( obj );
    if( removed )
       clearNotify( obj );
    
@@ -182,7 +182,7 @@ void SimSet::pushObject( SimObject* obj )
       
    lock();
    
-   bool added = objectList.pushBackForce( obj );
+   bool added = mObjectList.pushBackForce( obj );
    if( added )
       deleteNotify( obj );
       
@@ -200,15 +200,15 @@ void SimSet::pushObject( SimObject* obj )
 
 void SimSet::popObject()
 {
-   if( objectList.empty() )
+   if(mObjectList.empty() )
    {
       AssertWarn(false, "Stack underflow in SimSet::popObject");
       return;
    }
 
    lock();
-   SimObject* object = objectList.last();
-   objectList.pop_back();
+   SimObject* object = mObjectList.last();
+   mObjectList.pop_back();
 
    clearNotify( object );
    unlock();
@@ -223,7 +223,7 @@ void SimSet::popObject()
 void SimSet::scriptSort( const String &scriptCallbackFn )
 {
    lock();
-   objectList.scriptSort( scriptCallbackFn );
+   mObjectList.scriptSort( scriptCallbackFn );
    unlock();
 }
 
@@ -303,8 +303,8 @@ bool SimSet::reOrder( SimObject *obj, SimObject *target )
       if ( itrS != (end()-1) )
       {
          // remove object from its current location and push to back of list
-         objectList.erase(itrS);    
-         objectList.push_back(obj);
+		  mObjectList.erase(itrS);
+		  mObjectList.push_back(obj);
       }
    }
    else
@@ -314,12 +314,12 @@ bool SimSet::reOrder( SimObject *obj, SimObject *target )
          // target must be in list
          return false;
 
-      objectList.erase(itrS);
+	  mObjectList.erase(itrS);
 
       // once itrS has been erased, itrD won't be pointing at the 
       // same place anymore - re-find...
       itrD = find(begin(),end(),target);
-      objectList.insert(itrD, obj);
+	  mObjectList.insert(itrD, obj);
    }
 
    return true;
@@ -340,15 +340,15 @@ void SimSet::onRemove()
    MutexHandle handle;
    handle.lock( mMutex );
 
-   if( !objectList.empty() )
+   if( !mObjectList.empty() )
    {
-      objectList.sortId();
+	   mObjectList.sortId();
       
       // This backwards iterator loop doesn't work if the
       // list is empty, check the size first.
       
-      for( SimObjectList::iterator ptr = objectList.end() - 1;
-            ptr >= objectList.begin(); ptr -- )
+      for( SimObjectList::iterator ptr = mObjectList.end() - 1;
+            ptr >= mObjectList.begin(); ptr -- )
          clearNotify( *ptr );
    }
 
@@ -417,8 +417,8 @@ void SimSet::deleteAllObjects()
    lock();
    while( !empty() )
    {
-      SimObject* object = objectList.last();
-      objectList.pop_back();
+      SimObject* object = mObjectList.last();
+	  mObjectList.pop_back();
 
       object->deleteObject();
    }
@@ -536,7 +536,7 @@ SimObject* SimSet::findObjectByLineNumber(const char* fileName, S32 declarationL
 SimObject* SimSet::getRandom()
 {
    if (size() > 0)
-      return objectList[mRandI(0, size() - 1)];
+      return mObjectList[mRandI(0, size() - 1)];
 
    return NULL;
 }
@@ -640,7 +640,7 @@ void SimGroup::_addObject( SimObject* obj, bool forcePushBack )
    if( obj->getGroup() )
       obj->getGroup()->removeObject( obj );
       
-   if( forcePushBack ? objectList.pushBack( obj ) : objectList.pushBackForce( obj ) )
+   if( forcePushBack ? mObjectList.pushBack( obj ) : mObjectList.pushBackForce( obj ) )
    {
       mNameDictionary.insert( obj );
       obj->mGroup = this;
@@ -685,7 +685,7 @@ void SimGroup::_removeObjectNoLock( SimObject* obj )
       obj->onGroupRemove();
       
       mNameDictionary.remove( obj );
-      objectList.remove( obj );
+	  mObjectList.remove( obj );
       obj->mGroup = 0;
 
       getSetModificationSignal().trigger( SetObjectRemoved, this, obj );
@@ -709,14 +709,14 @@ void SimGroup::popObject()
    MutexHandle handle;
    handle.lock( mMutex );
 
-   if( objectList.empty() )
+   if(mObjectList.empty() )
    {
       AssertWarn( false, "SimGroup::popObject - Stack underflow" );
       return;
    }
 
-   SimObject* object = objectList.last();
-   objectList.pop_back();
+   SimObject* object = mObjectList.last();
+   mObjectList.pop_back();
 
    object->onGroupRemove();
    object->mGroup = NULL;
@@ -736,9 +736,9 @@ void SimGroup::popObject()
 void SimGroup::onRemove()
 {
    lock();
-   if( !objectList.empty() )
+   if( !mObjectList.empty() )
    {
-      objectList.sortId();
+	   mObjectList.sortId();
       clear();
    }
    SimObject::onRemove();
@@ -752,10 +752,10 @@ void SimGroup::clear()
    lock();
    while( size() > 0 )
    {
-      SimObject* object = objectList.last();
+      SimObject* object = mObjectList.last();
       object->onGroupRemove();
       
-      objectList.pop_back();
+	  mObjectList.pop_back();
       mNameDictionary.remove( object );
       object->mGroup = 0;
 
@@ -895,15 +895,7 @@ DefineEngineMethod( SimSet, listObjects, void, (),,
 
 //-----------------------------------------------------------------------------
 
-DEFINE_CALLIN( fnSimSet_add, add, SimSet, void, ( SimSet* set, SimObject* object ),,,
-   "Add the given object to the set.\n"
-   "@param object An object." )
-{
-   if( object )
-      set->addObject( object );
-}
-
-ConsoleMethod( SimSet, add, void, 3, 0,
+DefineEngineStringlyVariadicMethod( SimSet, add, void, 3, 0,
    "( SimObject objects... ) Add the given objects to the set.\n"
    "@param objects The objects to add to the set." )
 {
@@ -919,15 +911,7 @@ ConsoleMethod( SimSet, add, void, 3, 0,
 
 //-----------------------------------------------------------------------------
 
-DEFINE_CALLIN( fnSimSet_remove, remove, SimSet, void, ( SimSet* set, SimObject* object ),,,
-   "Remove the given object from the set.\n"
-   "@param object An object." )
-{
-   if( object )
-      set->removeObject( object );
-}
-
-ConsoleMethod( SimSet, remove, void, 3, 0,
+DefineEngineStringlyVariadicMethod( SimSet, remove, void, 3, 0,
    "( SimObject objects... ) Remove the given objects from the set.\n"
    "@param objects The objects to remove from the set." )
 {
@@ -954,7 +938,7 @@ DefineEngineMethod( SimSet, clear, void, (),,
 //-----------------------------------------------------------------------------
 
 //UNSAFE; don't want this in the new API
-DefineConsoleMethod( SimSet, deleteAllObjects, void, (), , "() Delete all objects in the set." )
+DefineEngineMethod( SimSet, deleteAllObjects, void, (), , "() Delete all objects in the set." )
 {
    object->deleteAllObjects();
 }
@@ -970,7 +954,7 @@ DefineEngineMethod( SimSet, getRandom, SimObject*, (),,
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( SimSet, callOnChildren, void, 3, 0,
+DefineEngineStringlyVariadicMethod( SimSet, callOnChildren, void, 3, 0,
    "( string method, string args... ) Call a method on all objects contained in the set.\n\n"
    "@param method The name of the method to call.\n"
    "@param args The arguments to the method.\n\n"
@@ -982,7 +966,7 @@ ConsoleMethod( SimSet, callOnChildren, void, 3, 0,
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( SimSet, callOnChildrenNoRecurse, void, 3, 0,
+DefineEngineStringlyVariadicMethod( SimSet, callOnChildrenNoRecurse, void, 3, 0,
    "( string method, string args... ) Call a method on all objects contained in the set.\n\n"
    "@param method The name of the method to call.\n"
    "@param args The arguments to the method.\n\n"
@@ -1026,7 +1010,7 @@ DEFINE_CALLIN( fnSimSet_getCountRecursive, getCountRecursive, SimSet, U32, ( Sim
    return set->sizeRecursive();
 }
 
-DefineConsoleMethod( SimSet, getFullCount, S32, (), , "() Get the number of direct and indirect child objects contained in the set.\n"
+DefineEngineMethod( SimSet, getFullCount, S32, (), , "() Get the number of direct and indirect child objects contained in the set.\n"
    "@return The number of objects contained in the set as well as in other sets contained directly or indirectly in the set." )
 {
    return object->sizeRecursive();
@@ -1122,7 +1106,7 @@ DefineEngineMethod( SimSet, pushToBack, void, ( SimObject* obj ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( SimSet, sort, void, ( const char * callbackFunction ), , "( string callbackFunction ) Sort the objects in the set using the given comparison function.\n"
+DefineEngineMethod( SimSet, sort, void, ( const char * callbackFunction ), , "( string callbackFunction ) Sort the objects in the set using the given comparison function.\n"
    "@param callbackFunction Name of a function that takes two object arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal." )
 {
    object->scriptSort( callbackFunction );

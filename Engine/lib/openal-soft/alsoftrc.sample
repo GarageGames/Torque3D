@@ -81,7 +81,7 @@
 #  which helps protect against skips when the CPU is under load, but increases
 #  the delay between a sound getting mixed and being heard. Acceptable values
 #  range between 2 and 16.
-#periods = 4
+#periods = 3
 
 ## stereo-mode:
 #  Specifies if stereo output is treated as being headphones or speakers. With
@@ -89,13 +89,14 @@
 #  Valid settings are auto, speakers, and headphones.
 #stereo-mode = auto
 
-## stereo-panning:
-#  Specifies the panning method for non-HRTF stereo output. uhj (default)
-#  creates stereo-compatible two-channel UHJ output, which encodes some
-#  surround sound information, while paired uses standard pair-wise panning
-#  between -30 and +30 degrees. If crossfeed filters are used, uhj panning is
-#  disabled.
-#stereo-panning = uhj
+## stereo-encoding:
+#  Specifies the encoding method for non-HRTF stereo output. 'panpot' (default)
+#  uses standard amplitude panning (aka pair-wise, stereo pair, etc) between
+#  -30 and +30 degrees, while 'uhj' creates stereo-compatible two-channel UHJ
+#  output, which encodes some surround sound information into stereo output
+#  that can be decoded with a surround sound receiver. If crossfeed filters are
+#  used, UHJ is disabled.
+#stereo-encoding = panpot
 
 ## ambi-format:
 #  Specifies the channel order and normalization for the "ambi*" set of channel
@@ -148,11 +149,11 @@
 #  Selects the resampler used when mixing sources. Valid values are:
 #  point - nearest sample, no interpolation
 #  linear - extrapolates samples using a linear slope between samples
-#  sinc4 - extrapolates samples using a 4-point Sinc filter
-#  sinc8 - extrapolates samples using an 8-point Sinc filter
-#  bsinc - extrapolates samples using a band-limited Sinc filter (varying
-#          between 12 and 24 points, with anti-aliasing)
-#  Specifying other values will result in using the default (linear).
+#  cubic - extrapolates samples using a Catmull-Rom spline
+#  bsinc12 - extrapolates samples using a band-limited Sinc filter (varying
+#            between 12 and 24 points, with anti-aliasing)
+#  bsinc24 - extrapolates samples using a band-limited Sinc filter (varying
+#            between 24 and 48 points, with anti-aliasing)
 #resampler = linear
 
 ## rt-prio: (global)
@@ -174,13 +175,39 @@
 #  can use a non-negligible amount of CPU time if an effect is set on it even
 #  if no sources are feeding it, so this may help when apps use more than the
 #  system can handle.
-#slots = 4
+#slots = 64
 
 ## sends:
-#  Sets the number of auxiliary sends per source. When not specified (default),
-#  it allows the app to request how many it wants. The maximum value currently
-#  possible is 4.
-#sends =
+#  Limits the number of auxiliary sends allowed per source. Setting this higher
+#  than the default has no effect.
+#sends = 16
+
+## front-stablizer:
+#  Applies filters to "stablize" front sound imaging. A psychoacoustic method
+#  is used to generate a front-center channel signal from the front-left and
+#  front-right channels, improving the front response by reducing the combing
+#  artifacts and phase errors. Consequently, it will only work with channel
+#  configurations that include front-left, front-right, and front-center.
+#front-stablizer = false
+
+## output-limiter:
+#  Applies a gain limiter on the final mixed output. This reduces the volume
+#  when the output samples would otherwise clamp, avoiding excessive clipping
+#  noise.
+#output-limiter = true
+
+## dither:
+#  Applies dithering on the final mix, for 8- and 16-bit output by default.
+#  This replaces the distortion created by nearest-value quantization with low-
+#  level whitenoise.
+#dither = true
+
+## dither-depth:
+#  Quantization bit-depth for dithered output. A value of 0 (or less) will
+#  match the output sample depth. For int32, uint32, and float32 output, 0 will
+#  disable dithering because they're at or beyond the rendered precision. The
+#  maximum dither depth is 24.
+#dither-depth = 0
 
 ## volume-adjust:
 #  A global volume adjustment for source output, expressed in decibels. The
@@ -193,7 +220,7 @@
 #  Sets which effects to exclude, preventing apps from using them. This can
 #  help for apps that try to use effects which are too CPU intensive for the
 #  system to handle. Available effects are: eaxreverb,reverb,chorus,compressor,
-#  distortion,echo,equalizer,flanger,modulator,dedicated
+#  distortion,echo,equalizer,flanger,modulator,dedicated,pshifter
 #excludefx =
 
 ## default-reverb: (global)
@@ -235,25 +262,38 @@ hq-mode = false
 #  Enables compensation for the speakers' relative distances to the listener.
 #  This applies the necessary delays and attenuation to make the speakers
 #  behave as though they are all equidistant, which is important for proper
-#  playback of 3D sound rendering. Requires the high-quality ambisonic decoder,
-#  as well as the proper distances to be specified in the decoder configuration
-#  file.
+#  playback of 3D sound rendering. Requires the proper distances to be
+#  specified in the decoder configuration file.
 distance-comp = true
 
+## nfc:
+#  Enables near-field control filters. This simulates and compensates for low-
+#  frequency effects caused by the curvature of nearby sound-waves, which
+#  creates a more realistic perception of sound distance. Note that the effect
+#  may be stronger or weaker than intended if the application doesn't use or
+#  specify an appropriate unit scale, or if incorrect speaker distances are set
+#  in the decoder configuration file. Requires hq-mode to be enabled.
+nfc = true
+
+## nfc-ref-delay
+#  Specifies the reference delay value for ambisonic output. When channels is
+#  set to one of the ambi* formats, this option enables NFC-HOA output with the
+#  specified Reference Delay parameter. The specified value can then be shared
+#  with an appropriate NFC-HOA decoder to reproduce correct near-field effects.
+#  Keep in mind that despite being designed for higher-order ambisonics, this
+#  applies to first-order output all the same. When left unset, normal output
+#  is created with no near-field simulation.
+nfc-ref-delay =
+
 ## quad:
-#  Decoder configuration file for Quadrophonic channel output. See
+#  Decoder configuration file for Quadraphonic channel output. See
 #  docs/ambdec.txt for a description of the file format.
 quad =
 
 ## surround51:
-#  Decoder configuration file for 5.1 Surround (Side) channel output. See
-#  docs/ambdec.txt for a description of the file format.
+#  Decoder configuration file for 5.1 Surround (Side and Rear) channel output.
+#  See docs/ambdec.txt for a description of the file format.
 surround51 =
-
-## surround51rear:
-#  Decoder configuration file for 5.1 Surround (Rear) channel output. See
-#  docs/ambdec.txt for a description of the file format.
-surround51rear =
 
 ## surround61:
 #  Decoder configuration file for 6.1 Surround channel output. See
@@ -278,12 +318,6 @@ surround71 =
 #  scale of 4x, etc. Similarly, -6 will be about half, and -12 about 1/4th. A
 #  value of 0 means no change.
 #boost = 0
-
-## emulate-eax: (global)
-#  Allows the standard reverb effect to be used in place of EAX reverb. EAX
-#  reverb processing is a bit more CPU intensive than standard, so this option
-#  allows a simpler effect to be used at the loss of some quality.
-#emulate-eax = false
 
 ##
 ## PulseAudio backend stuff
@@ -410,9 +444,9 @@ surround71 =
 #buffer-size = 0
 
 ##
-## MMDevApi backend stuff
+## WASAPI backend stuff
 ##
-[mmdevapi]
+[wasapi]
 
 ##
 ## DirectSound backend stuff

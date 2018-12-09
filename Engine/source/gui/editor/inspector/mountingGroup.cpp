@@ -242,7 +242,8 @@ void GuiInspectorMountingGroup::onMouseMove(const GuiEvent &event)
 	//mParent->mOverDivider = false;
 	bool test = false;
 }
-ConsoleMethod(GuiInspectorMountingGroup, inspectGroup, bool, 2, 2, "Refreshes the dynamic fields in the inspector.")
+
+DefineEngineMethod(GuiInspectorMountingGroup, inspectGroup, bool, (),, "Refreshes the dynamic fields in the inspector.")
 {
    return object->inspectGroup();
 }
@@ -319,12 +320,13 @@ AbstractClassRep::Field* GuiInspectorMountingGroup::findObjectComponentField(Com
    }
    return NULL;
 }
-ConsoleMethod( GuiInspectorMountingGroup, addDynamicField, void, 2, 2, "obj.addDynamicField();" )
+
+DefineEngineMethod(GuiInspectorMountingGroup, addDynamicField, void, (), , "obj.addDynamicField();")
 {
    object->addDynamicField();
 }
 
-ConsoleMethod( GuiInspectorMountingGroup, removeDynamicField, void, 3, 3, "" )
+DefineEngineMethod(GuiInspectorMountingGroup, removeDynamicField, void, (), , "")
 {
 }
 

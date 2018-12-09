@@ -528,11 +528,29 @@ bool Prefab::isValidChild( SimObject *simobj, bool logWarnings )
 bool Prefab::buildPolyList(PolyListContext context, AbstractPolyList* polyList, const Box3F &box, const SphereF& sphere)
 {
    Vector<SceneObject*> foundObjects;
+   if (mChildGroup.isNull() || mChildGroup->empty())
+   {
+	   Con::warnf("Bad Prefab Config! %s has no valid entries!", getName());
+	   return false;
+   }
    mChildGroup->findObjectByType(foundObjects);
 
    for (S32 i = 0; i < foundObjects.size(); i++)
    {
       foundObjects[i]->buildPolyList(context, polyList, box, sphere);
+   }
+
+   return true;
+}
+
+bool Prefab::buildExportPolyList(ColladaUtils::ExportData* exportData, const Box3F &box, const SphereF &sphere)
+{
+   Vector<SceneObject*> foundObjects;
+   mChildGroup->findObjectByType(foundObjects);
+
+   for (S32 i = 0; i < foundObjects.size(); i++)
+   {
+      foundObjects[i]->buildExportPolyList(exportData, box, sphere);
    }
 
    return true;
