@@ -455,6 +455,15 @@ bool ModuleManager::loadModuleGroup( const char* pModuleGroup )
                     moduleGroup, pLoadReadyModuleDefinition->getModuleId(), pLoadReadyModuleDefinition->getVersionId(), pLoadReadyModuleDefinition->getModuleScriptFilePath() );
             }
         }
+        else
+        {
+           // Is the create method available?
+           if (pScopeSet->isMethod(pLoadReadyModuleDefinition->getCreateFunction()))
+           {
+              // Yes, so call the create method.
+              Con::executef(pScopeSet, pLoadReadyModuleDefinition->getCreateFunction());
+           }
+        }
 
         // Raise notifications.
         raiseModulePostLoadNotifications( pLoadReadyModuleDefinition );

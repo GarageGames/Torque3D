@@ -40,6 +40,7 @@
 #include <stdarg.h>
 #include "platform/threads/mutex.h"
 #include "core/util/journal/journal.h"
+#include "cinterface/cinterface.h"
 
 extern StringStack STR;
 extern ConsoleValueStack CSTK;
@@ -1488,6 +1489,18 @@ ConsoleValueRef evaluatef(const char* string, ...)
 // Internal execute for global function which does not save the stack
 ConsoleValueRef _internalExecute(S32 argc, ConsoleValueRef argv[])
 {
+   const char** argv_str = static_cast<const char**>(malloc((argc - 1) * sizeof(char *)));
+   for (int i = 0; i < argc - 1; i++)
+   {
+      argv_str[i] = argv[i + 1];
+   }
+   bool result;
+   const char* methodRes = CInterface::CallFunction(NULL, argv[0], argv_str, argc - 1, &result);
+   if (result)
+   {
+      return ConsoleValueRef::fromValue(CSTK.pushString(methodRes));
+   }
+   
    Namespace::Entry *ent;
    StringTableEntry funcName = StringTable->insert(argv[0]);
    ent = Namespace::global()->lookup(funcName);
@@ -1557,6 +1570,18 @@ ConsoleValueRef _internalExecute(SimObject *object, S32 argc, ConsoleValueRef ar
          STR.popFrame();
          CSTK.popFrame();
       }
+   }
+
+   const char** argv_str = static_cast<const char**>(malloc((argc - 2) * sizeof(char *)));
+   for (int i = 0; i < argc - 2; i++)
+   {
+      argv_str[i] = argv[i + 2];
+   }
+   bool result;
+   const char* methodRes = CInterface::CallMethod(object, argv[0], argv_str, argc - 2, &result);
+   if (result)
+   {
+      return ConsoleValueRef::fromValue(CSTK.pushString(methodRes));
    }
 
    if(object->getNamespace())
@@ -1655,6 +1680,7 @@ inline ConsoleValueRef _executef(S32 checkArgc, S32 argc, ConsoleValueRef *argv)
 //------------------------------------------------------------------------------
 bool isFunction(const char *fn)
 {
+   if (CInterface::isMethod(NULL, fn)) return true;
    const char *string = StringTable->lookup(fn);
    if(!string)
       return false;

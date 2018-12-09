@@ -37,6 +37,7 @@
 #include "core/strings/stringUnit.h"
 #include "console/console.h"
 #include "console/consoleInternal.h"
+#include "cinterface/cinterface.h"
 
 //#define TORQUE_VALIDATE_STACK
 
@@ -2023,7 +2024,7 @@ OPCodeReturn CodeInterpreter::op_callfunc_resolve(U32 &ip)
 
    // Try to look it up.
    mNSEntry = Namespace::find(fnNamespace)->lookup(fnName);
-   if (!mNSEntry)
+   if (!CInterface::GetCInterface().isMethod(fnNamespace, fnName) && !mNSEntry)
    {
       ip += 5;
       Con::warnf(ConsoleLogEntry::General,
@@ -2051,6 +2052,7 @@ OPCodeReturn CodeInterpreter::op_callfunc(U32 &ip)
 
    U32 *code = mCodeBlock->code;
 
+   StringTableEntry fnNamespace = CodeToSTE(mCodeBlock->code, ip + 2);
    StringTableEntry fnName = CodeToSTE(code, ip);
 
    //if this is called from inside a function, append the ip and codeptr
@@ -2068,10 +2070,16 @@ OPCodeReturn CodeInterpreter::op_callfunc(U32 &ip)
    const char *componentReturnValue = "";
    Namespace *ns = NULL;
 
+   bool cFunctionRes = false;
+   const char* cRetRes = NULL;
+
    if (callType == FuncCallExprNode::FunctionCall)
    {
       if (!mNSEntry)
          mNSEntry = Namespace::global()->lookup(fnName);
+
+      StringStackWrapper args(mCallArgc, mCallArgv);
+      cRetRes = CInterface::GetCInterface().CallFunction(fnNamespace, fnName, args.argv, args.argc, &cFunctionRes);
    }
    else if (callType == FuncCallExprNode::MethodCall)
    {
@@ -2102,6 +2110,9 @@ OPCodeReturn CodeInterpreter::op_callfunc(U32 &ip)
          mNSEntry = ns->lookup(fnName);
       else
          mNSEntry = NULL;
+
+      StringStackWrapper args(mCallArgc, mCallArgv);
+      cRetRes = CInterface::GetCInterface().CallMethod(gEvalState.thisObject, fnName, args.argv, args.argc, &cFunctionRes);
    }
    else // it's a ParentCall
    {
@@ -2128,7 +2139,7 @@ OPCodeReturn CodeInterpreter::op_callfunc(U32 &ip)
       nsUsage = mNSEntry->mUsage;
       routingId = 0;
    }
-   if (!mNSEntry || mExec.noCalls)
+   if (!cFunctionRes && (!mNSEntry || mExec.noCalls))
    {
       if (!mExec.noCalls && !(routingId == MethodOnComponent))
       {
@@ -2167,11 +2178,19 @@ OPCodeReturn CodeInterpreter::op_callfunc(U32 &ip)
 
    // ConsoleFunctionType is for any function defined by script.
    // Any 'callback' type is an engine function that is exposed to script.
-   if (mNSEntry->mType == Namespace::Entry::ConsoleFunctionType)
+   if (mNSEntry->mType == Namespace::Entry::ConsoleFunctionType
+      || cFunctionRes)
    {
       ConsoleValueRef ret;
-      if (mNSEntry->mFunctionOffset)
+      if (cFunctionRes)
+      {
+         StringStackConsoleWrapper retVal(1, &cRetRes);
+         ret = retVal.argv[0];
+      }
+      else if (mNSEntry->mFunctionOffset)
+      {
          ret = mNSEntry->mCode->exec(mNSEntry->mFunctionOffset, fnName, mNSEntry->mNamespace, mCallArgc, mCallArgv, false, mNSEntry->mPackage);
+      }
 
       STR.popFrame();
       // Functions are assumed to return strings, so look ahead to see if we can skip the conversion
