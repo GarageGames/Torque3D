@@ -201,6 +201,8 @@ public:
 
    /// @}
 
+      String getMaterialName() { return mMaterialName; }
+
 protected:
 
    void _updateMaterial();
