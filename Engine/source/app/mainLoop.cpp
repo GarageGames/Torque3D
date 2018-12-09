@@ -267,6 +267,9 @@ void StandardMainLoop::init()
    
    ThreadPool::GlobalThreadPool::createSingleton();
 
+   // Set engineAPI initialized to true
+   engineAPI::gIsInitialized = true;
+
    // Initialize modules.
    
    EngineModuleManager::initializeSystem();
