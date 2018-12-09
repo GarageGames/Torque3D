@@ -35,12 +35,11 @@
 #include "T3D/physics/physicsWorld.h"
 #include "core/util/tNamedFactory.h"
 
-
 PhysicsPlugin* PhysicsPlugin::smSingleton = NULL;
 PhysicsResetSignal PhysicsPlugin::smPhysicsResetSignal;
 bool PhysicsPlugin::smSinglePlayer = false;
 U32 PhysicsPlugin::smThreadCount = 2;
-
+bool PhysicsPlugin::smGpuAccelerationAllowed = false;
 
 String PhysicsPlugin::smServerWorldName( "server" );
 String PhysicsPlugin::smClientWorldName( "client" );
@@ -51,6 +50,10 @@ AFTER_MODULE_INIT( Sim )
       "@brief Informs the physics simulation if only a single player exists.\n\n"
       "If true, optimizations will be implemented to better cater to a single player environmnent.\n\n"
 	   "@ingroup Physics\n");
+   Con::addVariable("$Physics::gpuAccelerationAllowed", TypeBool, &PhysicsPlugin::smGpuAccelerationAllowed,
+      "@brief Informs the physics plugin if it is allowed to use gpu acceleration.\n\n"
+      "Not all physics implemenations or gpus can support gpu acceleration, this simply informs the plugin if it is allowed to try and use it or not.\n\n"
+      "@ingroup Physics\n");
    Con::addVariable( "$pref::Physics::threadCount", TypeS32, &PhysicsPlugin::smThreadCount, 
       "@brief Number of threads to use in a single pass of the physics engine.\n\n"
       "Defaults to 2 if not set.\n\n"

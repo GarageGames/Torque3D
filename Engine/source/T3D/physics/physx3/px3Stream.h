@@ -62,11 +62,11 @@ protected:
 
 	};
 
-class Px3ConsoleStream : public physx::PxDefaultErrorCallback
+class Px3ConsoleStream : public physx::PxErrorCallback
 {
 protected:
 
-  virtual void reportError( physx::PxErrorCode code, const char *message, const char* file, int line );
+   virtual void reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line);
 
 public:
 
