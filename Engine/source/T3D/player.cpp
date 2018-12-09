@@ -7518,7 +7518,7 @@ U32 Player::lockAnimation()
    return last_anim_lock_tag;
 }
 
-ConsoleMethod(Player, isAnimationLocked, bool, 2, 2, "isAnimationLocked()")
+DefineEngineMethod(Player, isAnimationLocked, bool, (),, "")
 {
    return object->isAnimationLocked();
 }
@@ -7534,14 +7534,13 @@ void Player::setLookAnimationOverride(bool flag)
 #endif
 }
 
-ConsoleMethod(Player, setLookAnimationOverride, void, 3, 3, "setLookAnimationOverride(flag)")
+DefineEngineMethod(Player, setLookAnimationOverride, void, (bool flag),, "")
 {
-   object->setLookAnimationOverride(dAtob(argv[2]));
+   object->setLookAnimationOverride(flag);
 }
 
-ConsoleMethod(Player, copyHeadRotation, void, 3, 3, "copyHeadRotation(other_player)")
+DefineEngineMethod(Player, copyHeadRotation, void, (Player* other_player),, "")
 {
-   Player* other_player = dynamic_cast<Player*>(Sim::findObject(argv[2]));
    if (other_player)
       object->copyHeadRotation(other_player);
 }
@@ -7610,9 +7609,9 @@ void Player::restoreMovement(U32 tag)
    }
 }
 
-ConsoleMethod(Player, setMovementSpeedBias, void, 3, 3, "setMovementSpeedBias(F32 bias)")
+DefineEngineMethod(Player, setMovementSpeedBias, void, (F32 bias),, "setMovementSpeedBias(F32 bias)")
 {
-   object->setMovementSpeedBias(dAtof(argv[2]));
+   object->setMovementSpeedBias(bias);
 }
 
 void Player::overrideFootfallFX(bool decals, bool sounds, bool dust) 
@@ -7643,12 +7642,11 @@ void Player::setControllers(Vector<OpenVRTrackedObject*> controllerList)
    mControllers[1] = controllerList.size() > 1 ? controllerList[1] : NULL;
 }
 
-ConsoleMethod(Player, setVRControllers, void, 4, 4, "")
+DefineEngineMethod(Player, setVRControllers, void, (OpenVRTrackedObject* controllerL, OpenVRTrackedObject* controllerR,, "")
 {
-   OpenVRTrackedObject *controllerL, *controllerR;
    Vector<OpenVRTrackedObject*> list;
 
-   if (Sim::findObject(argv[2], controllerL))
+   if (controllerL)
    {
       list.push_back(controllerL);
    }
@@ -7657,7 +7655,7 @@ ConsoleMethod(Player, setVRControllers, void, 4, 4, "")
       list.push_back(NULL);
    }
 
-   if (Sim::findObject(argv[3], controllerR))
+   if (controllerR)
    {
       list.push_back(controllerR);
    }

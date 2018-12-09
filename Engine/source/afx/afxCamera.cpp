@@ -450,7 +450,7 @@ const char* afxCamera::getMode()
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 // Console Methods
 
-ConsoleMethod(afxCamera, setOrbitMode, void, 7, 8, 
+DefineEngineStringlyVariadicMethod(afxCamera, setOrbitMode, void, 7, 8,
   "(GameBase orbitObject, TransformF mat, float minDistance, float maxDistance, float curDistance, bool ownClientObject)"
   "Set the camera to orbit around some given object.\n\n"
   "@param   orbitObject  Object we want to orbit.\n"
@@ -481,108 +481,91 @@ ConsoleMethod(afxCamera, setOrbitMode, void, 7, 8,
   object->setOrbitMode(orbitObject, pos, aa, minDis, maxDis, curDis, (argc == 8) ? dAtob(argv[7]) : false);
 }
 
-ConsoleMethod( afxCamera, setFlyMode, void, 2, 2, "()" "Set the camera to be able to fly freely.")
+DefineEngineMethod(afxCamera, setFlyMode, void, (),, 
+   "@brief Set the camera to be able to fly freely.")
 {
-  object->setFlyMode();
+   object->setFlyMode();
 }
 
-ConsoleMethod( afxCamera, getPosition, const char *, 2, 2, "()"
-              "Get the position of the camera.\n\n"
-              "@returns A string of form \"x y z\".")
-{ 
-  Point3F& pos = object->getPosition();
-  char buffer[100];
-  dSprintf(buffer, sizeof(buffer),"%f %f %f",pos.x,pos.y,pos.z);
-  return buffer;
+DefineEngineMethod(afxCamera, getPosition, Point3F, (),,
+   "@brief Get the position of the camera.\n\n"
+   "@returns The position of the camera.")
+{
+   return object->getPosition();
 }
 
-ConsoleMethod(afxCamera, setCameraSubject, bool, 3, 3, "") 
-{   
-  SceneObject* subject;
-  if (!Sim::findObject(argv[2], subject))
-  {
-    Con::errorf("Camera subject \"%s\" not found.", argv[2].getStringValue());
-    return false;
-  }
-  
-  object->setCameraSubject(subject);
-  
-  return true;
+DefineEngineMethod(afxCamera, setCameraSubject, bool, (SceneObject* subject),, "")
+{
+   if (!subject)
+   {
+      Con::errorf("Camera subject not found.");
+      return false;
+   }
+
+   object->setCameraSubject(subject);
+
+   return true;
 }
 
-ConsoleMethod(afxCamera, setThirdPersonDistance, bool, 3, 3, "") 
-{   
-  F32 distance; 
-  dSscanf(argv[2], "%f", &distance);
+DefineEngineMethod(afxCamera, setThirdPersonDistance, bool, (F32 distance),, "")
+{
+   object->setThirdPersonDistance(distance);
 
-  object->setThirdPersonDistance(distance);
-  
-  return true;
+   return true;
 }
 
-ConsoleMethod(afxCamera, getThirdPersonDistance, F32, 2, 2, "")
+DefineEngineMethod(afxCamera, getThirdPersonDistance, F32, (),, "")
 {
    return object->getThirdPersonDistance();
 }
 
-ConsoleMethod(afxCamera, setThirdPersonAngle, bool, 3, 3, "") 
-{   
-  F32 angle; 
-  dSscanf(argv[2], "%f", &angle);
+DefineEngineMethod(afxCamera, setThirdPersonAngle, bool, (F32 distance),, "")
+{
+   object->setThirdPersonAngle(distance);
 
-  object->setThirdPersonAngle(angle);
-  
-  return true;
+   return true;
 }
 
-ConsoleMethod(afxCamera, getThirdPersonAngle, F32, 2, 2, "")
+DefineEngineMethod(afxCamera, getThirdPersonAngle, F32, (),, "")
 {
    return object->getThirdPersonAngle();
 }
 
-ConsoleMethod(afxCamera, setThirdPersonOffset, void, 3, 4, "(Point3F offset [, Point3F coi_offset])") 
+DefineEngineMethod(afxCamera, setThirdPersonOffset, void, (Point3F offset, Point3F coi_offset), (Point3F::Max), "")
 {
-  Point3F offset; 
-  dSscanf(argv[2], "%f %f %f", &offset.x, &offset.y, &offset.z);
-  if (argc > 3)
-  {
-    Point3F coi_offset; 
-    dSscanf(argv[3], "%f %f %f", &coi_offset.x, &coi_offset.y, &coi_offset.z);
-    object->setThirdPersonOffset(offset, coi_offset);
-  }
-  else
-    object->setThirdPersonOffset(offset);
+   if (coi_offset == Point3F::Max)
+   {
+      object->setThirdPersonOffset(offset);
+   }
+   else
+   {
+      object->setThirdPersonOffset(offset, coi_offset);
+   }
 }
 
-ConsoleMethod(afxCamera, getThirdPersonOffset, const char *, 2, 2, "()")
+DefineEngineMethod(afxCamera, getThirdPersonOffset, Point3F, (),, "")
 {
-  const Point3F& pos = object->getThirdPersonOffset();
-  char buffer[100];
-  dSprintf(buffer, sizeof(buffer),"%f %f %f",pos.x,pos.y,pos.z);
-  return buffer;
+   return object->getThirdPersonOffset();
 }
 
-ConsoleMethod(afxCamera, getThirdPersonCOIOffset, const char *, 2, 2, "()")
+DefineEngineMethod(afxCamera, getThirdPersonCOIOffset, Point3F, (),, "")
 {
-  const Point3F& pos = object->getThirdPersonCOIOffset();
-  char buffer[100];
-  dSprintf(buffer, sizeof(buffer),"%f %f %f",pos.x,pos.y,pos.z);
-  return buffer;
+   return object->getThirdPersonCOIOffset();
 }
 
-ConsoleMethod(afxCamera, setThirdPersonMode, void, 2, 2, "()")
+DefineEngineMethod(afxCamera, setThirdPersonMode, void, (),, "")
 {
-  object->setThirdPersonMode();
+   object->setThirdPersonMode();
 }
 
-ConsoleMethod(afxCamera, setThirdPersonSnap, void, 2, 2, "()")
+DefineEngineMethod(afxCamera, setThirdPersonSnap, void, (),, "")
 {
-  object->setThirdPersonSnap();
+   object->setThirdPersonSnap();
 }
 
-ConsoleMethod(afxCamera, getMode, const char *, 2, 2, "()")
+DefineEngineMethod(afxCamera, getMode, const char*, (),, "")
 {
-  return object->getMode();
+   return object->getMode();
 }
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//

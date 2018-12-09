@@ -454,14 +454,14 @@ bool MaterialManager::_handleGFXEvent( GFXDevice::GFXDeviceEventType event_ )
    return true;
 }
 
-DefineConsoleFunction( reInitMaterials, void, (),,
+DefineEngineFunction( reInitMaterials, void, (),,
    "@brief Flushes all procedural shaders and re-initializes all active material instances.\n\n" 
    "@ingroup Materials")
 {
    MATMGR->flushAndReInitInstances();
 }
 
-DefineConsoleFunction( addMaterialMapping, void, (const char * texName, const char * matName), , "(string texName, string matName)\n"
+DefineEngineFunction( addMaterialMapping, void, (const char * texName, const char * matName), , "(string texName, string matName)\n"
    "@brief Maps the given texture to the given material.\n\n"
    "Generates a console warning before overwriting.\n\n"
    "Material maps are used by terrain and interiors for triggering "
@@ -472,7 +472,7 @@ DefineConsoleFunction( addMaterialMapping, void, (const char * texName, const ch
    MATMGR->mapMaterial(texName, matName);
 }
 
-DefineConsoleFunction( getMaterialMapping, const char*, (const char * texName), , "(string texName)\n"
+DefineEngineFunction( getMaterialMapping, const char*, (const char * texName), , "(string texName)\n"
    "@brief Returns the name of the material mapped to this texture.\n\n"
    "If no materials are found, an empty string is returned.\n\n"
    "@param texName Name of the texture\n\n"
@@ -481,14 +481,14 @@ DefineConsoleFunction( getMaterialMapping, const char*, (const char * texName), 
    return MATMGR->getMapEntry(texName).c_str();
 }
 
-DefineConsoleFunction( dumpMaterialInstances, void, (), ,
+DefineEngineFunction( dumpMaterialInstances, void, (), ,
    "@brief Dumps a formatted list of currently allocated material instances to the console.\n\n"
    "@ingroup Materials")
 {
    MATMGR->dumpMaterialInstances();
 }
 
-DefineConsoleFunction( getMapEntry, const char*, (const char * texName), ,
+DefineEngineFunction( getMapEntry, const char*, (const char * texName), ,
    "@hide")
 {
 	return MATMGR->getMapEntry( String(texName) );

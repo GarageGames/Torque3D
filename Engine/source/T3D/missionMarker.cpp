@@ -494,7 +494,7 @@ ConsoleDocFragment _SpawnSpherespawnObject1(
    "bool spawnObject(string additionalProps);"
 );
 
-DefineConsoleMethod(SpawnSphere, spawnObject, S32, (String additionalProps), ,
+DefineEngineMethod(SpawnSphere, spawnObject, S32, (String additionalProps), ,
    "([string additionalProps]) Spawns the object based on the SpawnSphere's "
    "class, datablock, properties, and script settings. Allows you to pass in "
    "extra properties."

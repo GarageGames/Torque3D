@@ -407,7 +407,7 @@ DefineEngineMethod( GuiGraphCtrl, setGraphType, void, ( S32 plotId, GuiGraphType
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiGraphCtrl, matchScale, void, 3, GuiGraphCtrl::MaxPlots + 2, "( int plotID1, int plotID2, ... ) "
+DefineEngineStringlyVariadicMethod( GuiGraphCtrl, matchScale, void, 3, GuiGraphCtrl::MaxPlots + 2, "( int plotID1, int plotID2, ... ) "
    "Set the scale of all specified plots to the maximum scale among them.\n\n"
    "@param plotID1 Index of plotting curve.\n"
    "@param plotID2 Index of plotting curve." )

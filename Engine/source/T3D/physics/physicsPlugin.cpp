@@ -124,31 +124,31 @@ void PhysicsPlugin::_debugDraw( SceneManager *graph, const SceneRenderState *sta
       world->onDebugDraw( state );
 }
 
-DefineConsoleFunction( physicsPluginPresent, bool, (), , "physicsPluginPresent()"
+DefineEngineFunction( physicsPluginPresent, bool, (), , "physicsPluginPresent()"
    "@brief Returns true if a physics plugin exists and is initialized.\n\n"
    "@ingroup Physics" )
 {
    return PHYSICSMGR != NULL;
 }
 
-DefineConsoleFunction( physicsInit, bool, (const char * library), ("default"), "physicsInit( [string library] )")
+DefineEngineFunction( physicsInit, bool, (const char * library), ("default"), "physicsInit( [string library] )")
 {
    return PhysicsPlugin::activate( library );
 }
 
-DefineConsoleFunction( physicsDestroy, void, (), , "physicsDestroy()")
+DefineEngineFunction( physicsDestroy, void, (), , "physicsDestroy()")
 {
    if ( PHYSICSMGR )
       PHYSICSMGR->destroyPlugin();
 }
 
-DefineConsoleFunction( physicsInitWorld, bool, (const char * worldName), , "physicsInitWorld( String worldName )")
+DefineEngineFunction( physicsInitWorld, bool, (const char * worldName), , "physicsInitWorld( String worldName )")
 {
     bool res = PHYSICSMGR && PHYSICSMGR->createWorld( String( worldName ) );
    return res;
 }
 
-DefineConsoleFunction( physicsDestroyWorld, void, (const char * worldName), , "physicsDestroyWorld( String worldName )")
+DefineEngineFunction( physicsDestroyWorld, void, (const char * worldName), , "physicsDestroyWorld( String worldName )")
 {
    if ( PHYSICSMGR )
       PHYSICSMGR->destroyWorld( worldName );
@@ -157,19 +157,19 @@ DefineConsoleFunction( physicsDestroyWorld, void, (const char * worldName), , "p
 
 // Control/query of the stop/started state
 // of the currently running simulation.
-DefineConsoleFunction( physicsStartSimulation, void, (const char * worldName), , "physicsStartSimulation( String worldName )")
+DefineEngineFunction( physicsStartSimulation, void, (const char * worldName), , "physicsStartSimulation( String worldName )")
 {
    if ( PHYSICSMGR )
       PHYSICSMGR->enableSimulation( String( worldName ), true );
 }
 
-DefineConsoleFunction( physicsStopSimulation, void, (const char * worldName), , "physicsStopSimulation( String worldName )")
+DefineEngineFunction( physicsStopSimulation, void, (const char * worldName), , "physicsStopSimulation( String worldName )")
 {
    if ( PHYSICSMGR )
       PHYSICSMGR->enableSimulation( String( worldName ), false );
 }
 
-DefineConsoleFunction( physicsSimulationEnabled, bool, (), , "physicsStopSimulation( String worldName )")
+DefineEngineFunction( physicsSimulationEnabled, bool, (), , "physicsStopSimulation( String worldName )")
 {
    return PHYSICSMGR && PHYSICSMGR->isSimulationEnabled();
 }
@@ -177,14 +177,14 @@ DefineConsoleFunction( physicsSimulationEnabled, bool, (), , "physicsStopSimulat
 // Used for slowing down time on the
 // physics simulation, and for pausing/restarting
 // the simulation.
-DefineConsoleFunction( physicsSetTimeScale, void, (F32 scale), , "physicsSetTimeScale( F32 scale )")
+DefineEngineFunction( physicsSetTimeScale, void, (F32 scale), , "physicsSetTimeScale( F32 scale )")
 {
    if ( PHYSICSMGR )
       PHYSICSMGR->setTimeScale( scale );
 }
 
 // Get the currently set time scale.
-DefineConsoleFunction( physicsGetTimeScale, F32, (), , "physicsGetTimeScale()")
+DefineEngineFunction( physicsGetTimeScale, F32, (), , "physicsGetTimeScale()")
 {
    return PHYSICSMGR && PHYSICSMGR->getTimeScale();
 }
@@ -193,7 +193,7 @@ DefineConsoleFunction( physicsGetTimeScale, F32, (), , "physicsGetTimeScale()")
 // physics simulation that they should store
 // their current state for later restoration,
 // such as when the editor is closed.
-DefineConsoleFunction( physicsStoreState, void, (), , "physicsStoreState()")
+DefineEngineFunction( physicsStoreState, void, (), , "physicsStoreState()")
 {
    PhysicsPlugin::getPhysicsResetSignal().trigger( PhysicsResetEvent_Store );
 }
@@ -201,13 +201,13 @@ DefineConsoleFunction( physicsStoreState, void, (), , "physicsStoreState()")
 // Used to send a signal to objects in the
 // physics simulation that they should restore
 // their saved state, such as when the editor is opened.
-DefineConsoleFunction( physicsRestoreState, void, (), , "physicsRestoreState()")
+DefineEngineFunction( physicsRestoreState, void, (), , "physicsRestoreState()")
 {
    if ( PHYSICSMGR )
       PHYSICSMGR->reset();
 }
 
-DefineConsoleFunction( physicsDebugDraw, void, (bool enable), , "physicsDebugDraw( bool enable )")
+DefineEngineFunction( physicsDebugDraw, void, (bool enable), , "physicsDebugDraw( bool enable )")
 {
    if ( PHYSICSMGR )
       PHYSICSMGR->enableDebugDraw( enable );

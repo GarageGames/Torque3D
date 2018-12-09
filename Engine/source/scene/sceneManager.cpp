@@ -720,7 +720,7 @@ RenderPassManager* SceneManager::getDefaultRenderPass() const
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( sceneDumpZoneStates, void, ( bool updateFirst ), ( true ),
+DefineEngineFunction( sceneDumpZoneStates, void, ( bool updateFirst ), ( true ),
    "Dump the current zoning states of all zone spaces in the scene to the console.\n\n"
    "@param updateFirst If true, zoning states are brought up to date first; if false, the zoning states "
    "are dumped as is.\n\n"
@@ -745,7 +745,7 @@ DefineConsoleFunction( sceneDumpZoneStates, void, ( bool updateFirst ), ( true )
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( sceneGetZoneOwner, SceneObject*, ( U32 zoneId ),,
+DefineEngineFunction( sceneGetZoneOwner, SceneObject*, ( U32 zoneId ),,
    "Return the SceneObject that contains the given zone.\n\n"
    "@param zoneId ID of zone.\n"
    "@return A SceneObject or NULL if the given @a zoneId is invalid.\n\n"

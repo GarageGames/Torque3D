@@ -1798,7 +1798,7 @@ DefineEngineMethod(Entity, setBox, void,
 }
 
 
-/*DefineConsoleMethod(Entity, callOnComponents, void, (const char* functionName), ,
+/*DefineEngineMethod(Entity, callOnComponents, void, (const char* functionName), ,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1821,12 +1821,11 @@ ConsoleMethod(Entity, addComponents, void, 2, 2, "() - Add all fielded behaviors
    object->addComponents();
 }*/
 
-ConsoleMethod(Entity, addComponent, bool, 3, 3, "(ComponentInstance bi) - Add a behavior to the object\n"
+DefineEngineMethod(Entity, addComponent, bool, (Component* comp),,
+   "@brief Add a behavior to the object\n"
    "@param bi The behavior instance to add"
    "@return (bool success) Whether or not the behavior was successfully added")
 {
-   Component *comp = dynamic_cast<Component *>(Sim::findObject(argv[2]));
-
    if (comp != NULL)
    {
       bool success = object->addComponent(comp);
@@ -1846,40 +1845,33 @@ ConsoleMethod(Entity, addComponent, bool, 3, 3, "(ComponentInstance bi) - Add a 
    return false;
 }
 
-ConsoleMethod(Entity, removeComponent, bool, 3, 4, "(ComponentInstance bi, [bool deleteBehavior = true])\n"
+DefineEngineMethod(Entity, removeComponent, bool, (Component* comp, bool deleteComponent), (true),
    "@param bi The behavior instance to remove\n"
    "@param deleteBehavior Whether or not to delete the behavior\n"
    "@return (bool success) Whether the behavior was successfully removed")
 {
-   bool deleteComponent = true;
-   if (argc > 3)
-      deleteComponent = dAtob(argv[3]);
-
-   return object->removeComponent(dynamic_cast<Component *>(Sim::findObject(argv[2])), deleteComponent);
+   return object->removeComponent(comp, deleteComponent);
 }
 
-ConsoleMethod(Entity, clearComponents, void, 2, 2, "() - Clear all behavior instances\n"
+DefineEngineMethod(Entity, clearComponents, void, (),, "Clear all behavior instances\n"
    "@return No return value")
 {
    object->clearComponents();
 }
 
-ConsoleMethod(Entity, getComponentByIndex, S32, 3, 3, "(int index) - Gets a particular behavior\n"
+DefineEngineMethod(Entity, getComponentByIndex, Component*, (S32 index),, 
+   "@brief Gets a particular behavior\n"
    "@param index The index of the behavior to get\n"
    "@return (ComponentInstance bi) The behavior instance you requested")
 {
-   Component *comp = object->getComponent(dAtoi(argv[2]));
-
-   return (comp != NULL) ? comp->getId() : 0;
+   return object->getComponent(index);
 }
 
-DefineConsoleMethod(Entity, getComponent, S32, (String componentName), (""),
+DefineEngineMethod(Entity, getComponent, Component*, (String componentName), (""),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
-   Component *comp = object->getComponent(componentName);
-
-   return (comp != NULL) ? comp->getId() : 0;
+   return object->getComponent(componentName);
 }
 
 /*ConsoleMethod(Entity, getBehaviorByType, S32, 3, 3, "(string BehaviorTemplateName) - gets a behavior\n"
@@ -1908,13 +1900,14 @@ DefineConsoleMethod(Entity, getComponent, S32, (String componentName), (""),
    return object->reOrder(inst, idx);
 }*/
 
-ConsoleMethod(Entity, getComponentCount, S32, 2, 2, "() - Get the count of behaviors on an object\n"
+DefineEngineMethod(Entity, getComponentCount, S32, (),, 
+   "@brief Get the count of behaviors on an object\n"
    "@return (int count) The number of behaviors on an object")
 {
    return object->getComponentCount();
 }
 
-DefineConsoleMethod(Entity, setComponentDirty, void, (S32 componentID, bool forceUpdate), (0, false),
+DefineEngineMethod(Entity, setComponentDirty, void, (S32 componentID, bool forceUpdate), (0, false),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1923,7 +1916,7 @@ DefineConsoleMethod(Entity, setComponentDirty, void, (S32 componentID, bool forc
       object->setComponentDirty(comp, forceUpdate);*/
 }
 
-DefineConsoleMethod(Entity, getMoveVector, VectorF, (),,
+DefineEngineMethod(Entity, getMoveVector, VectorF, (),,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1937,7 +1930,7 @@ DefineConsoleMethod(Entity, getMoveVector, VectorF, (),,
    return VectorF::Zero;
 }
 
-DefineConsoleMethod(Entity, getMoveRotation, VectorF, (), ,
+DefineEngineMethod(Entity, getMoveRotation, VectorF, (), ,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1951,7 +1944,7 @@ DefineConsoleMethod(Entity, getMoveRotation, VectorF, (), ,
    return VectorF::Zero;
 }
 
-DefineConsoleMethod(Entity, getMoveTrigger, bool, (S32 triggerNum), (0),
+DefineEngineMethod(Entity, getMoveTrigger, bool, (S32 triggerNum), (0),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1972,28 +1965,28 @@ DefineEngineMethod(Entity, getForwardVector, VectorF, (), ,
    return forVec;
 }
 
-DefineConsoleMethod(Entity, setForwardVector, void, (VectorF newForward), (VectorF(0,0,0)),
+DefineEngineMethod(Entity, setForwardVector, void, (VectorF newForward), (VectorF(0,0,0)),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
    object->setForwardVector(newForward);
 }
 
-DefineConsoleMethod(Entity, lookAt, void, (Point3F lookPosition),,
+DefineEngineMethod(Entity, lookAt, void, (Point3F lookPosition),,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
    //object->setForwardVector(newForward);
 }
 
-DefineConsoleMethod(Entity, rotateTo, void, (Point3F lookPosition, F32 degreePerSecond), (1.0),
+DefineEngineMethod(Entity, rotateTo, void, (Point3F lookPosition, F32 degreePerSecond), (1.0),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
    //object->setForwardVector(newForward);
 }
 
-DefineConsoleMethod(Entity, notify, void, (String signalFunction, String argA, String argB, String argC, String argD, String argE),
+DefineEngineMethod(Entity, notify, void, (String signalFunction, String argA, String argB, String argC, String argD, String argE),
 ("", "", "", "", "", ""),
 "Triggers a signal call to all components for a certain function.")
 {
@@ -2003,7 +1996,7 @@ DefineConsoleMethod(Entity, notify, void, (String signalFunction, String argA, S
    object->notifyComponents(signalFunction, argA, argB, argC, argD, argE);
 }
 
-DefineConsoleFunction(findEntitiesByTag, const char*, (SimGroup* searchingGroup, String tags), (nullAsType<SimGroup*>(), ""),
+DefineEngineFunction(findEntitiesByTag, const char*, (SimGroup* searchingGroup, String tags), (nullAsType<SimGroup*>(), ""),
 "Finds all entities that have the provided tags.\n"
 "@param searchingGroup The SimGroup to search inside. If null, we'll search the entire dictionary(this can be slow!).\n"
 "@param tags Word delimited list of tags to search for. If multiple tags are included, the list is eclusively parsed, requiring all tags provided to be found on an entity for a match.\n"

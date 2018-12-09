@@ -1486,7 +1486,7 @@ PopupMenu* GuiMenuBar::findMenu(StringTableEntry barTitle)
 //-----------------------------------------------------------------------------
 // Console Methods
 //-----------------------------------------------------------------------------
-DefineConsoleMethod(GuiMenuBar, attachToCanvas, void, (const char *canvas, S32 pos), , "(GuiCanvas, pos)")
+DefineEngineMethod(GuiMenuBar, attachToCanvas, void, (const char *canvas, S32 pos), , "(GuiCanvas, pos)")
 {
    GuiCanvas* canv = dynamic_cast<GuiCanvas*>(Sim::findObject(canvas));
    if (canv)
@@ -1495,7 +1495,7 @@ DefineConsoleMethod(GuiMenuBar, attachToCanvas, void, (const char *canvas, S32 p
    }
 }
 
-DefineConsoleMethod(GuiMenuBar, removeFromCanvas, void, (), , "()")
+DefineEngineMethod(GuiMenuBar, removeFromCanvas, void, (), , "()")
 {
    GuiCanvas* canvas = object->getRoot();
 
@@ -1503,23 +1503,23 @@ DefineConsoleMethod(GuiMenuBar, removeFromCanvas, void, (), , "()")
       canvas->setMenuBar(nullptr);
 }
 
-DefineConsoleMethod(GuiMenuBar, getMenuCount, S32, (), , "()")
+DefineEngineMethod(GuiMenuBar, getMenuCount, S32, (), , "()")
 {
    return object->getMenuListCount();
 }
 
-DefineConsoleMethod(GuiMenuBar, getMenu, S32, (S32 index), (0), "(Index)")
+DefineEngineMethod(GuiMenuBar, getMenu, S32, (S32 index), (0), "(Index)")
 {
    return object->getMenu(index)->getId();
 }
 
 //-----------------------------------------------------------------------------
-DefineConsoleMethod(GuiMenuBar, insert, void, (SimObject* pObject, S32 pos), (nullAsType<SimObject*>(), -1), "(object, pos) insert object at position")
+DefineEngineMethod(GuiMenuBar, insert, void, (SimObject* pObject, S32 pos), (nullAsType<SimObject*>(), -1), "(object, pos) insert object at position")
 {
    object->insert(pObject, pos);
 }
 
-DefineConsoleMethod(GuiMenuBar, findMenu, S32, (const char* barTitle), (""), "(barTitle)")
+DefineEngineMethod(GuiMenuBar, findMenu, S32, (const char* barTitle), (""), "(barTitle)")
 {
    StringTableEntry barTitleStr = StringTable->insert(barTitle);
    PopupMenu* menu = object->findMenu(barTitleStr);

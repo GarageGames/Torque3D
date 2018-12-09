@@ -27,7 +27,7 @@
 #include "core/tSimpleHashTable.h"
 #include "core/strings/stringFunctions.h"
 #include "core/stringTable.h"
-#include "console/console.h"
+#include "console/engineAPI.h"
 #include "console/compiler.h"
 
 
@@ -342,28 +342,26 @@ bool collapseScriptFilename(char *filename, U32 size, const char *src)
 // Console Functions
 //-----------------------------------------------------------------------------
 
-ConsoleFunction(expandFilename, const char*, 2, 2, "(string filename)"
-            "@brief Grabs the full path of a specified file\n\n"
-            "@param filename Name of the local file to locate\n"
-            "@return String containing the full filepath on disk\n"
-            "@ingroup FileSystem")
+DefineEngineFunction(expandFilename, const char*, (const char* filename),,
+   "@brief Grabs the full path of a specified file\n\n"
+   "@param filename Name of the local file to locate\n"
+   "@return String containing the full filepath on disk\n"
+   "@ingroup FileSystem")
 {
-   TORQUE_UNUSED(argc);
    static const U32 bufSize = 1024;
-   char* ret = Con::getReturnBuffer( bufSize );
-   Con::expandScriptFilename(ret, bufSize, argv[1]);
+   char* ret = Con::getReturnBuffer(bufSize);
+   Con::expandScriptFilename(ret, bufSize, filename);
    return ret;
 }
 
-ConsoleFunction(expandOldFilename, const char*, 2, 2, "(string filename)"
-            "@brief Retrofits a filepath that uses old Torque style\n\n"
-            "@return String containing filepath with new formatting\n"
-            "@ingroup FileSystem")
+DefineEngineFunction(expandOldFilename, const char*, (const char* filename),,
+   "@brief Retrofits a filepath that uses old Torque style\n\n"
+   "@return String containing filepath with new formatting\n"
+   "@ingroup FileSystem")
 {
-   TORQUE_UNUSED(argc);
    static const U32 bufSize = 1024;
-   char* ret = Con::getReturnBuffer( bufSize );
-   Con::expandOldScriptFilename(ret, bufSize, argv[1]);
+   char* ret = Con::getReturnBuffer(bufSize);
+   Con::expandOldScriptFilename(ret, bufSize, filename);
    return ret;
 }
 

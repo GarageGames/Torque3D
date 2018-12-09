@@ -658,17 +658,17 @@ void GuiColorPickerCtrl::setScriptValue(const char *value)
    setValue(newValue);
 }
 
-DefineConsoleMethod(GuiColorPickerCtrl, getSelectorPos, Point2I, (), , "Gets the current position of the selector")
+DefineEngineMethod(GuiColorPickerCtrl, getSelectorPos, Point2I, (), , "Gets the current position of the selector")
 {
    return object->getSelectorPos();
 }
 
-DefineConsoleMethod(GuiColorPickerCtrl, setSelectorPos, void, (Point2I newPos), , "Sets the current position of the selector")
+DefineEngineMethod(GuiColorPickerCtrl, setSelectorPos, void, (Point2I newPos), , "Sets the current position of the selector")
 {
    object->setSelectorPos(newPos);
 }
 
-DefineConsoleMethod(GuiColorPickerCtrl, updateColor, void, (), , "Forces update of pick color")
+DefineEngineMethod(GuiColorPickerCtrl, updateColor, void, (), , "Forces update of pick color")
 {
    object->updateColor();
 }

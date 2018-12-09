@@ -92,17 +92,17 @@ void GuiToolboxButtonCtrl::onSleep()
 
 //-------------------------------------
 
-DefineConsoleMethod( GuiToolboxButtonCtrl, setNormalBitmap, void, ( const char * name ), , "( filepath name ) sets the bitmap that shows when the button is active")
+DefineEngineMethod( GuiToolboxButtonCtrl, setNormalBitmap, void, ( const char * name ), , "( filepath name ) sets the bitmap that shows when the button is active")
 {
    object->setNormalBitmap(name);
 }
 
-DefineConsoleMethod( GuiToolboxButtonCtrl, setLoweredBitmap, void, ( const char * name ), , "( filepath name ) sets the bitmap that shows when the button is disabled")
+DefineEngineMethod( GuiToolboxButtonCtrl, setLoweredBitmap, void, ( const char * name ), , "( filepath name ) sets the bitmap that shows when the button is disabled")
 {
    object->setLoweredBitmap(name);
 }
 
-DefineConsoleMethod( GuiToolboxButtonCtrl, setHoverBitmap, void, ( const char * name ), , "( filepath name ) sets the bitmap that shows when the button is disabled")
+DefineEngineMethod( GuiToolboxButtonCtrl, setHoverBitmap, void, ( const char * name ), , "( filepath name ) sets the bitmap that shows when the button is disabled")
 {
    object->setHoverBitmap(name);
 }

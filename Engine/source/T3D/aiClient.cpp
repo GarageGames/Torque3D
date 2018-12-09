@@ -418,7 +418,7 @@ void AIClient::onAdd( const char *nameSpace ) {
 /**
  * Sets the move speed for an AI object
  */
-DefineConsoleMethod( AIClient, setMoveSpeed, void, (F32 speed), , "ai.setMoveSpeed( float );" ) 
+DefineEngineMethod( AIClient, setMoveSpeed, void, (F32 speed), , "ai.setMoveSpeed( float );" ) 
 {
    AIClient *ai = static_cast<AIClient *>( object );
    ai->setMoveSpeed( speed );
@@ -427,7 +427,7 @@ DefineConsoleMethod( AIClient, setMoveSpeed, void, (F32 speed), , "ai.setMoveSpe
 /**
  * Stops all AI movement, halt!
  */
-DefineConsoleMethod( AIClient, stop, void, (),, "ai.stop();" ) 
+DefineEngineMethod( AIClient, stop, void, (),, "ai.stop();" ) 
 {
    AIClient *ai = static_cast<AIClient *>( object );
    ai->setMoveMode( AIClient::ModeStop );
@@ -436,7 +436,7 @@ DefineConsoleMethod( AIClient, stop, void, (),, "ai.stop();" )
 /**
  * Tells the AI to aim at the location provided
  */
-DefineConsoleMethod( AIClient, setAimLocation, void, (Point3F v), , "ai.setAimLocation( x y z );" ) 
+DefineEngineMethod( AIClient, setAimLocation, void, (Point3F v), , "ai.setAimLocation( x y z );" ) 
 {
    AIClient *ai = static_cast<AIClient *>( object );
 
@@ -446,7 +446,7 @@ DefineConsoleMethod( AIClient, setAimLocation, void, (Point3F v), , "ai.setAimLo
 /**
  * Tells the AI to move to the location provided
  */
-DefineConsoleMethod( AIClient, setMoveDestination, void, (Point3F v), , "ai.setMoveDestination( x y z );" )
+DefineEngineMethod( AIClient, setMoveDestination, void, (Point3F v), , "ai.setMoveDestination( x y z );" )
 {
    AIClient *ai = static_cast<AIClient *>( object );
 
@@ -456,7 +456,7 @@ DefineConsoleMethod( AIClient, setMoveDestination, void, (Point3F v), , "ai.setM
 /**
  * Returns the point the AI is aiming at
  */
-DefineConsoleMethod( AIClient, getAimLocation, Point3F, (),, "ai.getAimLocation();" ) 
+DefineEngineMethod( AIClient, getAimLocation, Point3F, (),, "ai.getAimLocation();" ) 
 {
    AIClient *ai = static_cast<AIClient *>( object );
    return ai->getAimLocation();
@@ -465,7 +465,7 @@ DefineConsoleMethod( AIClient, getAimLocation, Point3F, (),, "ai.getAimLocation(
 /**
  * Returns the point the AI is set to move to
  */
-DefineConsoleMethod( AIClient, getMoveDestination, Point3F, (),, "ai.getMoveDestination();" ) 
+DefineEngineMethod( AIClient, getMoveDestination, Point3F, (),, "ai.getMoveDestination();" ) 
 {
    AIClient *ai = static_cast<AIClient *>( object );
    return ai->getMoveDestination();
@@ -474,7 +474,7 @@ DefineConsoleMethod( AIClient, getMoveDestination, Point3F, (),, "ai.getMoveDest
 /**
  * Sets the bots target object
  */
-DefineConsoleMethod( AIClient, setTargetObject, void, (const char * objName), , "ai.setTargetObject( obj );" ) 
+DefineEngineMethod( AIClient, setTargetObject, void, (const char * objName), , "ai.setTargetObject( obj );" ) 
 {
    AIClient *ai = static_cast<AIClient *>( object );
    
@@ -489,7 +489,7 @@ DefineConsoleMethod( AIClient, setTargetObject, void, (const char * objName), , 
 /**
  * Gets the object the AI is targeting
  */
-DefineConsoleMethod( AIClient, getTargetObject, S32, (),, "ai.getTargetObject();" ) 
+DefineEngineMethod( AIClient, getTargetObject, S32, (),, "ai.getTargetObject();" ) 
 {
    AIClient *ai = static_cast<AIClient *>( object );
 
@@ -499,7 +499,7 @@ DefineConsoleMethod( AIClient, getTargetObject, S32, (),, "ai.getTargetObject();
 /**
  * Tells the bot the mission is cycling
  */
-DefineConsoleMethod( AIClient, missionCycleCleanup, void, (),, "ai.missionCycleCleanup();" ) 
+DefineEngineMethod( AIClient, missionCycleCleanup, void, (),, "ai.missionCycleCleanup();" ) 
 {
    AIClient *ai = static_cast<AIClient*>( object );
    ai->missionCycleCleanup();
@@ -508,7 +508,7 @@ DefineConsoleMethod( AIClient, missionCycleCleanup, void, (),, "ai.missionCycleC
 /**
  * Sets the AI to run mode
  */
-DefineConsoleMethod( AIClient, move, void, (),, "ai.move();" ) 
+DefineEngineMethod( AIClient, move, void, (),, "ai.move();" ) 
 {
    AIClient *ai = static_cast<AIClient *>( object );
    ai->setMoveMode( AIClient::ModeMove );
@@ -517,7 +517,7 @@ DefineConsoleMethod( AIClient, move, void, (),, "ai.move();" )
 /**
  * Gets the AI's location in the world
  */
-DefineConsoleMethod( AIClient, getLocation, Point3F, (),, "ai.getLocation();" ) 
+DefineEngineMethod( AIClient, getLocation, Point3F, (),, "ai.getLocation();" ) 
 {
    AIClient *ai = static_cast<AIClient *>( object );
    return ai->getLocation();
@@ -526,7 +526,7 @@ DefineConsoleMethod( AIClient, getLocation, Point3F, (),, "ai.getLocation();" )
 /**
  * Adds an AI Player to the game
  */
-DefineConsoleFunction( aiAddPlayer, S32, (const char * name, const char * ns), (""), "'playerName'[, 'AIClassType'] );")
+DefineEngineFunction( aiAddPlayer, S32, (const char * name, const char * ns), (""), "'playerName'[, 'AIClassType'] );")
 {
    // Create the player
    AIClient *aiPlayer = new AIClient();
@@ -559,7 +559,7 @@ DefineConsoleFunction( aiAddPlayer, S32, (const char * name, const char * ns), (
 /**
  * Tells the AI to move forward 100 units...TEST FXN
  */
-DefineConsoleMethod( AIClient, moveForward, void, (),, "ai.moveForward();" ) 
+DefineEngineMethod( AIClient, moveForward, void, (),, "ai.moveForward();" ) 
 {
    
    AIClient *ai = static_cast<AIClient *>( object );

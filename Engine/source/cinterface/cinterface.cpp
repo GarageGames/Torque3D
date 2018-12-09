@@ -436,7 +436,7 @@ extern "C" {
 // By default, it is marked as secure by the web plugins and then can be called from
 // Javascript on the web page to ensure that function calls across the language
 // boundry are working with arguments and return values
-DefineConsoleFunction( testJavaScriptBridge, const char *, (const char* arg1, const char* arg2, const char* arg3), , "testBridge(arg1, arg2, arg3)")
+DefineEngineFunction( testJavaScriptBridge, const char *, (const char* arg1, const char* arg2, const char* arg3), , "testBridge(arg1, arg2, arg3)")
 {
 	S32 failed = 0;
 		if (dStrcmp(arg1,"one"))

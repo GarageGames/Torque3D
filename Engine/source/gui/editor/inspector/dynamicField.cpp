@@ -316,7 +316,7 @@ void GuiInspectorDynamicField::_executeSelectedCallback()
       Con::executef( mInspector, "onFieldSelected", mDynField->slotName, "TypeDynamicField" );
 }
 
-DefineConsoleMethod( GuiInspectorDynamicField, renameField, void, (const char* newDynamicFieldName),, "field.renameField(newDynamicFieldName);" )
+DefineEngineMethod( GuiInspectorDynamicField, renameField, void, (const char* newDynamicFieldName),, "field.renameField(newDynamicFieldName);" )
 {
    object->renameField( newDynamicFieldName );
 }

@@ -627,13 +627,12 @@ void GuiNavEditorCtrl::_prepRenderImage(SceneManager* sceneGraph, const SceneRen
    }*/
 }
 
-ConsoleMethod(GuiNavEditorCtrl, getMode, const char*, 2, 2, "")
+DefineEngineMethod(GuiNavEditorCtrl, getMode, const char*, (), , "")
 {
    return object->getMode();
 }
 
-ConsoleMethod(GuiNavEditorCtrl, setMode, void, 3, 3, "setMode(String mode)")
+DefineEngineMethod(GuiNavEditorCtrl, setMode, void, (String mode),, "setMode(String mode)")
 {
-   String newMode = (argv[2]);
-   object->setMode(newMode);
+   object->setMode(mode);
 }

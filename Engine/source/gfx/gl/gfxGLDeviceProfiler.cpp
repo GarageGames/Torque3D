@@ -86,7 +86,7 @@ protected:
 
 GFXProfiler<GLTimer> gfxProfiler;
 
-DefineConsoleFunction(printGFXGLTimers, void,(), ,"")
+DefineEngineFunction(printGFXGLTimers, void,(), ,"")
 {
    gfxProfiler.printTimes();
 }

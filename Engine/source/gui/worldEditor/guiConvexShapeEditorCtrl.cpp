@@ -2179,43 +2179,43 @@ void GuiConvexEditorCtrl::splitSelectedFace()
    updateGizmoPos();
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, hollowSelection, void, (), , "" )
+DefineEngineMethod( GuiConvexEditorCtrl, hollowSelection, void, (), , "" )
 {
    object->hollowSelection();
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, recenterSelection, void, (), , "" )
+DefineEngineMethod( GuiConvexEditorCtrl, recenterSelection, void, (), , "" )
 {
    object->recenterSelection();
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, hasSelection, S32, (), , "" )
+DefineEngineMethod( GuiConvexEditorCtrl, hasSelection, S32, (), , "" )
 {
    return object->hasSelection();
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, handleDelete, void, (), , "" )
+DefineEngineMethod( GuiConvexEditorCtrl, handleDelete, void, (), , "" )
 {
    object->handleDelete();
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, handleDeselect, void, (), , "" )
+DefineEngineMethod( GuiConvexEditorCtrl, handleDeselect, void, (), , "" )
 {
    object->handleDeselect();
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, dropSelectionAtScreenCenter, void, (), , "" )
+DefineEngineMethod( GuiConvexEditorCtrl, dropSelectionAtScreenCenter, void, (), , "" )
 {
    object->dropSelectionAtScreenCenter();
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, selectConvex, void, (ConvexShape *convex), , "( ConvexShape )" )
+DefineEngineMethod( GuiConvexEditorCtrl, selectConvex, void, (ConvexShape *convex), , "( ConvexShape )" )
 {
 if (convex)
       object->setSelection( convex, -1 );
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, splitSelectedFace, void, (), , "" )
+DefineEngineMethod( GuiConvexEditorCtrl, splitSelectedFace, void, (), , "" )
 {
    object->splitSelectedFace();
 }

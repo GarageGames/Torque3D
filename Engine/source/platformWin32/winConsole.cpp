@@ -38,7 +38,7 @@ namespace Con
    extern bool alwaysUseDebugOutput;
 }
 
-DefineConsoleFunction( enableWinConsole, void, (bool flag), , "enableWinConsole(bool);")
+DefineEngineFunction( enableWinConsole, void, (bool flag), , "enableWinConsole(bool);")
 {
    WindowsConsole->enable(flag);
 }

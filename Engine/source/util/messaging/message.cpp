@@ -155,19 +155,19 @@ const char *Message::getType()
 // Console Methods
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod(Message, getType, const char *, (), , "() Get message type (script class name or C++ class name if no script defined class)")
+DefineEngineMethod(Message, getType, const char *, (), , "() Get message type (script class name or C++ class name if no script defined class)")
 {
    return object->getType();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod(Message, addReference, void, (), , "() Increment the reference count for this message")
+DefineEngineMethod(Message, addReference, void, (), , "() Increment the reference count for this message")
 {
    object->addReference();
 }
 
-DefineConsoleMethod(Message, freeReference, void, (), , "() Decrement the reference count for this message")
+DefineEngineMethod(Message, freeReference, void, (), , "() Decrement the reference count for this message")
 {
    object->freeReference();
 }

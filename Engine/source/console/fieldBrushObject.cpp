@@ -123,7 +123,7 @@ static char* suppressSpaces(const char* in_pname)
 //-----------------------------------------------------------------------------
 // Query Groups.
 //-----------------------------------------------------------------------------
-DefineConsoleMethod(FieldBrushObject, queryGroups, const char*, (const char* simObjName), , "(simObject) Query available static-field groups for selected object./\n"
+DefineEngineMethod(FieldBrushObject, queryGroups, const char*, (const char* simObjName), , "(simObject) Query available static-field groups for selected object./\n"
                                                                 "@param simObject Object to query static-field groups on.\n"
                                                              "@return Space-seperated static-field group list.")
 {
@@ -191,7 +191,7 @@ DefineConsoleMethod(FieldBrushObject, queryGroups, const char*, (const char* sim
 //-----------------------------------------------------------------------------
 // Query Fields.
 //-----------------------------------------------------------------------------
-DefineConsoleMethod(FieldBrushObject, queryFields, const char*, (const char* simObjName, const char* groupList), (""), "(simObject, [groupList]) Query available static-fields for selected object./\n"
+DefineEngineMethod(FieldBrushObject, queryFields, const char*, (const char* simObjName, const char* groupList), (""), "(simObject, [groupList]) Query available static-fields for selected object./\n"
                                                                 "@param simObject Object to query static-fields on.\n"
                                                                 "@param groupList groups to filter static-fields against.\n"
                                                              "@return Space-seperated static-field list.")
@@ -366,7 +366,7 @@ DefineConsoleMethod(FieldBrushObject, queryFields, const char*, (const char* sim
 //-----------------------------------------------------------------------------
 // Copy Fields.
 //-----------------------------------------------------------------------------
-DefineConsoleMethod(FieldBrushObject, copyFields, void, (const char* simObjName, const char* pFieldList), (""), "(simObject, [fieldList]) Copy selected static-fields for selected object./\n"
+DefineEngineMethod(FieldBrushObject, copyFields, void, (const char* simObjName, const char* pFieldList), (""), "(simObject, [fieldList]) Copy selected static-fields for selected object./\n"
                                                         "@param simObject Object to copy static-fields from.\n"
                                                         "@param fieldList fields to filter static-fields against.\n"
                                                      "@return No return value.")
@@ -500,7 +500,7 @@ void FieldBrushObject::copyFields( SimObject* pSimObject, const char* fieldList 
 //-----------------------------------------------------------------------------
 // Paste Fields.
 //-----------------------------------------------------------------------------
-DefineConsoleMethod(FieldBrushObject, pasteFields, void, (const char* simObjName), , "(simObject) Paste copied static-fields to selected object./\n"
+DefineEngineMethod(FieldBrushObject, pasteFields, void, (const char* simObjName), , "(simObject) Paste copied static-fields to selected object./\n"
                                                         "@param simObject Object to paste static-fields to.\n"
                                                      "@return No return value.")
 {

@@ -895,15 +895,7 @@ DefineEngineMethod( SimSet, listObjects, void, (),,
 
 //-----------------------------------------------------------------------------
 
-DEFINE_CALLIN( fnSimSet_add, add, SimSet, void, ( SimSet* set, SimObject* object ),,,
-   "Add the given object to the set.\n"
-   "@param object An object." )
-{
-   if( object )
-      set->addObject( object );
-}
-
-ConsoleMethod( SimSet, add, void, 3, 0,
+DefineEngineStringlyVariadicMethod( SimSet, add, void, 3, 0,
    "( SimObject objects... ) Add the given objects to the set.\n"
    "@param objects The objects to add to the set." )
 {
@@ -919,15 +911,7 @@ ConsoleMethod( SimSet, add, void, 3, 0,
 
 //-----------------------------------------------------------------------------
 
-DEFINE_CALLIN( fnSimSet_remove, remove, SimSet, void, ( SimSet* set, SimObject* object ),,,
-   "Remove the given object from the set.\n"
-   "@param object An object." )
-{
-   if( object )
-      set->removeObject( object );
-}
-
-ConsoleMethod( SimSet, remove, void, 3, 0,
+DefineEngineStringlyVariadicMethod( SimSet, remove, void, 3, 0,
    "( SimObject objects... ) Remove the given objects from the set.\n"
    "@param objects The objects to remove from the set." )
 {
@@ -954,7 +938,7 @@ DefineEngineMethod( SimSet, clear, void, (),,
 //-----------------------------------------------------------------------------
 
 //UNSAFE; don't want this in the new API
-DefineConsoleMethod( SimSet, deleteAllObjects, void, (), , "() Delete all objects in the set." )
+DefineEngineMethod( SimSet, deleteAllObjects, void, (), , "() Delete all objects in the set." )
 {
    object->deleteAllObjects();
 }
@@ -970,7 +954,7 @@ DefineEngineMethod( SimSet, getRandom, SimObject*, (),,
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( SimSet, callOnChildren, void, 3, 0,
+DefineEngineStringlyVariadicMethod( SimSet, callOnChildren, void, 3, 0,
    "( string method, string args... ) Call a method on all objects contained in the set.\n\n"
    "@param method The name of the method to call.\n"
    "@param args The arguments to the method.\n\n"
@@ -982,7 +966,7 @@ ConsoleMethod( SimSet, callOnChildren, void, 3, 0,
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( SimSet, callOnChildrenNoRecurse, void, 3, 0,
+DefineEngineStringlyVariadicMethod( SimSet, callOnChildrenNoRecurse, void, 3, 0,
    "( string method, string args... ) Call a method on all objects contained in the set.\n\n"
    "@param method The name of the method to call.\n"
    "@param args The arguments to the method.\n\n"
@@ -1026,7 +1010,7 @@ DEFINE_CALLIN( fnSimSet_getCountRecursive, getCountRecursive, SimSet, U32, ( Sim
    return set->sizeRecursive();
 }
 
-DefineConsoleMethod( SimSet, getFullCount, S32, (), , "() Get the number of direct and indirect child objects contained in the set.\n"
+DefineEngineMethod( SimSet, getFullCount, S32, (), , "() Get the number of direct and indirect child objects contained in the set.\n"
    "@return The number of objects contained in the set as well as in other sets contained directly or indirectly in the set." )
 {
    return object->sizeRecursive();
@@ -1122,7 +1106,7 @@ DefineEngineMethod( SimSet, pushToBack, void, ( SimObject* obj ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( SimSet, sort, void, ( const char * callbackFunction ), , "( string callbackFunction ) Sort the objects in the set using the given comparison function.\n"
+DefineEngineMethod( SimSet, sort, void, ( const char * callbackFunction ), , "( string callbackFunction ) Sort the objects in the set using the given comparison function.\n"
    "@param callbackFunction Name of a function that takes two object arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal." )
 {
    object->scriptSort( callbackFunction );

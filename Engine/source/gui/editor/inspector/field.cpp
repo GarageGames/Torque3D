@@ -688,59 +688,59 @@ void GuiInspectorField::_setFieldDocs( StringTableEntry docs )
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspectorField, getInspector, S32, (), , "() - Return the GuiInspector to which this field belongs." )
+DefineEngineMethod( GuiInspectorField, getInspector, S32, (), , "() - Return the GuiInspector to which this field belongs." )
 {
    return object->getInspector()->getId();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspectorField, getInspectedFieldName, const char*, (), , "() - Return the name of the field edited by this inspector field." )
+DefineEngineMethod( GuiInspectorField, getInspectedFieldName, const char*, (), , "() - Return the name of the field edited by this inspector field." )
 {
    return object->getFieldName();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspectorField, getInspectedFieldType, const char*, (), , "() - Return the type of the field edited by this inspector field." )
+DefineEngineMethod( GuiInspectorField, getInspectedFieldType, const char*, (), , "() - Return the type of the field edited by this inspector field." )
 {
    return object->getFieldType();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspectorField, apply, void, ( const char * newValue, bool callbacks ), (true), "( string newValue, bool callbacks=true ) - Set the field's value. Suppress callbacks for undo if callbacks=false." )
+DefineEngineMethod( GuiInspectorField, apply, void, ( const char * newValue, bool callbacks ), (true), "( string newValue, bool callbacks=true ) - Set the field's value. Suppress callbacks for undo if callbacks=false." )
 {
    object->setData( newValue, callbacks );
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspectorField, applyWithoutUndo, void, (const char * data), , "() - Set field value without recording undo (same as 'apply( value, false )')." )
+DefineEngineMethod( GuiInspectorField, applyWithoutUndo, void, (const char * data), , "() - Set field value without recording undo (same as 'apply( value, false )')." )
 {
    object->setData( data, false );
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspectorField, getData, const char*, (), , "() - Return the value currently displayed on the field." )
+DefineEngineMethod( GuiInspectorField, getData, const char*, (), , "() - Return the value currently displayed on the field." )
 {
    return object->getData();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspectorField, reset, void, (), , "() - Reset to default value." )
+DefineEngineMethod( GuiInspectorField, reset, void, (), , "() - Reset to default value." )
 {
    object->resetData();
 }
 
-DefineConsoleMethod(GuiInspectorField, setCaption, void, (String newCaption),, "() - Reset to default value.")
+DefineEngineMethod(GuiInspectorField, setCaption, void, (String newCaption),, "() - Reset to default value.")
 {
    object->setCaption(StringTable->insert(newCaption.c_str()));
 }
 
-DefineConsoleMethod(GuiInspectorField, setEditControl, void, (GuiControl* editCtrl), (nullAsType<GuiControl*>()), "() - Reset to default value.")
+DefineEngineMethod(GuiInspectorField, setEditControl, void, (GuiControl* editCtrl), (nullAsType<GuiControl*>()), "() - Reset to default value.")
 {
    object->setEditControl(editCtrl);
 }

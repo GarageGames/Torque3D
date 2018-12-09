@@ -250,12 +250,12 @@ GuiInspectorField* GuiInspectorVariableGroup::createInspectorField()
    return NULL;
 }
 
-DefineConsoleMethod(GuiInspectorVariableGroup, createInspectorField, GuiInspectorField*, (),, "createInspectorField()")
+DefineEngineMethod(GuiInspectorVariableGroup, createInspectorField, GuiInspectorField*, (),, "createInspectorField()")
 {
    return object->createInspectorField();
 }
 
-DefineConsoleMethod(GuiInspectorVariableGroup, addInspectorField, void, (GuiInspectorField* field), (nullAsType<GuiInspectorField*>()), "addInspectorField( GuiInspectorFieldObject )")
+DefineEngineMethod(GuiInspectorVariableGroup, addInspectorField, void, (GuiInspectorField* field), (nullAsType<GuiInspectorField*>()), "addInspectorField( GuiInspectorFieldObject )")
 {
    object->addInspectorField(field);
 }

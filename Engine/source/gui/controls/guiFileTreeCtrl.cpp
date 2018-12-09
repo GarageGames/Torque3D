@@ -379,18 +379,18 @@ void GuiFileTreeCtrl::recurseInsert( Item* parent, StringTableEntry path )
 
 }
 
-DefineConsoleMethod( GuiFileTreeCtrl, getSelectedPath, const char*, (), , "getSelectedPath() - returns the currently selected path in the tree")
+DefineEngineMethod( GuiFileTreeCtrl, getSelectedPath, const char*, (), , "getSelectedPath() - returns the currently selected path in the tree")
 {
    const String& path = object->getSelectedPath();
    return Con::getStringArg( path );
 }
 
-DefineConsoleMethod( GuiFileTreeCtrl, setSelectedPath, bool, (const char * path), , "setSelectedPath(path) - expands the tree to the specified path")
+DefineEngineMethod( GuiFileTreeCtrl, setSelectedPath, bool, (const char * path), , "setSelectedPath(path) - expands the tree to the specified path")
 {
    return object->setSelectedPath( path );
 }
 
-DefineConsoleMethod( GuiFileTreeCtrl, reload, void, (), , "() - Reread the directory tree hierarchy." )
+DefineEngineMethod( GuiFileTreeCtrl, reload, void, (), , "() - Reread the directory tree hierarchy." )
 {
    object->updateTree();
 }

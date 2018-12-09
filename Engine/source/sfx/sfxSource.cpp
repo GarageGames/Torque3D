@@ -1569,7 +1569,7 @@ static ConsoleDocFragment _sSetTransform2(
    "void setTransform( Point3F position, Point3F direction )"
 );
 
-DefineConsoleMethod( SFXSource, setTransform, void, ( const char * position, const char * direction ), ( "" ),
+DefineEngineMethod( SFXSource, setTransform, void, ( const char * position, const char * direction ), ( "" ),
    "( vector position [, vector direction ] ) "
    "Set the position and orientation of a 3D sound source.\n"
    "@hide" )

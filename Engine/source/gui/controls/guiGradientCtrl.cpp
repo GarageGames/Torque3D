@@ -601,7 +601,7 @@ void GuiGradientCtrl::sortColorRange()
 		dQsort( mAlphaRange.address(), mAlphaRange.size(), sizeof(ColorRange), _numIncreasing);
 }
 
-DefineConsoleMethod(GuiGradientCtrl, getColorCount, S32, (), , "Get color count")
+DefineEngineMethod(GuiGradientCtrl, getColorCount, S32, (), , "Get color count")
 {
 	if( object->getDisplayMode() == GuiGradientCtrl::pHorizColorRange )
 		return object->mColorRange.size();
@@ -611,7 +611,7 @@ DefineConsoleMethod(GuiGradientCtrl, getColorCount, S32, (), , "Get color count"
 	return 0;
 }
 
-DefineConsoleMethod(GuiGradientCtrl, getColor, LinearColorF, (S32 idx), , "Get color value")
+DefineEngineMethod(GuiGradientCtrl, getColor, LinearColorF, (S32 idx), , "Get color value")
 {
 
 	if( object->getDisplayMode() == GuiGradientCtrl::pHorizColorRange )

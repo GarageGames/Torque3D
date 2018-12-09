@@ -364,7 +364,7 @@ ConsoleDocFragment _GuiPopUpMenuCtrlExAdd(
    "void add(string name, S32 idNum, S32 scheme=0);"
 );
 
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, add, void, (const char * name, S32 idNum, U32 scheme), ("", -1, 0), "(string name, int idNum, int scheme=0)")
+DefineEngineMethod( GuiPopUpMenuCtrlEx, add, void, (const char * name, S32 idNum, U32 scheme), ("", -1, 0), "(string name, int idNum, int scheme=0)")
 {
    object->addEntry(name, idNum, scheme);
 }
@@ -525,7 +525,7 @@ ConsoleDocFragment _GuiPopUpMenuCtrlExsetSelected(
    "setSelected(int id, bool scriptCallback=true);"
 );
 
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, setSelected, void, (S32 id, bool scriptCallback), (true), "(int id, [scriptCallback=true])"
+DefineEngineMethod( GuiPopUpMenuCtrlEx, setSelected, void, (S32 id, bool scriptCallback), (true), "(int id, [scriptCallback=true])"
            "@hide")
 {
    object->setSelected( id, scriptCallback );
@@ -539,7 +539,7 @@ ConsoleDocFragment _GuiPopUpMenuCtrlExsetFirstSelected(
 );
 
 
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, setFirstSelected, void, (bool scriptCallback), (true), "([scriptCallback=true])"
+DefineEngineMethod( GuiPopUpMenuCtrlEx, setFirstSelected, void, (bool scriptCallback), (true), "([scriptCallback=true])"
            "@hide")
 {
    object->setFirstSelected( scriptCallback );
@@ -561,7 +561,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, getTextById, const char*, (S32 id),,
 }
 
 
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, getColorById,  ColorI, (S32 id), ,  
+DefineEngineMethod( GuiPopUpMenuCtrlEx, getColorById,  ColorI, (S32 id), ,  
            "@brief Get color of an entry's box\n\n"
            "@param id ID number of entry to query\n\n"
            "@return ColorI in the format of \"Red Green Blue Alpha\", each of with is a value between 0 - 255")
@@ -572,7 +572,7 @@ DefineConsoleMethod( GuiPopUpMenuCtrlEx, getColorById,  ColorI, (S32 id), ,
 
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, setEnumContent, void, ( const char * className, const char * enumName ), ,
+DefineEngineMethod( GuiPopUpMenuCtrlEx, setEnumContent, void, ( const char * className, const char * enumName ), ,
            "@brief This fills the popup with a classrep's field enumeration type info.\n\n"
               "More of a helper function than anything.   If console access to the field list is added, "
               "at least for the enumerated types, then this should go away.\n\n"
@@ -628,7 +628,7 @@ DefineConsoleMethod( GuiPopUpMenuCtrlEx, setEnumContent, void, ( const char * cl
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, findText, S32, (const char * text), , "(string text)"
+DefineEngineMethod( GuiPopUpMenuCtrlEx, findText, S32, (const char * text), , "(string text)"
               "Returns the id of the first entry containing the specified text or -1 if not found."
            "@param text String value used for the query\n\n"
            "@return Numerical ID of entry containing the text.")
@@ -637,7 +637,7 @@ DefineConsoleMethod( GuiPopUpMenuCtrlEx, findText, S32, (const char * text), , "
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, size, S32, (), , 
+DefineEngineMethod( GuiPopUpMenuCtrlEx, size, S32, (), , 
            "@brief Get the size of the menu\n\n"
            "@return Number of entries in the menu\n")
 {
@@ -645,7 +645,7 @@ DefineConsoleMethod( GuiPopUpMenuCtrlEx, size, S32, (), ,
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, replaceText, void, (S32 boolVal), , 
+DefineEngineMethod( GuiPopUpMenuCtrlEx, replaceText, void, (S32 boolVal), , 
            "@brief Flag that causes each new text addition to replace the current entry\n\n"
            "@param True to turn on replacing, false to disable it")
 {
@@ -737,7 +737,7 @@ void GuiPopUpMenuCtrlEx::clearEntry( S32 entry )
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, clearEntry, void, (S32 entry), , "(S32 entry)")
+DefineEngineMethod( GuiPopUpMenuCtrlEx, clearEntry, void, (S32 entry), , "(S32 entry)")
 {
    object->clearEntry(entry);
 }

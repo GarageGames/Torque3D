@@ -23,7 +23,7 @@
 #include <stdarg.h>
 
 #include "core/strings/stringFunctions.h"
-#include "console/console.h"
+#include "console/engineAPI.h"
 
 
 //-------------------------------------- STATIC Declaration
@@ -167,8 +167,8 @@ const char* avar(const char *message, ...)
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( Assert, void, 3, 3, "(condition, message) - Fatal Script Assertion" )
+DefineEngineFunction(Assert, void, (bool condition, const char* message),, "Fatal Script Assertion")
 {
-    // Process Assertion.
-    AssertISV( dAtob(argv[1]), argv[2] );
+   // Process Assertion.
+   AssertISV(condition, message);
 }

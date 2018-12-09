@@ -1442,7 +1442,7 @@ static ConsoleDocFragment _sfxCreateSource4(
    NULL,
    "SFXSound sfxCreateSource( SFXDescription description, string filename, float x, float y, float z );" );
 
-DefineConsoleFunction( sfxCreateSource, S32, ( const char * sfxType, const char * arg0, const char * arg1, const char * arg2, const char * arg3 ), ("", "", "", ""),
+DefineEngineFunction( sfxCreateSource, S32, ( const char * sfxType, const char * arg0, const char * arg1, const char * arg2, const char * arg3 ), ("", "", "", ""),
                      "( SFXTrack track | ( SFXDescription description, string filename ) [, float x, float y, float z ] ) "
                      "Creates a new paused sound source using a profile or a description "
                      "and filename.  The return value is the source which must be "
@@ -1547,7 +1547,7 @@ static ConsoleDocFragment _sfxPlay3(
    NULL,
    "void sfxPlay( SFXTrack track, float x, float y, float z );" );
    
-DefineConsoleFunction( sfxPlay, S32, ( const char * trackName, const char * pointOrX, const char * y, const char * z ), ( "", "", ""),
+DefineEngineFunction( sfxPlay, S32, ( const char * trackName, const char * pointOrX, const char * y, const char * z ), ( "", "", ""),
    "Start playing the given source or create a new source for the given track and play it.\n"
    "@hide" )
 {
@@ -1657,7 +1657,7 @@ static ConsoleDocFragment _sPlayOnce4(
    "SFXSource sfxPlayOnce( SFXDescription description, string filename, float x, float y, float z, float fadeInTime=-1 );"
 );
 
-DefineConsoleFunction( sfxPlayOnce, S32, ( const char * sfxType, const char * arg0, const char * arg1, const char * arg2, const char * arg3, const char* arg4 ), ("", "", "", "", "-1.0f"),
+DefineEngineFunction( sfxPlayOnce, S32, ( const char * sfxType, const char * arg0, const char * arg1, const char * arg2, const char * arg3, const char* arg4 ), ("", "", "", "", "-1.0f"),
    "SFXSource sfxPlayOnce( ( SFXTrack track | SFXDescription description, string filename ) [, float x, float y, float z, float fadeInTime=-1 ] ) "
    "Create a new play-once source for the given profile or description+filename and start playback of the source.\n"
    "@hide" )

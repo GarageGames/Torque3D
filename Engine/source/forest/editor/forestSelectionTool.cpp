@@ -563,32 +563,32 @@ void ForestSelectionTool::onUndoAction()
       mBounds.intersect( mSelection[i].getWorldBox() );
 }
 
-DefineConsoleMethod( ForestSelectionTool, getSelectionCount, S32, (), , "" )
+DefineEngineMethod( ForestSelectionTool, getSelectionCount, S32, (), , "" )
 {
    return object->getSelectionCount();
 }
 
-DefineConsoleMethod( ForestSelectionTool, deleteSelection, void, (), , "" )
+DefineEngineMethod( ForestSelectionTool, deleteSelection, void, (), , "" )
 {
    object->deleteSelection();
 }
 
-DefineConsoleMethod( ForestSelectionTool, clearSelection, void, (), , "" )
+DefineEngineMethod( ForestSelectionTool, clearSelection, void, (), , "" )
 {
    object->clearSelection();
 }
 
-DefineConsoleMethod( ForestSelectionTool, cutSelection, void, (), , "" )
+DefineEngineMethod( ForestSelectionTool, cutSelection, void, (), , "" )
 {
    object->cutSelection();
 }
 
-DefineConsoleMethod( ForestSelectionTool, copySelection, void, (), , "" )
+DefineEngineMethod( ForestSelectionTool, copySelection, void, (), , "" )
 {
    object->copySelection();
 }
 
-DefineConsoleMethod( ForestSelectionTool, pasteSelection, void, (), , "" )
+DefineEngineMethod( ForestSelectionTool, pasteSelection, void, (), , "" )
 {
    object->pasteSelection();
 }

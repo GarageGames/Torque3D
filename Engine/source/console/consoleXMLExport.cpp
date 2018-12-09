@@ -314,7 +314,7 @@ namespace Con {
 }; // namespace Con
 
 
-DefineConsoleFunction( consoleExportXML, const char*, (), ,"Exports console definition XML representation" )
+DefineEngineFunction( consoleExportXML, const char*, (), ,"Exports console definition XML representation" )
 {
    Con::XMLExport xmlExport;
    String xml;

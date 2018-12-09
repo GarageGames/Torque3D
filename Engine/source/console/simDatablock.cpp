@@ -428,7 +428,7 @@ void SimDataBlock::write(Stream &stream, U32 tabStop, U32 flags)
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( SimDataBlock, reloadOnLocalClient, void, (),,
+DefineEngineMethod( SimDataBlock, reloadOnLocalClient, void, (),,
    "Reload the datablock.  This can only be used with a local client configuration." )
 {
    // Make sure we're running a local client.
@@ -464,7 +464,7 @@ DefineConsoleMethod( SimDataBlock, reloadOnLocalClient, void, (),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( preloadClientDataBlocks, void, (),,
+DefineEngineFunction( preloadClientDataBlocks, void, (),,
    "Preload all datablocks in client mode.\n\n"
    "(Server parameter is set to false).  This will take some time to complete.")
 {
@@ -482,7 +482,7 @@ DefineConsoleFunction( preloadClientDataBlocks, void, (),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( deleteDataBlocks, void, (),,
+DefineEngineFunction( deleteDataBlocks, void, (),,
    "Delete all the datablocks we've downloaded.\n\n"
    "This is usually done in preparation of downloading a new set of datablocks, "
    "such as occurs on a mission change, but it's also good post-mission cleanup." )

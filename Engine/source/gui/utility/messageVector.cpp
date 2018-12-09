@@ -258,7 +258,7 @@ static ConsoleDocFragment _MessageVectordump2(
    "MessageVector",
    "void dump( string filename, string header);");
 
-DefineConsoleMethod( MessageVector, dump, void, (const char * filename, const char * header), (""), "(string filename, string header=NULL)"
+DefineEngineMethod( MessageVector, dump, void, (const char * filename, const char * header), (""), "(string filename, string header=NULL)"
               "Dump the message vector to a file, optionally prefixing a header."
 			  "@hide")
 {

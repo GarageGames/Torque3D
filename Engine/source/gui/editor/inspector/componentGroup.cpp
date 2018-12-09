@@ -469,7 +469,7 @@ void GuiInspectorComponentGroup::onRightMouseUp(const GuiEvent &event)
       Con::executef(this, "onRightMouseUp", event.mousePoint);
 }
 
-ConsoleMethod(GuiInspectorComponentGroup, inspectGroup, bool, 2, 2, "Refreshes the dynamic fields in the inspector.")
+DefineEngineMethod(GuiInspectorComponentGroup, inspectGroup, bool, (),, "Refreshes the dynamic fields in the inspector.")
 {
    return object->inspectGroup();
 }
@@ -515,16 +515,17 @@ AbstractClassRep::Field* GuiInspectorComponentGroup::findObjectBehaviorField(Com
    }
    return NULL;
 }
-ConsoleMethod(GuiInspectorComponentGroup, addDynamicField, void, 2, 2, "obj.addDynamicField();")
+
+DefineEngineMethod(GuiInspectorComponentGroup, addDynamicField, void, (), , "obj.addDynamicField();")
 {
    object->addDynamicField();
 }
 
-ConsoleMethod(GuiInspectorComponentGroup, removeDynamicField, void, 3, 3, "")
+DefineEngineMethod(GuiInspectorComponentGroup, removeDynamicField, void, (), , "")
 {
 }
 
-DefineConsoleMethod(GuiInspectorComponentGroup, getComponent, S32, (), ,"")
+DefineEngineMethod(GuiInspectorComponentGroup, getComponent, S32, (), , "")
 {
    return object->getComponent()->getId();
 }

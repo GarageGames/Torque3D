@@ -300,82 +300,82 @@ void GuiPopUpMenuCtrl::initPersistFields(void)
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleMethod( GuiPopUpMenuCtrl, add, void, (const char * name, S32 idNum, U32 scheme), ("", -1, 0), "(string name, int idNum, int scheme=0)")
+DefineEngineMethod( GuiPopUpMenuCtrl, add, void, (const char * name, S32 idNum, U32 scheme), ("", -1, 0), "(string name, int idNum, int scheme=0)")
 {
    object->addEntry(name, idNum, scheme);
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrl, addScheme, void, (U32 id, ColorI fontColor, ColorI fontColorHL, ColorI fontColorSEL), , 
+DefineEngineMethod( GuiPopUpMenuCtrl, addScheme, void, (U32 id, ColorI fontColor, ColorI fontColorHL, ColorI fontColorSEL), , 
    "(int id, ColorI fontColor, ColorI fontColorHL, ColorI fontColorSEL)")
 {
 
    object->addScheme( id, fontColor, fontColorHL, fontColorSEL );
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrl, getText, const char*, (), , "")
+DefineEngineMethod( GuiPopUpMenuCtrl, getText, const char*, (), , "")
 {
    return object->getText();
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrl, clear, void, (), , "Clear the popup list.")
+DefineEngineMethod( GuiPopUpMenuCtrl, clear, void, (), , "Clear the popup list.")
 {
    object->clear();
 }
 
 //FIXME: clashes with SimSet.sort
-DefineConsoleMethod(GuiPopUpMenuCtrl, sort, void, (), , "Sort the list alphabetically.")
+DefineEngineMethod(GuiPopUpMenuCtrl, sort, void, (), , "Sort the list alphabetically.")
 {
    object->sort();
 }
 
 //  Added to sort the entries by ID
-DefineConsoleMethod(GuiPopUpMenuCtrl, sortID, void, (), , "Sort the list by ID.")
+DefineEngineMethod(GuiPopUpMenuCtrl, sortID, void, (), , "Sort the list by ID.")
 {
    object->sortID();
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrl, forceOnAction, void, (), , "")
+DefineEngineMethod( GuiPopUpMenuCtrl, forceOnAction, void, (), , "")
 {
    object->onAction();
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrl, forceClose, void, (), , "")
+DefineEngineMethod( GuiPopUpMenuCtrl, forceClose, void, (), , "")
 {
    object->closePopUp();
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrl, getSelected, S32, (), , "Gets the selected index")
+DefineEngineMethod( GuiPopUpMenuCtrl, getSelected, S32, (), , "Gets the selected index")
 {
    return object->getSelected();
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrl, setSelected, void, (S32 id,  bool scriptCallback), (true), "(int id, [scriptCallback=true])")
+DefineEngineMethod( GuiPopUpMenuCtrl, setSelected, void, (S32 id,  bool scriptCallback), (true), "(int id, [scriptCallback=true])")
 {
    object->setSelected( id, scriptCallback );
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrl, setFirstSelected, void, (bool scriptCallback), (true), "([scriptCallback=true])")
+DefineEngineMethod( GuiPopUpMenuCtrl, setFirstSelected, void, (bool scriptCallback), (true), "([scriptCallback=true])")
 {
    object->setFirstSelected( scriptCallback );
 
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrl, setNoneSelected, void, (), , "")
+DefineEngineMethod( GuiPopUpMenuCtrl, setNoneSelected, void, (), , "")
 {
    object->setNoneSelected();
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrl, getTextById, const char*, (S32 id), ,  "(int id)")
+DefineEngineMethod( GuiPopUpMenuCtrl, getTextById, const char*, (S32 id), ,  "(int id)")
 {
    return(object->getTextById(id));
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrl, changeTextById, void, ( S32 id, const char * text ), , "( int id, string text )" )
+DefineEngineMethod( GuiPopUpMenuCtrl, changeTextById, void, ( S32 id, const char * text ), , "( int id, string text )" )
 {
    object->setEntryText( id, text );
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrl, setEnumContent, void, (const char * className, const char * enumName), , "(string class, string enum)"
+DefineEngineMethod( GuiPopUpMenuCtrl, setEnumContent, void, (const char * className, const char * enumName), , "(string class, string enum)"
               "This fills the popup with a classrep's field enumeration type info.\n\n"
               "More of a helper function than anything.   If console access to the field list is added, "
               "at least for the enumerated types, then this should go away..")
@@ -429,20 +429,20 @@ DefineConsoleMethod( GuiPopUpMenuCtrl, setEnumContent, void, (const char * class
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleMethod( GuiPopUpMenuCtrl, findText, S32, (const char * text), , "(string text)"
+DefineEngineMethod( GuiPopUpMenuCtrl, findText, S32, (const char * text), , "(string text)"
               "Returns the position of the first entry containing the specified text or -1 if not found.")
 {
    return( object->findText( text ) );   
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleMethod( GuiPopUpMenuCtrl, size, S32, (), , "Get the size of the menu - the number of entries in it.")
+DefineEngineMethod( GuiPopUpMenuCtrl, size, S32, (), , "Get the size of the menu - the number of entries in it.")
 {
    return( object->getNumEntries() ); 
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleMethod( GuiPopUpMenuCtrl, replaceText, void, (bool doReplaceText), , "(bool doReplaceText)")
+DefineEngineMethod( GuiPopUpMenuCtrl, replaceText, void, (bool doReplaceText), , "(bool doReplaceText)")
 {
    object->replaceText(S32(doReplaceText));  
 }
@@ -532,7 +532,7 @@ void GuiPopUpMenuCtrl::clearEntry( S32 entry )
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleMethod( GuiPopUpMenuCtrl, clearEntry, void, (S32 entry), , "(S32 entry)")
+DefineEngineMethod( GuiPopUpMenuCtrl, clearEntry, void, (S32 entry), , "(S32 entry)")
 {
    object->clearEntry(entry);
 }

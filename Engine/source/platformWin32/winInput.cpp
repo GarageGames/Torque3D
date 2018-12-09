@@ -157,13 +157,13 @@ void Input::init()
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleFunction( isJoystickDetected, bool, (), , "isJoystickDetected()")
+DefineEngineFunction( isJoystickDetected, bool, (), , "isJoystickDetected()")
 {
    return( DInputDevice::joystickDetected() );
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleFunction( getJoystickAxes, const char*, (U32 deviceID), , "getJoystickAxes( instance )")
+DefineEngineFunction( getJoystickAxes, const char*, (U32 deviceID), , "getJoystickAxes( instance )")
 {
    DInputManager* mgr = dynamic_cast<DInputManager*>( Input::getManager() );
    if ( mgr )
@@ -505,7 +505,7 @@ void Input::log( const char* format, ... )
    va_end( argptr );
 }
 
-DefineConsoleFunction( inputLog, void, (const char * log), , "inputLog( string )")
+DefineEngineFunction( inputLog, void, (const char * log), , "inputLog( string )")
 {
    Input::log( "%s\n", log );
 }
