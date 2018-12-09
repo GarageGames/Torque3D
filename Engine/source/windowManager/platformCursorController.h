@@ -76,6 +76,9 @@ public:
       curResizeNESW,
       curResizeNWSE,
       curHand,
+      curWaitArrow,
+      curNoNo,
+      numPlatformCursors
    };
 
 public:

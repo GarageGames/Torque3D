@@ -1277,11 +1277,11 @@ void GuiRiverEditorCtrl::setSelectedNode( S32 node )
    mSelNode = node;
    if ( mSelNode != -1 )
    {
-      const RiverNode &node = mSelRiver->mNodes[mSelNode];
+      const RiverNode &curNode = mSelRiver->mNodes[mSelNode];
 
       MatrixF objMat = mSelRiver->getNodeTransform(mSelNode);      
-      Point3F objScale( node.width, 1.0f, node.depth );
-      Point3F worldPos = node.point;
+      Point3F objScale(curNode.width, 1.0f, curNode.depth );
+      Point3F worldPos = curNode.point;
 
       mGizmo->set( objMat, worldPos, objScale );
    }

@@ -245,17 +245,17 @@ void SimFieldDictionary::writeFields(SimObject *obj, Stream &stream, U32 tabStop
    const AbstractClassRep::FieldList &list = obj->getFieldList();
    Vector<Entry *> flist(__FILE__, __LINE__);
 
-   for (U32 i = 0; i < HashTableSize; i++)
+   for (U32 curEntry = 0; curEntry < HashTableSize; curEntry++)
    {
-      for (Entry *walk = mHashTable[i]; walk; walk = walk->next)
+      for (Entry *walk = mHashTable[curEntry]; walk; walk = walk->next)
       {
          // make sure we haven't written this out yet:
-         U32 i;
-         for (i = 0; i < list.size(); i++)
-            if (list[i].pFieldname == walk->slotName)
+         U32 curField;
+         for (curField = 0; curField < list.size(); curField++)
+            if (list[curField].pFieldname == walk->slotName)
                break;
 
-         if (i != list.size())
+         if (curField != list.size())
             continue;
 
 
@@ -293,17 +293,17 @@ void SimFieldDictionary::printFields(SimObject *obj)
    char expandedBuffer[4096];
    Vector<Entry *> flist(__FILE__, __LINE__);
 
-   for (U32 i = 0; i < HashTableSize; i++)
+   for (U32 curEntry = 0; curEntry < HashTableSize; curEntry++)
    {
-      for (Entry *walk = mHashTable[i]; walk; walk = walk->next)
+      for (Entry *walk = mHashTable[curEntry]; walk; walk = walk->next)
       {
          // make sure we haven't written this out yet:
-         U32 i;
-         for (i = 0; i < list.size(); i++)
-            if (list[i].pFieldname == walk->slotName)
+         U32 curField;
+         for (curField = 0; curField < list.size(); curField++)
+            if (list[curField].pFieldname == walk->slotName)
                break;
 
-         if (i != list.size())
+         if (curField != list.size())
             continue;
 
          flist.push_back(walk);

@@ -172,8 +172,8 @@ SimGroup* ForestBrush::getGroup()
 
 bool ForestBrush::containsItemData( const ForestItemData *inData )
 {
-   SimObjectList::iterator iter = objectList.begin();
-   for ( ; iter != objectList.end(); iter++ )
+   SimObjectList::iterator iter = mObjectList.begin();
+   for ( ; iter != mObjectList.end(); iter++ )
    {
       ForestBrushElement *pElement = dynamic_cast<ForestBrushElement*>(*iter);
 

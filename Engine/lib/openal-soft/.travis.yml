@@ -1,5 +1,66 @@
-os:
-  - linux
-  - osx
 language: c
-script: cmake . && make -j2
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+    - os: linux
+      dist: trusty
+      env:
+        - BUILD_ANDROID=true
+    - os: osx
+sudo: required
+install:
+  - >
+    if [[ "${TRAVIS_OS_NAME}" == "linux" && -z "${BUILD_ANDROID}" ]]; then
+      # Install pulseaudio, portaudio, ALSA, JACK dependencies for
+      # corresponding backends.
+      # Install Qt5 dependency for alsoft-config.
+      sudo apt-get install -qq \
+        libpulse-dev \
+        portaudio19-dev \
+        libasound2-dev \
+        libjack-dev \
+        qtbase5-dev
+    fi
+  - >
+    if [[ "${TRAVIS_OS_NAME}" == "linux" && "${BUILD_ANDROID}" == "true" ]]; then
+      curl -o ~/android-ndk.zip https://dl.google.com/android/repository/android-ndk-r15-linux-x86_64.zip
+      unzip -q ~/android-ndk.zip -d ~ \
+        'android-ndk-r15/build/cmake/*' \
+        'android-ndk-r15/build/core/toolchains/arm-linux-androideabi-*/*' \
+        'android-ndk-r15/platforms/android-14/arch-arm/*' \
+        'android-ndk-r15/source.properties' \
+        'android-ndk-r15/sources/cxx-stl/gnu-libstdc++/4.9/libs/armeabi-v7a/*' \
+        'android-ndk-r15/sources/cxx-stl/gnu-libstdc++/4.9/include/*' \
+        'android-ndk-r15/sysroot/*' \
+        'android-ndk-r15/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/*' \
+        'android-ndk-r15/toolchains/llvm/prebuilt/linux-x86_64/*'
+    fi
+script:
+  - >
+    if [[ "${TRAVIS_OS_NAME}" == "linux" && -z "${BUILD_ANDROID}" ]]; then
+      cmake \
+        -DALSOFT_REQUIRE_ALSA=ON \
+        -DALSOFT_REQUIRE_OSS=ON \
+        -DALSOFT_REQUIRE_PORTAUDIO=ON \
+        -DALSOFT_REQUIRE_PULSEAUDIO=ON \
+        -DALSOFT_REQUIRE_JACK=ON \
+        -DALSOFT_EMBED_HRTF_DATA=YES \
+        .
+    fi
+  - >
+    if [[ "${TRAVIS_OS_NAME}" == "linux" && "${BUILD_ANDROID}" == "true" ]]; then
+      cmake \
+        -DCMAKE_TOOLCHAIN_FILE=~/android-ndk-r15/build/cmake/android.toolchain.cmake \
+        -DALSOFT_REQUIRE_OPENSL=ON \
+        -DALSOFT_EMBED_HRTF_DATA=YES \
+        .
+    fi
+  - >
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      cmake \
+        -DALSOFT_REQUIRE_COREAUDIO=ON \
+        -DALSOFT_EMBED_HRTF_DATA=YES \
+        .
+    fi
+  - make -j2

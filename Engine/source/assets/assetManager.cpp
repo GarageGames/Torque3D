@@ -1353,10 +1353,10 @@ bool AssetManager::refreshAsset( const char* pAssetId )
                 }
 
                 // Refresh depended-on assets.
-                for ( Vector<typeAssetId>::iterator isDependedOnItr = dependedOn.begin(); isDependedOnItr != dependedOn.end(); ++isDependedOnItr )
+                for ( Vector<typeAssetId>::iterator refreshItr = dependedOn.begin(); refreshItr != dependedOn.end(); ++refreshItr)
                 {
                     // Refresh dependency asset.
-                    refreshAsset( *isDependedOnItr );
+                    refreshAsset( *refreshItr);
                 }
             }
         }

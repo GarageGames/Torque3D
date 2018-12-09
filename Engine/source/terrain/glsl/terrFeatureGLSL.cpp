@@ -569,9 +569,6 @@ void TerrainDetailMapFeatGLSL::processPix(   Vector<ShaderComponent*> &component
    // amount so that it fades out with the layer blending.
    if ( fd.features.hasFeature( MFT_TerrainParallaxMap, detailIndex ) )
    {
-      // Get the rest of our inputs.
-      Var *normalMap = _getNormalMapTex();
-
       // Call the library function to do the rest.
       if (fd.features.hasFeature(MFT_IsBC3nm, detailIndex))
       {
@@ -930,6 +927,9 @@ void TerrainNormalMapFeatGLSL::processVert(  Vector<ShaderComponent*> &component
 void TerrainNormalMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList, 
                                              const MaterialFeatureData &fd )
 {
+   // We only need to process normals during the deferred.
+   if (!fd.features.hasFeature(MFT_DeferredConditioner))
+      return;
 
    MultiLine *meta = new MultiLine;
 

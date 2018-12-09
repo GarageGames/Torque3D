@@ -1241,8 +1241,8 @@ ImplementEnumType(_TamlFormatMode,
       // *************************************************************
 
       // Generate the engine type elements.
-      TiXmlComment* pComment = new TiXmlComment("Type Elements");
-      pSchemaElement->LinkEndChild(pComment);
+      TiXmlComment* tComment = new TiXmlComment("Type Elements");
+      pSchemaElement->LinkEndChild(tComment);
       for (AbstractClassRep* pType = pRootType; pType != NULL; pType = pType->getNextClass())
       {
          // Add type.
@@ -1260,8 +1260,8 @@ ImplementEnumType(_TamlFormatMode,
       {
          // Add complex type comment.
          dSprintf(buffer, sizeof(buffer), " %s Type ", pType->getClassName());
-         TiXmlComment* pComment = new TiXmlComment(buffer);
-         pSchemaElement->LinkEndChild(pComment);
+         TiXmlComment* ctComment = new TiXmlComment(buffer);
+         pSchemaElement->LinkEndChild(ctComment);
 
          // Add complex type.
          TiXmlElement* pComplexTypeElement = new TiXmlElement("xs:complexType");

@@ -358,7 +358,7 @@ bool PhysicsDebris::onAdd()
    }
 
    // Setup our bounding box
-   mObjBox = mDataBlock->shape->bounds;   
+   mObjBox = mDataBlock->shape->mBounds;
    resetWorldBox();
 
    // Add it to the client scene.

@@ -63,11 +63,11 @@ class afxXM_MountedImageNode : public afxXM_Base
 {
   typedef afxXM_Base Parent;
 
-  StringTableEntry  node_name;
-  U32               image_slot;
-  S32               node_ID;
-  ShapeBase*        shape;
-  afxConstraint*    cons;
+  StringTableEntry  mNode_name;
+  U32               mImage_slot;
+  S32               mNode_ID;
+  ShapeBase*        mShape;
+  afxConstraint*    mCons;
 
   afxConstraint*  find_constraint();
 
@@ -163,11 +163,11 @@ afxXM_Base* afxXM_MountedImageNodeData::create(afxEffectWrapper* fx, bool on_ser
 afxXM_MountedImageNode::afxXM_MountedImageNode(afxXM_MountedImageNodeData* db, afxEffectWrapper* fxw) 
 : afxXM_Base(db, fxw)
 { 
-  image_slot = db->image_slot; 
-  node_name = db->node_name; 
-  cons = 0;
-  node_ID = -1;
-  shape = 0;
+  mImage_slot = db->image_slot; 
+  mNode_name = db->node_name; 
+  mCons = 0;
+  mNode_ID = -1;
+  mShape = 0;
 }
 
 // find the first constraint with a shape by checking pos
@@ -189,41 +189,41 @@ void afxXM_MountedImageNode::start(F32 timestamp)
 {
   // constraint won't change over the modifier's
   // lifetime so we find it here in start().
-  cons = find_constraint();
-  if (!cons)
+  mCons = find_constraint();
+  if (!mCons)
     Con::errorf(ConsoleLogEntry::General, 
                 "afxXM_MountedImageNode: failed to find a ShapeBase derived constraint source.");
 }
 
 void afxXM_MountedImageNode::updateParams(F32 dt, F32 elapsed, afxXM_Params& params)
 {
-  if (!cons)
+  if (!mCons)
     return;
 
   // validate shape
   //   The shape must be validated in case it gets deleted
   //   of goes out scope. 
-  SceneObject* scene_object = cons->getSceneObject();
-  if (scene_object != (SceneObject*)shape)
+  SceneObject* scene_object = mCons->getSceneObject();
+  if (scene_object != (SceneObject*)mShape)
   {
-    shape = dynamic_cast<ShapeBase*>(scene_object);
-    if (shape && node_name != ST_NULLSTRING)
+    mShape = dynamic_cast<ShapeBase*>(scene_object);
+    if (mShape && mNode_name != ST_NULLSTRING)
     {
-      node_ID = shape->getNodeIndex(image_slot, node_name);
-      if (node_ID < 0)
+      mNode_ID = mShape->getNodeIndex(mImage_slot, mNode_name);
+      if (mNode_ID < 0)
       {
         Con::errorf(ConsoleLogEntry::General, 
                "afxXM_MountedImageNode: failed to find nodeName, \"%s\".",
-               node_name);
+			mNode_name);
       }
     }
     else
-      node_ID = -1;
+      mNode_ID = -1;
   }
 
-  if (shape)
+  if (mShape)
   {
-    shape->getImageTransform(image_slot, node_ID, &params.ori);
+    mShape->getImageTransform(mImage_slot, mNode_ID, &params.ori);
     params.pos = params.ori.getPosition();
   }
 }

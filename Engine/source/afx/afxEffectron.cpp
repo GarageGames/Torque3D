@@ -157,7 +157,7 @@ void afxEffectronData::packData(BitStream* stream)
   stream->write(duration);
   stream->write(n_loops);
 
-  pack_fx(stream, fx_list, packed);
+  pack_fx(stream, fx_list, mPacked);
 }
 
 void afxEffectronData::unpackData(BitStream* stream)
@@ -407,9 +407,9 @@ U32 afxEffectron::packUpdate(NetConnection* conn, U32 mask, BitStream* stream)
   if (stream->writeFlag(mask & InitialUpdateMask))
   {
     // pack extra object's ghost index or scope id if not yet ghosted
-    if (stream->writeFlag(dynamic_cast<NetObject*>(extra) != 0))
+    if (stream->writeFlag(dynamic_cast<NetObject*>(mExtra) != 0))
     {
-      NetObject* net_extra = (NetObject*)extra;
+      NetObject* net_extra = (NetObject*)mExtra;
       S32 ghost_idx = conn->getGhostIndex(net_extra);
       if (stream->writeFlag(ghost_idx != -1))
          stream->writeRangedU32(U32(ghost_idx), 0, NetConnection::MaxGhostCount);
@@ -476,7 +476,7 @@ void afxEffectron::unpackUpdate(NetConnection * conn, BitStream * stream)
       if (stream->readFlag()) // is ghost_idx
       {
         S32 ghost_idx = stream->readRangedU32(0, NetConnection::MaxGhostCount);
-        extra = dynamic_cast<SimObject*>(conn->resolveGhost(ghost_idx));
+		mExtra = dynamic_cast<SimObject*>(conn->resolveGhost(ghost_idx));
       }
       else
       {

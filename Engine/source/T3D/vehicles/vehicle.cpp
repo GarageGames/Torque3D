@@ -277,7 +277,7 @@ void VehicleData::packData(BitStream* stream)
    stream->write(body.friction);
    for (i = 0; i < Body::MaxSounds; i++)
       if (stream->writeFlag(body.sound[i]))
-         stream->writeRangedU32(packed? SimObjectId((uintptr_t)body.sound[i]):
+         stream->writeRangedU32(mPacked ? SimObjectId((uintptr_t)body.sound[i]):
                                 body.sound[i]->getId(),DataBlockObjectIdFirst,
                                 DataBlockObjectIdLast);
 
@@ -1364,7 +1364,7 @@ bool Vehicle::updateCollision(F32 dt)
 
    mCollisionList.clear();
    CollisionState *state = mConvex.findClosestState(cmat, getScale(), mDataBlock->collisionTol);
-   if (state && state->dist <= mDataBlock->collisionTol) 
+   if (state && state->mDist <= mDataBlock->collisionTol) 
    {
       //resolveDisplacement(ns,state,dt);
       mConvex.getCollisionInfo(cmat, getScale(), &mCollisionList, mDataBlock->collisionTol);
@@ -1497,8 +1497,8 @@ bool Vehicle::resolveDisplacement(Rigid& ns,CollisionState *state, F32 dt)
 {
    PROFILE_SCOPE( Vehicle_ResolveDisplacement );
 
-   SceneObject* obj = (state->a->getObject() == this)?
-       state->b->getObject(): state->a->getObject();
+   SceneObject* obj = (state->mA->getObject() == this)?
+       state->mB->getObject(): state->mA->getObject();
 
    if (obj->isDisplacable() && ((obj->getTypeMask() & ShapeBaseObjectType) != 0))
    {

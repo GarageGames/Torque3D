@@ -150,10 +150,10 @@ void ForestWind::processTick()
       mCurrentInterp = 0;
       mCurrentTarget.set( 0, 0 );
    
-      Point2F windDir( mDirection.x, mDirection.y );
-      windDir.normalizeSafe();
+      Point2F windNorm( mDirection.x, mDirection.y );
+	  windNorm.normalizeSafe();
 
-      mCurrentTarget = finalVec + windDir;
+      mCurrentTarget = finalVec + windNorm;
    }
    else
    {
@@ -179,6 +179,7 @@ void ForestWind::setStrengthAndDirection( F32 strength, const VectorF &direction
    {
       mStrength = strength;
       mDirection = direction;
+      mCurrentTarget.zero();
       mIsDirty = true;
    }
 }

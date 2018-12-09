@@ -56,9 +56,9 @@ NetObject::NetObject()
    mNextDirtyList = NULL;
    mDirtyMaskBits = 0;
 #ifdef TORQUE_AFX_ENABLED
-   scope_id = 0;
-   scope_refs = 0;
-   scope_registered = false;
+   mScope_id = 0;
+   mScope_refs = 0;
+   mScope_registered = false;
 #endif
 }
 
@@ -478,23 +478,23 @@ DefineEngineMethod( NetObject, isServerObject, bool, (),,
 #ifdef TORQUE_AFX_ENABLED
 U16 NetObject::addScopeRef() 
 { 
-   if (scope_refs == 0)
+   if (mScope_refs == 0)
    {
-      scope_id = arcaneFX::generateScopeId();
+      mScope_id = arcaneFX::generateScopeId();
       onScopeIdChange();
    }
-   scope_refs++;
-   return scope_id; 
+   mScope_refs++;
+   return mScope_id;
 }
 
 void NetObject::removeScopeRef() 
 { 
-   if (scope_refs == 0)
+   if (mScope_refs == 0)
       return;
-   scope_refs--;
-   if (scope_refs == 0)
+   mScope_refs--;
+   if (mScope_refs == 0)
    {
-      scope_id = 0;
+      mScope_id = 0;
       onScopeIdChange();
    }
 }

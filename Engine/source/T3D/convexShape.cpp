@@ -492,7 +492,6 @@ void ConvexShape::unpackUpdate( NetConnection *conn, BitStream *stream )
 
 void ConvexShape::prepRenderImage( SceneRenderState *state )
 {   
-   /*
    if ( state->isDiffusePass() )
    {
       ObjectRenderInst *ri2 = state->getRenderPass()->allocInst<ObjectRenderInst>();
@@ -500,8 +499,7 @@ void ConvexShape::prepRenderImage( SceneRenderState *state )
       ri2->type = RenderPassManager::RIT_Editor;
       state->getRenderPass()->addInst( ri2 );
    }
-   */
-
+   
    if ( mVertexBuffer.isNull() || !state)
       return;
 
@@ -795,21 +793,10 @@ bool ConvexShape::castRay( const Point3F &start, const Point3F &end, RayInfo *in
    F32 t;
    F32 tmin = F32_MAX;
    S32 hitFace = -1;
-   Point3F hitPnt, pnt;
+   Point3F pnt;
    VectorF rayDir( end - start );
    rayDir.normalizeSafe();
-
-   if ( false )
-   {
-      PlaneF plane( Point3F(0,0,0), Point3F(0,0,1) );
-      Point3F sp( 0,0,-1 );
-      Point3F ep( 0,0,1 );
-
-      F32 t = plane.intersect( sp, ep );
-      Point3F hitPnt;
-      hitPnt.interpolate( sp, ep, t );
-   }
-
+   
    for ( S32 i = 0; i < planeCount; i++ )
    {
       // Don't hit the back-side of planes.
@@ -1228,11 +1215,11 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
    GFX->setTexture( 0, NULL );
 
    // Render world box.
-   if ( false )
+   if (Con::getBoolVariable("$pref::convexDBG::ShowWorldBox", false))
    {
       Box3F wbox( mWorldBox );
-      //if ( getServerObject() )      
-      //   Box3F wbox = static_cast<ConvexShape*>( getServerObject() )->mWorldBox;      
+      if ( getServerObject() )      
+         wbox = static_cast<ConvexShape*>( getServerObject() )->mWorldBox;      
       GFXStateBlockDesc desc;
       desc.setCullMode( GFXCullNone );
       desc.setFillModeWireframe();
@@ -1244,7 +1231,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
 	const Vector< ConvexShape::Face > &faceList = mGeometry.faces;
 
    // Render Edges.
-   if ( false )
+   if (Con::getBoolVariable("$pref::convexDBG::ShowEdges", false))
    {
       GFXTransformSaver saver;
       //GFXFrustumSaver fsaver;
@@ -1298,7 +1285,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
    objToWorld.scale( mObjScale );
 
    // Render faces centers/colors.
-   if ( false )
+   if (Con::getBoolVariable("$pref::convexDBG::ShowFaceColors", false))
    {
       GFXStateBlockDesc desc;
       desc.setCullMode( GFXCullNone );
@@ -1322,7 +1309,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
    }
 
    // Render winding order.
-   if ( false )
+   if (Con::getBoolVariable("$pref::convexDBG::ShowWinding", false))
    {
       GFXStateBlockDesc desc;
       desc.setCullMode( GFXCullNone );
@@ -1379,7 +1366,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
    }
 
    // Render surface transforms.
-   if ( false )
+   if (Con::getBoolVariable("$pref::convexDBG::ShowSurfaceTransforms", false))
    {
       GFXStateBlockDesc desc;
       desc.setBlend( false );
@@ -1389,7 +1376,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
 
       for ( S32 i = 0; i < mSurfaces.size(); i++ )
       {
-         MatrixF objToWorld( mObjToWorld );
+         objToWorld = mObjToWorld;
          objToWorld.scale( mObjScale );
 
          MatrixF renderMat;

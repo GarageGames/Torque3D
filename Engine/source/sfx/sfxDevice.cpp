@@ -168,9 +168,9 @@ void SFXDevice::_removeBuffer( SFXBuffer* buffer )
    BufferIterator iter = T3D::find( mBuffers.begin(), mBuffers.end(), buffer );
    if( iter != mBuffers.end() )
    {
-      SFXBuffer* buffer = *iter;
+      SFXBuffer* curBuf = *iter;
 
-      mStatNumBufferBytes -= buffer->getMemoryUsed();
+      mStatNumBufferBytes -= curBuf->getMemoryUsed();
       mStatNumBuffers --;
       
       mBuffers.erase( iter );

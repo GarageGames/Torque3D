@@ -81,7 +81,7 @@ bool afxEA_Explosion::ea_start()
   do_runtime_substitutions();
 
   explosion = new Explosion();
-  explosion->setSubstitutionData(choreographer, group_index);
+  explosion->setSubstitutionData(mChoreographer, mGroup_index);
   explosion->setDataBlock(explosion_data);
 
   return true;
@@ -91,10 +91,10 @@ bool afxEA_Explosion::ea_update(F32 dt)
 {
   if (!exploded && explosion)
   {
-    if (in_scope)
+    if (mIn_scope)
     {
-      Point3F norm(0,0,1); updated_xfm.mulV(norm);
-      explosion->setInitialState(updated_pos, norm);
+      Point3F norm(0,0,1); mUpdated_xfm.mulV(norm);
+      explosion->setInitialState(mUpdated_pos, norm);
       if (!explosion->registerObject())
       {
         delete explosion;
@@ -117,7 +117,7 @@ void afxEA_Explosion::ea_finish(bool was_stopped)
 
 void afxEA_Explosion::do_runtime_substitutions()
 {
-  explosion_data = explosion_data->cloneAndPerformSubstitutions(choreographer, group_index);
+  explosion_data = explosion_data->cloneAndPerformSubstitutions(mChoreographer, mGroup_index);
 }
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//

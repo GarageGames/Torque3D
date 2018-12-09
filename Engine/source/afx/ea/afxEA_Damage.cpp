@@ -101,7 +101,7 @@ bool afxEA_Damage::ea_start()
 
   if (damage_data->repeats > 1)
   {
-    dot_delta_ms = full_lifetime/(damage_data->repeats - 1);
+    dot_delta_ms = mFull_lifetime /(damage_data->repeats - 1);
     next_dot_time = dot_delta_ms;
   }
 
@@ -122,15 +122,15 @@ bool afxEA_Damage::ea_update(F32 dt)
     if (aim_cons && aim_cons->getSceneObject())
       impacted_obj_id = aim_cons->getSceneObject()->getId();
 
-    if (choreographer)
-      choreographer->inflictDamage(damage_data->label, damage_data->flavor, impacted_obj_id, damage_data->amount, 
+    if (mChoreographer)
+      mChoreographer->inflictDamage(damage_data->label, damage_data->flavor, impacted_obj_id, damage_data->amount, 
                                    repeat_cnt, damage_data->ad_amount, damage_data->radius, impact_pos, 
                                    damage_data->impulse);
     repeat_cnt++;
   }
   else if (repeat_cnt < damage_data->repeats)
   {
-    if (next_dot_time <= life_elapsed)
+    if (next_dot_time <= mLife_elapsed)
     {
       // CONSTRAINT REMAPPING <<
       afxConstraint* aim_cons = getAimConstraint();
@@ -138,8 +138,8 @@ bool afxEA_Damage::ea_update(F32 dt)
         impacted_obj_id = aim_cons->getSceneObject()->getId();
       // CONSTRAINT REMAPPING >>
 
-      if (choreographer)
-        choreographer->inflictDamage(damage_data->label, damage_data->flavor, impacted_obj_id, damage_data->amount, 
+      if (mChoreographer)
+		  mChoreographer->inflictDamage(damage_data->label, damage_data->flavor, impacted_obj_id, damage_data->amount,
                                      repeat_cnt, 0, 0, impact_pos, 0);
       next_dot_time += dot_delta_ms;
       repeat_cnt++;
@@ -153,10 +153,10 @@ void afxEA_Damage::ea_finish(bool was_stopped)
 {
   if (started && (repeat_cnt < damage_data->repeats))
   {
-    if (next_dot_time <= life_elapsed)
+    if (next_dot_time <= mLife_elapsed)
     {
-      if (choreographer)
-        choreographer->inflictDamage(damage_data->label, damage_data->flavor, impacted_obj_id, damage_data->amount, 
+      if (mChoreographer)
+		  mChoreographer->inflictDamage(damage_data->label, damage_data->flavor, impacted_obj_id, damage_data->amount,
                                      repeat_cnt, 0, 0, impact_pos, 0);
     }
   }
@@ -172,7 +172,7 @@ void afxEA_Damage::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxDamageData* orig_db = damage_data;
     damage_data = new afxDamageData(*orig_db, true);
-    orig_db->performSubstitutions(damage_data, choreographer, group_index);
+    orig_db->performSubstitutions(damage_data, mChoreographer, mGroup_index);
   }
 }
 

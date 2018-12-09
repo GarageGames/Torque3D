@@ -370,12 +370,12 @@ Polyhedron OptimizedPolyList::toPolyhedron() const
    for( U32 i = 0; i < numPoints; ++ i )
    {
       bool isDuplicate = false;
-      for( U32 npoint = 0; npoint < polyhedron.pointList.size(); ++ npoint )
+      for( U32 npoint = 0; npoint < polyhedron.mPointList.size(); ++ npoint )
       {
          if( npoint == i )
             continue;
 
-         if( !polyhedron.pointList[ npoint ].equal( mPoints[ i ] ) )
+         if( !polyhedron.mPointList[ npoint ].equal( mPoints[ i ] ) )
             continue;
 
          pointRemap[ i ] = npoint;
@@ -384,8 +384,8 @@ Polyhedron OptimizedPolyList::toPolyhedron() const
 
       if( !isDuplicate )
       {
-         pointRemap[ i ] = polyhedron.pointList.size();
-         polyhedron.pointList.push_back( mPoints[ i ] );
+         pointRemap[ i ] = polyhedron.mPointList.size();
+         polyhedron.mPointList.push_back( mPoints[ i ] );
       }
    }
 
@@ -399,13 +399,13 @@ Polyhedron OptimizedPolyList::toPolyhedron() const
 
       // Add the plane.
 
-      const U32 polyIndex = polyhedron.planeList.size();
-      polyhedron.planeList.push_back( mPlaneList[ poly.plane ] );
+      const U32 polyIndex = polyhedron.mPlaneList.size();
+      polyhedron.mPlaneList.push_back( mPlaneList[ poly.plane ] );
 
       // Account for polyhedrons expecting planes to
       // face inwards.
 
-      polyhedron.planeList.last().invert();
+      polyhedron.mPlaneList.last().invert();
 
       // Gather remapped indices according to the
       // current polygon type.
@@ -500,7 +500,7 @@ Polyhedron OptimizedPolyList::toPolyhedron() const
       U32 lastIndex = 0;
       for( S32 n = indexList.size() - 1; n >= 0; -- n )
       {
-         polyhedron.edgeList.push_back(
+         polyhedron.mEdgeList.push_back(
             Polyhedron::Edge(
                polyIndex, 0, // face1 filled later
                indexList[ lastIndex ], indexList[ n ]
@@ -514,16 +514,16 @@ Polyhedron OptimizedPolyList::toPolyhedron() const
    // Finally, consolidate the edge list by merging all edges that
    // are shared by polygons.
 
-   for( U32 i = 0; i < polyhedron.edgeList.size(); ++ i )
+   for( U32 i = 0; i < polyhedron.mEdgeList.size(); ++ i )
    {
-      Polyhedron::Edge& edge = polyhedron.edgeList[ i ];
+      Polyhedron::Edge& edge = polyhedron.mEdgeList[ i ];
 
       // Find the corresponding duplicate edge, if any, and merge
       // it into our current edge.
 
-      for( U32 n = i + 1; n < polyhedron.edgeList.size(); ++ n )
+      for( U32 n = i + 1; n < polyhedron.mEdgeList.size(); ++ n )
       {
-         const Polyhedron::Edge& thisEdge = polyhedron.edgeList[ n ];
+         const Polyhedron::Edge& thisEdge = polyhedron.mEdgeList[ n ];
 
          if( ( thisEdge.vertex[ 0 ] == edge.vertex[ 1 ] &&
                thisEdge.vertex[ 1 ] == edge.vertex[ 0 ] ) ||
@@ -531,7 +531,7 @@ Polyhedron OptimizedPolyList::toPolyhedron() const
                thisEdge.vertex[ 1 ] == edge.vertex[ 1 ] ) )
          {
             edge.face[ 1 ] = thisEdge.face[ 0 ];
-            polyhedron.edgeList.erase( n );
+            polyhedron.mEdgeList.erase( n );
             break;
          }
       }

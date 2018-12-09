@@ -612,12 +612,12 @@ bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
             Point3F(mOrigin + (p1 + p2) * scale)
          };
 
-         Point3F end = camPos + event.vec * smProjectDistance;
-         F32 t = plane.intersect(camPos, end);
+         Point3F endProj = camPos + event.vec * smProjectDistance;
+         F32 t = plane.intersect(camPos, endProj);
          if ( t >= 0 && t <= 1 )
          {
             Point3F pos;
-            pos.interpolate(camPos, end, t);
+            pos.interpolate(camPos, endProj, t);
 
             // check if inside our 'poly' of this axisIdx vector...
             bool inside = true;

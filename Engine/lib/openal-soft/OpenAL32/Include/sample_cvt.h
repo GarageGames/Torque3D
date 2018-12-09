@@ -4,6 +4,12 @@
 #include "AL/al.h"
 #include "alBuffer.h"
 
-void ConvertData(ALvoid *dst, enum UserFmtType dstType, const ALvoid *src, enum UserFmtType srcType, ALsizei numchans, ALsizei len, ALsizei align);
+extern const ALshort muLawDecompressionTable[256];
+extern const ALshort aLawDecompressionTable[256];
+
+void Convert_ALshort_ALima4(ALshort *dst, const ALubyte *src, ALsizei numchans, ALsizei len,
+                            ALsizei align);
+void Convert_ALshort_ALmsadpcm(ALshort *dst, const ALubyte *src, ALsizei numchans, ALsizei len,
+                               ALsizei align);
 
 #endif /* SAMPLE_CVT_H */

@@ -190,9 +190,9 @@ void GuiPopupTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool selec
    if(drawbox)
    {
       Point2I coloredboxsize(15,10);
-      RectI r(offset.x + mProfile->mTextOffset.x, offset.y+2, coloredboxsize.x, coloredboxsize.y);
-      GFX->getDrawUtil()->drawRectFill( r, boxColor);
-      GFX->getDrawUtil()->drawRect( r, ColorI(0,0,0));
+      RectI boxBounds(offset.x + mProfile->mTextOffset.x, offset.y+2, coloredboxsize.x, coloredboxsize.y);
+      GFX->getDrawUtil()->drawRectFill(boxBounds, boxColor);
+      GFX->getDrawUtil()->drawRect(boxBounds, ColorI(0,0,0));
 
       textXOffset += coloredboxsize.x + mProfile->mTextOffset.x;
    }
@@ -855,23 +855,23 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
 
    GFXDrawUtil* drawUtil = GFX->getDrawUtil();
 
-   RectI r( offset, getExtent() );
+   RectI baseRect( offset, getExtent() );
    if ( mInAction )
    {
-      S32 l = r.point.x, r2 = r.point.x + r.extent.x - 1;
-      S32 t = r.point.y, b = r.point.y + r.extent.y - 1;
+      S32 left = baseRect.point.x, right = baseRect.point.x + baseRect.extent.x - 1;
+      S32 top = baseRect.point.y, bottom = baseRect.point.y + baseRect.extent.y - 1;
 
       // Do we render a bitmap border or lines?
       if ( mProfile->getChildrenProfile() && mProfile->mBitmapArrayRects.size() )
       {
          // Render the fixed, filled in border
-         renderFixedBitmapBordersFilled(r, 3, mProfile );
+         renderFixedBitmapBordersFilled(baseRect, 3, mProfile );
 
       } 
       else
       {
          //renderSlightlyLoweredBox(r, mProfile);
-         drawUtil->drawRectFill( r, mProfile->mFillColor );
+         drawUtil->drawRectFill(baseRect, mProfile->mFillColor );
       }
 
       //  Draw a bitmap over the background?
@@ -891,10 +891,10 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
       // Do we render a bitmap border or lines?
       if ( !( mProfile->getChildrenProfile() && mProfile->mBitmapArrayRects.size() ) )
       {
-         drawUtil->drawLine( l, t, l, b, colorWhite );
-         drawUtil->drawLine( l, t, r2, t, colorWhite );
-         drawUtil->drawLine( l + 1, b, r2, b, mProfile->mBorderColor );
-         drawUtil->drawLine( r2, t + 1, r2, b - 1, mProfile->mBorderColor );
+         drawUtil->drawLine(left, top, left, bottom, colorWhite );
+         drawUtil->drawLine(left, top, right, top, colorWhite );
+         drawUtil->drawLine(left + 1, bottom, right, bottom, mProfile->mBorderColor );
+         drawUtil->drawLine(right, top + 1, right, bottom - 1, mProfile->mBorderColor );
       }
 
    }
@@ -903,19 +903,19 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
       // TODO: Add onMouseEnter() and onMouseLeave() and a definition of mMouseOver (see guiButtonBaseCtrl) for this to work.
       if ( mMouseOver ) 
       {
-         S32 l = r.point.x, r2 = r.point.x + r.extent.x - 1;
-         S32 t = r.point.y, b = r.point.y + r.extent.y - 1;
+         S32 left = baseRect.point.x, right = baseRect.point.x + baseRect.extent.x - 1;
+         S32 top = baseRect.point.y, bottom = baseRect.point.y + baseRect.extent.y - 1;
 
          // Do we render a bitmap border or lines?
          if ( mProfile->getChildrenProfile() && mProfile->mBitmapArrayRects.size() )
          {
             // Render the fixed, filled in border
-            renderFixedBitmapBordersFilled( r, 2, mProfile );
+            renderFixedBitmapBordersFilled(baseRect, 2, mProfile );
 
          } 
          else
          {
-            drawUtil->drawRectFill( r, mProfile->mFillColorHL );
+            drawUtil->drawRectFill(baseRect, mProfile->mFillColorHL );
          }
 
          //  Draw a bitmap over the background?
@@ -929,10 +929,10 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
          // Do we render a bitmap border or lines?
          if ( !( mProfile->getChildrenProfile() && mProfile->mBitmapArrayRects.size() ) )
          {
-            drawUtil->drawLine( l, t, l, b, colorWhite );
-            drawUtil->drawLine( l, t, r2, t, colorWhite );
-            drawUtil->drawLine( l + 1, b, r2, b, mProfile->mBorderColor );
-            drawUtil->drawLine( r2, t + 1, r2, b - 1, mProfile->mBorderColor );
+			 drawUtil->drawLine(left, top, left, bottom, colorWhite);
+			 drawUtil->drawLine(left, top, right, top, colorWhite);
+			 drawUtil->drawLine(left + 1, bottom, right, bottom, mProfile->mBorderColor);
+			 drawUtil->drawLine(right, top + 1, right, bottom - 1, mProfile->mBorderColor);
          }
       }
       else
@@ -941,11 +941,11 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
          if ( mProfile->getChildrenProfile() && mProfile->mBitmapArrayRects.size() )
          {
             // Render the fixed, filled in border
-            renderFixedBitmapBordersFilled( r, 1, mProfile );
+            renderFixedBitmapBordersFilled(baseRect, 1, mProfile );
          } 
          else
          {
-            drawUtil->drawRectFill( r, mProfile->mFillColorNA );
+            drawUtil->drawRectFill(baseRect, mProfile->mFillColorNA );
          }
 
          //  Draw a bitmap over the background?
@@ -959,7 +959,7 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
          // Do we render a bitmap border or lines?
          if ( !( mProfile->getChildrenProfile() && mProfile->mBitmapArrayRects.size() ) )
          {
-            drawUtil->drawRect( r, mProfile->mBorderColorNA );
+            drawUtil->drawRect( baseRect, mProfile->mBorderColorNA );
          }
       }
       //      renderSlightlyRaisedBox(r, mProfile); //  Used to be the only 'else' condition to mInAction above.
@@ -1029,9 +1029,9 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
       if ( drawbox )
       {
          Point2I coloredboxsize( 15, 10 );
-         RectI r( offset.x + mProfile->mTextOffset.x, offset.y + ( (getHeight() - coloredboxsize.y ) / 2 ), coloredboxsize.x, coloredboxsize.y );
-         drawUtil->drawRectFill( r, boxColor);
-         drawUtil->drawRect( r, ColorI(0,0,0));
+         RectI boxBounds( offset.x + mProfile->mTextOffset.x, offset.y + ( (getHeight() - coloredboxsize.y ) / 2 ), coloredboxsize.x, coloredboxsize.y );
+         drawUtil->drawRectFill(boxBounds, boxColor);
+         drawUtil->drawRect(boxBounds, ColorI(0,0,0));
 
          localStart.x += coloredboxsize.x + mProfile->mTextOffset.x;
       }
@@ -1055,18 +1055,18 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
 
          // Draw the second column to the right
          getColumn( mText, buff, 1, "\t" );
-         S32 txt_w = mProfile->mFont->getStrWidth( buff );
+         S32 colTxt_w = mProfile->mFont->getStrWidth( buff );
          if ( mProfile->getChildrenProfile() && mProfile->mBitmapArrayRects.size() )
          {
             // We're making use of a bitmap border, so take into account the
             // right cap of the border.
             RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
-            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - bitmapBounds[2].extent.x, localStart.y ) );
+            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - colTxt_w - bitmapBounds[2].extent.x, localStart.y ) );
             drawUtil->drawText( mProfile->mFont, textpos, buff, mProfile->mFontColors );
 
          } else
          {
-            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - 12, localStart.y ) );
+            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - colTxt_w - 12, localStart.y ) );
             drawUtil->drawText( mProfile->mFont, textpos, buff, mProfile->mFontColors );
          }
 
@@ -1079,10 +1079,10 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
       if ( !(mProfile->getChildrenProfile() && mProfile->mBitmapArrayRects.size()) )
       {
          //  Draw a triangle (down arrow)
-         S32 left = r.point.x + r.extent.x - 12;
+         S32 left = baseRect.point.x + baseRect.extent.x - 12;
          S32 right = left + 8;
          S32 middle = left + 4;
-         S32 top = r.extent.y / 2 + r.point.y - 4;
+         S32 top = baseRect.extent.y / 2 + baseRect.point.y - 4;
          S32 bottom = top + 8;
 
          PrimBuild::color( mProfile->mFontColor );

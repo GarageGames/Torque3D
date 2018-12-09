@@ -34,51 +34,51 @@
 void
 afxPhrase::init_fx(S32 group_index)
 {
-  fx->ev_init(init_chor, *init_fx_list, on_server, will_stop, init_time_factor, init_dur, group_index); 
+  mFX->ev_init(mInit_chor, *mInit_fx_list, mOn_server, mWill_stop, mInit_time_factor, mInit_dur, group_index); 
 }
 
 //~~~~~~~~~~~~~~~~~~~~//
 
 afxPhrase::afxPhrase(bool on_server, bool will_stop)
 {
-  this->on_server = on_server;
-  this->will_stop = will_stop;
+  mOn_server = on_server;
+  mWill_stop = will_stop;
 
-  init_fx_list = NULL;
-  init_dur = 0.0f;
-  init_chor = NULL;
-  init_time_factor = 1.0f;
+  mInit_fx_list = NULL;
+  mInit_dur = 0.0f;
+  mInit_chor = NULL;
+  mInit_time_factor = 1.0f;
 
-  fx = new afxEffectVector;
-  fx2 = NULL;
-  starttime = 0;
-  dur = 0;
+  mFX = new afxEffectVector;
+  mFX2 = NULL;
+  mStartTime = 0;
+  mDur = 0;
 
-  n_loops = 1;
-  loop_cnt = 1;
+  mNum_loops = 1;
+  mLoop_cnt = 1;
 
-  extra_time = 0.0f;
-  extra_stoptime = 0.0f;
+  mExtra_time = 0.0f;
+  mExtra_stoptime = 0.0f;
 }
 
 afxPhrase::~afxPhrase()
 {
-  delete fx;
-  delete fx2;
+  delete mFX;
+  delete mFX2;
 };
 
 void 
 afxPhrase::init(afxEffectList& fx_list, F32 dur, afxChoreographer* chor, F32 time_factor, 
                 S32 n_loops, S32 group_index, F32 extra_time)
 {
-  init_fx_list = &fx_list;
-  init_dur = dur;
-  init_chor = chor;
-  init_time_factor = time_factor;
+  mInit_fx_list = &fx_list;
+  mInit_dur = dur;
+  mInit_chor = chor;
+  mInit_time_factor = time_factor;
 
-  this->n_loops = n_loops;
-  this->extra_time = extra_time;
-  this->dur = (init_dur < 0) ? init_dur : init_dur*init_time_factor;
+  mNum_loops = n_loops;
+  mExtra_time = extra_time;
+  mDur = (mInit_dur < 0) ? mInit_dur : mInit_dur*mInit_time_factor;
 
   init_fx(group_index);
 }
@@ -86,30 +86,30 @@ afxPhrase::init(afxEffectList& fx_list, F32 dur, afxChoreographer* chor, F32 tim
 void
 afxPhrase::start(F32 startstamp, F32 timestamp)
 {
-  starttime = startstamp;
+  mStartTime = startstamp;
 
   F32 loopstart = timestamp - startstamp;
 
-  if (dur > 0 && loopstart > dur)
+  if (mDur > 0 && loopstart > mDur)
   {
-    loop_cnt += (S32) (loopstart/dur);
-    loopstart = mFmod(loopstart, dur);
+    mLoop_cnt += (S32) (loopstart/ mDur);
+    loopstart = mFmod(loopstart, mDur);
   }
 
-  if (!fx->empty())
-    fx->start(loopstart);
+  if (!mFX->empty())
+    mFX->start(loopstart);
 }
 
 void
 afxPhrase::update(F32 dt, F32 timestamp)
 {
-  if (fx->isActive())
-    fx->update(dt);
+  if (mFX->isActive())
+    mFX->update(dt);
 
-  if (fx2 && fx2->isActive())
-    fx2->update(dt);
+  if (mFX2 && mFX2->isActive())
+    mFX2->update(dt);
 
-  if (extra_stoptime > 0 && timestamp > extra_stoptime)
+  if (mExtra_stoptime > 0 && timestamp > mExtra_stoptime)
   {
     stop(timestamp);
   }
@@ -118,54 +118,54 @@ afxPhrase::update(F32 dt, F32 timestamp)
 void
 afxPhrase::stop(F32 timestamp)
 {
-  if (extra_time > 0 && !(extra_stoptime > 0))
+  if (mExtra_time > 0 && !(mExtra_stoptime > 0))
   {
-    extra_stoptime = timestamp + extra_time;
+    mExtra_stoptime = timestamp + mExtra_time;
     return;
   }
 
-  if (fx->isActive())
-    fx->stop();
+  if (mFX->isActive())
+    mFX->stop();
 
-  if (fx2 && fx2->isActive())
-    fx2->stop();
+  if (mFX2 && mFX2->isActive())
+    mFX2->stop();
 }
 
 bool
 afxPhrase::expired(F32 timestamp)
 {
-  if (dur < 0)
+  if (mDur < 0)
     return false;
 
-  return ((timestamp - starttime) > loop_cnt*dur);
+  return ((timestamp - mStartTime) > mLoop_cnt*mDur);
 }
 
 F32
 afxPhrase::elapsed(F32 timestamp)
 {
-  return (timestamp - starttime);
+  return (timestamp - mStartTime);
 }
 
 bool
 afxPhrase::recycle(F32 timestamp)
 {
-  if (n_loops < 0 || loop_cnt < n_loops)
+  if (mNum_loops < 0 || mLoop_cnt < mNum_loops)
   {
-    if (fx2)
-      delete fx2;
+    if (mFX2)
+      delete mFX2;
 
-    fx2 = fx;
+	mFX2 = mFX;
 
-    fx = new afxEffectVector;
+	mFX = new afxEffectVector;
     init_fx();
 
-    if (fx2 && !fx2->empty())
-      fx2->stop();
+    if (mFX2 && !mFX2->empty())
+      mFX2->stop();
 
-    if (!fx->empty())
-      fx->start(0.0F);
+    if (!mFX->empty())
+      mFX->start(0.0F);
 
-    loop_cnt++;
+	mLoop_cnt++;
     return true;
   }
 
@@ -175,21 +175,21 @@ afxPhrase::recycle(F32 timestamp)
 void
 afxPhrase::interrupt(F32 timestamp)
 {
-  if (fx->isActive())
-    fx->interrupt();
+  if (mFX->isActive())
+    mFX->interrupt();
 
-  if (fx2 && fx2->isActive())
-    fx2->interrupt();
+  if (mFX2 && mFX2->isActive())
+    mFX2->interrupt();
 }
 
 F32 afxPhrase::calcDoneTime()
 {
-  return starttime + fx->getTotalDur();
+  return mStartTime + mFX->getTotalDur();
 }
 
 F32 afxPhrase::calcAfterLife()
 {
-  return fx->getAfterLife();
+  return mFX->getAfterLife();
 }
 
 

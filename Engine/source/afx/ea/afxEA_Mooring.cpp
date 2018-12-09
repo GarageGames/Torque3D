@@ -37,8 +37,8 @@ class afxEA_Mooring : public afxEffectWrapper
 {
   typedef afxEffectWrapper Parent;
 
-  afxMooringData*   mooring_data;
-  afxMooring*       obj;
+  afxMooringData*   mMooring_data;
+  afxMooring*       mObj;
 
   void              do_runtime_substitutions();
 
@@ -57,27 +57,27 @@ public:
 
 afxEA_Mooring::afxEA_Mooring()
 {
-  mooring_data = 0;
-  obj = 0;
+  mMooring_data = 0;
+  mObj = 0;
 }
 
 afxEA_Mooring::~afxEA_Mooring()
 {
-  if (obj)
-    obj->deleteObject();
-  if (mooring_data && mooring_data->isTempClone())
-    delete mooring_data;
-  mooring_data = 0;
+  if (mObj)
+    mObj->deleteObject();
+  if (mMooring_data && mMooring_data->isTempClone())
+    delete mMooring_data;
+  mMooring_data = 0;
 }
 
 void afxEA_Mooring::ea_set_datablock(SimDataBlock* db)
 {
-  mooring_data = dynamic_cast<afxMooringData*>(db);
+  mMooring_data = dynamic_cast<afxMooringData*>(db);
 }
 
 bool afxEA_Mooring::ea_start()
 {
-  if (!mooring_data)
+  if (!mMooring_data)
   {
     Con::errorf("afxEA_Mooring::ea_start() -- missing or incompatible datablock.");
     return false;
@@ -90,33 +90,33 @@ bool afxEA_Mooring::ea_start()
 
 bool afxEA_Mooring::ea_update(F32 dt)
 {
-  if (!obj)
+  if (!mObj)
   {
-    if (datablock->use_ghost_as_cons_obj && datablock->effect_name != ST_NULLSTRING)
+    if (mDatablock->use_ghost_as_cons_obj && mDatablock->effect_name != ST_NULLSTRING)
     {
-      obj = new afxMooring(mooring_data->networking, 
-                           choreographer->getChoreographerId(), 
-                           datablock->effect_name);
+      mObj = new afxMooring(mMooring_data->networking,
+                           mChoreographer->getChoreographerId(), 
+                           mDatablock->effect_name);
     }
     else
     {
-      obj = new afxMooring(mooring_data->networking, 0, ST_NULLSTRING);
+      mObj = new afxMooring(mMooring_data->networking, 0, ST_NULLSTRING);
     }
 
-    obj->onNewDataBlock(mooring_data, false);
-    if (!obj->registerObject())
+	mObj->onNewDataBlock(mMooring_data, false);
+    if (!mObj->registerObject())
     {
-      delete obj;
-      obj = 0;
+      delete mObj;
+	  mObj = 0;
       Con::errorf("afxEA_Mooring::ea_update() -- effect failed to register.");
       return false;
     }
-    deleteNotify(obj);
+    deleteNotify(mObj);
   }
 
-  if (obj)
+  if (mObj)
   {
-    obj->setTransform(updated_xfm);
+    mObj->setTransform(mUpdated_xfm);
   }
 
   return true;
@@ -128,7 +128,7 @@ void afxEA_Mooring::ea_finish(bool was_stopped)
 
 void afxEA_Mooring::onDeleteNotify(SimObject* obj)
 {
-  if (this->obj == obj)
+  if (mObj == obj)
     obj = 0;
 
   Parent::onDeleteNotify(obj);
@@ -137,12 +137,12 @@ void afxEA_Mooring::onDeleteNotify(SimObject* obj)
 void afxEA_Mooring::do_runtime_substitutions()
 {
   // only clone the datablock if there are substitutions
-  if (mooring_data->getSubstitutionCount() > 0)
+  if (mMooring_data->getSubstitutionCount() > 0)
   {
     // clone the datablock and perform substitutions
-    afxMooringData* orig_db = mooring_data;
-    mooring_data = new afxMooringData(*orig_db, true);
-    orig_db->performSubstitutions(mooring_data, choreographer, group_index);
+    afxMooringData* orig_db = mMooring_data;
+	mMooring_data = new afxMooringData(*orig_db, true);
+    orig_db->performSubstitutions(mMooring_data, mChoreographer, mGroup_index);
   }
 }
 

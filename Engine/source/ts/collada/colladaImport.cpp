@@ -120,9 +120,9 @@ static void processNode(GuiTreeViewCtrl* tree, domNode* node, S32 parentID, Scen
    for (S32 i = 0; i < node->getInstance_node_array().getCount(); i++)
    {
       domInstance_node* instnode = node->getInstance_node_array()[i];
-      domNode* node = daeSafeCast<domNode>(instnode->getUrl().getElement());
-      if (node)
-         processNode(tree, node, nodeID, stats);
+      domNode* dNode = daeSafeCast<domNode>(instnode->getUrl().getElement());
+      if (dNode)
+         processNode(tree, dNode, nodeID, stats);
    }
 }
 

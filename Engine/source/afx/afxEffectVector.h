@@ -37,14 +37,14 @@ class afxChoreographer;
 
 class afxEffectVector
 {
-  Vector<afxEffectWrapper*>*  fx_v;
-  Vector<afxEffectWrapper*>*  fx_v2;
+  Vector<afxEffectWrapper*>*  mFX_v;
+  Vector<afxEffectWrapper*>*  mFX_v2;
 
-  bool          active;
-  bool          on_server;
-  F32           phrase_dur;
-  F32           total_fx_dur;
-  F32           after_life;
+  bool          mActive;
+  bool          mOn_server;
+  F32           mPhrase_dur;
+  F32           mTotal_fx_dur;
+  F32           mAfter_life;
 
   void          swap_vecs();
   void          filter_client_server();
@@ -64,21 +64,21 @@ public:
   void          update(F32 dt);
   void          stop(bool force_cleanup=false);
   void          interrupt();
-  bool          empty() { return (!fx_v || fx_v->empty()); }
-  bool          isActive() { return active; }
-  S32           count() { return (fx_v) ? fx_v->size() : 0; }
+  bool          empty() { return (!mFX_v || mFX_v->empty()); }
+  bool          isActive() { return mActive; }
+  S32           count() { return (mFX_v) ? mFX_v->size() : 0; }
 
-  F32           getTotalDur() { return total_fx_dur; }
-  F32           getAfterLife() { return after_life; }
+  F32           getTotalDur() { return mTotal_fx_dur; }
+  F32           getAfterLife() { return mAfter_life; }
 
-  Vector<afxEffectWrapper*>* getFX() { return fx_v; }
+  Vector<afxEffectWrapper*>* getFX() { return mFX_v; }
 };
 
 inline void afxEffectVector::swap_vecs()
 {
-  Vector<afxEffectWrapper*>* tmp = fx_v;
-  fx_v = fx_v2;
-  fx_v2 = tmp;
+  Vector<afxEffectWrapper*>* tmp = mFX_v;
+  mFX_v = mFX_v2;
+  mFX_v2 = tmp;
 }
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//

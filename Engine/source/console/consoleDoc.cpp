@@ -88,7 +88,7 @@ void printClassHeader(const char* usage, const char * className, const char * su
    if((usage != NULL) && strlen(usage))
    {
       // Copy Usage Document
-      S32 usageLen = dStrlen( usage );
+      S32 usageLen = dStrlen( usage ) + 1;
       FrameTemp<char> usageStr( usageLen );
       dStrcpy( usageStr, usage, usageLen );
 

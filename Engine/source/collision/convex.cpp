@@ -520,7 +520,7 @@ void Convex::updateStateList(const MatrixF& mat, const Point3F& scale, const Poi
 
    // Destroy states which are no longer intersecting
    for (CollisionStateList* itr = mList.mNext; itr != &mList; itr = itr->mNext) {
-      Convex* cv = (itr->mState->a == this)? itr->mState->b: itr->mState->a;
+      Convex* cv = (itr->mState->mA == this)? itr->mState->mB: itr->mState->mA;
       cv->mTag = sTag;
       if (!box1.isOverlapped(cv->getBoundingBox())) {
          CollisionState* cs = itr->mState;
@@ -568,9 +568,9 @@ CollisionState* Convex::findClosestState(const MatrixF& mat, const Point3F& scal
          state->swap();
 
       // Prepare scaled version of transform
-      MatrixF bxform = state->b->getTransform();
+      MatrixF bxform = state->mB->getTransform();
       temp = bxform;
-      Point3F bscale = state->b->getScale();
+      Point3F bscale = state->mB->getScale();
       bxform.scale(bscale);
       MatrixF bxforminv(true);
       bxforminv.scale(Point3F(1.0f/bscale.x, 1.0f/bscale.y, 1.0f/bscale.z));
@@ -613,7 +613,7 @@ bool Convex::getCollisionInfo(const MatrixF& mat, const Point3F& scale, Collisio
       if (state->mLista != itr)
          state->swap();
 
-      if (state->dist <= tol) 
+      if (state->mDist <= tol) 
       {
          fa.reset();
          fb.reset();
@@ -628,18 +628,18 @@ bool Convex::getCollisionInfo(const MatrixF& mat, const Point3F& scale, Collisio
 
          MatrixF imat = omat;
          imat.inverse();
-         imat.mulV(-state->v,&v);
+         imat.mulV(-state->mDistvec,&v);
 
          getFeatures(omat,v,&fa);
 
-         imat = state->b->getTransform();
-         imat.scale(state->b->getScale());
+         imat = state->mB->getTransform();
+         imat.scale(state->mB->getScale());
 
          MatrixF bxform = imat;
          imat.inverse();
-         imat.mulV(state->v,&v);
+         imat.mulV(state->mDistvec,&v);
 
-         state->b->getFeatures(bxform,v,&fb);
+         state->mB->getFeatures(bxform,v,&fb);
 
          fa.collide(fb,cList,tol);
       }

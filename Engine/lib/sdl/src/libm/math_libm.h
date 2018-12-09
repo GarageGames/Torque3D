@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,7 +28,9 @@ double SDL_uclibc_copysign(double x, double y);
 double SDL_uclibc_cos(double x);         
 double SDL_uclibc_fabs(double x);        
 double SDL_uclibc_floor(double x);
+double SDL_uclibc_fmod(double x, double y);
 double SDL_uclibc_log(double x);
+double SDL_uclibc_log10(double x);
 double SDL_uclibc_pow(double x, double y);    
 double SDL_uclibc_scalbn(double x, int n);
 double SDL_uclibc_sin(double x);

@@ -1571,224 +1571,111 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
    %haveLockAndHideEntries = true;
    
    //Set up the generic pop-up pre-emptively if we haven't already
-   if( !isObject( ETContextPopup ) )
+   %popup = new PopupMenu()
    {
-      %popup = new PopupMenu( ETContextPopup )
-      {
-         superClass = "MenuBuilder";
-         isPopup = "1";
-
-         item[ 0 ] = "Rename" TAB "" TAB "EditorTree.showItemRenameCtrl( EditorTree.findItemByObjectId( %this.object ) );";
-         item[ 1 ] = "Delete" TAB "" TAB "EWorldEditor.deleteMissionObject( %this.object );";
-         item[ 2 ] = "Inspect" TAB "" TAB "inspectObject( %this.object );";
-         item[ 3 ] = "-";
-         item[ 4 ] = "Locked" TAB "" TAB "%this.object.setLocked( !%this.object.locked ); EWorldEditor.syncGui();";
-         item[ 5 ] = "Hidden" TAB "" TAB "EWorldEditor.hideObject( %this.object, !%this.object.hidden ); EWorldEditor.syncGui();";
-         item[ 6 ] = "-";
-         item[ 7 ] = "Group" TAB "" TAB "EWorldEditor.addSimGroup( true );";
-
-         object = -1;
-      };
-   }
+      superClass = "MenuBuilder";
+      isPopup = "1";
+      object = -1;
+      bookmark = -1;
+   };
    
-   // Handle multi-selection.
    if( %this.getSelectedItemsCount() > 1 )
    {
-      %popup = ETMultiSelectionContextPopup;
-      if( !isObject( %popup ) )
-         %popup = new PopupMenu( ETMultiSelectionContextPopup )
-         {
-            superClass = "MenuBuilder";
-            isPopup = "1";
-
-            item[ 0 ] = "Delete" TAB "" TAB "EditorMenuEditDelete();";
-            item[ 1 ] = "Group" TAB "" TAB "EWorldEditor.addSimGroup( true );";
-         };
+      %popup.item[ 0 ] = "Delete" TAB "" TAB "EditorMenuEditDelete();";
+      %popup.item[ 1 ] = "Group" TAB "" TAB "EWorldEditor.addSimGroup( true );";
    }
-
-   // Open context menu if this is a CameraBookmark
-   else if( %obj.isMemberOfClass( "CameraBookmark" ) )
-   {
-      %popup = ETCameraBookmarkContextPopup;
-      if( !isObject( %popup ) )
-         %popup = new PopupMenu( ETCameraBookmarkContextPopup )
-         {
-            superClass = "MenuBuilder";
-            isPopup = "1";
-
-            item[ 0 ] = "Go To Bookmark" TAB "" TAB "EditorGui.jumpToBookmark( %this.bookmark.getInternalName() );";
-
-            bookmark = -1;
-         };
-
-      ETCameraBookmarkContextPopup.bookmark = %obj;
-   }
-   
-   // Open context menu if this is set CameraBookmarks group.
-   else if( %obj.name $= "CameraBookmarks" )
-   {
-      %popup = ETCameraBookmarksGroupContextPopup;
-      if( !isObject( %popup ) )
-         %popup = new PopupMenu( ETCameraBookmarksGroupContextPopup )
-         {
-            superClass = "MenuBuilder";
-            isPopup = "1";
-
-            item[ 0 ] = "Add Camera Bookmark" TAB "" TAB "EditorGui.addCameraBookmarkByGui();";
-         };
-   }
-   
-   else if(%obj.isMemberOfClass("Entity"))
-   {
-      %popup = EntityObjectPopup;
-      if(!isObject(EntityObjectPopup))
-      {
-         %popup = new PopupMenu( EntityObjectPopup )
-         {
-            superClass = "MenuBuilder";
-            isPopup = "1";
-
-            item[ 0 ] = "Rename" TAB "" TAB "EditorTree.showItemRenameCtrl( EditorTree.findItemByObjectId( %this.object ) );";
-            item[ 1 ] = "Delete" TAB "" TAB "EWorldEditor.deleteMissionObject( %this.object );";
-            item[ 2 ] = "Inspect" TAB "" TAB "inspectObject( %this.object );";
-            item[ 3 ] = "-";
-            item[ 4 ] = "Toggle Lock Children" TAB "" TAB "EWorldEditor.toggleLockChildren( %this.object );";
-            item[ 5 ] = "Toggle Hide Children" TAB "" TAB "EWorldEditor.toggleHideChildren( %this.object );";
-            item[ 6 ] = "-";
-            item[ 7 ] = "Group" TAB "" TAB "EWorldEditor.addSimGroup( true );";
-            item[ 8 ] = "-";
-            item[ 9 ] = "Add New Objects Here" TAB "" TAB "EWCreatorWindow.setNewObjectGroup( %this.object );";
-            item[ 10 ] = "Add Children to Selection" TAB "" TAB "EWorldEditor.selectAllObjectsInSet( %this.object, false );";
-            item[ 11 ] = "Remove Children from Selection" TAB "" TAB "EWorldEditor.selectAllObjectsInSet( %this.object, true );";
-            item[ 12 ] = "-";
-            item[ 13 ] = "Convert to Game Object" TAB "" TAB "EWorldEditor.createGameObject( %this.object );";
-            item[ 14 ] = "Duplicate Game Object" TAB "" TAB "EWorldEditor.duplicateGameObject( %this.object );";
-            item[ 15 ] = "Show in Asset Browser" TAB "" TAB "EWorldEditor.showGameObjectInAssetBrowser( %this.object );";
-            
-            object = -1;
-         };
-      }
-         
-      if(!isObject(AssetDatabase.acquireAsset(%obj.gameObjectAsset)))
-      {
-         EntityObjectPopup.enableItem(13, true);
-         EntityObjectPopup.enableItem(14, false);
-         EntityObjectPopup.enableItem(15, false);
-      }
-      else
-      {
-         EntityObjectPopup.enableItem(13, false);
-         EntityObjectPopup.enableItem(14, true);
-         EntityObjectPopup.enableItem(15, true);
-      }
-      
-      %popup.object = %obj;
-      
-      %hasChildren = %obj.getCount() > 0;
-      %popup.enableItem( 10, %hasChildren );
-      %popup.enableItem( 11, %hasChildren );
-      
-      %haveObjectEntries = true;
-      %haveLockAndHideEntries = false;
-   }
-
-   // Open context menu if this is a SimGroup
-   else if( !%obj.isMemberOfClass( "SceneObject" ) )
-   {
-      %popup = ETSimGroupContextPopup;
-      if( !isObject( %popup ) )
-      {
-         %popup = new PopupMenu( ETSimGroupContextPopup )
-         {
-            superClass = "MenuBuilder";
-            isPopup = "1";
-
-            item[ 0 ] = "Rename" TAB "" TAB "EditorTree.showItemRenameCtrl( EditorTree.findItemByObjectId( %this.object ) );";
-            item[ 1 ] = "Delete" TAB "" TAB "EWorldEditor.deleteMissionObject( %this.object );";
-            item[ 2 ] = "Inspect" TAB "" TAB "inspectObject( %this.object );";
-            item[ 3 ] = "-";
-            item[ 4 ] = "Toggle Lock Children" TAB "" TAB "EWorldEditor.toggleLockChildren( %this.object );";
-            item[ 5 ] = "Toggle Hide Children" TAB "" TAB "EWorldEditor.toggleHideChildren( %this.object );";
-            item[ 6 ] = "-";
-            item[ 7 ] = "Group" TAB "" TAB "EWorldEditor.addSimGroup( true );";
-            item[ 8 ] = "-";
-            item[ 9 ] = "Add New Objects Here" TAB "" TAB "EWCreatorWindow.setNewObjectGroup( %this.object );";
-            item[ 10 ] = "Add Children to Selection" TAB "" TAB "EWorldEditor.selectAllObjectsInSet( %this.object, false );";
-            item[ 11 ] = "Remove Children from Selection" TAB "" TAB "EWorldEditor.selectAllObjectsInSet( %this.object, true );";
-
-            object = -1;
-         };
-      }
-
-      %popup.object = %obj;
-      
-      %hasChildren = %obj.getCount() > 0;
-      %popup.enableItem( 10, %hasChildren );
-      %popup.enableItem( 11, %hasChildren );
-      
-      %haveObjectEntries = true;
-      %haveLockAndHideEntries = false;
-   }
-   
-   // Specialized version for ConvexShapes. 
-   else if( %obj.isMemberOfClass( "ConvexShape" ) )
-   {
-      %popup = ETConvexShapeContextPopup;      
-      if( !isObject( %popup ) )
-      {
-         %popup = new PopupMenu( ETConvexShapeContextPopup : ETContextPopup )
-         {
-            superClass = "MenuBuilder";
-            isPopup = "1";
-
-            item[ 8 ] = "-";
-            item[ 9 ] = "Convert to Zone" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"Zone\" );";
-            item[ 10 ] = "Convert to Portal" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"Portal\" );";
-            item[ 11 ] = "Convert to Occluder" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"OcclusionVolume\" );";
-            item[ 12 ] = "Convert to Sound Space" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"SFXSpace\" );";
-         };
-      }
-      
-      %popup.object = %obj;
-      %haveObjectEntries = true;
-   }
-   
-   // Specialized version for polyhedral objects.
-   else if( %obj.isMemberOfClass( "Zone" ) ||
-            %obj.isMemberOfClass( "Portal" ) ||
-            %obj.isMemberOfClass( "OcclusionVolume" ) ||
-            %obj.isMemberOfClass( "SFXSpace" ) )
-   {
-      %popup = ETPolyObjectContextPopup;      
-      if( !isObject( %popup ) )
-      {
-         %popup = new PopupMenu( ETPolyObjectContextPopup : ETContextPopup )
-         {
-            superClass = "MenuBuilder";
-            isPopup = "1";
-
-            item[ 8 ] = "-";
-            item[ 9 ] = "Convert to ConvexShape" TAB "" TAB "EWorldEditor.convertSelectionToConvexShape();";
-         };
-      }
-      
-      %popup.object = %obj;
-      %haveObjectEntries = true;
-   }
-   
-   // Open generic context menu.
    else
    {
-      %popup = ETContextPopup;      
-
-      %popup.object = %obj;
-      %haveObjectEntries = true;
+      if( %obj.isMemberOfClass( "CameraBookmark" ) )
+      {
+         %popup.bookmark = %obj;
+         
+         %popup.item[ 0 ] = "Go To Bookmark" TAB "" TAB "EditorGui.jumpToBookmark( " @ %popup.bookmark.getInternalName() @ " );";
+      }
+      else if( %obj.name $= "CameraBookmarks" )
+      {
+         %popup.item[ 0 ] = "Add Camera Bookmark" TAB "" TAB "EditorGui.addCameraBookmarkByGui();";
+      }
+      else 
+      {
+         %popup.object = %obj;
+         %haveObjectEntries = true;
+         
+         %popup.item[ 0 ] = "Rename" TAB "" TAB "EditorTree.showItemRenameCtrl( EditorTree.findItemByObjectId(" @ %popup.object @ ") );";
+         %popup.item[ 1 ] = "Delete" TAB "" TAB "EWorldEditor.deleteMissionObject(" @ %popup.object @ ");";
+         %popup.item[ 2 ] = "Inspect" TAB "" TAB "inspectObject(" @ %popup.object @ ");";
+         %popup.item[ 3 ] = "-";
+         %popup.item[ 4 ] = "Locked" TAB "" TAB "%this.object.setLocked( !" @ %popup.object @ ".locked ); EWorldEditor.syncGui();";
+         %popup.item[ 5 ] = "Hidden" TAB "" TAB "EWorldEditor.hideObject( " @ %popup.object @ ", !" @ %popup.object @ ".hidden ); EWorldEditor.syncGui();";
+         %popup.item[ 6 ] = "-";
+         %popup.item[ 7 ] = "Group" TAB "" TAB "EWorldEditor.addSimGroup( true );";
+   
+         if( %obj.isMemberOfClass( "ConvexShape" ) )
+         {
+            %popup.item[ 8 ] = "-";
+            %popup.item[ 9 ] = "Convert to Zone" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"Zone\" );";
+            %popup.item[ 10 ] = "Convert to Portal" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"Portal\" );";
+            %popup.item[ 11 ] = "Convert to Occluder" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"OcclusionVolume\" );";
+            %popup.item[ 12 ] = "Convert to Sound Space" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"SFXSpace\" );";
+         }
+         else if( %obj.isMemberOfClass( "Zone" ) ||
+               %obj.isMemberOfClass( "Portal" ) ||
+               %obj.isMemberOfClass( "OcclusionVolume" ) ||
+               %obj.isMemberOfClass( "SFXSpace" ) )
+         {
+            %popup.item[ 8 ] = "-";
+            %popup.item[ 9 ] = "Convert to ConvexShape" TAB "" TAB "EWorldEditor.convertSelectionToConvexShape();";
+         }
+         else if(%obj.getClassName() $= "SimGroup" || 
+               %obj.isMemberOfClass( "Path" ) ||
+               %obj.isMemberOfClass("Entity") )
+         {
+            //If it's not any special-handle classes above, then it'll be group-based stuff here
+            %popup.item[ 4 ] = "Toggle Lock Children" TAB "" TAB "EWorldEditor.toggleLockChildren( " @ %popup.object @ " );";
+            %popup.item[ 5 ] = "Toggle Hide Children" TAB "" TAB "EWorldEditor.toggleHideChildren( " @ %popup.object @ " );";
+            
+            %popup.item[ 8 ] = "-";
+            %popup.item[ 9 ] = "Add New Objects Here" TAB "" TAB "EWCreatorWindow.setNewObjectGroup( " @ %popup.object @ " );";
+            %popup.item[ 10 ] = "Add Children to Selection" TAB "" TAB "EWorldEditor.selectAllObjectsInSet( " @ %popup.object @ ", false );";
+            %popup.item[ 11 ] = "Remove Children from Selection" TAB "" TAB "EWorldEditor.selectAllObjectsInSet( " @ %popup.object @ ", true );";
+            
+            %hasChildren = %obj.getCount() > 0;
+            %popup.enableItem( 10, %hasChildren );
+            %popup.enableItem( 11, %hasChildren );
+            
+            %haveObjectEntries = true;
+            %haveLockAndHideEntries = false;
+            
+            //Special case for Entities, which is special-case AND does group stuff with chld objects
+            if(%obj.isMemberOfClass("Entity"))
+            {
+               %popup.item[ 12 ] = "-";
+               %popup.item[ 13 ] = "Convert to Game Object" TAB "" TAB "EWorldEditor.createGameObject( " @ %popup.object @ " );";
+               %popup.item[ 14 ] = "Duplicate Game Object" TAB "" TAB "EWorldEditor.duplicateGameObject( " @ %popup.object @ " );";
+               %popup.item[ 15 ] = "Show in Asset Browser" TAB "" TAB "EWorldEditor.showGameObjectInAssetBrowser( " @ %popup.object @ " );";
+               
+               if(!isObject(AssetDatabase.acquireAsset(%obj.gameObjectAsset)))
+               {
+                  %popup.enableItem(13, true);
+                  %popup.enableItem(14, false);
+                  %popup.enableItem(15, false);
+               }
+               else
+               {
+                  %popup.enableItem(13, false);
+                  %popup.enableItem(14, true);
+                  %popup.enableItem(15, true);
+               }
+            }
+         }  
+      }
    }
 
    if( %haveObjectEntries )
    {         
       %popup.enableItem( 0, %obj.isNameChangeAllowed() && %obj.getName() !$= "MissionGroup" );
       %popup.enableItem( 1, %obj.getName() !$= "MissionGroup" );
+      
       if( %haveLockAndHideEntries )
       {
          %popup.checkItem( 4, %obj.locked );
@@ -1797,6 +1684,7 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
       %popup.enableItem( 7, %this.isItemSelected( %itemId ) );
    }
    
+   %popup.reloadItems();
    %popup.showPopup( Canvas );
 }
 

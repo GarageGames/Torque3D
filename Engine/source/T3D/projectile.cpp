@@ -828,7 +828,7 @@ bool Projectile::onAdd()
 
    // Setup our bounding box
    if (bool(mDataBlock->projectileShape) == true)
-      mObjBox = mDataBlock->projectileShape->bounds;
+      mObjBox = mDataBlock->projectileShape->mBounds;
    else
       mObjBox = Box3F(Point3F(0, 0, 0), Point3F(0, 0, 0));
 

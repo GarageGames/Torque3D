@@ -37,13 +37,13 @@ class afxPath3D : public EngineObject
 {
 private:
     // Path-related data
-  afxCurve3D   curve;
-  afxAnimCurve curve_parameters;
-  int       num_points;
+  afxCurve3D   mCurve;
+  afxAnimCurve mCurve_parameters;
+  int       mNum_points;
   
   // Time data
-  F32       start_time;
-  F32       end_time;
+  F32       mStart_time;
+  F32       mEnd_time;
   
 public:
   /*C*/     afxPath3D( );
@@ -83,7 +83,7 @@ public:
     LOOP_OSCILLATE
   };
   
-  U32       loop_type;
+  U32       mLoop_type;
   void      setLoopType(U32);
   
 private:

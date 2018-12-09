@@ -1,0 +1,10 @@
+<ModuleDefinition
+	ModuleId="Core_PostFX"
+	VersionId="1"
+	Description="Module that implements the core engine-level setup for the game."
+	ScriptFile="Core_PostFX.cs"
+	CreateFunction="onCreate"
+	DestroyFunction="onDestroy"
+	Group="Core"
+	Dependencies="Core_Rendering=1,Core_Lighting=1">
+</ModuleDefinition>

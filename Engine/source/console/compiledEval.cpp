@@ -41,6 +41,7 @@
 #include "core/frameAllocator.h"
 
 #include "console/codeInterpreter.h"
+#include "console/returnBuffer.h"
 
 #ifndef TORQUE_TGB_ONLY
 #include "materials/materialDefinition.h"
@@ -101,17 +102,17 @@ F64 consoleStringToNumber(const char *str, StringTableEntry file, U32 line)
 
 namespace Con
 {
+   ReturnBuffer retBuffer;
 
    char *getReturnBuffer(U32 bufferSize)
-
    {
-      return STR.getReturnBuffer(bufferSize);
+      return retBuffer.getBuffer(bufferSize);
    }
 
    char *getReturnBuffer(const char *stringToCopy)
    {
       U32 len = dStrlen(stringToCopy) + 1;
-      char *ret = STR.getReturnBuffer(len);
+      char *ret = retBuffer.getBuffer(len);
       dMemcpy(ret, stringToCopy, len);
       return ret;
    }
@@ -119,7 +120,7 @@ namespace Con
    char* getReturnBuffer(const String& str)
    {
       const U32 size = str.size();
-      char* ret = STR.getReturnBuffer(size);
+      char* ret = retBuffer.getBuffer(size);
       dMemcpy(ret, str.c_str(), size);
       return ret;
    }

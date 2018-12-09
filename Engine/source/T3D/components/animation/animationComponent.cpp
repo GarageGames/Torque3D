@@ -645,12 +645,12 @@ void AnimationComponent::advanceThreads(F32 dt)
 
          if (mOwnerShapeInstance && !isClientObject())
          {
-            for (U32 i = 1; i < 32; i++)
+            for (U32 stateIDx = 1; stateIDx < 32; stateIDx++)
             {
-               if (mOwnerShapeInstance->getTriggerState(i))
+               if (mOwnerShapeInstance->getTriggerState(stateIDx))
                {
                   const char* animName = st.thread->getSequenceName().c_str();
-                  onAnimationTrigger_callback(this, animName, i);
+                  onAnimationTrigger_callback(this, animName, stateIDx);
                }
             }
          }

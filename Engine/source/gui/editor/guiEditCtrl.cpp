@@ -542,10 +542,10 @@ void GuiEditCtrl::onMouseDragged( const GuiEvent &event )
       // Snap the mouse cursor to grid if active.  Do this on the mouse cursor so that we handle
       // incremental drags correctly.
       
-      Point2I mousePoint = event.mousePoint;
-      snapToGrid( mousePoint );
+      Point2I dragPoint = event.mousePoint;
+      snapToGrid(dragPoint);
                   
-      Point2I delta = mousePoint - mLastDragPos;
+      Point2I delta = dragPoint - mLastDragPos;
       
       // If CTRL is down, apply smart snapping.
       
@@ -584,7 +584,7 @@ void GuiEditCtrl::onMouseDragged( const GuiEvent &event )
          
       // Remember drag point.
       
-      mLastDragPos = mousePoint;
+      mLastDragPos = dragPoint;
    }
    else if (mMouseDownMode == MovingSelection && mSelectedControls.size())
    {
@@ -770,7 +770,7 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
          ( mMouseDownMode == MovingSelection || mMouseDownMode == SizingSelection ) &&
          ( mGridSnap.x || mGridSnap.y ) )
    {
-      Point2I cext = getContentControl()->getExtent();
+      cext = getContentControl()->getExtent();
       Point2I coff = getContentControl()->localToGlobalCoord(Point2I(0,0));
       
       // create point-dots
@@ -847,8 +847,8 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
             
             if( mSnapTargets[ axis ] )
             {
-               RectI bounds = mSnapTargets[ axis ]->getGlobalBounds();
-               drawer->drawRect( bounds, ColorI( 128, 128, 128, 128 ) );
+               RectI snapBounds = mSnapTargets[ axis ]->getGlobalBounds();
+               drawer->drawRect(snapBounds, ColorI( 128, 128, 128, 128 ) );
             }
          }
       }

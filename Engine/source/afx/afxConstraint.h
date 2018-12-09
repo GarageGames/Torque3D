@@ -47,17 +47,17 @@ struct afxConstraintDef : public afxEffectDefs
     CONS_GHOST
   };
 
-  DefType           def_type;
+  DefType           mDef_type;
 
-  StringTableEntry  cons_src_name;
-  StringTableEntry  cons_node_name;
-  F32               history_time;
-  U8                sample_rate;
+  StringTableEntry  mCons_src_name;
+  StringTableEntry  mCons_node_name;
+  F32               mHistory_time;
+  U8                mSample_rate;
 
-  bool              runs_on_server;
-  bool              runs_on_client;
-  bool              pos_at_box_center;
-  bool              treat_as_camera;
+  bool              mRuns_on_server;
+  bool              mRuns_on_client;
+  bool              mPos_at_box_center;
+  bool              mTreat_as_camera;
 
   /*C*/             afxConstraintDef();
 
@@ -94,30 +94,30 @@ class afxConstraint : public SimObject, public afxEffectDefs
   typedef SimObject Parent;
 
 protected:
-  afxConstraintMgr* mgr;
-  afxConstraintDef  cons_def;
-  bool              is_defined;
-  bool              is_valid;
-  Point3F           last_pos;
-  MatrixF           last_xfm;
-  F32               history_time;
-  bool              is_alive;
-  bool              gone_missing;
-  U32               change_code;
+  afxConstraintMgr* mMgr;
+  afxConstraintDef  mCons_def;
+  bool              mIs_defined;
+  bool              mIs_valid;
+  Point3F           mLast_pos;
+  MatrixF           mLast_xfm;
+  F32               mHistory_time;
+  bool              mIs_alive;
+  bool              mGone_missing;
+  U32               mChange_code;
 
 public:
   /*C*/             afxConstraint(afxConstraintMgr*);
   virtual           ~afxConstraint();
 
   virtual bool      getPosition(Point3F& pos, F32 hist=0.0f) 
-                      { pos = last_pos; return is_valid; }
+                      { pos = mLast_pos; return mIs_valid; }
   virtual bool      getTransform(MatrixF& xfm, F32 hist=0.0f) 
-                      { xfm = last_xfm; return is_valid;}
+                      { xfm = mLast_xfm; return mIs_valid;}
   virtual bool      getAltitudes(F32& terrain_alt, F32& interior_alt) { return false; }
 
-  virtual bool      isDefined() { return is_defined; }
-  virtual bool      isValid() { return is_valid; }
-  virtual U32       getChangeCode() { return change_code; }
+  virtual bool      isDefined() { return mIs_defined; }
+  virtual bool      isValid() { return mIs_valid; }
+  virtual U32       getChangeCode() { return mChange_code; }
 
   virtual U32       setAnimClip(const char* clip, F32 pos, F32 rate, F32 trans, bool is_death_anim) 
                                   { return 0; };
@@ -127,8 +127,8 @@ public:
   virtual F32       getAnimClipDuration(const char* clip) { return 0.0f; }
 
   virtual S32       getDamageState() { return -1; }
-  virtual void      setLivingState(bool state) { is_alive = state; };
-  virtual bool      getLivingState() { return is_alive; };
+  virtual void      setLivingState(bool state) { mIs_alive = state; };
+  virtual bool      getLivingState() { return mIs_alive; };
 
   virtual void      sample(F32 dt, U32 elapsed_ms, const Point3F* cam_pos)=0;
 
@@ -175,15 +175,15 @@ class afxConstraintMgr : public afxEffectDefs
     U32               type;
   };
 
-  Vector<afxConstraintList*>  constraints_v;
+  Vector<afxConstraintList*>  mConstraints_v;
 
-  Vector<StringTableEntry>  names_on_server;
-  Vector<S32>               ghost_ids;
-  Vector<preDef>            predefs;
-  U32                       starttime;
-  bool                      on_server;
-  bool                      initialized;
-  F32                       scoping_dist_sq;
+  Vector<StringTableEntry>  mNames_on_server;
+  Vector<S32>               mGhost_ids;
+  Vector<preDef>            mPredefs;
+  U32                       mStartTime;
+  bool                      mOn_server;
+  bool                      mInitialized;
+  F32                       mScoping_dist_sq;
 
   SceneObject*        find_object_from_name(StringTableEntry);
   S32                 find_cons_idx_from_name(StringTableEntry);
@@ -221,7 +221,7 @@ public:
 
   void                sample(F32 dt, U32 now, const Point3F* cam_pos=0);
 
-  void                setStartTime(U32 timestamp) { starttime = timestamp; }
+  void                setStartTime(U32 timestamp) { mStartTime = timestamp; }
   void                initConstraintDefs(Vector<afxConstraintDef>&, bool on_server, F32 scoping_dist=-1.0f); 
   void                packConstraintNames(NetConnection* conn, BitStream* stream);
   void                unpackConstraintNames(BitStream* stream);
@@ -245,7 +245,7 @@ public:
   void                  restoreScopedObject(SceneObject*, afxChoreographer* ch);
   void                  adjustProcessOrdering(afxChoreographer*);
 
-  F32                   getScopingDistanceSquared() const { return scoping_dist_sq; }
+  F32                   getScopingDistanceSquared() const { return mScoping_dist_sq; }
 };
 
 inline afxConstraintID afxConstraintMgr::setReferencePoint(StringTableEntry which, Point3F point)
@@ -270,8 +270,8 @@ class afxPointConstraint : public afxConstraint
   typedef afxConstraint  Parent;
 
 protected:
-  Point3F           point;
-  Point3F           vector;
+  Point3F           mPoint;
+  Point3F           mVector;
 
 public:
   /*C*/             afxPointConstraint(afxConstraintMgr*);
@@ -298,7 +298,7 @@ class afxTransformConstraint : public afxConstraint
   typedef afxConstraint  Parent;
 
 protected:
-  MatrixF           xfm;
+  MatrixF           mXfm;
 
 public:
   /*C*/             afxTransformConstraint(afxConstraintMgr*);
@@ -329,11 +329,11 @@ class afxShapeConstraint : public afxConstraint
   typedef afxConstraint  Parent;
 
 protected:
-  StringTableEntry  arb_name;
-  ShapeBase*        shape;
-  U16               scope_id;
-  U32               clip_tag;
-  U32               lock_tag;
+  StringTableEntry  mArb_name;
+  ShapeBase*        mShape;
+  U16               mScope_id;
+  U32               mClip_tag;
+  U32               mLock_tag;
 
 public:
   /*C*/             afxShapeConstraint(afxConstraintMgr*);
@@ -354,9 +354,9 @@ public:
 
   virtual S32       getDamageState();
 
-  virtual SceneObject* getSceneObject() { return shape; }
+  virtual SceneObject* getSceneObject() { return mShape; }
   virtual void      restoreObject(SceneObject*);
-  virtual U16       getScopeId() { return scope_id; }
+  virtual U16       getScopeId() { return mScope_id; }
   virtual U32       getTriggers();
 
   virtual void      onDeleteNotify(SimObject*);
@@ -373,8 +373,8 @@ class afxShapeNodeConstraint : public afxShapeConstraint
   typedef afxShapeConstraint  Parent;
 
 protected:
-  StringTableEntry  arb_node;
-  S32               shape_node_ID;
+  StringTableEntry  mArb_node;
+  S32               mShape_node_ID;
 
 public:
   /*C*/             afxShapeNodeConstraint(afxConstraintMgr*);
@@ -385,7 +385,7 @@ public:
   virtual void      sample(F32 dt, U32 elapsed_ms, const Point3F* cam_pos);
   virtual void      restoreObject(SceneObject*);
 
-  S32               getNodeID() const { return shape_node_ID; }
+  S32               getNodeID() const { return mShape_node_ID; }
 
   virtual void      onDeleteNotify(SimObject*);
 };
@@ -404,10 +404,10 @@ class afxObjectConstraint : public afxConstraint
   typedef afxConstraint  Parent;
 
 protected:
-  StringTableEntry  arb_name;
-  SceneObject*      obj;
-  U16               scope_id;
-  bool              is_camera;
+  StringTableEntry  mArb_name;
+  SceneObject*      mObj;
+  U16               mScope_id;
+  bool              mIs_camera;
 
 public:
                     afxObjectConstraint(afxConstraintMgr*);
@@ -418,9 +418,9 @@ public:
   virtual void      set_scope_id(U16 scope_id);
   virtual void      sample(F32 dt, U32 elapsed_ms, const Point3F* cam_pos);
 
-  virtual SceneObject* getSceneObject() { return obj; }
+  virtual SceneObject* getSceneObject() { return mObj; }
   virtual void      restoreObject(SceneObject*);
-  virtual U16       getScopeId() { return scope_id; }
+  virtual U16       getScopeId() { return mScope_id; }
   virtual U32       getTriggers();
 
   virtual void      onDeleteNotify(SimObject*);
@@ -441,11 +441,11 @@ class afxEffectConstraint : public afxConstraint
   typedef afxConstraint  Parent;
 
 protected:
-  StringTableEntry  effect_name;
-  afxEffectWrapper* effect;
-  U32               clip_tag;
-  bool              is_death_clip;
-  U32               lock_tag;
+  StringTableEntry  mEffect_name;
+  afxEffectWrapper* mEffect;
+  U32               mClip_tag;
+  bool              mIs_death_clip;
+  U32               mLock_tag;
 
 public:
   /*C*/             afxEffectConstraint(afxConstraintMgr*);
@@ -480,8 +480,8 @@ class afxEffectNodeConstraint : public afxEffectConstraint
   typedef afxEffectConstraint  Parent;
 
 protected:
-  StringTableEntry  effect_node;
-  S32               effect_node_ID;
+  StringTableEntry  mEffect_node;
+  S32               mEffect_node_ID;
 
 public:
   /*C*/             afxEffectNodeConstraint(afxConstraintMgr*);
@@ -492,7 +492,7 @@ public:
 
   virtual void      set(afxEffectWrapper* effect);
 
-  S32               getNodeID() const { return effect_node_ID; }
+  S32               getNodeID() const { return mEffect_node_ID; }
 };
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
@@ -501,13 +501,13 @@ public:
 class afxSampleBuffer
 {
 protected:
-  U32               buffer_sz;
-  U32               buffer_ms;
-  U32               ms_per_sample;
-  U32               elapsed_ms;
-  U32               last_sample_ms;
-  U32               next_sample_num;
-  U32               n_samples;
+  U32               mBuffer_sz;
+  U32               mBuffer_ms;
+  U32               mMS_per_sample;
+  U32               mElapsed_ms;
+  U32               mLast_sample_ms;
+  U32               mNext_sample_num;
+  U32               mNum_samples;
 
   virtual void      recSample(U32 idx, void* data) = 0;
   bool              compute_idx_from_lag(F32 lag, U32& idx);
@@ -530,7 +530,7 @@ class afxSampleXfmBuffer : public afxSampleBuffer
   typedef afxSampleBuffer  Parent;
 
 protected:
-  MatrixF*          xfm_buffer;
+  MatrixF*          mXfm_buffer;
 
   virtual void      recSample(U32 idx, void* data);
 
@@ -552,7 +552,7 @@ class afxPointHistConstraint : public afxPointConstraint
   typedef afxPointConstraint  Parent;
 
 protected:
-  afxSampleBuffer*  samples;
+  afxSampleBuffer*  mSamples;
 
 public:
   /*C*/             afxPointHistConstraint(afxConstraintMgr*);
@@ -575,7 +575,7 @@ class afxTransformHistConstraint : public afxTransformConstraint
   typedef afxTransformConstraint  Parent;
 
 protected:
-  afxSampleBuffer*  samples;
+  afxSampleBuffer*  mSamples;
 
 public:
   /*C*/             afxTransformHistConstraint(afxConstraintMgr*);
@@ -598,7 +598,7 @@ class afxShapeHistConstraint : public afxShapeConstraint
   typedef afxShapeConstraint  Parent;
 
 protected:
-  afxSampleBuffer*  samples;
+  afxSampleBuffer*  mSamples;
 
 public:
   /*C*/             afxShapeHistConstraint(afxConstraintMgr*);
@@ -625,7 +625,7 @@ class afxShapeNodeHistConstraint : public afxShapeNodeConstraint
   typedef afxShapeNodeConstraint  Parent;
 
 protected:
-  afxSampleBuffer*  samples;
+  afxSampleBuffer*  mSamples;
 
 public:
   /*C*/             afxShapeNodeHistConstraint(afxConstraintMgr*);
@@ -654,7 +654,7 @@ class afxObjectHistConstraint : public afxObjectConstraint
   typedef afxObjectConstraint  Parent;
 
 protected:
-  afxSampleBuffer*  samples;
+  afxSampleBuffer* mSamples;
 
 public:
                     afxObjectHistConstraint(afxConstraintMgr*);

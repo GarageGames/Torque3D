@@ -38,52 +38,52 @@ void afxEffectVector::filter_client_server()
   if (empty())
     return;
 
-  for (S32 i = 0; i < fx_v->size(); i++)
+  for (S32 i = 0; i < mFX_v->size(); i++)
   {
-    if ((*fx_v)[i]->datablock->runsHere(on_server))
-      fx_v2->push_back((*fx_v)[i]);
+    if ((*mFX_v)[i]->mDatablock->runsHere(mOn_server))
+      mFX_v2->push_back((*mFX_v)[i]);
     else
     {
-      delete (*fx_v)[i];
-      (*fx_v)[i] = 0;
+      delete (*mFX_v)[i];
+      (*mFX_v)[i] = 0;
     }
   }
 
   swap_vecs();
 
-  fx_v2->clear();
+  mFX_v2->clear();
 }
 
 void afxEffectVector::calc_fx_dur_and_afterlife()
 {
-  total_fx_dur = 0.0f;
-  after_life = 0.0f;
+  mTotal_fx_dur = 0.0f;
+  mAfter_life = 0.0f;
 
   if (empty())
     return;
 
-  for (S32 i = 0; i < fx_v->size(); i++)
+  for (S32 i = 0; i < mFX_v->size(); i++)
   {
-    afxEffectWrapper* ew = (*fx_v)[i];
+    afxEffectWrapper* ew = (*mFX_v)[i];
     if (ew)
     {
       F32 ew_dur;
-      if (ew->ew_timing.lifetime < 0)
+      if (ew->mEW_timing.lifetime < 0)
       {
-        if (phrase_dur > ew->ew_timing.delay)
-          ew_dur = phrase_dur + ew->afterStopTime();
+        if (mPhrase_dur > ew->mEW_timing.delay)
+          ew_dur = mPhrase_dur + ew->afterStopTime();
         else
-          ew_dur = ew->ew_timing.delay + ew->afterStopTime();
+          ew_dur = ew->mEW_timing.delay + ew->afterStopTime();
       }
       else
-        ew_dur = ew->ew_timing.delay + ew->ew_timing.lifetime + ew->ew_timing.fade_out_time;
+        ew_dur = ew->mEW_timing.delay + ew->mEW_timing.lifetime + ew->mEW_timing.fade_out_time;
 
-      if (ew_dur > total_fx_dur)
-        total_fx_dur = ew_dur;
+      if (ew_dur > mTotal_fx_dur)
+        mTotal_fx_dur = ew_dur;
 
       F32 after = ew->afterStopTime();
-      if (after > after_life)
-        after_life = after;
+      if (after > mAfter_life)
+        mAfter_life = after;
     }
   }
 }
@@ -92,19 +92,19 @@ void afxEffectVector::calc_fx_dur_and_afterlife()
 
 afxEffectVector::afxEffectVector()
 {
-  fx_v = 0;
-  fx_v2 = 0;
-  active = false;
-  on_server = false;
-  total_fx_dur = 0;
-  after_life = 0;
+  mFX_v = 0;
+  mFX_v2 = 0;
+  mActive = false;
+  mOn_server = false;
+  mTotal_fx_dur = 0;
+  mAfter_life = 0;
 }
 
 afxEffectVector::~afxEffectVector()
 {
   stop(true);
-  delete fx_v;
-  delete fx_v2;
+  delete mFX_v;
+  delete mFX_v2;
 }
 
 void afxEffectVector::effects_init(afxChoreographer* chor, afxEffectList& effects, bool will_stop, F32 time_factor, 
@@ -189,7 +189,7 @@ void afxEffectVector::effects_init(afxChoreographer* chor, afxEffectList& effect
           afxEffectWrapper* effect;
           effect = afxEffectWrapper::ew_create(chor, ewd, cons_mgr, time_factor, group_index);
           if (effect)
-            fx_v->push_back(effect);
+            mFX_v->push_back(effect);
         }      
       }
       else
@@ -205,14 +205,14 @@ void afxEffectVector::effects_init(afxChoreographer* chor, afxEffectList& effect
 void afxEffectVector::ev_init(afxChoreographer* chor, afxEffectList& effects, bool on_server, 
                               bool will_stop, F32 time_factor, F32 phrase_dur, S32 group_index)
 {
-  this->on_server = on_server;
-  this->phrase_dur = phrase_dur;
+  mOn_server = on_server;
+  mPhrase_dur = phrase_dur;
 
-  fx_v = new Vector<afxEffectWrapper*>;
+  mFX_v = new Vector<afxEffectWrapper*>;
 
   effects_init(chor, effects, will_stop, time_factor, group_index);
 
-  fx_v2 = new Vector<afxEffectWrapper*>(fx_v->size());
+  mFX_v2 = new Vector<afxEffectWrapper*>(mFX_v->size());
 }
 
 void afxEffectVector::start(F32 timestamp)
@@ -222,8 +222,8 @@ void afxEffectVector::start(F32 timestamp)
 
   // At this point both client and server effects are in the list.
   // Timing adjustments are made during prestart().
-  for (S32 i = 0; i < fx_v->size(); i++)
-    (*fx_v)[i]->prestart();
+  for (S32 i = 0; i < mFX_v->size(); i++)
+    (*mFX_v)[i]->prestart();
 
   // duration and afterlife values are pre-calculated here
   calc_fx_dur_and_afterlife();
@@ -232,58 +232,58 @@ void afxEffectVector::start(F32 timestamp)
   // don't belong here,
   filter_client_server();
 
-  active = true;
+  mActive = true;
 
-  for (S32 j = 0; j < fx_v->size(); j++)
+  for (S32 j = 0; j < mFX_v->size(); j++)
   {
-    if ((*fx_v)[j]->start(timestamp))
-      fx_v2->push_back((*fx_v)[j]);
+    if ((*mFX_v)[j]->start(timestamp))
+      mFX_v2->push_back((*mFX_v)[j]);
     else
     {
-      delete (*fx_v)[j];
-      (*fx_v)[j] = 0;
+      delete (*mFX_v)[j];
+      (*mFX_v)[j] = 0;
     }
   }
 
   swap_vecs();
-  fx_v2->clear();
+  mFX_v2->clear();
 }
 
 void afxEffectVector::update(F32 dt)
 {
   if (empty())
   {
-    active = false;
+    mActive = false;
     return;
   }
 
-  for (int i = 0; i < fx_v->size(); i++)
+  for (int i = 0; i < mFX_v->size(); i++)
   {
-    (*fx_v)[i]->update(dt);
+    (*mFX_v)[i]->update(dt);
 
-    if ((*fx_v)[i]->isDone() || (*fx_v)[i]->isAborted())
+    if ((*mFX_v)[i]->isDone() || (*mFX_v)[i]->isAborted())
     {
       // effect has ended, cleanup and delete
-      (*fx_v)[i]->cleanup();
-      delete (*fx_v)[i];
-      (*fx_v)[i] = 0;
+      (*mFX_v)[i]->cleanup();
+      delete (*mFX_v)[i];
+      (*mFX_v)[i] = 0;
     }
     else
     {
       // effect is still going, so keep it around
-      fx_v2->push_back((*fx_v)[i]);
+      mFX_v2->push_back((*mFX_v)[i]);
     }
   }
 
   swap_vecs();
 
-  fx_v2->clear();
+  mFX_v2->clear();
 
   if (empty())
   {
-    active = false;
-    delete fx_v; fx_v =0;
-    delete fx_v2; fx_v2 = 0;
+    mActive = false;
+    delete mFX_v; mFX_v =0;
+    delete mFX_v2; mFX_v2 = 0;
   }
 }
 
@@ -291,37 +291,37 @@ void afxEffectVector::stop(bool force_cleanup)
 {
   if (empty())
   {
-    active = false;
+    mActive = false;
     return;
   }
 
-  for (int i = 0; i < fx_v->size(); i++)
+  for (int i = 0; i < mFX_v->size(); i++)
   {
-    (*fx_v)[i]->stop();
+    (*mFX_v)[i]->stop();
 
-    if (force_cleanup || (*fx_v)[i]->deleteWhenStopped())
+    if (force_cleanup || (*mFX_v)[i]->deleteWhenStopped())
     {
       // effect is over when stopped, cleanup and delete 
-      (*fx_v)[i]->cleanup();
-      delete (*fx_v)[i];
-      (*fx_v)[i] = 0;
+      (*mFX_v)[i]->cleanup();
+      delete (*mFX_v)[i];
+      (*mFX_v)[i] = 0;
     }
     else
     {
       // effect needs to fadeout or something, so keep it around
-      fx_v2->push_back((*fx_v)[i]);
+		mFX_v2->push_back((*mFX_v)[i]);
     }
   }
 
   swap_vecs();
 
-  fx_v2->clear();
+  mFX_v2->clear();
 
   if (empty())
   {
-    active = false;
-    delete fx_v; fx_v =0;
-    delete fx_v2; fx_v2 = 0;
+    mActive = false;
+    delete mFX_v; mFX_v =0;
+    delete mFX_v2; mFX_v2 = 0;
   }
 }
 
@@ -329,27 +329,27 @@ void afxEffectVector::interrupt()
 {
   if (empty())
   {
-    active = false;
+    mActive = false;
     return;
   }
 
-  for (int i = 0; i < fx_v->size(); i++)
+  for (int i = 0; i < mFX_v->size(); i++)
   {
-    (*fx_v)[i]->stop();
-    (*fx_v)[i]->cleanup();
-    delete (*fx_v)[i];
-    (*fx_v)[i] = 0;
+    (*mFX_v)[i]->stop();
+    (*mFX_v)[i]->cleanup();
+    delete (*mFX_v)[i];
+    (*mFX_v)[i] = 0;
   }
 
   swap_vecs();
 
-  fx_v2->clear();
+  mFX_v2->clear();
 
   if (empty())
   {
-    active = false;
-    delete fx_v; fx_v =0;
-    delete fx_v2; fx_v2 = 0;
+    mActive = false;
+    delete mFX_v; mFX_v =0;
+    delete mFX_v2; mFX_v2 = 0;
   }
 }
 

@@ -100,7 +100,7 @@ GuiPopupMenuTextListCtrl::GuiPopupMenuTextListCtrl()
 void GuiPopupMenuTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool selected, bool mouseOver)
 {
    //check if we're a real entry, or if it's a divider
-   if (mPopup->mMenuItems[cell.y].isSpacer)
+   if (mPopup->mMenuItems[cell.y].mIsSpacer)
    {
       S32 yp = offset.y + mCellSize.y / 2;
       GFX->getDrawUtil()->drawLine(offset.x + 5, yp, offset.x + mCellSize.x - 5, yp, ColorI(128, 128, 128));
@@ -214,8 +214,8 @@ void GuiPopupMenuTextListCtrl::onMouseUp(const GuiEvent &event)
 
       if (item)
       {
-         if (item->enabled)
-            dAtob(Con::executef(mPopup, "onSelectItem", Con::getIntArg(getSelectedCell().y), item->text.isNotEmpty() ? item->text : ""));
+         if (item->mEnabled)
+            dAtob(Con::executef(mPopup, "onSelectItem", Con::getIntArg(getSelectedCell().y), item->mText.isNotEmpty() ? item->mText : ""));
       }
    }
 
@@ -247,9 +247,9 @@ void GuiPopupMenuTextListCtrl::onCellHighlighted(Point2I cell)
    {
       MenuItem *list = &mPopup->mMenuItems[selectionIndex];
 
-      if (list->isSubmenu && list->subMenu != nullptr)
+      if (list->mIsSubmenu && list->mSubMenu != nullptr)
       {
-         list->subMenu->showPopup(getRoot(), getPosition().x + mCellSize.x, getPosition().y + (selectionIndex * mCellSize.y));
+         list->mSubMenu->showPopup(getRoot(), getPosition().x + mCellSize.x, getPosition().y + (selectionIndex * mCellSize.y));
       }
    }
 }

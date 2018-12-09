@@ -1194,7 +1194,7 @@ bool RigidShape::updateCollision(F32 dt)
 
    mCollisionList.clear();
    CollisionState *state = mConvex.findClosestState(cmat, getScale(), mDataBlock->collisionTol);
-   if (state && state->dist <= mDataBlock->collisionTol) 
+   if (state && state->mDist <= mDataBlock->collisionTol) 
    {
       //resolveDisplacement(ns,state,dt);
       mConvex.getCollisionInfo(cmat, getScale(), &mCollisionList, mDataBlock->collisionTol);
@@ -1326,8 +1326,8 @@ bool RigidShape::resolveContacts(Rigid& ns,CollisionList& cList,F32 dt)
 
 bool RigidShape::resolveDisplacement(Rigid& ns,CollisionState *state, F32 dt)
 {
-   SceneObject* obj = (state->a->getObject() == this)?
-      state->b->getObject(): state->a->getObject();
+   SceneObject* obj = (state->mA->getObject() == this)?
+      state->mB->getObject(): state->mA->getObject();
 
    if (obj->isDisplacable() && ((obj->getTypeMask() & ShapeBaseObjectType) != 0))
    {

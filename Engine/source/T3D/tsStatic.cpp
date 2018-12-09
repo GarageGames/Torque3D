@@ -373,7 +373,7 @@ bool TSStatic::_createShape()
          NetConnection::filesWereDownloaded() )
       return false;
 
-   mObjBox = mShape->bounds;
+   mObjBox = mShape->mBounds;
    resetWorldBox();
 
    mShapeInstance = new TSShapeInstance( mShape, isClientObject() );
@@ -537,6 +537,7 @@ void TSStatic::reSkin()
 {
    if ( isGhost() && mShapeInstance && mSkinNameHandle.isValidString() )
    {
+	  mShapeInstance->resetMaterialList();
       Vector<String> skins;
       String(mSkinNameHandle.getString()).split( ";", skins );
 
@@ -1006,6 +1007,8 @@ bool TSStatic::castRayRendered(const Point3F &start, const Point3F &end, RayInfo
 
    // Cast the ray against the currently visible detail
    RayInfo localInfo;
+   if (info && info->generateTexCoord)
+      localInfo.generateTexCoord = true;
    bool res = mShapeInstance->castRayOpcode( mShapeInstance->getCurrentDetail(), start, end, &localInfo );
 
    if ( res )

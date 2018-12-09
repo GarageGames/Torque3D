@@ -528,6 +528,11 @@ bool Prefab::isValidChild( SimObject *simobj, bool logWarnings )
 bool Prefab::buildPolyList(PolyListContext context, AbstractPolyList* polyList, const Box3F &box, const SphereF& sphere)
 {
    Vector<SceneObject*> foundObjects;
+   if (mChildGroup.isNull() || mChildGroup->empty())
+   {
+	   Con::warnf("Bad Prefab Config! %s has no valid entries!", getName());
+	   return false;
+   }
    mChildGroup->findObjectByType(foundObjects);
 
    for (S32 i = 0; i < foundObjects.size(); i++)

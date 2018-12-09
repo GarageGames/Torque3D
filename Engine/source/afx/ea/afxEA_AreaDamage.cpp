@@ -133,7 +133,7 @@ void afxEA_AreaDamage::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxAreaDamageData* orig_db = damage_data;
     damage_data = new afxAreaDamageData(*orig_db, true);
-    orig_db->performSubstitutions(damage_data, choreographer, group_index);
+    orig_db->performSubstitutions(damage_data, mChoreographer, mGroup_index);
   }
 }
 
@@ -204,8 +204,8 @@ void afxEA_AreaDamage::notify_damage_source(ShapeBase* damaged, F32 damage, cons
   char *posArg = Con::getArgBuffer(64);
   dSprintf(posArg, 64, "%f %f %f", pos.x, pos.y, pos.z);
 
-  Con::executef(choreographer->getDataBlock(), "onInflictedAreaDamage", 
-                choreographer->getIdString(),
+  Con::executef(mChoreographer->getDataBlock(), "onInflictedAreaDamage",
+                mChoreographer->getIdString(),
                 damaged->getIdString(),
                 Con::getFloatArg(damage),
                 flavor,
@@ -221,7 +221,7 @@ void afxEA_AreaDamage::apply_damage(ShapeBase* shape, F32 damage, const char* fl
   dSprintf(posArg, 64, "%f %f %f", pos.x, pos.y, pos.z);
 
   Con::executef(shape, "damage", 
-                choreographer->getIdString(),
+                mChoreographer->getIdString(),
                 posArg,
                 Con::getFloatArg(damage), 
                 flavor);

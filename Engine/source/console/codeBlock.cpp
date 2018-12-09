@@ -392,14 +392,14 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
    if (size)
    {
       globalFloats = new F64[size];
-      for (U32 i = 0; i < size; i++)
+      for (i = 0; i < size; i++)
          st.read(&globalFloats[i]);
    }
    st.read(&size);
    if (size)
    {
       functionFloats = new F64[size];
-      for (U32 i = 0; i < size; i++)
+      for (i = 0; i < size; i++)
          st.read(&functionFloats[i]);
    }
    U32 codeLength;
@@ -698,10 +698,10 @@ String CodeBlock::getFunctionArgs(U32 ip)
 {
    StringBuilder str;
 
-   U32 fnArgc = code[ip + 5];
+   U32 fnArgc = code[ip + 8];
    for (U32 i = 0; i < fnArgc; ++i)
    {
-      StringTableEntry var = CodeToSTE(code, ip + (i * 2) + 6);
+      StringTableEntry var = CodeToSTE(code, ip + (i * 2) + 9);
 
       if (i != 0)
          str.append(", ");

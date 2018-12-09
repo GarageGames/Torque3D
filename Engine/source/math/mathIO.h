@@ -142,10 +142,10 @@ inline bool mathRead(Stream& stream, QuatF* q)
 
 inline bool mathRead(Stream& stream, EaseF* e)
 {
-   bool success = stream.read( &e->dir );
-   success     &= stream.read( &e->type );
-   success     &= stream.read( &e->param[ 0 ] );
-   success     &= stream.read( &e->param[ 1 ] );
+   bool success = stream.read( &e->mDir );
+   success     &= stream.read( &e->mType );
+   success     &= stream.read( &e->mParam[ 0 ] );
+   success     &= stream.read( &e->mParam[ 1 ] );
    return success;
 }
 
@@ -270,10 +270,10 @@ inline bool mathWrite(Stream& stream, const QuatF& q)
 
 inline bool mathWrite(Stream& stream, const EaseF& e)
 {
-   bool success = stream.write(e.dir);
-   success     &= stream.write(e.type);
-   success     &= stream.write(e.param[0]);
-   success     &= stream.write(e.param[1]);
+   bool success = stream.write(e.mDir);
+   success     &= stream.write(e.mType);
+   success     &= stream.write(e.mParam[0]);
+   success     &= stream.write(e.mParam[1]);
    return success;
 }
 

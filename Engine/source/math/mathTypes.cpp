@@ -557,7 +557,7 @@ ConsoleGetType( TypeEaseF )
    static const U32 bufSize = 256;
    char* returnBuffer = Con::getReturnBuffer(bufSize);
    dSprintf(returnBuffer, bufSize, "%d %d %g %g",
-            pEase->dir, pEase->type, pEase->param[0], pEase->param[1]);
+            pEase->mDir, pEase->mType, pEase->mParam[0], pEase->mParam[1]);
 
    return returnBuffer;
 }
@@ -567,11 +567,11 @@ ConsoleSetType( TypeEaseF )
    EaseF* pDst = (EaseF*)dptr;
 
    // defaults...
-   pDst->param[0] = -1.0f;
-   pDst->param[1] = -1.0f;
+   pDst->mParam[0] = -1.0f;
+   pDst->mParam[1] = -1.0f;
    if (argc == 1) {
       U32 args = dSscanf(argv[0], "%d %d %f %f", // the two params are optional and assumed -1 if not present...
-                         &pDst->dir, &pDst->type, &pDst->param[0],&pDst->param[1]);
+                         &pDst->mDir, &pDst->mType, &pDst->mParam[0],&pDst->mParam[1]);
       if( args < 2 )
          Con::warnf( "Warning, EaseF probably not read properly" );
    } else {

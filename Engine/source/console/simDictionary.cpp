@@ -45,13 +45,13 @@ SimNameDictionary::~SimNameDictionary()
 
 void SimNameDictionary::insert(SimObject* obj)
 {
-   if (!obj || !obj->objectName)
+   if (!obj || !obj->getName())
       return;
 
-   SimObject* checkForDup = find(obj->objectName);
+   SimObject* checkForDup = find(obj->getName());
 
    if (checkForDup)
-      Con::warnf("Warning! You have a duplicate datablock name of %s. This can cause problems. You should rename one of them.", obj->objectName);
+      Con::warnf("Warning! You have a duplicate datablock name of %s. This can cause problems. You should rename one of them.", obj->getName());
 
    Mutex::lockMutex(mutex);
 #ifndef USE_NEW_SIMDICTIONARY
@@ -64,7 +64,7 @@ void SimNameDictionary::insert(SimObject* obj)
       dMemset(hashTable, 0, sizeof(*hashTable) * DefaultTableSize);
    }
 
-   S32 idx = HashPointer(obj->objectName) % hashTableSize;
+   S32 idx = HashPointer(obj->getName()) % hashTableSize;
    obj->nextNameObject = hashTable[idx];
    hashTable[idx] = obj;
    hashEntryCount++;
@@ -86,7 +86,7 @@ void SimNameDictionary::insert(SimObject* obj)
          {
             SimObject* next = object->nextNameObject;
 
-            idx = HashPointer(object->objectName) % newHashTableSize;
+            idx = HashPointer(object->getName()) % newHashTableSize;
             object->nextNameObject = newHashTable[idx];
             newHashTable[idx] = object;
 
@@ -118,7 +118,7 @@ SimObject* SimNameDictionary::find(StringTableEntry name)
    SimObject *walk = hashTable[idx];
    while (walk)
    {
-      if (walk->objectName == name)
+      if (walk->getName() == name)
       {
          Mutex::unlockMutex(mutex);
          return walk;
@@ -139,12 +139,12 @@ SimObject* SimNameDictionary::find(StringTableEntry name)
 
 void SimNameDictionary::remove(SimObject* obj)
 {
-   if (!obj || !obj->objectName)
+   if (!obj || !obj->getName())
       return;
 
    Mutex::lockMutex(mutex);
 #ifndef USE_NEW_SIMDICTIONARY
-   SimObject **walk = &hashTable[HashPointer(obj->objectName) % hashTableSize];
+   SimObject **walk = &hashTable[HashPointer(obj->getName()) % hashTableSize];
    while (*walk)
    {
       if (*walk == obj)
@@ -190,12 +190,12 @@ SimManagerNameDictionary::~SimManagerNameDictionary()
 
 void SimManagerNameDictionary::insert(SimObject* obj)
 {
-   if (!obj || !obj->objectName)
+   if (!obj || !obj->getName())
       return;
 
    Mutex::lockMutex(mutex);
 #ifndef USE_NEW_SIMDICTIONARY
-   S32 idx = HashPointer(obj->objectName) % hashTableSize;
+   S32 idx = HashPointer(obj->getName()) % hashTableSize;
    obj->nextManagerNameObject = hashTable[idx];
    hashTable[idx] = obj;
    hashEntryCount++;
@@ -217,7 +217,7 @@ void SimManagerNameDictionary::insert(SimObject* obj)
          {
             SimObject* next = object->nextManagerNameObject;
 
-            idx = HashPointer(object->objectName) % newHashTableSize;
+            idx = HashPointer(object->getName()) % newHashTableSize;
             object->nextManagerNameObject = newHashTable[idx];
             newHashTable[idx] = object;
 
@@ -247,7 +247,7 @@ SimObject* SimManagerNameDictionary::find(StringTableEntry name)
    SimObject *walk = hashTable[idx];
    while (walk)
    {
-      if (walk->objectName == name)
+      if (walk->getName() == name)
       {
          Mutex::unlockMutex(mutex);
          return walk;
@@ -267,13 +267,13 @@ SimObject* SimManagerNameDictionary::find(StringTableEntry name)
 
 void SimManagerNameDictionary::remove(SimObject* obj)
 {
-   if (!obj || !obj->objectName)
+   if (!obj || !obj->getName())
       return;
 
 #ifndef USE_NEW_SIMDICTIONARY
    Mutex::lockMutex(mutex);
 
-   SimObject **walk = &hashTable[HashPointer(obj->objectName) % hashTableSize];
+   SimObject **walk = &hashTable[HashPointer(obj->getName()) % hashTableSize];
    while (*walk)
    {
       if (*walk == obj)

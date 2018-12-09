@@ -179,9 +179,9 @@ public:
 protected:
    struct SubstitutionStatement
    {
-      StringTableEntry  slot;
-      S32               idx;
-      char*             value;
+      StringTableEntry  mSlot;
+      S32               mIdx;
+      char*             mValue;
       SubstitutionStatement(StringTableEntry slot, S32 idx, const char* value);
       ~SubstitutionStatement();
       void replaceValue(const char* value);

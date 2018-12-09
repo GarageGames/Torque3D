@@ -1681,54 +1681,40 @@ void MeshRoad::_generateSlices()
          }          
       }
    }
-
-   //
-   // Calculate uvec, fvec, and rvec for all slices
-   //   
-
+   
    MatrixF mat(true);
-
-   for ( U32 i = 0; i < mSlices.size(); i++ )
-   {
-      calcSliceTransform( i, mat );
-      mat.getColumn( 0, &mSlices[i].rvec );
-      mat.getColumn( 1, &mSlices[i].fvec );
-      mat.getColumn( 2, &mSlices[i].uvec );
-   } 
-
-   //
-   // Calculate p0/p2/pb0/pb2 for all slices
-   //      
-   for ( U32 i = 0; i < mSlices.size(); i++ )
-   {
-      MeshRoadSlice *slice = &mSlices[i];
-      slice->p0 = slice->p1 - slice->rvec * slice->width * 0.5f;
-      slice->p2 = slice->p1 + slice->rvec * slice->width * 0.5f;
-      slice->pb0 = slice->p0 - slice->uvec * slice->depth;
-      slice->pb2 = slice->p2 - slice->uvec * slice->depth;
-   }
-
-   // Generate the object/world bounds
    Box3F box;
    for ( U32 i = 0; i < mSlices.size(); i++ )
    {
-      const MeshRoadSlice &slice = mSlices[i];
+      // Calculate uvec, fvec, and rvec for all slices
+      calcSliceTransform( i, mat );
+	  MeshRoadSlice *slicePtr = &mSlices[i];
+      mat.getColumn( 0, &slicePtr->rvec );
+      mat.getColumn( 1, &slicePtr->fvec );
+      mat.getColumn( 2, &slicePtr->uvec );
 
+      // Calculate p0/p2/pb0/pb2 for all slices
+	  slicePtr->p0 = slicePtr->p1 - slicePtr->rvec * slicePtr->width * 0.5f;
+	  slicePtr->p2 = slicePtr->p1 + slicePtr->rvec * slicePtr->width * 0.5f;
+	  slicePtr->pb0 = slicePtr->p0 - slicePtr->uvec * slicePtr->depth;
+	  slicePtr->pb2 = slicePtr->p2 - slicePtr->uvec * slicePtr->depth;
+
+	  // Generate or extend the object/world bounds
       if ( i == 0 )
       {
-         box.minExtents = slice.p0;
-         box.maxExtents = slice.p2;
-         box.extend( slice.pb0 );
-         box.extend( slice.pb2 );
+         box.minExtents = slicePtr->p0;
+         box.maxExtents = slicePtr->p2;
+         box.extend(slicePtr->pb0 );
+         box.extend(slicePtr->pb2 );
       }
       else
       {
-         box.extend( slice.p0 ); 
-         box.extend( slice.p2 );
-         box.extend( slice.pb0 );
-         box.extend( slice.pb2 );
+         box.extend(slicePtr->p0 );
+         box.extend(slicePtr->p2 );
+         box.extend(slicePtr->pb0 );
+         box.extend(slicePtr->pb2 );
       }
-   }
+   } 
 
    mWorldBox = box;
    resetObjectBox();

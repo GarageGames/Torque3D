@@ -449,10 +449,10 @@ void FieldBrushObject::copyFields( SimObject* pSimObject, const char* fieldList 
                 // Yes, so is this field name selected?
 
                 // Iterate fields...
-                for ( U32 fieldIndex = 0; fieldIndex < fields.size(); ++fieldIndex )
+                for ( U32 findFieldIDx = 0; findFieldIDx < fields.size(); ++findFieldIDx)
                 {
                     // Field selected?
-                    if ( staticField.pFieldname == fields[fieldIndex] )
+                    if ( staticField.pFieldname == fields[findFieldIDx] )
                     {
                         // Yes, so flag as such.
                         fieldSpecified = true;

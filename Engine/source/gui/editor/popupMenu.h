@@ -34,27 +34,27 @@ class GuiPopupMenuBackgroundCtrl;
 
 struct MenuItem   // an individual item in a pull-down menu
 {
-   String text;    // the text of the menu item
-   U32 id;        // a script-assigned identifier
-   char *accelerator; // the keyboard accelerator shortcut for the menu item
-   U32 acceleratorIndex; // index of this accelerator
-   bool enabled;        // true if the menu item is selectable
-   bool visible;        // true if the menu item is visible
-   S32 bitmapIndex;     // index of the bitmap in the bitmap array
-   S32 checkGroup;      // the group index of the item visa vi check marks - 
+   String mText;    // the text of the menu item
+   U32 mID;        // a script-assigned identifier
+   char *mAccelerator; // the keyboard accelerator shortcut for the menu item
+   U32 mAcceleratorIndex; // index of this accelerator
+   bool mEnabled;        // true if the menu item is selectable
+   bool mVisible;        // true if the menu item is visible
+   S32 mBitmapIndex;     // index of the bitmap in the bitmap array
+   S32 mCheckGroup;      // the group index of the item visa vi check marks - 
                         // only one item in the group can be checked.
 
-   bool isSubmenu;				//  This menu item has a submenu that will be displayed
+   bool mIsSubmenu;				//  This menu item has a submenu that will be displayed
 
-   bool isChecked;
+   bool mIsChecked;
 
-   bool isSpacer;
+   bool mIsSpacer;
 
-   bool isMenubarEntry;
+   bool mIsMenubarEntry;
 
-   PopupMenu* subMenuParentMenu; //  For a submenu, this is the parent menu
-   PopupMenu* subMenu;
-   String cmd;
+   PopupMenu* mSubMenuParentMenu; //  For a submenu, this is the parent menu
+   PopupMenu* mSubMenu;
+   String mCMD;
 };
 
 // PopupMenu represents a menu.
@@ -72,16 +72,16 @@ protected:
 
    GuiMenuBar* mMenuBarCtrl;
 
-   StringTableEntry barTitle;
+   StringTableEntry mBarTitle;
 
-   RectI bounds;
-   bool visible;
+   RectI mBounds;
+   bool mVisible;
 
-   S32 bitmapIndex;		// Index of the bitmap in the bitmap array (-1 = no bitmap)
-   bool drawBitmapOnly;	// Draw only the bitmap and not the text
-   bool drawBorder;		// Should a border be drawn around this menu (usually if we only have a bitmap, we don't want a border)
+   S32 mBitmapIndex;		// Index of the bitmap in the bitmap array (-1 = no bitmap)
+   bool mDrawBitmapOnly;	// Draw only the bitmap and not the text
+   bool mDrawBorder;		// Should a border be drawn around this menu (usually if we only have a bitmap, we don't want a border)
 
-   bool isSubmenu;
+   bool mIsSubmenu;
 
    //This is the gui control that renders our popup
    GuiPopupMenuTextListCtrl *mTextList;
@@ -137,6 +137,9 @@ public:
    /// Returns the number of items in the menu.
    U32 getItemCount();
 
+   ///Clears all items
+   void clearItems();
+
    //-----------------------------------------------------------------------------
    /// Displays this menu as a popup menu and blocks until the user has selected
    /// an item.
@@ -175,8 +178,8 @@ public:
    virtual bool onMessageReceived(StringTableEntry queue, const char* event, const char* data );
    virtual bool onMessageObjectReceived(StringTableEntry queue, Message *msg );
 
-   bool isVisible() { return visible; }
-   void setVisible(bool isVis) { visible = isVis; }
+   bool isVisible() { return mVisible; }
+   void setVisible(bool isVis) { mVisible = isVis; }
 
    GuiMenuBar* getMenuBarCtrl();
 };

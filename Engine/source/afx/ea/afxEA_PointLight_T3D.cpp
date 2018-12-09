@@ -66,10 +66,10 @@ public:
 
 class PointLightProxy : public PointLight
 {
-  F32 fade_amt;
+  F32 mFade_amt;
 
 public:
-  PointLightProxy() { fade_amt = 1.0f; }
+  PointLightProxy() { mFade_amt = 1.0f; }
 
   void force_ghost() 
   {
@@ -79,7 +79,7 @@ public:
 
   void setFadeAmount(F32 fade_amt)
   {
-    this->fade_amt = fade_amt;
+    mFade_amt = fade_amt;
     mLight->setBrightness(mBrightness*fade_amt);
   }
 
@@ -125,10 +125,10 @@ public:
 
   void submitLights(LightManager* lm, bool staticLighting)
   {
-    if (mAnimState.active && mAnimationData && fade_amt < 1.0f)
+    if (mAnimState.active && mAnimationData && mFade_amt < 1.0f)
     {
       F32 mBrightness_save = mBrightness;
-      mBrightness *= fade_amt;
+      mBrightness *= mFade_amt;
       PointLight::submitLights(lm, staticLighting);
       mBrightness = mBrightness_save;
       return;
@@ -203,12 +203,12 @@ bool afxEA_T3DPointLight::ea_update(F32 dt)
     light->setConstraintObject(cons_obj);
 #endif
 
-    light->setLiveColor(updated_color);
+    light->setLiveColor(mUpdated_color);
 
-    if (do_fades)
-      light->setFadeAmount(fade_value*updated_scale.x);
+    if (mDo_fades)
+      light->setFadeAmount(mFade_value*mUpdated_scale.x);
 
-    light->updateTransform(updated_xfm);
+    light->updateTransform(mUpdated_xfm);
 
     // scale should not be updated this way. It messes up the culling.
     //light->setScale(updated_scale);
@@ -254,7 +254,7 @@ void afxEA_T3DPointLight::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxT3DPointLightData* orig_db = light_data;
     light_data = new afxT3DPointLightData(*orig_db, true);
-    orig_db->performSubstitutions(light_data, choreographer, group_index);
+    orig_db->performSubstitutions(light_data, mChoreographer, mGroup_index);
   }
 }
 

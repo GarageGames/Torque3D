@@ -1454,16 +1454,16 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
 
       }
 
-      CameraSpline::Knot::Path path;
+      CameraSpline::Knot::Path tPath;
       switch (pathmarker->mSmoothingType)
       {
-         case Marker::SmoothingTypeLinear:   path = CameraSpline::Knot::LINEAR; break;
+         case Marker::SmoothingTypeLinear:   tPath = CameraSpline::Knot::LINEAR; break;
          case Marker::SmoothingTypeSpline:
-         default:                            path = CameraSpline::Knot::SPLINE; break;
+         default:                            tPath = CameraSpline::Knot::SPLINE; break;
 
       }
 
-      spline.push_back(new CameraSpline::Knot(pos, rot, 1.0f, type, path));
+      spline.push_back(new CameraSpline::Knot(pos, rot, 1.0f, type, tPath));
    }
 
    F32 t = 0.0f;
@@ -1559,8 +1559,8 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
 
          // Reset for next pass...
          vIdx = 0;
-         void *lockPtr = vb.lock();
-         if(!lockPtr) return;
+         void *nextlockPtr = vb.lock();
+         if(!nextlockPtr) return;
       }
    }
 
@@ -3036,25 +3036,25 @@ bool WorldEditor::alignByAxis( S32 axis )
    if(mSelected->size() < 2)
       return true;
       
-   SceneObject* object = dynamic_cast< SceneObject* >( ( *mSelected )[ 0 ] );
-   if( !object )
+   SceneObject* primaryObj = dynamic_cast< SceneObject* >( ( *mSelected )[ 0 ] );
+   if( !primaryObj)
       return false;
 
    submitUndo( mSelected, "Align By Axis" );
 
    // All objects will be repositioned to line up with the
    // first selected object
-   Point3F pos = object->getPosition();
+   Point3F pos = primaryObj->getPosition();
 
    for(S32 i=0; i<mSelected->size(); ++i)
    {
-      SceneObject* object = dynamic_cast< SceneObject* >( ( *mSelected )[ i ] );
-      if( !object )
+      SceneObject* additionalObj = dynamic_cast< SceneObject* >( ( *mSelected )[ i ] );
+      if( !additionalObj)
          continue;
          
-      Point3F objPos = object->getPosition();
+      Point3F objPos = additionalObj->getPosition();
       objPos[axis] = pos[axis];
-      object->setPosition(objPos);
+	  additionalObj->setPosition(objPos);
    }
 
    return true;
@@ -4073,8 +4073,8 @@ DefineEngineMethod( WorldEditor, createPolyhedralObject, SceneObject*, ( const c
 
    // Create the object.
 
-   SceneObject* object = dynamic_cast< SceneObject* >( classRep->create() );
-   if( !Object )
+   SceneObject* polyObj = dynamic_cast< SceneObject* >( classRep->create() );
+   if( !polyObj)
    {
       Con::errorf( "WorldEditor::createPolyhedralObject - Could not create SceneObject with class '%s'", className );
       return NULL;
@@ -4092,7 +4092,7 @@ DefineEngineMethod( WorldEditor, createPolyhedralObject, SceneObject*, ( const c
    for( U32 i = 0; i < numPoints; ++ i )
    {
       static StringTableEntry sPoint = StringTable->insert( "point" );
-      object->setDataField( sPoint, NULL, EngineMarshallData( points[ i ] ) );
+	  polyObj->setDataField( sPoint, NULL, EngineMarshallData( points[ i ] ) );
    }
 
    // Add the plane data.
@@ -4108,7 +4108,7 @@ DefineEngineMethod( WorldEditor, createPolyhedralObject, SceneObject*, ( const c
       char buffer[ 1024 ];
       dSprintf( buffer, sizeof( buffer ), "%g %g %g %g", plane.x, plane.y, plane.z, plane.d );
 
-      object->setDataField( sPlane, NULL, buffer );
+	  polyObj->setDataField( sPlane, NULL, buffer );
    }
 
    // Add the edge data.
@@ -4127,24 +4127,24 @@ DefineEngineMethod( WorldEditor, createPolyhedralObject, SceneObject*, ( const c
          edge.vertex[ 0 ], edge.vertex[ 1 ]
       );
 
-      object->setDataField( sEdge, NULL, buffer );
+	  polyObj->setDataField( sEdge, NULL, buffer );
    }
 
    // Set the transform.
 
-   object->setTransform( savedTransform );
-   object->setScale( savedScale );
+   polyObj->setTransform( savedTransform );
+   polyObj->setScale( savedScale );
 
    // Register and return the object.
 
-   if( !object->registerObject() )
+   if( !polyObj->registerObject() )
    {
       Con::errorf( "WorldEditor::createPolyhedralObject - Failed to register object!" );
-      delete object;
+      delete polyObj;
       return NULL;
    }
 
-   return object;
+   return polyObj;
 }
 
 //-----------------------------------------------------------------------------
