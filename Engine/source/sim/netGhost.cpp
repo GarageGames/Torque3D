@@ -793,7 +793,7 @@ void NetConnection::objectInScope(NetObject *obj)
       walk->flags |= GhostInfo::InScope;
 
       // Make sure scope always if reflected on the ghostinfo too
-      if (obj->mNetFlags.test(NetObject::ScopeAlways))
+      if (obj->mNetFlags.test(NetObject::ScopeAlways) && !(walk->flags & GhostInfo::Flags::KillingGhost))
          walk->flags |= GhostInfo::ScopeAlways;
 
       return;

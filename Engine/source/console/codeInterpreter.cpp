@@ -2178,14 +2178,16 @@ OPCodeReturn CodeInterpreter::op_callfunc(U32 &ip)
 
    // ConsoleFunctionType is for any function defined by script.
    // Any 'callback' type is an engine function that is exposed to script.
-   if (mNSEntry->mType == Namespace::Entry::ConsoleFunctionType
-      || cFunctionRes)
+   if (cFunctionRes
+      || (mNSEntry && mNSEntry->mType == Namespace::Entry::ConsoleFunctionType))
    {
+      ConsoleValue retVal;
       ConsoleValueRef ret;
       if (cFunctionRes)
       {
-         StringStackConsoleWrapper retVal(1, &cRetRes);
-         ret = retVal.argv[0];
+         retVal.init();
+         ret.value = &retVal;
+         retVal.setStackStringValue(cRetRes);
       }
       else if (mNSEntry->mFunctionOffset)
       {

@@ -27,6 +27,10 @@
    #include "console/engineTypes.h"
 #endif
 
+#include "core/strings/stringFunctions.h"
+#include "math/mPlane.h"
+#include "math/mPolyhedron.h"
+
 
 /// @file
 /// Definitions for the core primitive types used in the
@@ -45,6 +49,15 @@ DECLARE_PRIMITIVE_R(F64);
 DECLARE_PRIMITIVE_R(U64);
 DECLARE_PRIMITIVE_R(S64);
 DECLARE_PRIMITIVE_R(void*);
+
+DECLARE_PRIMITIVE_R(bool*);
+DECLARE_PRIMITIVE_R(U8*);
+DECLARE_PRIMITIVE_R(S32*);
+DECLARE_PRIMITIVE_R(F32*);
+DECLARE_PRIMITIVE_R(Point3F*);
+DECLARE_PRIMITIVE_R(PlaneF*);
+DECLARE_PRIMITIVE_R(PolyhedronData::Edge*);
+DECLARE_PRIMITIVE_R(const char**);
 
 
 //FIXME: this allows String to be used as a struct field type
@@ -80,5 +93,22 @@ struct EngineTypeTraits< String > : public _EnginePrimitiveTypeTraits< String >
 template<> struct EngineTypeTraits< const UTF16* > : public EngineTypeTraits< String > {};
 template<> inline const EngineTypeInfo* TYPE< const UTF16* >() { return TYPE< String >(); }
 inline const EngineTypeInfo* TYPE( const UTF16*& ) { return TYPE< String >(); }
+
+_DECLARE_TYPE_R(const UTF8*);
+template<>
+struct EngineTypeTraits< const UTF8* > : public _EnginePrimitiveTypeTraits< const UTF8* >
+{
+   typedef const UTF16* ReturnValueType;
+
+   //FIXME: this needs to be sorted out; for now, we store default value literals in ASCII
+   typedef const char* DefaultArgumentValueStoreType;
+
+   static const UTF16* ReturnValue(const String& str)
+   {
+      static String sTemp;
+      sTemp = str;
+      return sTemp.utf16();
+   }
+};
 
 #endif // !_ENGINEPRIMITIVES_H_

@@ -515,9 +515,14 @@ DefineEngineMethod( GuiButtonBaseCtrl, setTextID, void, ( const char* id ),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( GuiButtonBaseCtrl, getText, const char*, (),,
-   "Get the text display on the button's label (if any).\n\n"
-   "@return The button's label." )
+struct _GuiButtonBaseCtrlgetTextframe { typedef GuiButtonBaseCtrl ObjectType; GuiButtonBaseCtrl* object; inline const char* _exec () const; }; 
+TORQUE_API EngineTypeTraits< const char* >::ReturnValueType fnGuiButtonBaseCtrl_getText ( GuiButtonBaseCtrl* object, _EngineMethodTrampoline< _GuiButtonBaseCtrlgetTextframe, const char* () >::FixedArgs a )
+{
+   if( !engineAPI::gIsInitialized ) { Con::errorf( "EngineAPI: Engine not initialized when calling " "GuiButtonBaseCtrl::getText" ); 
+      return EngineTypeTraits< const char* >::ReturnValue( EngineTypeTraits< const char* >::ReturnValueType() ); }; 
+   return EngineTypeTraits< const char* >::ReturnValue( _EngineMethodTrampoline< _GuiButtonBaseCtrlgetTextframe, const char* () >::jmp( object, a ) );
+}; static _EngineFunctionDefaultArguments< _EngineMethodTrampoline< _GuiButtonBaseCtrlgetTextframe, void () >::FunctionType > _fnGuiButtonBaseCtrlgetTextDefaultArgs ; static EngineFunctionInfo _fnGuiButtonBaseCtrlgetTextFunctionInfo( "getText", &_SCOPE< GuiButtonBaseCtrl >()(), "Get the text display on the button's label (if any).\n\n" "@return The button's label.", "virtual " "const char*" " " "getText" "()", "fn" "GuiButtonBaseCtrl" "_" "getText", TYPE< _EngineMethodTrampoline< _GuiButtonBaseCtrlgetTextframe, const char* () >::FunctionType >(), &_fnGuiButtonBaseCtrlgetTextDefaultArgs, ( void* ) &fnGuiButtonBaseCtrl_getText, 0 ); static _EngineConsoleThunkType< const char* >::ReturnType _GuiButtonBaseCtrlgetTextcaster( SimObject* object, S32 argc, ConsoleValueRef *argv ) { _GuiButtonBaseCtrlgetTextframe frame; frame.object = static_cast< GuiButtonBaseCtrl* >( object ); return _EngineConsoleThunkType< const char* >::ReturnType( _EngineConsoleThunk< 2, const char* () >::thunk( argc, argv, &_GuiButtonBaseCtrlgetTextframe::_exec, &frame, _fnGuiButtonBaseCtrlgetTextDefaultArgs ) ); } static ConsoleFunctionHeader _GuiButtonBaseCtrlgetTextheader ( "const char*", "()", "" ); static ConsoleConstructor GuiButtonBaseCtrlgetTextobj( "GuiButtonBaseCtrl", "getText", _EngineConsoleThunkType< const char* >::CallbackType( _GuiButtonBaseCtrlgetTextcaster ), "Get the text display on the button's label (if any).\n\n" "@return The button's label.", _EngineConsoleThunk< 2, const char* () >::NUM_ARGS - _EngineConsoleThunkCountArgs() , _EngineConsoleThunk< 2, const char* () >::NUM_ARGS, false, &_GuiButtonBaseCtrlgetTextheader ); 
+const char* _GuiButtonBaseCtrlgetTextframe::_exec () const
 {
    return object->getText( );
 }

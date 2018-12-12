@@ -110,8 +110,8 @@ namespace engineAPI {
 // Temp support for allowing const char* to remain in the API functions as long as we
 // still have the console system around.  When that is purged, these definitions should
 // be deleted and all const char* uses be replaced with String.
-template<> struct EngineTypeTraits< const char* > : public EngineTypeTraits< String > {};
-template<> inline const EngineTypeInfo* TYPE< const char* >() { return TYPE< String >(); }
+//template<> struct EngineTypeTraits< const char* > : public EngineTypeTraits< UTF8* > {};
+//template<> inline const EngineTypeInfo* TYPE< const char* >() { return TYPE< UTF8* >(); }
 
 
 
@@ -349,10 +349,11 @@ template<typename T> struct _EngineTrampoline {
 template< typename R, typename ...ArgTs >
 struct _EngineTrampoline< R( ArgTs ... ) >
 {
-   typedef std::tuple<ArgTs ...> Args;
-   std::tuple<ArgTs ...> argT;
-   typedef fixed_tuple<ArgTs ...> FixedArgs;
-   fixed_tuple<ArgTs ...> fixedArgT;
+   template<typename T> using AVT = typename EngineTypeTraits<T>::ArgumentValueType;
+   typedef std::tuple<AVT<ArgTs> ...> Args;
+   std::tuple<AVT<ArgTs> ...> argT;
+   typedef fixed_tuple<AVT<ArgTs> ...> FixedArgs;
+   fixed_tuple<AVT<ArgTs> ...> fixedArgT;
 };
 
 template< typename T >
@@ -372,6 +373,7 @@ private:
    using Super = _EngineFunctionTrampolineBase< R(ArgTs...) >;
    using ArgsType = typename Super::Args;
    using FixedArgsType = typename Super::FixedArgs;
+   template<typename T> using ToValue = typename _EngineTypeTraits<T>::ArgumentToValue;
    
    template<size_t ...> struct Seq {};
    template<size_t N, size_t ...S> struct Gens : Gens<N-1, N-1, S...> {};
@@ -382,9 +384,15 @@ private:
       return R( fn(std::get<I>(args) ...) );
    }
    
+   template<size_t I>
+   static typename fixed_tuple_element<I, fixed_tuple<ArgTs...>>::type get_and_to_type(const FixedArgsType& args) {
+      return typename EngineTypeTraits<typename fixed_tuple_element<I, fixed_tuple<ArgTs...>>::type>::ArgumentToValue(fixed_tuple_accessor<I>::get(args));
+   }
+
    template<size_t ...I>
    static R dispatchHelper(typename Super::FunctionType fn, const FixedArgsType& args, Seq<I...>)  {
-      return R( fn(fixed_tuple_accessor<I>::get(args) ...) );
+      return R( fn(get_and_to_type<I>(args) ...) );
+      //return R( fn(fixed_tuple_accessor<I>::get(args) ...) );
    }
 
    using SeqType = typename Gens<sizeof...(ArgTs)>::type;
@@ -425,10 +433,17 @@ private:
    static R dispatchHelper(Frame f, const ArgsType& args, Seq<I...>)  {
       return R( f._exec(std::get<I>(args) ...) );
    }
-   
+
+
+   template<size_t I>
+   static typename fixed_tuple_element<I, fixed_tuple<ArgTs...>>::type get_and_to_type(const FixedArgsType& args) {
+      return typename EngineTypeTraits<typename fixed_tuple_element<I, fixed_tuple<ArgTs...>>::type>::ArgumentToValue(fixed_tuple_accessor<I>::get(args));
+   }
+
    template<size_t ...I>
    static R dispatchHelper(Frame f, const FixedArgsType& args, Seq<I...>)  {
-      return R( f._exec(fixed_tuple_accessor<I>::get(args) ...) );
+      return R(f._exec(get_and_to_type<I>(args) ...));
+      //return R( f._exec(fixed_tuple_accessor<I>::get(args) ...) );
    }
    
    using SeqType = typename Gens<sizeof...(ArgTs)>::type;
@@ -889,10 +904,10 @@ public:
 #  define DefineEngineStringlyVariadicFunction(name,returnType,minArgs,maxArgs,usage)                                            \
    static inline returnType _fn ## name ## impl (SimObject *, S32, ConsoleValueRef*);                                            \
    TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn ## name                                                         \
-      (Vector<const char*>* vec)                                                                                                  \
+      (Vector<const char*>* vec)                                                                                                 \
    {                                                                                                                             \
       _CHECK_ENGINE_INITIALIZED( name, returnType );                                                                             \
-      StringStackConsoleWrapper args(vec->size(), vec->address());                                                                 \
+      StringStackConsoleWrapper args(vec->size(), vec->address());                                                               \
       return EngineTypeTraits< returnType >::ReturnValue(                                                                        \
          _fn ## name ## impl(NULL, args.count(), args)                                                                           \
       );                                                                                                                         \
@@ -904,7 +919,7 @@ public:
       usage,                                                                                                                     \
       #returnType " " #name "(Vector<String> args)",                                                                             \
       "fn" #name,                                                                                                                \
-      TYPE< returnType (Vector<const char*> vec) >(),                                                                            \
+      TYPE< returnType (Vector<const char*>* vec) >(),                                                                           \
       &_fn ## name ## DefaultArgs,                                                                                               \
       ( void* ) &fn ## name,                                                                                                     \
       0                                                                                                                          \

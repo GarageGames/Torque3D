@@ -35,15 +35,6 @@ const U32 Vector<PlaneF>::offset[] = { Offset(mElementCount, Vector<PlaneF>), Of
 const U32 Vector<PolyhedronData::Edge>::offset[] = { Offset(mElementCount, Vector<PolyhedronData::Edge>), Offset(mArraySize, Vector<PolyhedronData::Edge>), Offset(mArray, Vector<PolyhedronData::Edge>)};
 const U32 Vector<const char*>::offset[] = { Offset(mElementCount, Vector<const char*>), Offset(mArraySize, Vector<const char*>), Offset(mArray, Vector<const char*>)};
 
-// Define pointer types for vectors.
-IMPLEMENT_PRIMITIVE(bool*, ptr_bool, , "Pointer to a bool.");
-IMPLEMENT_PRIMITIVE(S32*, ptr_int, , "Pointer to a 32bit int.");
-IMPLEMENT_PRIMITIVE(F32*, ptr_float, , "Pointer to a 32bit float.");
-IMPLEMENT_PRIMITIVE(Point3F*, ptr_Point3F, , "Pointer to a Point3F struct.");
-IMPLEMENT_PRIMITIVE(PlaneF*, ptr_PlaneF, , "Pointer to a PlaneF struct.");
-IMPLEMENT_PRIMITIVE(PolyhedronData::Edge*, ptr_Edge, , "Pointer to an Edge struct.");
-IMPLEMENT_PRIMITIVE(const char**, ptr_string, , "Pointer to a string.");
-
 IMPLEMENT_STRUCT( Vector< bool >,
    BoolVector,,
    "" )

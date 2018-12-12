@@ -2828,7 +2828,7 @@ DefineEngineMethod( SimObject, isField, bool, ( const char* fieldName ),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( SimObject, getFieldValue, const char*, ( const char* fieldName, S32 index ), ( -1 ),
+DefineEngineMethod( SimObject, getFieldValue, String, ( String fieldName, S32 index ), ( -1 ),
    "Return the value of the given field on this object.\n"
    "@param fieldName The name of the field.  If it includes a field index, the index is parsed out.\n"
    "@param index Optional parameter to specify the index of an array field separately.\n"
@@ -2846,23 +2846,23 @@ DefineEngineMethod( SimObject, getFieldValue, const char*, ( const char* fieldNa
    const char* arrayIndex = NULL;
    if( fieldName[ nameLen - 1 ] == ']' )
    {
-      const char* leftBracket = dStrchr( fieldName, '[' );
-      const char* rightBracket = &fieldName[ nameLen - 1 ];
+      const char* leftBracket = dStrchr( _fieldName, '[' );
+      const char* rightBracket = &_fieldName[ nameLen - 1 ];
       
-      const U32 fieldNameLen = getMin( U32( leftBracket - fieldName ), sizeof( fieldNameBuffer ) - 1 );
+      const U32 fieldNameLen = getMin( U32( leftBracket - _fieldName ), sizeof( fieldNameBuffer ) - 1 );
       const U32 arrayIndexLen = getMin( U32( rightBracket - leftBracket - 1 ), sizeof( arrayIndexBuffer ) - 1 );
       
-      dMemcpy( fieldNameBuffer, fieldName, fieldNameLen );
+      dMemcpy( fieldNameBuffer, _fieldName, fieldNameLen );
       dMemcpy( arrayIndexBuffer, leftBracket + 1, arrayIndexLen );
       
       fieldNameBuffer[ fieldNameLen ] = '\0';
       arrayIndexBuffer[ arrayIndexLen ] = '\0';
       
-      fieldName = fieldNameBuffer;
+      _fieldName = fieldNameBuffer;
       arrayIndex = arrayIndexBuffer;
    }
 
-   fieldName = StringTable->insert( fieldName );
+   _fieldName = StringTable->insert(_fieldName);
    
    if( index != -1 )
    {
@@ -2870,7 +2870,7 @@ DefineEngineMethod( SimObject, getFieldValue, const char*, ( const char* fieldNa
       arrayIndex = arrayIndexBuffer;
    }
    
-   return object->getDataField( fieldName, arrayIndex );
+   return object->getDataField(_fieldName, arrayIndex );
 }
 
 //-----------------------------------------------------------------------------
