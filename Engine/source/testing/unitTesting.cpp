@@ -76,7 +76,7 @@ public:
    TorqueUnitTestListener( bool verbose ) : mVerbose( verbose ) {}
 };
 
-DefineConsoleFunction( runAllUnitTests, int, (const char* testSpecs), (""),
+DefineEngineFunction( runAllUnitTests, int, (const char* testSpecs), (""),
    "Runs engine unit tests. Some tests are marked as 'stress' tests which do not "
    "necessarily check correctness, just performance or possible nondeterministic "
    "glitches. There may also be interactive or networking tests which may be "

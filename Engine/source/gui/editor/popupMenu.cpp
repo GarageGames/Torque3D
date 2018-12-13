@@ -509,7 +509,7 @@ DefineEngineMethod(PopupMenu, getItemCount, S32, (), , "()")
    return object->getItemCount();
 }
 
-DefineConsoleMethod(PopupMenu, clearItems, void, (), , "()")
+DefineEngineMethod(PopupMenu, clearItems, void, (), , "()")
 {
 	return object->clearItems();
 }
