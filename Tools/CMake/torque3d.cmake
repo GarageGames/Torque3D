@@ -204,6 +204,9 @@ mark_as_advanced(TORQUE_DEBUG_GFX_MODE)
 #option(DEBUG_SPEW "more debug" OFF)
 set(TORQUE_NO_DSO_GENERATION ON)
 
+option(TORQUE_UseZenity "use the Zenity backend for NFD" OFF)
+mark_as_advanced(TORQUE_UseZenity)
+
 if(WIN32)
     # warning C4800: 'XXX' : forcing value to bool 'true' or 'false' (performance warning)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4800")
@@ -460,7 +463,11 @@ if(TORQUE_SDL)
        # Add other flags to the compiler
        add_definitions(${GTK3_CFLAGS_OTHER})
 
-       set(BLACKLIST "nfd_win.cpp" "nfd_cocoa.m"  )
+	   if(TORQUE_UseZenity)
+			set(BLACKLIST "nfd_win.cpp" "nfd_cocoa.m"  )
+	   else()
+			set(BLACKLIST "nfd_win.cpp" "nfd_cocoa.m" "simple_exec.h" "nfd_zenity.c")
+	   endif()
        addLib(nativeFileDialogs)
 
        set(BLACKLIST ""  )
