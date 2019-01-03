@@ -4,8 +4,14 @@ compiler:
   - gcc
 
 script:
+  - pwd
+  - ls
   - cp -r Templates/BaseGame/ My\ Projects/
-  - mkdir My\ Projects/BaseGame/travis/
-  - cd My\ Projects/BaseGame/travis/
+  - mkdir My\ Projects/BaseGame/buildFiles/travis/
+  - cd My\ Projects/BaseGame/buildFile/travis/
+  - pwd
   - cmake ../../../.. -DTORQUE_APP_NAME=BaseGame -DCMAKE_BUILD_TYPE=Debug
+  - ls
   - make
+  - cd ../../game/
+  - ls
