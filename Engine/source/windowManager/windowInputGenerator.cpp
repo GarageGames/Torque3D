@@ -84,11 +84,21 @@ void WindowInputGenerator::generateInputEvent( InputEventInfo &inputEvent )
 
    if (inputEvent.action == SI_MAKE && inputEvent.deviceType == KeyboardDeviceType)
    {
+      U32 realMods = inputEvent.modifier;
+      if (realMods & SI_SHIFT)
+         realMods |= SI_SHIFT;
+      if (realMods & SI_CTRL)
+         realMods |= SI_CTRL;
+      if (realMods & SI_ALT)
+         realMods |= SI_ALT;
+      if (realMods & SI_MAC_OPT)
+         realMods |= SI_MAC_OPT;
+
       for (int i = 0; i < mAcceleratorMap.size(); ++i)
       {
          const AccKeyMap &acc = mAcceleratorMap[i];
          if (!mWindow->getKeyboardTranslation() &&
-            ((acc.modifier == inputEvent.modifier && acc.modifier != 0) || (acc.modifier == 0 && inputEvent.modifier == 0))
+            ((acc.modifier == realMods && acc.modifier != 0) || (acc.modifier == 0 && realMods == 0))
             && acc.keyCode == inputEvent.objInst)
          {
             Con::evaluatef(acc.cmd);
