@@ -17,7 +17,7 @@ script:
   - mkdir My\ Projects/BaseGame/buildFiles/travis/
   - cd My\ Projects/BaseGame/buildFiles/travis/
   - pwd
-  - cmake ../../../.. -DTORQUE_APP_NAME=BaseGame -DCMAKE_BUILD_TYPE=Debug
+  - cmake ../../../.. -DTORQUE_APP_NAME=BaseGame -DCMAKE_BUILD_TYPE=Debug -Wno-deprecated
   - ls
   - make
   - cd ../../game/
