@@ -33,15 +33,9 @@
 
 using namespace Torque;
 
-ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5, 
-   "TerrainBlock.create( String terrainName, U32 resolution, String materialName, bool genNoise )\n"
+DefineEngineStaticMethod( TerrainBlock, createNew, S32, (String terrainName, U32 resolution, String materialName, bool genNoise),, 
    "" )
 {
-   const UTF8 *terrainName = argv[1];
-   U32 resolution = dAtoi( argv[2] );
-   const UTF8 *materialName = argv[3];
-   bool genNoise = dAtob( argv[4] );
-
    Vector<String> materials;
    materials.push_back( materialName );
 
@@ -82,17 +76,17 @@ ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5,
       noise.setSeed( 134208587 );
       
       // Set up some defaults.
-      F32 octaves = 3.0f;
-      U32 freq = 4;
-      F32 roughness = 0.0f;
+      const F32 octaves = 3.0f;
+      const U32 freq = 4;
+      const F32 roughness = 0.0f;
       noise.fBm( &floatHeights, blockSize, freq, 1.0f - roughness, octaves );
 
       F32 height = 0;
 
       F32 omax, omin;
       noise.getMinMax( &floatHeights, &omin, &omax, blockSize );
-         
-      F32 terrscale = 300.0f / (omax - omin);
+
+      const F32 terrscale = 300.0f / (omax - omin);
       for ( S32 y = 0; y < blockSize; y++ )
       {
          for ( S32 x = 0; x < blockSize; x++ )
@@ -111,7 +105,7 @@ ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5,
       terrain->updateGridMaterials( Point2I::Zero, Point2I( blockSize, blockSize ) );
    }
 
-   terrain->registerObject( terrainName );
+   terrain->registerObject( terrainName.c_str() );
 
    // Add to mission group!
    SimGroup *missionGroup;
@@ -121,21 +115,11 @@ ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5,
    return terrain->getId();
 }
 
-ConsoleStaticMethod( TerrainBlock, import, S32, 7, 8, 
-   "( String terrainName, String heightMap, F32 metersPerPixel, F32 heightScale, String materials, String opacityLayers[, bool flipYAxis=true] )\n"
+DefineEngineStaticMethod( TerrainBlock, import, S32, (String terrainName, String heightMapFile, F32 metersPerPixel, F32 heightScale, String opacityLayerFiles, String materialsStr, bool flipYAxis), (true),
    "" )
 {
-   // Get the parameters.
-   const UTF8 *terrainName = argv[1];
-   const UTF8 *hmap = argv[2];
-   F32 metersPerPixel = dAtof(argv[3]);
-   F32 heightScale = dAtof(argv[4]);
-   const UTF8 *opacityFiles = argv[5];
-   const UTF8 *materialsStr = argv[6];
-   bool flipYAxis = argc == 8? dAtob(argv[7]) : true;
-
    // First load the height map and validate it.
-   Resource<GBitmap> heightmap = GBitmap::load( hmap );
+   Resource<GBitmap> heightmap = GBitmap::load(heightMapFile);
    if ( !heightmap )
    {
       Con::errorf( "Heightmap failed to load!" );
@@ -155,7 +139,7 @@ ConsoleStaticMethod( TerrainBlock, import, S32, 7, 8,
       return 0;
    }
 
-   U32 fileCount = StringUnit::getUnitCount( opacityFiles, "\n" ); 
+   U32 fileCount = StringUnit::getUnitCount(opacityLayerFiles, "\n" );
    Vector<U8> layerMap;
    layerMap.setSize( terrSize * terrSize );
    {
@@ -163,7 +147,7 @@ ConsoleStaticMethod( TerrainBlock, import, S32, 7, 8,
   
       for ( U32 i = 0; i < fileCount; i++ )
       {
-         String fileNameWithChannel = StringUnit::getUnit( opacityFiles, i, "\n" );
+         String fileNameWithChannel = StringUnit::getUnit(opacityLayerFiles, i, "\n" );
          String fileName = StringUnit::getUnit( fileNameWithChannel, 0, "\t" );
          String channel = StringUnit::getUnit( fileNameWithChannel, 1, "\t" );
          
@@ -251,7 +235,7 @@ ConsoleStaticMethod( TerrainBlock, import, S32, 7, 8,
    }
 
    // Do we have an existing terrain with that name... then update it!
-   TerrainBlock *terrain = dynamic_cast<TerrainBlock*>( Sim::findObject( terrainName ) );
+   TerrainBlock *terrain = dynamic_cast<TerrainBlock*>( Sim::findObject( terrainName.c_str() ) );
    if ( terrain )
       terrain->import( (*heightmap), heightScale, metersPerPixel, layerMap, materials, flipYAxis );
    else

@@ -47,7 +47,7 @@ class SimFieldDictionary
 public:
    struct Entry
    {
-      Entry() : type( NULL ) {};
+      Entry() : type(NULL) {};
 
       StringTableEntry slotName;
       char *value;
@@ -64,10 +64,10 @@ private:
    static Entry   *smFreeList;
 
    void           freeEntry(Entry *entry);
-   Entry*         addEntry( U32 bucket, StringTableEntry slotName, ConsoleBaseType* type, char* value = 0 );
+   Entry*         addEntry(U32 bucket, StringTableEntry slotName, ConsoleBaseType* type, char* value = 0);
 
-   static U32     getHashValue( StringTableEntry slotName );
-   static U32     getHashValue( const String& fieldName );
+   static U32     getHashValue(StringTableEntry slotName);
+   static U32     getHashValue(const String& fieldName);
 
    U32   mNumFields;
 
@@ -88,7 +88,7 @@ public:
    const char *getFieldValue(StringTableEntry slotName);
    U32 getFieldType(StringTableEntry slotName) const;
    Entry  *findDynamicField(const String &fieldName) const;
-   Entry  *findDynamicField( StringTableEntry fieldName) const;
+   Entry  *findDynamicField(StringTableEntry fieldName) const;
    void writeFields(SimObject *obj, Stream &strem, U32 tabStop);
    void printFields(SimObject *obj);
    void assignFrom(SimFieldDictionary *dict);

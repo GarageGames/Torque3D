@@ -193,19 +193,19 @@ void Polytope::intersect(SimObject* object,const BSPNode* root)
 
             // Split the edge into each volume
             mEdgeList.increment(2);
-            Edge& e0 = mEdgeList.last();
-            e0.next = frontVolume.edgeList;
+            Edge& ev0 = mEdgeList.last();
+			ev0.next = frontVolume.edgeList;
             frontVolume.edgeList = mEdgeList.size() - 1;
 
-            Edge& e1 = *(&e0 - 1);
-            e1.next = backVolume.edgeList;
+            Edge& ev1 = *(&ev0 - 1);
+			ev1.next = backVolume.edgeList;
             backVolume.edgeList = frontVolume.edgeList - 1;
 
-            e0.vertex[0] = edge.vertex[s];
-            e1.vertex[0] = edge.vertex[s ^ 1];
-            e0.vertex[1] = e1.vertex[1] = mVertexList.size() - 1;
-            e0.face[0] = e1.face[0] = edge.face[0];
-            e0.face[1] = e1.face[1] = edge.face[1];
+			ev0.vertex[0] = edge.vertex[s];
+			ev1.vertex[0] = edge.vertex[s ^ 1];
+			ev0.vertex[1] = ev1.vertex[1] = mVertexList.size() - 1;
+			ev0.face[0] = ev1.face[0] = edge.face[0];
+			ev0.face[1] = ev1.face[1] = edge.face[1];
 
             // Add new edges on the plane, one to each volume
             for (S32 f = 0; f < 2; f++) {
@@ -214,19 +214,19 @@ void Polytope::intersect(SimObject* object,const BSPNode* root)
                   face.vertex = mVertexList.size() - 1;
                else {
                   mEdgeList.increment(2);
-                  Edge& e0 = mEdgeList.last();
-                  e0.next = frontVolume.edgeList;
+                  Edge& ep0 = mEdgeList.last();
+				  ep0.next = frontVolume.edgeList;
                   frontVolume.edgeList = mEdgeList.size() - 1;
 
-                  Edge& e1 = *(&e0 - 1);
-                  e1.next = backVolume.edgeList;
+                  Edge& ep1 = *(&ep0 - 1);
+				  ep1.next = backVolume.edgeList;
                   backVolume.edgeList = frontVolume.edgeList - 1;
 
-                  e1.vertex[0] = e0.vertex[0] = face.vertex;
-                  e1.vertex[1] = e0.vertex[1] = mVertexList.size() - 1;
-                  e1.face[0] = e0.face[0] = edge.face[f];
-                  e1.face[1] = mFaceList.size() - 1;
-                  e0.face[1] = e1.face[1] - 1;
+				  ep1.vertex[0] = ep0.vertex[0] = face.vertex;
+				  ep1.vertex[1] = ep0.vertex[1] = mVertexList.size() - 1;
+				  ep1.face[0] = ep0.face[0] = edge.face[f];
+				  ep1.face[1] = mFaceList.size() - 1;
+				  ep0.face[1] = ep1.face[1] - 1;
                }
             }
          }

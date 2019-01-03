@@ -2570,7 +2570,7 @@ DefineEngineMethod( GuiControl, findHitControls, const char*, ( S32 x, S32 y, S3
       return "";
    
    char* buffer = Con::getReturnBuffer( s.size() );
-   dStrcpy( buffer, s.c_str() );
+   dStrcpy( buffer, s.c_str(), s.size() );
    
    return buffer;
 }
@@ -2898,7 +2898,7 @@ static ConsoleDocFragment _sGuiControlSetExtent2(
    "GuiControl", // The class to place the method in; use NULL for functions.
    "void setExtent( Point2I p );" ); // The definition string.
 
-DefineConsoleMethod( GuiControl, setExtent, void, ( const char* extOrX, const char* y ), (""),
+DefineEngineMethod( GuiControl, setExtent, void, ( const char* extOrX, const char* y ), (""),
    "( Point2I p | int x, int y ) Set the width and height of the control.\n\n"
    "@hide" )
 {

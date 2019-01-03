@@ -769,7 +769,7 @@ void DInputManager::processXInput( void )
          mXInputStateReset = false;
    }
 }
-DefineConsoleFunction( enableJoystick, bool, (), , "()"
+DefineEngineFunction( enableJoystick, bool, (), , "()"
              "@brief Enables use of the joystick.\n\n"
              "@note DirectInput must be enabled and active to use this function.\n\n"
              "@ingroup Input")
@@ -778,7 +778,7 @@ DefineConsoleFunction( enableJoystick, bool, (), , "()"
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleFunction( disableJoystick, void, (), , "()"
+DefineEngineFunction( disableJoystick, void, (), , "()"
              "@brief Disables use of the joystick.\n\n"
              "@note DirectInput must be enabled and active to use this function.\n\n"
              "@ingroup Input")
@@ -787,7 +787,7 @@ DefineConsoleFunction( disableJoystick, void, (), , "()"
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleFunction( isJoystickEnabled, bool, (), , "()"
+DefineEngineFunction( isJoystickEnabled, bool, (), , "()"
 				"@brief Queries input manager to see if a joystick is enabled\n\n"
 				"@return 1 if a joystick exists and is enabled, 0 if it's not.\n"
 				"@ingroup Input")
@@ -796,7 +796,7 @@ DefineConsoleFunction( isJoystickEnabled, bool, (), , "()"
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleFunction( enableXInput, bool, (), , "()"
+DefineEngineFunction( enableXInput, bool, (), , "()"
             "@brief Enables XInput for Xbox 360 controllers.\n\n"
             "@note XInput is enabled by default. Disable to use an Xbox 360 "
             "Controller as a joystick device.\n\n"
@@ -811,7 +811,7 @@ DefineConsoleFunction( enableXInput, bool, (), , "()"
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleFunction( disableXInput, void, (), , "()"
+DefineEngineFunction( disableXInput, void, (), , "()"
             "@brief Disables XInput for Xbox 360 controllers.\n\n"
             "@ingroup Input")
 {
@@ -819,7 +819,7 @@ DefineConsoleFunction( disableXInput, void, (), , "()"
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleFunction( resetXInput, void, (), , "()"
+DefineEngineFunction( resetXInput, void, (), , "()"
             "@brief Rebuilds the XInput section of the InputManager\n\n"
             "Requests a full refresh of events for all controllers. Useful when called at the beginning "
             "of game code after actionMaps are set up to hook up all appropriate events.\n\n"
@@ -836,7 +836,7 @@ DefineConsoleFunction( resetXInput, void, (), , "()"
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleFunction( isXInputConnected, bool, (S32 controllerID), , "( int controllerID )"
+DefineEngineFunction( isXInputConnected, bool, (S32 controllerID), , "( int controllerID )"
 				"@brief Checks to see if an Xbox 360 controller is connected\n\n"
 				"@param controllerID Zero-based index of the controller to check.\n"
             "@return 1 if the controller is connected, 0 if it isn't, and 205 if XInput "
@@ -849,7 +849,7 @@ DefineConsoleFunction( isXInputConnected, bool, (S32 controllerID), , "( int con
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleFunction( getXInputState, int, (S32 controllerID, const char * properties, bool current), (false), "( int controllerID, string property, bool currentD )"
+DefineEngineFunction( getXInputState, int, (S32 controllerID, const char * properties, bool current), (false), "( int controllerID, string property, bool currentD )"
 				"@brief Queries the current state of a connected Xbox 360 controller.\n\n"
             "XInput Properties:\n\n"
             " - XI_THUMBLX, XI_THUMBLY - X and Y axes of the left thumbstick. \n"
@@ -905,7 +905,7 @@ DefineConsoleFunction( getXInputState, int, (S32 controllerID, const char * prop
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleFunction( echoInputState, void, (), , "()"
+DefineEngineFunction( echoInputState, void, (), , "()"
             "@brief Prints information to the console stating if DirectInput and a Joystick are enabled and active.\n\n"
             "@ingroup Input")
 {
@@ -921,7 +921,7 @@ DefineConsoleFunction( echoInputState, void, (), , "()"
       Con::printf( "DirectInput is not enabled." );
 }
 
-DefineConsoleFunction( rumble, void, (const char * device, F32 xRumble, F32 yRumble), , "(string device, float xRumble, float yRumble)"
+DefineEngineFunction( rumble, void, (const char * device, F32 xRumble, F32 yRumble), , "(string device, float xRumble, float yRumble)"
       "@brief Activates the vibration motors in the specified controller.\n\n"
       "The controller will constantly at it's xRumble and yRumble intensities until "
       "changed or told to stop."

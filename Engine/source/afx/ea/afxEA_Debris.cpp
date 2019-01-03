@@ -78,7 +78,7 @@ afxEA_Debris::~afxEA_Debris()
 
 bool afxEA_Debris::isDone()
 {
-  return (datablock->use_as_cons_obj) ? debris_done : exploded;
+  return (mDatablock->use_as_cons_obj) ? debris_done : exploded;
 }
 
 void afxEA_Debris::ea_set_datablock(SimDataBlock* db)
@@ -106,21 +106,21 @@ bool afxEA_Debris::ea_update(F32 dt)
 {
   if (exploded && debris)
   {
-    if (in_scope)
+    if (mIn_scope)
     {
-      updated_xfm = debris->getRenderTransform();
-      updated_xfm.getColumn(3, &updated_pos);
+      mUpdated_xfm = debris->getRenderTransform();
+	  mUpdated_xfm.getColumn(3, &mUpdated_pos);
     }
   }
 
   if (!exploded && debris)
   {
-    if (in_scope)
+    if (mIn_scope)
     {     
       Point3F dir_vec(0,1,0);
-      updated_xfm.mulV(dir_vec);
+	  mUpdated_xfm.mulV(dir_vec);
 
-      debris->init(updated_pos, dir_vec);
+      debris->init(mUpdated_pos, dir_vec);
       if (!debris->registerObject())
       {
         delete debris;
@@ -165,7 +165,7 @@ void afxEA_Debris::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     DebrisData* orig_db = debris_data;
     debris_data = new DebrisData(*orig_db, true);
-    orig_db->performSubstitutions(debris_data, choreographer, group_index);
+    orig_db->performSubstitutions(debris_data, mChoreographer, mGroup_index);
   }
 }
 

@@ -114,7 +114,7 @@ class SimSet : public SimObject, public TamlChildren
 
    protected:
 
-      SimObjectList objectList;
+      SimObjectList mObjectList;
       void *mMutex;
 
       /// Signal that is triggered when objects are added or removed from the set.
@@ -144,26 +144,26 @@ class SimSet : public SimObject, public TamlChildren
       ///
       typedef SimObjectList::iterator iterator;
       typedef SimObjectList::value_type value;
-      SimObject* front() { return objectList.front(); }
-      SimObject* first() { return objectList.first(); }
-      SimObject* last()  { return objectList.last(); }
-      bool       empty() const { return objectList.empty();   }
-      S32        size() const  { return objectList.size(); }
-      iterator   begin() { return objectList.begin(); }
-      iterator   end()   { return objectList.end(); }
-      value operator[] (S32 index) { return objectList[U32(index)]; }
+      SimObject* front() { return mObjectList.front(); }
+      SimObject* first() { return mObjectList.first(); }
+      SimObject* last()  { return mObjectList.last(); }
+      bool       empty() const { return mObjectList.empty();   }
+      S32        size() const  { return mObjectList.size(); }
+      iterator   begin() { return mObjectList.begin(); }
+      iterator   end()   { return mObjectList.end(); }
+      value operator[] (S32 index) { return mObjectList[U32(index)]; }
 
       inline iterator find( iterator first, iterator last, SimObject *obj)
-      { return ::find(first, last, obj); }
+      { return T3D::find(first, last, obj); }
       inline iterator find(SimObject *obj) 
-      { return ::find(begin(), end(), obj); }
+      { return T3D::find(begin(), end(), obj); }
 
       /// Reorder the position of "obj" to either be the last object in the list or, if
       /// "target" is given, to come before "target" in the list of children.
       virtual bool reOrder( SimObject *obj, SimObject *target=0 );
       
       /// Return the object at the given index.
-      SimObject* at(S32 index) const { return objectList.at(index); }
+      SimObject* at(S32 index) const { return mObjectList.at(index); }
 
       /// Remove all objects from this set.
       virtual void clear();
@@ -263,7 +263,7 @@ class SimSet : public SimObject, public TamlChildren
       #ifdef TORQUE_DEBUG_GUARD
       inline void _setVectorAssoc( const char *file, const U32 line )
       {
-         objectList.setFileAssociation( file, line );
+		  mObjectList.setFileAssociation( file, line );
       }
       #endif
 
@@ -324,9 +324,9 @@ void SimSet::findObjectByType( Vector<T*> &foundObjects )
 
    // Loop through our child objects.
 
-   SimObjectList::iterator itr = objectList.begin();   
+   SimObjectList::iterator itr = mObjectList.begin();   
 
-   for ( ; itr != objectList.end(); itr++ )
+   for ( ; itr != mObjectList.end(); itr++ )
    {
       curObj = dynamic_cast<T*>( *itr );
       curSet = dynamic_cast<SimSet*>( *itr );
@@ -358,9 +358,9 @@ void SimSet::findObjectByCallback(  bool ( *fn )( T* ), Vector<T*> &foundObjects
 
    // Loop through our child objects.
 
-   SimObjectList::iterator itr = objectList.begin();   
+   SimObjectList::iterator itr = mObjectList.begin();
 
-   for ( ; itr != objectList.end(); itr++ )
+   for ( ; itr != mObjectList.end(); itr++ )
    {
       curObj = dynamic_cast<T*>( *itr );
       curSet = dynamic_cast<SimSet*>( *itr );

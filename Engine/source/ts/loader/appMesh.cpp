@@ -147,13 +147,13 @@ TSMesh* AppMesh::constructTSMesh()
    }
 
    // Copy mesh elements
-   tsmesh->verts = points;
-   tsmesh->norms = normals;
-   tsmesh->tverts = uvs;
-   tsmesh->primitives = primitives;
-   tsmesh->indices = indices;
-   tsmesh->colors = colors;
-   tsmesh->tverts2 = uv2s;
+   tsmesh->mVerts = points;
+   tsmesh->mNorms = normals;
+   tsmesh->mTverts = uvs;
+   tsmesh->mPrimitives = primitives;
+   tsmesh->mIndices = indices;
+   tsmesh->mColors = colors;
+   tsmesh->mTverts2 = uv2s;
 
    // Finish initializing the shape
    tsmesh->setFlags(flags);
@@ -162,8 +162,8 @@ TSMesh* AppMesh::constructTSMesh()
    tsmesh->numFrames = numFrames;
    tsmesh->numMatFrames = numMatFrames;
    tsmesh->vertsPerFrame = vertsPerFrame;
-   tsmesh->createTangents(tsmesh->verts, tsmesh->norms);
-   tsmesh->encodedNorms.set(NULL,0);
+   tsmesh->createTangents(tsmesh->mVerts, tsmesh->mNorms);
+   tsmesh->mEncodedNorms.set(NULL,0);
 
    return tsmesh;
 }

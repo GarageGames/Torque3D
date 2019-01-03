@@ -87,6 +87,16 @@ function initRenderManager()
                
    // Resolve format change token last.
    DiffuseRenderPassManager.addManager( new RenderPassStateBin(FinalBin)       { renderOrder = 1.7; stateToken = AL_FormatToken; } );
+
+   // AFX CODE BLOCK (interior-zodiacs)(polysoup-zodiacs) <<
+   if(isObject(afxZodiacTerrainRenderer))
+   {
+      DiffuseRenderPassManager.addManager( new afxZodiacTerrainRenderer() { bintype = "TerrainZodiac"; renderOrder = 1.41; processAddOrder = 1.41; } );
+      DiffuseRenderPassManager.addManager( new afxZodiacPolysoupRenderer() { bintype = "PolysoupZodiac"; renderOrder = 1.42; processAddOrder = 1.42; } );
+      DiffuseRenderPassManager.addManager( new afxZodiacGroundPlaneRenderer() { bintype = "GroundPlaneZodiac"; renderOrder = 1.43; processAddOrder = 1.43; } );
+      DiffuseRenderPassManager.addManager( new afxZodiacMeshRoadRenderer() { bintype = "MeshRoadZodiac"; renderOrder = 1.44; processAddOrder = 1.44; } );
+      DiffuseRenderPassManager.addManager( new afxRenderHighlightMgr() { renderOrder = 1.55; processAddOrder = 1.55; } );  // for selection-highlighting
+   }
 }
 
 /// This post effect is used to copy data from the non-MSAA back-buffer to the

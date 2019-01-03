@@ -188,7 +188,7 @@ void GuiInspectorDynamicGroup::updateAllFields()
    inspectGroup();
 }
 
-DefineConsoleMethod(GuiInspectorDynamicGroup, inspectGroup, bool, (), , "Refreshes the dynamic fields in the inspector.")
+DefineEngineMethod(GuiInspectorDynamicGroup, inspectGroup, bool, (), , "Refreshes the dynamic fields in the inspector.")
 {
    return object->inspectGroup();
 }
@@ -263,11 +263,11 @@ void GuiInspectorDynamicGroup::addDynamicField()
    instantExpand();
 }
 
-DefineConsoleMethod( GuiInspectorDynamicGroup, addDynamicField, void, (), , "obj.addDynamicField();" )
+DefineEngineMethod( GuiInspectorDynamicGroup, addDynamicField, void, (), , "obj.addDynamicField();" )
 {
    object->addDynamicField();
 }
 
-DefineConsoleMethod( GuiInspectorDynamicGroup, removeDynamicField, void, (), , "" )
+DefineEngineMethod( GuiInspectorDynamicGroup, removeDynamicField, void, (), , "" )
 {
 }

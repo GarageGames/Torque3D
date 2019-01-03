@@ -89,10 +89,10 @@ bool afxEA_AnimClip::ea_start()
   do_runtime_substitutions();
 
   afxConstraint* pos_constraint = getPosConstraint();
-  if (full_lifetime == INFINITE_LIFETIME && pos_constraint != 0)
+  if (mFull_lifetime == INFINITE_LIFETIME && pos_constraint != 0)
     anim_lifetime = pos_constraint->getAnimClipDuration(clip_data->clip_name);
   else 
-    anim_lifetime = full_lifetime;
+    anim_lifetime = mFull_lifetime;
 
   anim_tag = 0;
   lock_tag = 0;
@@ -127,8 +127,8 @@ bool afxEA_AnimClip::ea_update(F32 dt)
 
     if (go_for_it)
     {
-      F32 rate = clip_data->rate/prop_time_factor;
-      F32 pos = mFmod(life_elapsed, anim_lifetime)/anim_lifetime;
+      F32 rate = clip_data->rate/mProp_time_factor;
+      F32 pos = mFmod(mLife_elapsed, anim_lifetime)/anim_lifetime;
       pos = mFmod(pos + clip_data->pos_offset, 1.0);
       if (clip_data->rate < 0) 
         pos = 1.0f - pos;
@@ -164,7 +164,7 @@ void afxEA_AnimClip::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxAnimClipData* orig_db = clip_data;
     clip_data = new afxAnimClipData(*orig_db, true);
-    orig_db->performSubstitutions(clip_data, choreographer, group_index);
+    orig_db->performSubstitutions(clip_data, mChoreographer, mGroup_index);
   }
 }
 

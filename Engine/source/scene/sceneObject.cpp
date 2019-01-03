@@ -1265,7 +1265,7 @@ DefineEngineMethod( SceneObject, getType, S32, (),,
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( SceneObject, mountObject, bool,
-   ( SceneObject* objB, S32 slot, TransformF txfm ), ( MatrixF::Identity ),
+   ( SceneObject* objB, S32 slot, TransformF txfm ), ( TransformF::Identity ),
    "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
 
    "@param objB  Object to mount onto us\n"
@@ -1517,7 +1517,7 @@ DefineEngineMethod( SceneObject, isGlobalBounds, bool, (),,
    return object->isGlobalBounds();
 }
 
-DefineConsoleMethod(SceneObject, setForwardVector, void, (VectorF newForward, VectorF upVector), (VectorF(0, 0, 0), VectorF(0, 0, 1)),
+DefineEngineMethod(SceneObject, setForwardVector, void, (VectorF newForward, VectorF upVector), (VectorF(0, 0, 0), VectorF(0, 0, 1)),
    "Sets the forward vector of a scene object, making it face Y+ along the new vector.\n"
    "@param The new forward vector to set.\n"
    "@param (Optional) The up vector to use to help orient the rotation.")

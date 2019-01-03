@@ -194,7 +194,7 @@ void Path::onRemove()
 /// Sort the markers objects into sequence order
 void Path::sortMarkers()
 {
-   dQsort(objectList.address(), objectList.size(), sizeof(SimObject*), cmpPathObject);
+   dQsort(mObjectList.address(), mObjectList.size(), sizeof(SimObject*), cmpPathObject);
 }
 
 void Path::updatePath()

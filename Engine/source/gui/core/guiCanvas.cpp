@@ -277,8 +277,6 @@ bool GuiCanvas::onAdd()
    // Define the menu bar for this canvas (if any)
    Con::executef(this, "onCreateMenu");
 
-   Sim::findObject("PlatformGenericMenubar", mMenuBarCtrl);
-
    return parentRet;
 }
 
@@ -299,11 +297,11 @@ void GuiCanvas::setMenuBar(SimObject *obj)
     mMenuBarCtrl = dynamic_cast<GuiControl*>(obj);
 
     //remove old menubar
-	if (oldMenuBar)
-	{
-		Parent::removeObject(oldMenuBar);
-		Parent::removeObject(mMenuBackground); //also remove the modeless wrapper
-	}
+    if (oldMenuBar)
+    {
+        Parent::removeObject(oldMenuBar);
+        Parent::removeObject(mMenuBackground); //also remove the modeless wrapper
+    }
 
     // set new menubar    
     if (mMenuBarCtrl)
@@ -318,15 +316,15 @@ void GuiCanvas::setMenuBar(SimObject *obj)
           return;
        }
 
-	   if (mMenuBackground == nullptr)
-	   {
-		   mMenuBackground = new GuiControl();
-		   mMenuBackground->registerObject();
+       if (mMenuBackground == nullptr)
+       {
+           mMenuBackground = new GuiControl();
+           mMenuBackground->registerObject();
 
-		   mMenuBackground->setControlProfile(profile);
-	   }
+           mMenuBackground->setControlProfile(profile);
+       }
 
-	   mMenuBackground->addObject(mMenuBarCtrl);
+       mMenuBackground->addObject(mMenuBarCtrl);
 
        Parent::addObject(mMenuBackground);
     }
@@ -334,15 +332,14 @@ void GuiCanvas::setMenuBar(SimObject *obj)
     // update window accelerator keys
     if( oldMenuBar != mMenuBarCtrl )
     {
-        StringTableEntry ste = StringTable->insert("menubar");
-        GuiMenuBar* menu = NULL;
-        menu = !oldMenuBar ? NULL : dynamic_cast<GuiMenuBar*>(oldMenuBar->findObjectByInternalName( ste, true));
-        if( menu )
-            menu->removeWindowAcceleratorMap( *getPlatformWindow()->getInputGenerator() );
+        GuiMenuBar* oldMenu = dynamic_cast<GuiMenuBar*>(oldMenuBar);
+        GuiMenuBar* newMenu = dynamic_cast<GuiMenuBar*>(mMenuBarCtrl);
 
-        menu = !mMenuBarCtrl ? NULL : dynamic_cast<GuiMenuBar*>(mMenuBarCtrl->findObjectByInternalName( ste, true));
-        if( menu )
-                menu->buildWindowAcceleratorMap( *getPlatformWindow()->getInputGenerator() );
+        if(oldMenu)
+           oldMenu->removeWindowAcceleratorMap(*getPlatformWindow()->getInputGenerator());
+
+        if(newMenu)
+           newMenu->buildWindowAcceleratorMap(*getPlatformWindow()->getInputGenerator());
     }
 }
 

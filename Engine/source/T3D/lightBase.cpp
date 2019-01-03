@@ -440,7 +440,7 @@ static ConsoleDocFragment _lbplayAnimation2(
    "void playAnimation(LightAnimData anim);"
 );
 
-DefineConsoleMethod( LightBase, playAnimation, void, (const char * anim), (""), "( [LightAnimData anim] )\t"
+DefineEngineMethod( LightBase, playAnimation, void, (const char * anim), (""), "( [LightAnimData anim] )\t"
    "Plays a light animation on the light.  If no LightAnimData is passed the "
    "existing one is played."
    "@hide")
@@ -484,7 +484,7 @@ void LightBase::playAnimation( LightAnimData *animData )
     }
 }
 
-DefineConsoleMethod( LightBase, pauseAnimation, void, (), , "Stops the light animation." )
+DefineEngineMethod( LightBase, pauseAnimation, void, (), , "Stops the light animation." )
 {
     object->pauseAnimation();
 }

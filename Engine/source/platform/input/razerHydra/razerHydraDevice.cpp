@@ -91,7 +91,7 @@ U32 RazerHydraDevice::RH_FRAME = 0;
 RazerHydraDevice::RazerHydraDevice()
 {
    // From IInputDevice
-   dStrcpy(mName, "razerhydra");
+   dStrcpy(mName, "razerhydra", 30);
    mDeviceType = INPUTMGR->getNextDeviceType();
 
    //

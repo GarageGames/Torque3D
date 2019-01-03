@@ -495,7 +495,8 @@ public:
             table( NULL ),
             validator( NULL ),
             setDataFn( NULL ),
-            getDataFn( NULL )
+            getDataFn( NULL ),
+            networkMask(0)
       {
          doNotSubstitute = keepClearSubsOnly = false;
       }
@@ -515,9 +516,11 @@ public:
       TypeValidator *validator;     ///< Validator, if any.
       SetDataNotify  setDataFn;     ///< Set data notify Fn
       GetDataNotify  getDataFn;     ///< Get data notify Fn
+	    WriteDataNotify writeDataFn;  ///< Function to determine whether data should be written or not.
       bool           doNotSubstitute;
       bool           keepClearSubsOnly;
-      WriteDataNotify writeDataFn;  ///< Function to determine whether data should be written or not.
+
+      U32            networkMask;
    };
    typedef Vector<Field> FieldList;
 
@@ -659,6 +662,29 @@ public:
       // Finally, do any class specific initialization...
       T::initPersistFields();
       T::consoleInit();
+
+      EnginePropertyTable::Property* props = new EnginePropertyTable::Property[sg_tempFieldList.size()];
+
+      for (int i = 0; i < sg_tempFieldList.size(); ++i)
+      {
+         EnginePropertyTable::Property prop;
+         prop.mDocString = sg_tempFieldList[i].pFieldDocs;
+         prop.mName = sg_tempFieldList[i].pFieldname;
+         prop.mNumElements = sg_tempFieldList[i].elementCount;
+         prop.mFlags = 0;
+         if (sg_tempFieldList[i].type == StartGroupFieldType)
+            prop.mFlags |= EnginePropertyGroupBegin;
+         if (sg_tempFieldList[i].type == EndGroupFieldType)
+            prop.mFlags |= EnginePropertyGroupEnd;
+         prop.mType = sg_tempFieldList[i].type;
+
+         props[i] = prop;
+      }
+
+      _smPropertyTable = EnginePropertyTable(sg_tempFieldList.size(), props);
+      smPropertyTable = _smPropertyTable;
+
+      const_cast<EngineTypeInfo*>(mTypeInfo)->mPropertyTable = &_smPropertyTable;
  
       // Let the base finish up.
       AbstractClassRep::init();
@@ -1262,10 +1288,6 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
       };                                                                                                 \
       EnginePropertyTable _propTable( sizeof( _props ) / sizeof( _props[ 0 ] ) - 1, _props );            \
    } }
-
-/// Add an auto-doc for a class.
-#define ConsoleDocClass( className, docString ) \
-   CLASSDOC( className, docString )
 
 /// @}
 

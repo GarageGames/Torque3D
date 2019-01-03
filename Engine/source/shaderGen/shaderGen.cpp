@@ -153,8 +153,8 @@ void ShaderGen::generateShader( const MaterialFeatureData &featureData,
    dSprintf( vertShaderName, sizeof(vertShaderName), "shadergen:/%s_V.%s", cacheName, mFileEnding.c_str() );
    dSprintf( pixShaderName, sizeof(pixShaderName), "shadergen:/%s_P.%s", cacheName, mFileEnding.c_str() );
    
-   dStrcpy( vertFile, vertShaderName );
-   dStrcpy( pixFile, pixShaderName );   
+   dStrcpy( vertFile, vertShaderName, 256 );
+   dStrcpy( pixFile, pixShaderName, 256 );
    
    // this needs to change - need to optimize down to ps v.1.1
    *pixVersion = GFX->getPixelShaderVersion();

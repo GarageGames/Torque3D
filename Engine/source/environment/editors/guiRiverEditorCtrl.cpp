@@ -1277,11 +1277,11 @@ void GuiRiverEditorCtrl::setSelectedNode( S32 node )
    mSelNode = node;
    if ( mSelNode != -1 )
    {
-      const RiverNode &node = mSelRiver->mNodes[mSelNode];
+      const RiverNode &curNode = mSelRiver->mNodes[mSelNode];
 
       MatrixF objMat = mSelRiver->getNodeTransform(mSelNode);      
-      Point3F objScale( node.width, 1.0f, node.depth );
-      Point3F worldPos = node.point;
+      Point3F objScale(curNode.width, 1.0f, curNode.depth );
+      Point3F worldPos = curNode.point;
 
       mGizmo->set( objMat, worldPos, objScale );
    }
@@ -1393,66 +1393,66 @@ void GuiRiverEditorCtrl::_renderSelectedRiver( ObjectRenderInst *ri, SceneRender
    }
 }
 
-DefineConsoleMethod( GuiRiverEditorCtrl, deleteNode, void, (), , "deleteNode()" )
+DefineEngineMethod( GuiRiverEditorCtrl, deleteNode, void, (), , "deleteNode()" )
 {
    object->deleteSelectedNode();
 }
 
-DefineConsoleMethod( GuiRiverEditorCtrl, getMode, const char*, (), , "" )
+DefineEngineMethod( GuiRiverEditorCtrl, getMode, const char*, (), , "" )
 {
    return object->getMode();
 }
 
-DefineConsoleMethod( GuiRiverEditorCtrl, setMode, void, ( const char * mode ), , "setMode( String mode )" )
+DefineEngineMethod( GuiRiverEditorCtrl, setMode, void, ( const char * mode ), , "setMode( String mode )" )
 {
    String newMode = ( mode );
    object->setMode( newMode );
 }
 
-DefineConsoleMethod( GuiRiverEditorCtrl, getNodeWidth, F32, (), , "" )
+DefineEngineMethod( GuiRiverEditorCtrl, getNodeWidth, F32, (), , "" )
 {
    return object->getNodeWidth();
 }
 
-DefineConsoleMethod( GuiRiverEditorCtrl, setNodeWidth, void, ( F32 width ), , "" )
+DefineEngineMethod( GuiRiverEditorCtrl, setNodeWidth, void, ( F32 width ), , "" )
 {
    object->setNodeWidth( width );
 }
 
-DefineConsoleMethod( GuiRiverEditorCtrl, getNodeDepth, F32, (), , "" )
+DefineEngineMethod( GuiRiverEditorCtrl, getNodeDepth, F32, (), , "" )
 {
    return object->getNodeDepth();
 }
 
-DefineConsoleMethod( GuiRiverEditorCtrl, setNodeDepth, void, ( F32 depth ), , "" )
+DefineEngineMethod( GuiRiverEditorCtrl, setNodeDepth, void, ( F32 depth ), , "" )
 {
    object->setNodeDepth( depth );
 }
 
-DefineConsoleMethod( GuiRiverEditorCtrl, getNodePosition, Point3F, (), , "" )
+DefineEngineMethod( GuiRiverEditorCtrl, getNodePosition, Point3F, (), , "" )
 {
 
 	return  object->getNodePosition();
 }
 
-DefineConsoleMethod( GuiRiverEditorCtrl, setNodePosition, void, (Point3F pos), , "" )
+DefineEngineMethod( GuiRiverEditorCtrl, setNodePosition, void, (Point3F pos), , "" )
 {
    object->setNodePosition( pos );
 }
 
-DefineConsoleMethod( GuiRiverEditorCtrl, getNodeNormal, Point3F, (), , "" )
+DefineEngineMethod( GuiRiverEditorCtrl, getNodeNormal, Point3F, (), , "" )
 {
 
 	return object->getNodeNormal();
 }
 
-DefineConsoleMethod( GuiRiverEditorCtrl, setNodeNormal, void, (Point3F normal), , "" )
+DefineEngineMethod( GuiRiverEditorCtrl, setNodeNormal, void, (Point3F normal), , "" )
 {
 
    object->setNodeNormal( normal );
 }
 
-DefineConsoleMethod( GuiRiverEditorCtrl, setSelectedRiver, void, (const char * objName), (""), "" )
+DefineEngineMethod( GuiRiverEditorCtrl, setSelectedRiver, void, (const char * objName), (""), "" )
 {
    if (dStrcmp( objName,"" )==0)
       object->setSelectedRiver(NULL);
@@ -1464,7 +1464,7 @@ DefineConsoleMethod( GuiRiverEditorCtrl, setSelectedRiver, void, (const char * o
    }
 }
 
-DefineConsoleMethod( GuiRiverEditorCtrl, getSelectedRiver, S32, (), , "" )
+DefineEngineMethod( GuiRiverEditorCtrl, getSelectedRiver, S32, (), , "" )
 {
    River *river = object->getSelectedRiver();
    if ( !river )
@@ -1473,7 +1473,7 @@ DefineConsoleMethod( GuiRiverEditorCtrl, getSelectedRiver, S32, (), , "" )
    return river->getId();
 }
 
-DefineConsoleMethod( GuiRiverEditorCtrl, regenerate, void, (), , "" )
+DefineEngineMethod( GuiRiverEditorCtrl, regenerate, void, (), , "" )
 {
    River *river = object->getSelectedRiver();
    if ( river )

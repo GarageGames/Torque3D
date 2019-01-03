@@ -377,7 +377,7 @@ protected:
    }
 
    void reSkin( String newBaseName, String oldBaseName = String::EmptyString );
-
+   void resetMaterialList();
    enum
    {
       MaskNodeRotation       = 0x01,
@@ -727,7 +727,7 @@ class TSThread
    TSShapeInstance * mShapeInstance;  ///< Instance of the shape that this thread animates
 
    S32 sequence;                      ///< Sequence this thread will perform
-   F32 pos;
+   F32 mSeqPos;
 
    F32 timeScale;                     ///< How fast to play through the sequence
 

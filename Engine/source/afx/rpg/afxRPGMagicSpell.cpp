@@ -194,7 +194,7 @@ char* afxRPGMagicSpellData::fmt_placeholder_desc(char* buffer, int len) const
 {
   char pack_str[32]; 
   if (source_pack == ST_NULLSTRING)
-    dStrcpy(pack_str, "unknown");
+    dStrcpy(pack_str, "unknown", 32);
   else
     dSprintf(pack_str, 32, "%s", source_pack);
 
@@ -225,9 +225,9 @@ char* afxRPGMagicSpellData::formatDesc(char* buffer, int len) const
     {
       if (spell_target != TARGET_NOTHING)
       {
-        dStrcpy(target_str, _afxRPGMagicSpell_TargetType::_sEnumTable[i].mName);
+        dStrcpy(target_str, _afxRPGMagicSpell_TargetType::_sEnumTable[i].mName, 32);
         if (spell_target != TARGET_FREE && target_optional)
-          dStrcat(target_str, " (opt)");
+          dStrcat(target_str, " (opt)", 32);
       }
       break;
     }
@@ -245,13 +245,13 @@ char* afxRPGMagicSpellData::formatDesc(char* buffer, int len) const
 
   char casting_str[32];
   if (casting_dur <= 0)
-    dStrcpy(casting_str, "instant");
+    dStrcpy(casting_str, "instant", 32);
   else
     dSprintf(casting_str, 32, "%.1f sec cast", casting_dur);
 
   char pack_str[32]; 
   if (source_pack == ST_NULLSTRING)
-    dStrcpy(pack_str, "unknown");
+    dStrcpy(pack_str, "unknown", 32);
   else
     dSprintf(pack_str, 32, "%s", source_pack);
 

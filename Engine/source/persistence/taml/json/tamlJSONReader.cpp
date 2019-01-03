@@ -192,7 +192,7 @@ SimObject* TamlJSONReader::parseType( const rapidjson::Value::ConstMemberIterato
     for( rapidjson::Value::ConstMemberIterator objectMemberItr = typeValue.MemberBegin(); objectMemberItr != typeValue.MemberEnd(); ++objectMemberItr )
     {
         // Fetch name and value.
-        const rapidjson::Value& objectName = objectMemberItr->name;
+        const rapidjson::Value& objName = objectMemberItr->name;
         const rapidjson::Value& objectValue = objectMemberItr->value;
         
         // Skip if not an object.
@@ -200,7 +200,7 @@ SimObject* TamlJSONReader::parseType( const rapidjson::Value::ConstMemberIterato
             continue;
 
         // Find the period character in the name.
-        const char* pPeriod = dStrchr( objectName.GetString(), '.' );
+        const char* pPeriod = dStrchr( objName.GetString(), '.' );
 
         // Did we find the period?
         if ( pPeriod == NULL )

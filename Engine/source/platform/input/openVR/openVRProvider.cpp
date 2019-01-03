@@ -493,7 +493,7 @@ OpenVRProvider::OpenVRProvider() :
    mDrawCanvas(NULL),
    mGameConnection(NULL)
 {
-   dStrcpy(mName, "openvr");
+   dStrcpy(mName, "openvr", 30);
    mDeviceType = INPUTMGR->getNextDeviceType();
    buildInputCodeTable();
    GFXDevice::getDeviceEventSignal().notify(this, &OpenVRProvider::_handleDeviceEvent);

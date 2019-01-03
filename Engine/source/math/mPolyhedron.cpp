@@ -137,8 +137,8 @@ void PolyhedronVectorData::buildFromPlanes( const PlaneSetF& planes )
 
          S32 v1index = -1;
          bool v1Existed = false;
-         for( U32 nvert = 0; nvert < pointList.size(); ++ nvert )
-            if( pointList[ nvert ].equal( v1, 0.001f ) )
+         for( U32 nvert = 0; nvert < mPointList.size(); ++ nvert )
+            if(mPointList[ nvert ].equal( v1, 0.001f ) )
             {
                v1index = nvert;
                v1Existed = true;
@@ -149,8 +149,8 @@ void PolyhedronVectorData::buildFromPlanes( const PlaneSetF& planes )
 
          S32 v2index = -1;
          bool v2Existed = false;
-         for( U32 nvert = 0; nvert < pointList.size(); ++ nvert )
-            if( pointList[ nvert ].equal( v2, 0.001f ) )
+         for( U32 nvert = 0; nvert < mPointList.size(); ++ nvert )
+            if(mPointList[ nvert ].equal( v2, 0.001f ) )
             {
                v2index = nvert;
                v2Existed = true;
@@ -161,30 +161,30 @@ void PolyhedronVectorData::buildFromPlanes( const PlaneSetF& planes )
 
          if( !v1Existed )
          {
-            v1index = pointList.size();
-            pointList.push_back( v1 );
+            v1index = mPointList.size();
+			mPointList.push_back( v1 );
          }
 
          // Add vertex 2, if necessary.
 
          if( !v2Existed )
          {
-            v2index = pointList.size();
-            pointList.push_back( v2 );
+            v2index = mPointList.size();
+			mPointList.push_back( v2 );
          }
 
          // If both v1 and v2 already existed in the point
          // set, this must be an edge that we are sharing so try
          // to find it.
 
-         const U32 thisPlaneIndex = planeList.size();
+         const U32 thisPlaneIndex = mPlaneList.size();
          bool foundExistingEdge = false;
 
          if( v1Existed && v2Existed )
          {
-            for( U32 nedge = 0; nedge < edgeList.size(); ++ nedge )
+            for( U32 nedge = 0; nedge < mEdgeList.size(); ++ nedge )
             {
-               Edge& edge = edgeList[ nedge ];
+               Edge& edge = mEdgeList[ nedge ];
 
                if( ( edge.vertex[ 0 ] == v1index && edge.vertex[ 1 ] == v2index ) ||
                    ( edge.vertex[ 0 ] == v2index && edge.vertex[ 1 ] == v1index ) )
@@ -222,13 +222,13 @@ void PolyhedronVectorData::buildFromPlanes( const PlaneSetF& planes )
 
             if( !invert )
             {
-               edgeList.push_back(
+				mEdgeList.push_back(
                   Edge( thisPlaneIndex, 0, v1index, v2index )
                );
             }
             else
             {
-               edgeList.push_back(
+				mEdgeList.push_back(
                   Edge( thisPlaneIndex, 0, v2index, v1index )
                );
             }
@@ -242,6 +242,6 @@ void PolyhedronVectorData::buildFromPlanes( const PlaneSetF& planes )
       // If this plane produced edges, add it.
 
       if( haveEdges )
-         planeList.push_back( currentPlane );
+         mPlaneList.push_back( currentPlane );
    }
 }

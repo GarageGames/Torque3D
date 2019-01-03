@@ -1132,11 +1132,11 @@ void GuiMeshRoadEditorCtrl::setSelectedNode( S32 node )
    mSelNode = node;
    if ( mSelNode != -1 )
    {
-      const MeshRoadNode &node = mSelRoad->mNodes[mSelNode];
+      const MeshRoadNode &curNode = mSelRoad->mNodes[mSelNode];
 
       MatrixF objMat = mSelRoad->getNodeTransform(mSelNode);      
-      Point3F objScale( node.width, 1.0f, node.depth );
-      Point3F worldPos = node.point;
+      Point3F objScale(curNode.width, 1.0f, curNode.depth );
+      Point3F worldPos = curNode.point;
       
       mGizmo->set( objMat, worldPos, objScale );
    }
@@ -1185,67 +1185,67 @@ void GuiMeshRoadEditorCtrl::matchTerrainToRoad()
    // with the terrain underneath it.
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, deleteNode, void, (), , "deleteNode()" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, deleteNode, void, (), , "deleteNode()" )
 {
    object->deleteSelectedNode();
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, getMode, const char*, (), , "" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, getMode, const char*, (), , "" )
 {
    return object->getMode();
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, setMode, void, (const char * mode), , "setMode( String mode )" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, setMode, void, (const char * mode), , "setMode( String mode )" )
 {
    String newMode = ( mode );
    object->setMode( newMode );
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, getNodeWidth, F32, (), , "" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, getNodeWidth, F32, (), , "" )
 {
    return object->getNodeWidth();
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, setNodeWidth, void, ( F32 width ), , "" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, setNodeWidth, void, ( F32 width ), , "" )
 {
    object->setNodeWidth( width );
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, getNodeDepth, F32, (), , "" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, getNodeDepth, F32, (), , "" )
 {
    return object->getNodeDepth();
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, setNodeDepth, void, ( F32 depth ), , "" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, setNodeDepth, void, ( F32 depth ), , "" )
 {
    object->setNodeDepth( depth );
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, getNodePosition, Point3F, (), , "" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, getNodePosition, Point3F, (), , "" )
 {
 
 	return object->getNodePosition();
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, setNodePosition, void, (Point3F pos), , "" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, setNodePosition, void, (Point3F pos), , "" )
 {
 
    object->setNodePosition( pos );
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, getNodeNormal, Point3F, (), , "" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, getNodeNormal, Point3F, (), , "" )
 {
 
 	return object->getNodeNormal();
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, setNodeNormal, void, (Point3F normal), , "" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, setNodeNormal, void, (Point3F normal), , "" )
 {
 
    object->setNodeNormal( normal );
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, setSelectedRoad, void, (const char * objName), (""), "" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, setSelectedRoad, void, (const char * objName), (""), "" )
 {
    if ( String::isEmpty(objName) )
       object->setSelectedRoad(NULL);
@@ -1257,7 +1257,7 @@ DefineConsoleMethod( GuiMeshRoadEditorCtrl, setSelectedRoad, void, (const char *
    }
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, getSelectedRoad, S32, (), , "" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, getSelectedRoad, S32, (), , "" )
 {
    MeshRoad *road = object->getSelectedRoad();
    if ( !road )
@@ -1266,14 +1266,14 @@ DefineConsoleMethod( GuiMeshRoadEditorCtrl, getSelectedRoad, S32, (), , "" )
    return road->getId();
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, regenerate, void, (), , "" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, regenerate, void, (), , "" )
 {
    MeshRoad *road = object->getSelectedRoad();
    if ( road )
       road->regenerate();
 }
 
-DefineConsoleMethod( GuiMeshRoadEditorCtrl, matchTerrainToRoad, void, (), , "" )
+DefineEngineMethod( GuiMeshRoadEditorCtrl, matchTerrainToRoad, void, (), , "" )
 {
    object->matchTerrainToRoad();
 }

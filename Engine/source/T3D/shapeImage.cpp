@@ -522,7 +522,7 @@ bool ShapeBaseImageData::preload(bool server, String &errorStr)
             if (stateSequence[j] && stateSequence[j][0] && stateSequenceRandomFlash[j]) {
                char bufferVis[128];
                dStrncpy(bufferVis, stateSequence[j], 100);
-               dStrcat(bufferVis, "_vis");
+               dStrcat(bufferVis, "_vis", 128);
                s.sequenceVis[i] = shape[i]->findSequence(bufferVis);
             }
             if (s.sequenceVis[i] != -1)
@@ -1019,7 +1019,7 @@ void ShapeBaseImageData::packData(BitStream* stream)
 
    // Write the projectile datablock
    if (stream->writeFlag(projectile))
-      stream->writeRangedU32(packed? SimObjectId((uintptr_t)projectile):
+      stream->writeRangedU32(mPacked ? SimObjectId((uintptr_t)projectile):
                              projectile->getId(),DataBlockObjectIdFirst,DataBlockObjectIdLast);
 
    stream->writeFlag(cloakable);
@@ -1050,7 +1050,7 @@ void ShapeBaseImageData::packData(BitStream* stream)
 
    if( stream->writeFlag( casing ) )
    {
-      stream->writeRangedU32(packed? SimObjectId((uintptr_t)casing):
+      stream->writeRangedU32(mPacked ? SimObjectId((uintptr_t)casing):
          casing->getId(),DataBlockObjectIdFirst,DataBlockObjectIdLast);
    }
 
@@ -1139,7 +1139,7 @@ void ShapeBaseImageData::packData(BitStream* stream)
 
          if (stream->writeFlag(s.emitter))
          {
-            stream->writeRangedU32(packed? SimObjectId((uintptr_t)s.emitter):
+            stream->writeRangedU32(mPacked ? SimObjectId((uintptr_t)s.emitter):
                                    s.emitter->getId(),DataBlockObjectIdFirst,DataBlockObjectIdLast);
             stream->write(s.emitterTime);
 

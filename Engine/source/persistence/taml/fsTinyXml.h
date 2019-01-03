@@ -129,7 +129,7 @@ public:
 		   attrib->SetValue( _value );
 	   }
    }
-   void SetAttribute( const char * name, int value )
+   void SetAttribute( const char * name, int _value)
    {
 	   TiXmlAttribute* attrib = attributeSet.Find( name );
       if(!attrib)
@@ -139,7 +139,7 @@ public:
 		   attrib->SetName( name );
       }
 	   if ( attrib ) {
-		   attrib->SetIntValue( value );
+		   attrib->SetIntValue(_value);
 	   }
    }
    TiXmlNode* Identify( const char* p, TiXmlEncoding encoding );

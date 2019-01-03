@@ -137,7 +137,7 @@ void afxEA_PhraseEffect::grab_player_triggers(U32& trigger_mask)
 
 bool afxEA_PhraseEffect::ea_update(F32 dt)
 {
-  if (fade_value >= 1.0f)
+  if (mFade_value >= 1.0f)
   {
     //
     // Choreographer Triggers:
@@ -145,7 +145,7 @@ bool afxEA_PhraseEffect::ea_update(F32 dt)
     //    They must be set explicitly by calls to afxChoreographer
     //    console-methods, setTriggerBit(), or clearTriggerBit().
     //
-    U32 trigger_mask = (phrase_fx_data->no_choreographer_trigs) ? 0 : choreographer->getTriggerMask();
+    U32 trigger_mask = (phrase_fx_data->no_choreographer_trigs) ? 0 : mChoreographer->getTriggerMask();
 
     //
     // Constraint Triggers:
@@ -191,7 +191,7 @@ bool afxEA_PhraseEffect::ea_update(F32 dt)
           {
             for (S32 i = 0; i < active_phrases->size(); i++)
             {
-              (*active_phrases)[i]->stop(life_elapsed);
+              (*active_phrases)[i]->stop(mLife_elapsed);
             }          
           }
         }
@@ -240,7 +240,7 @@ void afxEA_PhraseEffect::ea_finish(bool was_stopped)
 {
   for (S32 i = 0; i < active_phrases->size(); i++)
   {
-    (*active_phrases)[i]->stop(life_elapsed);
+    (*active_phrases)[i]->stop(mLife_elapsed);
   }
 }
 
@@ -252,7 +252,7 @@ void afxEA_PhraseEffect::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxPhraseEffectData* orig_db = phrase_fx_data;
     phrase_fx_data = new afxPhraseEffectData(*orig_db, true);
-    orig_db->performSubstitutions(phrase_fx_data, choreographer, group_index);
+    orig_db->performSubstitutions(phrase_fx_data, mChoreographer, mGroup_index);
   }
 }
 
@@ -260,8 +260,8 @@ void afxEA_PhraseEffect::trigger_new_phrase()
 {
   //afxPhrase* phrase = new afxPhrase(choreographer->isServerObject(), /*willStop=*/false);
   bool will_stop = phrase_fx_data->phrase_type == afxPhraseEffectData::PHRASE_CONTINUOUS;
-  afxPhrase* phrase = new afxPhrase(choreographer->isServerObject(), will_stop);
-  phrase->init(phrase_fx_data->fx_list, datablock->ewd_timing.lifetime, choreographer, time_factor, phrase_fx_data->n_loops, group_index);
+  afxPhrase* phrase = new afxPhrase(mChoreographer->isServerObject(), will_stop);
+  phrase->init(phrase_fx_data->fx_list, mDatablock->ewd_timing.lifetime, mChoreographer, mTime_factor, phrase_fx_data->n_loops, mGroup_index);
   phrase->start(0, 0);
   if (phrase->isEmpty())
   {
@@ -272,10 +272,10 @@ void afxEA_PhraseEffect::trigger_new_phrase()
   if (phrase_fx_data->on_trig_cmd != ST_NULLSTRING)
   {
     char obj_str[32];
-    dStrcpy(obj_str, Con::getIntArg(choreographer->getId()));
+    dStrcpy(obj_str, Con::getIntArg(mChoreographer->getId()), 32);
 
     char index_str[32];
-    dStrcpy(index_str, Con::getIntArg(group_index));
+    dStrcpy(index_str, Con::getIntArg(mGroup_index), 32);
 
     char buffer[1024];
     char* b = buffer;
@@ -331,9 +331,9 @@ void afxEA_PhraseEffect::update_active_phrases(F32 dt)
   for (S32 i = 0; i < active_phrases->size(); i++)
   {
     afxPhrase* phrase = (*active_phrases)[i];
-    if (phrase->expired(life_elapsed))
-      phrase->recycle(life_elapsed);
-    phrase->update(dt, life_elapsed);
+    if (phrase->expired(mLife_elapsed))
+      phrase->recycle(mLife_elapsed);
+    phrase->update(dt, mLife_elapsed);
   }
 }
 

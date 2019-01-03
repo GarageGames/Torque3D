@@ -32,28 +32,28 @@ class afxForce;
 
 class afxForceSet
 {
-  Vector<afxForce*> force_v;
-  StringTableEntry  name;
+  Vector<afxForce*> mForce_v;
+  StringTableEntry  mName;
 
   // tick-based updating
-  F32           update_dt;  // constant update interval, in seconds
-  F32           elapsed_dt; // runtime elapsed delta, in seconds
-  U32           elapsed_ms;
-  S32           num_updates;
-  S32           last_num_updates;
+  F32           mUpdate_dt;  // constant update interval, in seconds
+  F32           mElapsed_dt; // runtime elapsed delta, in seconds
+  U32           mElapsed_ms;
+  S32           mNum_updates;
+  S32           mLast_num_updates;
 
 public:
   /*C*/         afxForceSet(const char* name=0);
 
-  void          add(afxForce* force) { force_v.push_back(force); }
+  void          add(afxForce* force) { mForce_v.push_back(force); }
   void          remove(afxForce* force);
 
-  S32           count() { return force_v.size(); }
-  afxForce*     getForce(S32 idx) { return force_v[idx]; }
-  const char*   getName() const { return name; }
+  S32           count() { return mForce_v.size(); }
+  afxForce*     getForce(S32 idx) { return mForce_v[idx]; }
+  const char*   getName() const { return mName; }
 
-  void          setUpdateDT(F32 update_dt) { this->update_dt = update_dt; }
-  F32           getUpdateDT() { return update_dt; }
+  void          setUpdateDT(F32 update_dt) { mUpdate_dt = update_dt; }
+  F32           getUpdateDT() { return mUpdate_dt; }
 
   S32           updateDT(F32 dt);
 };

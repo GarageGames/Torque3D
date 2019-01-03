@@ -47,7 +47,9 @@
 #include "T3D/gameBase/std/stdMoveList.h"
 
 #include "T3D/prefab.h"
+#include "T3D/gameBase/gameConnection.h"
 
+#include <thread>
 //
 #include "gfx/sim/debugDraw.h"
 //
@@ -118,6 +120,8 @@ Entity::Entity()
 
    mInitialized = false;
 
+   mLifetimeMS = 0;
+
    mGameObjectAssetId = StringTable->insert("");
 
 }
@@ -146,6 +150,10 @@ void Entity::initPersistFields()
    addField("LocalRotation", TypeMatrixRotation, Offset(mMount.xfm, Entity), "Rotation we are mounted at ( object space of our mount object ).");
 
    endGroup("Transform");
+
+   addGroup("Misc");
+   addField("LifetimeMS", TypeS32, Offset(mLifetimeMS, Entity), "Object world orientation.");
+   endGroup("Misc");
 
    addGroup("GameObject");
    addProtectedField("gameObjectName", TypeGameObjectAssetPtr, Offset(mGameObjectAsset, Entity), &_setGameObject, &defaultProtectedGetFn,
@@ -231,8 +239,19 @@ bool Entity::onAdd()
    addToScene();
 
    //Make sure we get positioned
-   setMaskBits(TransformMask);
-   setMaskBits(NamespaceMask);
+   if (isServerObject())
+   {
+      setMaskBits(TransformMask);
+      setMaskBits(NamespaceMask);
+   }
+   else
+   {
+      //We can shortcut the initialization here because stuff generally ghosts down in order, and onPostAdd isn't called on ghosts.
+      onPostAdd();
+   }
+
+   if (mLifetimeMS != 0)
+      mStartTimeMS = Platform::getRealMilliseconds();
 
    return true;
 }
@@ -245,6 +264,8 @@ void Entity::onRemove()
 
    onDataSet.removeAll();
 
+   mGameObjectAsset.clear();
+
    Parent::onRemove();
 }
 
@@ -256,6 +277,27 @@ void Entity::onPostAdd()
    for (U32 i = 0; i < mComponents.size(); i++)
    {
       mComponents[i]->onComponentAdd();
+   }
+
+   //Set up the networked components
+   mNetworkedComponents.clear();
+   for (U32 i = 0; i < mComponents.size(); i++)
+   {
+      if (mComponents[i]->isNetworked())
+      {
+         NetworkedComponent netComp;
+         netComp.componentIndex = i;
+         netComp.updateState = NetworkedComponent::Adding;
+         netComp.updateMaskBits = -1;
+
+         mNetworkedComponents.push_back(netComp);
+      }
+   }
+
+   if (!mNetworkedComponents.empty())
+   {
+      setMaskBits(AddComponentsMask);
+      setMaskBits(ComponentsUpdateMask);
    }
 
    if (isMethod("onAdd"))
@@ -396,6 +438,14 @@ void Entity::processTick(const Move* move)
       mDelta.rot[1] = mRot.asQuatF();
 
       setTransform(getPosition(), mRot);
+
+      //Lifetime test
+      if (mLifetimeMS != 0)
+      {
+         S32 currentTime = Platform::getRealMilliseconds();
+         if (currentTime - mStartTimeMS >= mLifetimeMS)
+            deleteObject();
+      }
    }
 }
 
@@ -446,62 +496,107 @@ U32 Entity::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       mathWrite(*stream, mObjBox);
    }
 
-   //pass our behaviors around
-   if (mask & ComponentsMask || mask & InitialUpdateMask)
+   if (stream->writeFlag(mask & AddComponentsMask))
    {
-      stream->writeFlag(true);
-      //now, we run through a list of our to-be-sent behaviors and begin sending them
-      //if any fail, we keep our list and re-queue the mask
-      S32 componentCount = mToLoadComponents.size();
+      U32 toAddComponentCount = 0;
 
-      //build our 'ready' list
-      //This requires both the instance and the instances' template to be prepped(if the template hasn't been ghosted,
-      //then we know we shouldn't be passing the instance's ghosts around yet)
-      U32 ghostedCompCnt = 0;
-      for (U32 i = 0; i < componentCount; i++)
+      for (U32 i = 0; i < mNetworkedComponents.size(); i++)
       {
-         if (con->getGhostIndex(mToLoadComponents[i]) != -1)
-            ghostedCompCnt++;
-      }
-
-      if (ghostedCompCnt != 0)
-      {
-         stream->writeFlag(true);
-
-         stream->writeFlag(mStartComponentUpdate);
-
-         //if not all the behaviors have been ghosted, we'll need another pass
-         if (ghostedCompCnt != componentCount)
-            retMask |= ComponentsMask;
-
-         //write the currently ghosted behavior count
-         stream->writeInt(ghostedCompCnt, 16);
-
-         for (U32 i = 0; i < mToLoadComponents.size(); i++)
+         if (mNetworkedComponents[i].updateState == NetworkedComponent::Adding)
          {
-            //now fetch them and pass the ghost
-            S32 ghostIndex = con->getGhostIndex(mToLoadComponents[i]);
-            if (ghostIndex != -1)
-            {
-               stream->writeInt(ghostIndex, NetConnection::GhostIdBitSize);
-               mToLoadComponents.erase(i);
-               i--;
-
-               mStartComponentUpdate = false;
-            }
+            toAddComponentCount++;
          }
       }
-      else if (componentCount)
+
+      //you reaaaaally shouldn't have >255 networked components on a single entity
+      stream->writeInt(toAddComponentCount, 8);
+
+      for (U32 i = 0; i < mNetworkedComponents.size(); i++)
       {
-         //on the odd chance we have behaviors to ghost, but NONE of them have been yet, just set the flag now
-         stream->writeFlag(false);
-         retMask |= ComponentsMask;
+         NetworkedComponent::UpdateState state = mNetworkedComponents[i].updateState;
+
+         if (mNetworkedComponents[i].updateState == NetworkedComponent::Adding)
+         {
+            const char* className = mComponents[mNetworkedComponents[i].componentIndex]->getClassName();
+            stream->writeString(className, strlen(className));
+
+            mNetworkedComponents[i].updateState = NetworkedComponent::Updating;
+         }
       }
-      else
-         stream->writeFlag(false);
    }
-   else
-      stream->writeFlag(false);
+
+   if (stream->writeFlag(mask & RemoveComponentsMask))
+   {
+      /*U32 toRemoveComponentCount = 0;
+
+      for (U32 i = 0; i < mNetworkedComponents.size(); i++)
+      {
+         if (mNetworkedComponents[i].updateState == NetworkedComponent::Adding)
+         {
+            toRemoveComponentCount++;
+         }
+      }
+
+      //you reaaaaally shouldn't have >255 networked components on a single entity
+      stream->writeInt(toRemoveComponentCount, 8);
+
+      for (U32 i = 0; i < mNetworkedComponents.size(); i++)
+      {
+         if (mNetworkedComponents[i].updateState == NetworkedComponent::Removing)
+         {
+            stream->writeInt(i, 16);
+         }
+      }*/
+
+      /*for (U32 i = 0; i < mNetworkedComponents.size(); i++)
+      {
+         if (mNetworkedComponents[i].updateState == NetworkedComponent::UpdateState::Removing)
+         {
+            removeComponent(mComponents[mNetworkedComponents[i].componentIndex], true);
+            mNetworkedComponents.erase(i);
+            i--;
+
+         }
+      }*/
+   }
+
+   //Update our components
+   if (stream->writeFlag(mask & ComponentsUpdateMask))
+   {
+      U32 toUpdateComponentCount = 0;
+
+      for (U32 i = 0; i < mNetworkedComponents.size(); i++)
+      {
+         if (mNetworkedComponents[i].updateState == NetworkedComponent::Updating)
+         {
+            toUpdateComponentCount++;
+         }
+      }
+
+      //you reaaaaally shouldn't have >255 networked components on a single entity
+      stream->writeInt(toUpdateComponentCount, 8);
+
+      bool forceUpdate = false;
+
+      for (U32 i = 0; i < mNetworkedComponents.size(); i++)
+      {
+         if (mNetworkedComponents[i].updateState == NetworkedComponent::Updating)
+         {
+            stream->writeInt(i, 8);
+
+            mNetworkedComponents[i].updateMaskBits = mComponents[mNetworkedComponents[i].componentIndex]->packUpdate(con, mNetworkedComponents[i].updateMaskBits, stream);
+
+            if (mNetworkedComponents[i].updateMaskBits != 0)
+               forceUpdate = true;
+            else
+               mNetworkedComponents[i].updateState = NetworkedComponent::None;
+         }
+      }
+
+      //If we have leftover, we need to re-iterate our packing
+      if (forceUpdate)
+         setMaskBits(ComponentsUpdateMask);
+   }
 
    /*if (stream->writeFlag(mask & NamespaceMask))
    {
@@ -594,22 +689,49 @@ void Entity::unpackUpdate(NetConnection *con, BitStream *stream)
       resetWorldBox();
    }
 
+   //AddComponentMask
    if (stream->readFlag())
    {
-      //are we passing any behaviors currently?
-      if (stream->readFlag())
+      U32 addedComponentCount = stream->readInt(8);
+
+      for (U32 i = 0; i < addedComponentCount; i++)
       {
-         //if we've just started the update, clear our behaviors
-         if (stream->readFlag())
-            clearComponents(false);
+         char className[256] = "";
+         stream->readString(className);
 
-         S32 componentCount = stream->readInt(16);
+         //Change to components, so iterate our list and create any new components
+         // Well, looks like we have to create a new object.
+         const char* componentType = className;
 
-         for (U32 i = 0; i < componentCount; i++)
+         ConsoleObject *object = ConsoleObject::create(componentType);
+
+         // Finally, set currentNewObject to point to the new one.
+         Component* newComponent = dynamic_cast<Component *>(object);
+
+         if (newComponent)
          {
-            S32 gIndex = stream->readInt(NetConnection::GhostIdBitSize);
-            addComponent(dynamic_cast<Component*>(con->resolveGhost(gIndex)));
+            addComponent(newComponent);
          }
+      }
+   }
+
+   //RemoveComponentMask
+   if (stream->readFlag())
+   {
+      
+   }
+
+   //ComponentUpdateMask
+   if (stream->readFlag())
+   {
+      U32 updatingComponents = stream->readInt(8);
+
+      for (U32 i = 0; i < updatingComponents; i++)
+      {
+         U32 updateComponentIndex = stream->readInt(8);
+
+         Component* comp = mComponents[updateComponentIndex];
+         comp->unpackUpdate(con, stream);
       }
    }
 
@@ -638,6 +760,26 @@ void Entity::unpackUpdate(NetConnection *con, BitStream *stream)
 
       linkNamespaces();
    }*/
+}
+
+void Entity::setComponentNetMask(Component* comp, U32 mask)
+{
+   setMaskBits(Entity::ComponentsUpdateMask);
+
+   for (U32 i = 0; i < mNetworkedComponents.size(); i++)
+   {
+      U32 netCompId = mComponents[mNetworkedComponents[i].componentIndex]->getId();
+      U32 compId = comp->getId();
+
+      if (netCompId == compId && 
+         (mNetworkedComponents[i].updateState == NetworkedComponent::None || mNetworkedComponents[i].updateState == NetworkedComponent::Updating))
+      {
+         mNetworkedComponents[i].updateState = NetworkedComponent::Updating;
+         mNetworkedComponents[i].updateMaskBits |= mask;
+
+         break;
+      }
+   }
 }
 
 //Manipulation
@@ -708,7 +850,7 @@ void Entity::setTransform(const MatrixF &mat)
    }
 }
 
-void Entity::setTransform(Point3F position, RotationF rotation)
+void Entity::setTransform(const Point3F& position, const RotationF& rotation)
 {
    MatrixF oldTransform = getTransform();
 
@@ -758,7 +900,11 @@ void Entity::setTransform(Point3F position, RotationF rotation)
       // Update the transforms.
       Parent::setTransform(newMat);
 
-      onTransformSet.trigger(&newMat);
+      U32 compCount = mComponents.size();
+      for (U32 i = 0; i < compCount; ++i)
+      {
+         mComponents[i]->ownerTransformSet(&newMat);
+      }
 
       Point3F newPos = newMat.getPosition();
       RotationF newRot = newMat;
@@ -776,7 +922,7 @@ void Entity::setRenderTransform(const MatrixF &mat)
    Parent::setRenderTransform(mat);
 }
 
-void Entity::setRenderTransform(Point3F position, RotationF rotation)
+void Entity::setRenderTransform(const Point3F& position, const RotationF& rotation)
 {
    if (isMounted())
    {
@@ -800,7 +946,11 @@ void Entity::setRenderTransform(Point3F position, RotationF rotation)
 
       Parent::setRenderTransform(newMat);
 
-      onTransformSet.trigger(&newMat);
+      U32 compCount = mComponents.size();
+      for (U32 i = 0; i < compCount; ++i)
+      {
+         mComponents[i]->ownerTransformSet(&newMat);
+      }
    }
 }
 
@@ -827,7 +977,7 @@ MatrixF Entity::getTransform()
    }
 }
 
-void Entity::setMountOffset(Point3F posOffset)
+void Entity::setMountOffset(const Point3F& posOffset)
 {
    if (isMounted())
    {
@@ -837,7 +987,7 @@ void Entity::setMountOffset(Point3F posOffset)
    }
 }
 
-void Entity::setMountRotation(EulerF rotOffset)
+void Entity::setMountRotation(const EulerF& rotOffset)
 {
    if (isMounted())
    {
@@ -961,11 +1111,12 @@ bool Entity::castRayRendered(const Point3F &start, const Point3F &end, RayInfo *
 
 bool Entity::buildPolyList(PolyListContext context, AbstractPolyList* polyList, const Box3F &box, const SphereF &sphere)
 {
-   Vector<BuildPolyListInterface*> updaters = getComponents<BuildPolyListInterface>();
+   Con::errorf("Build Poly List not yet implemented as a passthrough for Entity");
+   /*Vector<BuildPolyListInterface*> updaters = getComponents<BuildPolyListInterface>();
    for (Vector<BuildPolyListInterface*>::iterator it = updaters.begin(); it != updaters.end(); it++)
    {
       return (*it)->buildPolyList(context, polyList, box, sphere);
-   }
+   }*/
 
    return false;
 }
@@ -981,7 +1132,7 @@ void Entity::buildConvex(const Box3F& box, Convex* convex)
 
 //
 // Mounting and heirarchy manipulation
-void Entity::mountObject(SceneObject* objB, MatrixF txfm)
+void Entity::mountObject(SceneObject* objB, const MatrixF& txfm)
 {
    Parent::mountObject(objB, -1, txfm);
    Parent::addObject(objB);
@@ -1155,10 +1306,27 @@ bool Entity::addComponent(Component *comp)
    // Register the component with this owner.
    comp->setOwner(this);
 
+   comp->setIsServerObject(isServerObject());
+
    //if we've already been added and this is being added after the fact(at runtime), 
    //then just go ahead and call it's onComponentAdd so it can get to work
-   if (mInitialized)
+   //if (mInitialized)
+   {
       comp->onComponentAdd();
+
+      if (comp->isNetworked())
+      {
+         NetworkedComponent netComp;
+         netComp.componentIndex = mComponents.size() - 1;
+         netComp.updateState = NetworkedComponent::Adding;
+         netComp.updateMaskBits = -1;
+
+         mNetworkedComponents.push_back(netComp);
+
+         setMaskBits(AddComponentsMask);
+         setMaskBits(ComponentsUpdateMask);
+      }
+   }
 
    onComponentAdded.trigger(comp);
 
@@ -1269,7 +1437,7 @@ Component *Entity::getComponent(String componentType)
          Namespace *NS = comp->getNamespace();
 
          //we shouldn't ever go past Component into net object, as we're no longer dealing with component classes
-         while (dStrcmp(NS->getName(), "NetObject"))
+         while (dStrcmp(NS->getName(), "SimObject"))
          {
             String namespaceName = NS->getName();
 
@@ -1374,11 +1542,9 @@ void Entity::write(Stream &stream, U32 tabStop, U32 flags)
    if (mComponents.size() > 0)
    {
       // Pack out the behaviors into fields
-      U32 i = 0;
       for (U32 i = 0; i < mComponents.size(); i++)
       {
          writeTabs(stream, tabStop + 1);
-         char buffer[1024];
          dSprintf(buffer, sizeof(buffer), "new %s() {\r\n", mComponents[i]->getClassName());
          stream.write(dStrlen(buffer), buffer);
          //bi->writeFields( stream, tabStop + 2 );
@@ -1437,7 +1603,7 @@ void Entity::onCameraScopeQuery(NetConnection* connection, CameraScopeQuery* que
    }
 }
 //
-void Entity::setObjectBox(Box3F objBox)
+void Entity::setObjectBox(const Box3F& objBox)
 {
    mObjBox = objBox;
    resetWorldBox();
@@ -1497,7 +1663,8 @@ void Entity::notifyComponents(String signalFunction, String argA, String argB, S
 
 void Entity::setComponentsDirty()
 {
-   if (mToLoadComponents.empty())
+   bool tmp = true;
+   /*if (mToLoadComponents.empty())
       mStartComponentUpdate = true;
 
    //we need to build a list of behaviors that need to be pushed across the network
@@ -1522,7 +1689,7 @@ void Entity::setComponentsDirty()
       }
    }
 
-   setMaskBits(ComponentsMask);
+   setMaskBits(ComponentsMask);*/
 }
 
 void Entity::setComponentDirty(Component *comp, bool forceUpdate)
@@ -1537,8 +1704,8 @@ void Entity::setComponentDirty(Component *comp, bool forceUpdate)
       }
    }
 
-   if (!found)
-      return;
+   //if (!found)
+   //   return;
 
    //if(mToLoadComponents.empty())
    //	mStartComponentUpdate = true;
@@ -1631,7 +1798,7 @@ DefineEngineMethod(Entity, setBox, void,
 }
 
 
-/*DefineConsoleMethod(Entity, callOnComponents, void, (const char* functionName), ,
+/*DefineEngineMethod(Entity, callOnComponents, void, (const char* functionName), ,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1654,12 +1821,11 @@ ConsoleMethod(Entity, addComponents, void, 2, 2, "() - Add all fielded behaviors
    object->addComponents();
 }*/
 
-ConsoleMethod(Entity, addComponent, bool, 3, 3, "(ComponentInstance bi) - Add a behavior to the object\n"
+DefineEngineMethod(Entity, addComponent, bool, (Component* comp),,
+   "@brief Add a behavior to the object\n"
    "@param bi The behavior instance to add"
    "@return (bool success) Whether or not the behavior was successfully added")
 {
-   Component *comp = dynamic_cast<Component *>(Sim::findObject(argv[2]));
-
    if (comp != NULL)
    {
       bool success = object->addComponent(comp);
@@ -1679,40 +1845,33 @@ ConsoleMethod(Entity, addComponent, bool, 3, 3, "(ComponentInstance bi) - Add a 
    return false;
 }
 
-ConsoleMethod(Entity, removeComponent, bool, 3, 4, "(ComponentInstance bi, [bool deleteBehavior = true])\n"
+DefineEngineMethod(Entity, removeComponent, bool, (Component* comp, bool deleteComponent), (true),
    "@param bi The behavior instance to remove\n"
    "@param deleteBehavior Whether or not to delete the behavior\n"
    "@return (bool success) Whether the behavior was successfully removed")
 {
-   bool deleteComponent = true;
-   if (argc > 3)
-      deleteComponent = dAtob(argv[3]);
-
-   return object->removeComponent(dynamic_cast<Component *>(Sim::findObject(argv[2])), deleteComponent);
+   return object->removeComponent(comp, deleteComponent);
 }
 
-ConsoleMethod(Entity, clearComponents, void, 2, 2, "() - Clear all behavior instances\n"
+DefineEngineMethod(Entity, clearComponents, void, (),, "Clear all behavior instances\n"
    "@return No return value")
 {
    object->clearComponents();
 }
 
-ConsoleMethod(Entity, getComponentByIndex, S32, 3, 3, "(int index) - Gets a particular behavior\n"
+DefineEngineMethod(Entity, getComponentByIndex, Component*, (S32 index),, 
+   "@brief Gets a particular behavior\n"
    "@param index The index of the behavior to get\n"
    "@return (ComponentInstance bi) The behavior instance you requested")
 {
-   Component *comp = object->getComponent(dAtoi(argv[2]));
-
-   return (comp != NULL) ? comp->getId() : 0;
+   return object->getComponent(index);
 }
 
-DefineConsoleMethod(Entity, getComponent, S32, (String componentName), (""),
+DefineEngineMethod(Entity, getComponent, Component*, (String componentName), (""),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
-   Component *comp = object->getComponent(componentName);
-
-   return (comp != NULL) ? comp->getId() : 0;
+   return object->getComponent(componentName);
 }
 
 /*ConsoleMethod(Entity, getBehaviorByType, S32, 3, 3, "(string BehaviorTemplateName) - gets a behavior\n"
@@ -1741,13 +1900,14 @@ DefineConsoleMethod(Entity, getComponent, S32, (String componentName), (""),
    return object->reOrder(inst, idx);
 }*/
 
-ConsoleMethod(Entity, getComponentCount, S32, 2, 2, "() - Get the count of behaviors on an object\n"
+DefineEngineMethod(Entity, getComponentCount, S32, (),, 
+   "@brief Get the count of behaviors on an object\n"
    "@return (int count) The number of behaviors on an object")
 {
    return object->getComponentCount();
 }
 
-DefineConsoleMethod(Entity, setComponentDirty, void, (S32 componentID, bool forceUpdate), (0, false),
+DefineEngineMethod(Entity, setComponentDirty, void, (S32 componentID, bool forceUpdate), (0, false),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1756,7 +1916,7 @@ DefineConsoleMethod(Entity, setComponentDirty, void, (S32 componentID, bool forc
       object->setComponentDirty(comp, forceUpdate);*/
 }
 
-DefineConsoleMethod(Entity, getMoveVector, VectorF, (),,
+DefineEngineMethod(Entity, getMoveVector, VectorF, (),,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1770,7 +1930,7 @@ DefineConsoleMethod(Entity, getMoveVector, VectorF, (),,
    return VectorF::Zero;
 }
 
-DefineConsoleMethod(Entity, getMoveRotation, VectorF, (), ,
+DefineEngineMethod(Entity, getMoveRotation, VectorF, (), ,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1784,7 +1944,7 @@ DefineConsoleMethod(Entity, getMoveRotation, VectorF, (), ,
    return VectorF::Zero;
 }
 
-DefineConsoleMethod(Entity, getMoveTrigger, bool, (S32 triggerNum), (0),
+DefineEngineMethod(Entity, getMoveTrigger, bool, (S32 triggerNum), (0),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1805,28 +1965,28 @@ DefineEngineMethod(Entity, getForwardVector, VectorF, (), ,
    return forVec;
 }
 
-DefineConsoleMethod(Entity, setForwardVector, void, (VectorF newForward), (VectorF(0,0,0)),
+DefineEngineMethod(Entity, setForwardVector, void, (VectorF newForward), (VectorF(0,0,0)),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
    object->setForwardVector(newForward);
 }
 
-DefineConsoleMethod(Entity, lookAt, void, (Point3F lookPosition),,
+DefineEngineMethod(Entity, lookAt, void, (Point3F lookPosition),,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
    //object->setForwardVector(newForward);
 }
 
-DefineConsoleMethod(Entity, rotateTo, void, (Point3F lookPosition, F32 degreePerSecond), (1.0),
+DefineEngineMethod(Entity, rotateTo, void, (Point3F lookPosition, F32 degreePerSecond), (1.0),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
    //object->setForwardVector(newForward);
 }
 
-DefineConsoleMethod(Entity, notify, void, (String signalFunction, String argA, String argB, String argC, String argD, String argE),
+DefineEngineMethod(Entity, notify, void, (String signalFunction, String argA, String argB, String argC, String argD, String argE),
 ("", "", "", "", "", ""),
 "Triggers a signal call to all components for a certain function.")
 {
@@ -1834,4 +1994,43 @@ DefineConsoleMethod(Entity, notify, void, (String signalFunction, String argA, S
       return;
 
    object->notifyComponents(signalFunction, argA, argB, argC, argD, argE);
+}
+
+DefineEngineFunction(findEntitiesByTag, const char*, (SimGroup* searchingGroup, String tags), (nullAsType<SimGroup*>(), ""),
+"Finds all entities that have the provided tags.\n"
+"@param searchingGroup The SimGroup to search inside. If null, we'll search the entire dictionary(this can be slow!).\n"
+"@param tags Word delimited list of tags to search for. If multiple tags are included, the list is eclusively parsed, requiring all tags provided to be found on an entity for a match.\n"
+"@return A word list of IDs of entities that match the tag search terms.")
+{
+   //if (tags.isEmpty())
+      return "";
+
+   /*if (searchingGroup == nullptr)
+   {
+      searchingGroup = Sim::getRootGroup();
+   }
+
+   StringTableEntry entityStr = StringTable->insert("Entity");
+
+   std::thread threadBob;
+
+   std::thread::id a = threadBob.get_id();
+   std::thread::id b = std::this_thread::get_id().;
+
+   if (a == b)
+   {
+      //do
+   }
+
+   for (SimGroup::iterator itr = searchingGroup->begin(); itr != searchingGroup->end(); itr++)
+   {
+      Entity* ent = dynamic_cast<Entity*>((*itr));
+
+      if (ent != nullptr)
+      {
+         ent->mTags.
+      }
+   }
+
+   object->notifyComponents(signalFunction, argA, argB, argC, argD, argE);*/
 }

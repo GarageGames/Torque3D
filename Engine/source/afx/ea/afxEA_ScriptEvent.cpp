@@ -91,10 +91,10 @@ bool afxEA_ScriptEvent::ea_start()
 
 bool afxEA_ScriptEvent::ea_update(F32 dt)
 {
-  if (!ran_script && choreographer != NULL)
+  if (!ran_script && mChoreographer != NULL)
   {
     afxConstraint* pos_constraint = getPosConstraint();
-    choreographer->executeScriptEvent(script_data->method_name, pos_constraint, updated_xfm, 
+	mChoreographer->executeScriptEvent(script_data->method_name, pos_constraint, mUpdated_xfm,
                                       script_data->script_data);
     ran_script = true;
   }
@@ -115,7 +115,7 @@ void afxEA_ScriptEvent::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxScriptEventData* orig_db = script_data;
     script_data = new afxScriptEventData(*orig_db, true);
-    orig_db->performSubstitutions(script_data, choreographer, group_index);
+    orig_db->performSubstitutions(script_data, mChoreographer, mGroup_index);
   }
 }
 

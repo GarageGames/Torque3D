@@ -1577,20 +1577,20 @@ Player::Player()
 {
    mTypeMask |= PlayerObjectType | DynamicShapeObjectType;
 
-   delta.pos = mAnchorPoint = Point3F(0,0,100);
-   delta.rot = delta.head = Point3F(0,0,0);
-   delta.rotOffset.set(0.0f,0.0f,0.0f);
-   delta.warpOffset.set(0.0f,0.0f,0.0f);
-   delta.posVec.set(0.0f,0.0f,0.0f);
-   delta.rotVec.set(0.0f,0.0f,0.0f);
-   delta.headVec.set(0.0f,0.0f,0.0f);
-   delta.warpTicks = 0;
-   delta.dt = 1.0f;
-   delta.move = NullMove;
+   mDelta.pos = mAnchorPoint = Point3F(0,0,100);
+   mDelta.rot = mDelta.head = Point3F(0,0,0);
+   mDelta.rotOffset.set(0.0f,0.0f,0.0f);
+   mDelta.warpOffset.set(0.0f,0.0f,0.0f);
+   mDelta.posVec.set(0.0f,0.0f,0.0f);
+   mDelta.rotVec.set(0.0f,0.0f,0.0f);
+   mDelta.headVec.set(0.0f,0.0f,0.0f);
+   mDelta.warpTicks = 0;
+   mDelta.dt = 1.0f;
+   mDelta.move = NullMove;
    mPredictionCount = sMaxPredictionTicks;
-   mObjToWorld.setColumn(3,delta.pos);
-   mRot = delta.rot;
-   mHead = delta.head;
+   mObjToWorld.setColumn(3, mDelta.pos);
+   mRot = mDelta.rot;
+   mHead = mDelta.head;
    mVelocity.set(0.0f, 0.0f, 0.0f);
    mDataBlock = 0;
    mHeadHThread = mHeadVThread = mRecoilThread = mImageStateThread = 0;
@@ -1953,6 +1953,7 @@ void Player::reSkin()
 {
    if ( isGhost() && mShapeInstance && mSkinNameHandle.isValidString() )
    {
+	  mShapeInstance->resetMaterialList();
       Vector<String> skins;
       String(mSkinNameHandle.getString()).split( ";", skins );
 
@@ -2103,30 +2104,30 @@ void Player::processTick(const Move* move)
       }
    }
    // Warp to catch up to server
-   if (delta.warpTicks > 0) {
-      delta.warpTicks--;
+   if (mDelta.warpTicks > 0) {
+	   mDelta.warpTicks--;
 
       // Set new pos
-      getTransform().getColumn(3, &delta.pos);
-      delta.pos += delta.warpOffset;
-      delta.rot += delta.rotOffset;
+      getTransform().getColumn(3, &mDelta.pos);
+	  mDelta.pos += mDelta.warpOffset;
+	  mDelta.rot += mDelta.rotOffset;
 
       // Wrap yaw to +/-PI
-      if (delta.rot.z < - M_PI_F)
-         delta.rot.z += M_2PI_F;
-      else if (delta.rot.z > M_PI_F)
-         delta.rot.z -= M_2PI_F;
+      if (mDelta.rot.z < - M_PI_F)
+		  mDelta.rot.z += M_2PI_F;
+      else if (mDelta.rot.z > M_PI_F)
+		  mDelta.rot.z -= M_2PI_F;
 
       if (!ignore_updates)
       {
-         setPosition(delta.pos,delta.rot);
+         setPosition(mDelta.pos, mDelta.rot);
       }
       updateDeathOffsets();
       updateLookAnimation();
 
       // Backstepping
-      delta.posVec = -delta.warpOffset;
-      delta.rotVec = -delta.rotOffset;
+	  mDelta.posVec = -mDelta.warpOffset;
+	  mDelta.rotVec = -mDelta.rotOffset;
    }
    else {
       // If there is no move, the player is either an
@@ -2139,7 +2140,7 @@ void Player::processTick(const Move* move)
             if (mPredictionCount-- <= 0)
                return;
 
-            move = &delta.move;
+            move = &mDelta.move;
          }
          else
             move = &NullMove;
@@ -2215,8 +2216,8 @@ void Player::interpolateTick(F32 dt)
    // Client side interpolation
    Parent::interpolateTick(dt);
 
-   Point3F pos = delta.pos + delta.posVec * dt;
-   Point3F rot = delta.rot + delta.rotVec * dt;
+   Point3F pos = mDelta.pos + mDelta.posVec * dt;
+   Point3F rot = mDelta.rot + mDelta.rotVec * dt;
 
    if (!ignore_updates)
       setRenderPosition(pos,rot,dt);
@@ -2237,7 +2238,7 @@ void Player::interpolateTick(F32 dt)
 */
 
    updateLookAnimation(dt);
-   delta.dt = dt;
+   mDelta.dt = dt;
 }
 
 void Player::advanceTime(F32 dt)
@@ -2561,7 +2562,7 @@ void Player::updateMove(const Move* move)
       }
       move = &my_move;
    }
-   delta.move = *move;
+   mDelta.move = *move;
 
 #ifdef TORQUE_OPENVR
    if (mControllers[0])
@@ -2611,7 +2612,7 @@ void Player::updateMove(const Move* move)
    // Update current orientation
    if (mDamageState == Enabled) {
       F32 prevZRot = mRot.z;
-      delta.headVec = mHead;
+	  mDelta.headVec = mHead;
 
       bool doStandardMove = true;
       bool absoluteDelta = false;
@@ -2772,29 +2773,29 @@ void Player::updateMove(const Move* move)
             mRot.z -= M_2PI_F;
       }
 
-      delta.rot = mRot;
-      delta.rotVec.x = delta.rotVec.y = 0.0f;
-      delta.rotVec.z = prevZRot - mRot.z;
-      if (delta.rotVec.z > M_PI_F)
-         delta.rotVec.z -= M_2PI_F;
-      else if (delta.rotVec.z < -M_PI_F)
-         delta.rotVec.z += M_2PI_F;
+	  mDelta.rot = mRot;
+	  mDelta.rotVec.x = mDelta.rotVec.y = 0.0f;
+	  mDelta.rotVec.z = prevZRot - mRot.z;
+      if (mDelta.rotVec.z > M_PI_F)
+		  mDelta.rotVec.z -= M_2PI_F;
+      else if (mDelta.rotVec.z < -M_PI_F)
+		  mDelta.rotVec.z += M_2PI_F;
 
-      delta.head = mHead;
-      delta.headVec -= mHead;
+	  mDelta.head = mHead;
+	  mDelta.headVec -= mHead;
 
       if (absoluteDelta)
       {
-         delta.headVec = Point3F(0, 0, 0);
-         delta.rotVec = Point3F(0, 0, 0);
+         mDelta.headVec = Point3F(0, 0, 0);
+		 mDelta.rotVec = Point3F(0, 0, 0);
       }
 
       for(U32 i=0; i<3; ++i)
       {
-         if (delta.headVec[i] > M_PI_F)
-            delta.headVec[i] -= M_2PI_F;
-         else if (delta.headVec[i] < -M_PI_F)
-            delta.headVec[i] += M_2PI_F;
+         if (mDelta.headVec[i] > M_PI_F)
+            mDelta.headVec[i] -= M_2PI_F;
+         else if (mDelta.headVec[i] < -M_PI_F)
+            mDelta.headVec[i] += M_2PI_F;
       }
    }
    MatrixF zRot;
@@ -3028,7 +3029,7 @@ void Player::updateMove(const Move* move)
 
       // get the head pitch and add it to the moveVec
       // This more accurate swim vector calc comes from Matt Fairfax
-      MatrixF xRot, zRot;
+      MatrixF xRot;
       xRot.set(EulerF(mHead.x, 0, 0));
       zRot.set(EulerF(0, 0, mRot.z));
       MatrixF rot;
@@ -3583,7 +3584,7 @@ void Player::updateLookAnimation(F32 dt)
       return;
    }
    // Calculate our interpolated head position.
-   Point3F renderHead = delta.head + delta.headVec * dt;
+   Point3F renderHead = mDelta.head + mDelta.headVec * dt;
 
    // Adjust look pos.  This assumes that the animations match
    // the min and max look angles provided in the datablock.
@@ -4421,8 +4422,8 @@ void Player::onImageStateAnimation(U32 imageSlot, const char* seqName, bool dire
 
          if (!found && hasImageBasePrefix && hasScriptPrefix)
          {
-            String seqName = String(imageBasePrefix) + String("_") + String(scriptPrefix) + String("_") + baseSeqName;
-            S32 index = mShapeInstance->getShape()->findSequence(seqName);
+            String comboSeqName = String(imageBasePrefix) + String("_") + String(scriptPrefix) + String("_") + baseSeqName;
+            S32 index = mShapeInstance->getShape()->findSequence(comboSeqName);
             if (index != -1)
             {
                seqIndex = index;
@@ -4432,8 +4433,8 @@ void Player::onImageStateAnimation(U32 imageSlot, const char* seqName, bool dire
 
          if (!found && hasImageBasePrefix)
          {
-            String seqName = String(imageBasePrefix) + String("_") + baseSeqName;
-            S32 index = mShapeInstance->getShape()->findSequence(seqName);
+            String imgSeqName = String(imageBasePrefix) + String("_") + baseSeqName;
+            S32 index = mShapeInstance->getShape()->findSequence(imgSeqName);
             if (index != -1)
             {
                seqIndex = index;
@@ -4443,8 +4444,8 @@ void Player::onImageStateAnimation(U32 imageSlot, const char* seqName, bool dire
 
          if (!found && hasScriptPrefix)
          {
-            String seqName = String(scriptPrefix) + String("_") + baseSeqName;
-            S32 index = mShapeInstance->getShape()->findSequence(seqName);
+            String scriptSeqName = String(scriptPrefix) + String("_") + baseSeqName;
+            S32 index = mShapeInstance->getShape()->findSequence(scriptSeqName);
             if (index != -1)
             {
                seqIndex = index;
@@ -5113,7 +5114,7 @@ void Player::_handleCollision( const Collision &collision )
 bool Player::updatePos(const F32 travelTime)
 {
    PROFILE_SCOPE(Player_UpdatePos);
-   getTransform().getColumn(3,&delta.posVec);
+   getTransform().getColumn(3,&mDelta.posVec);
 
    // When mounted to another object, only Z rotation used.
    if (isMounted()) {
@@ -5205,7 +5206,7 @@ bool Player::updatePos(const F32 travelTime)
    else
    {
       if ( mVelocity.isZero() )
-         newPos = delta.posVec;
+         newPos = mDelta.posVec;
       else
          newPos = _move( travelTime, &col );
    
@@ -5222,9 +5223,9 @@ bool Player::updatePos(const F32 travelTime)
    // If on the client, calc delta for backstepping
    if (isClientObject())
    {
-      delta.pos = newPos;
-      delta.posVec = delta.posVec - delta.pos;
-      delta.dt = 1.0f;
+      mDelta.pos = newPos;
+	  mDelta.posVec = mDelta.posVec - mDelta.pos;
+	  mDelta.dt = 1.0f;
    }
 
    setPosition( newPos, mRot );
@@ -5460,8 +5461,8 @@ bool Player::displaceObject(const Point3F& displacement)
 
    sBalance--;
 
-   getTransform().getColumn(3, &delta.pos);
-   delta.posVec.set(0.0f, 0.0f, 0.0f);
+   getTransform().getColumn(3, &mDelta.pos);
+   mDelta.posVec.set(0.0f, 0.0f, 0.0f);
 
    return result;
 }
@@ -5480,8 +5481,8 @@ bool Player::displaceObject(const Point3F& displacement)
 
    bool result = updatePos(dt);
 
-   mObjToWorld.getColumn(3, &delta.pos);
-   delta.posVec.set(0.0f, 0.0f, 0.0f);
+   mObjToWorld.getColumn(3, &mDelta.pos);
+   mDelta.posVec.set(0.0f, 0.0f, 0.0f);
 
    return result;
 }
@@ -5684,10 +5685,10 @@ void Player::getRenderEyeBaseTransform(MatrixF* mat, bool includeBank)
    // Eye transform in world space.  We only use the eye position
    // from the animation and supply our own rotation.
    MatrixF pmat,xmat,zmat;
-   xmat.set(EulerF(delta.head.x + delta.headVec.x * delta.dt, 0.0f, 0.0f));
+   xmat.set(EulerF(mDelta.head.x + mDelta.headVec.x * mDelta.dt, 0.0f, 0.0f));
 
    if (mUseHeadZCalc)
-      zmat.set(EulerF(0.0f, 0.0f, delta.head.z + delta.headVec.z * delta.dt));
+      zmat.set(EulerF(0.0f, 0.0f, mDelta.head.z + mDelta.headVec.z * mDelta.dt));
    else
       zmat.identity();
 
@@ -5697,7 +5698,7 @@ void Player::getRenderEyeBaseTransform(MatrixF* mat, bool includeBank)
       MatrixF imat;
       imat.mul(zmat, xmat);
       MatrixF ymat;
-      ymat.set(EulerF(0.0f, delta.head.y + delta.headVec.y * delta.dt, 0.0f));
+      ymat.set(EulerF(0.0f, mDelta.head.y + mDelta.headVec.y * mDelta.dt, 0.0f));
       pmat.mul(imat, ymat);
    }
    else
@@ -6234,7 +6235,7 @@ void Player::readPacketData(GameConnection *connection, BitStream *stream)
       stream->read(&mVelocity.y);
       stream->read(&mVelocity.z);
       stream->setCompressionPoint(pos);
-      delta.pos = pos;
+	  mDelta.pos = pos;
       mJumpSurfaceLastContact = stream->readInt(4);
 
       if (stream->readFlag())
@@ -6257,7 +6258,7 @@ void Player::readPacketData(GameConnection *connection, BitStream *stream)
       }
    }
    else
-      pos = delta.pos;
+      pos = mDelta.pos;
    stream->read(&mHead.x);
    if(stream->readFlag())
    {
@@ -6269,8 +6270,8 @@ void Player::readPacketData(GameConnection *connection, BitStream *stream)
    rot.x = rot.y = 0;
    if (!ignore_updates)
       setPosition(pos,rot);
-   delta.head = mHead;
-   delta.rot = rot;
+   mDelta.head = mHead;
+   mDelta.rot = rot;
 
    if (stream->readFlag()) {
       S32 gIndex = stream->readInt(NetConnection::GhostIdBitSize);
@@ -6348,7 +6349,7 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       stream->writeFloat(mRot.z / M_2PI_F, 7);
       stream->writeSignedFloat(mHead.x / (mDataBlock->maxLookAngle - mDataBlock->minLookAngle), 6);
       stream->writeSignedFloat(mHead.z / mDataBlock->maxFreelookAngle, 6);
-      delta.move.pack(stream);
+	  mDelta.move.pack(stream);
       stream->writeFlag(!(mask & NoWarpMask));
    }
    // Ghost need energy to predict reliably
@@ -6454,67 +6455,67 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       rot.z = stream->readFloat(7) * M_2PI_F;
       mHead.x = stream->readSignedFloat(6) * (mDataBlock->maxLookAngle - mDataBlock->minLookAngle);
       mHead.z = stream->readSignedFloat(6) * mDataBlock->maxFreelookAngle;
-      delta.move.unpack(stream);
+	  mDelta.move.unpack(stream);
 
-      delta.head = mHead;
-      delta.headVec.set(0.0f, 0.0f, 0.0f);
+	  mDelta.head = mHead;
+	  mDelta.headVec.set(0.0f, 0.0f, 0.0f);
 
       if (stream->readFlag() && isProperlyAdded())
       {
          // Determine number of ticks to warp based on the average
          // of the client and server velocities.
-         delta.warpOffset = pos - delta.pos;
+		  mDelta.warpOffset = pos - mDelta.pos;
          F32 as = (speed + mVelocity.len()) * 0.5f * TickSec;
-         F32 dt = (as > 0.00001f) ? delta.warpOffset.len() / as: sMaxWarpTicks;
-         delta.warpTicks = (S32)((dt > sMinWarpTicks) ? getMax(mFloor(dt + 0.5f), 1.0f) : 0.0f);
+         F32 dt = (as > 0.00001f) ? mDelta.warpOffset.len() / as: sMaxWarpTicks;
+		 mDelta.warpTicks = (S32)((dt > sMinWarpTicks) ? getMax(mFloor(dt + 0.5f), 1.0f) : 0.0f);
 
-         if (delta.warpTicks)
+         if (mDelta.warpTicks)
          {
             // Setup the warp to start on the next tick.
-            if (delta.warpTicks > sMaxWarpTicks)
-               delta.warpTicks = sMaxWarpTicks;
-            delta.warpOffset /= (F32)delta.warpTicks;
+            if (mDelta.warpTicks > sMaxWarpTicks)
+				mDelta.warpTicks = sMaxWarpTicks;
+			mDelta.warpOffset /= (F32)mDelta.warpTicks;
 
-            delta.rotOffset = rot - delta.rot;
+			mDelta.rotOffset = rot - mDelta.rot;
 
             // Ignore small rotation differences
-            if (mFabs(delta.rotOffset.z) < 0.001f)
-               delta.rotOffset.z = 0;
+            if (mFabs(mDelta.rotOffset.z) < 0.001f)
+               mDelta.rotOffset.z = 0;
 
             // Wrap rotation to +/-PI
-            if(delta.rotOffset.z < - M_PI_F)
-               delta.rotOffset.z += M_2PI_F;
-            else if(delta.rotOffset.z > M_PI_F)
-               delta.rotOffset.z -= M_2PI_F;
+            if(mDelta.rotOffset.z < - M_PI_F)
+				mDelta.rotOffset.z += M_2PI_F;
+            else if(mDelta.rotOffset.z > M_PI_F)
+				mDelta.rotOffset.z -= M_2PI_F;
 
-            delta.rotOffset /= (F32)delta.warpTicks;
+			mDelta.rotOffset /= (F32)mDelta.warpTicks;
          }
          else
          {
             // Going to skip the warp, server and client are real close.
             // Adjust the frame interpolation to move smoothly to the
             // new position within the current tick.
-            Point3F cp = delta.pos + delta.posVec * delta.dt;
-            if (delta.dt == 0) 
+            Point3F cp = mDelta.pos + mDelta.posVec * mDelta.dt;
+            if (mDelta.dt == 0)
             {
-               delta.posVec.set(0.0f, 0.0f, 0.0f);
-               delta.rotVec.set(0.0f, 0.0f, 0.0f);
+               mDelta.posVec.set(0.0f, 0.0f, 0.0f);
+               mDelta.rotVec.set(0.0f, 0.0f, 0.0f);
             }
             else
             {
-               F32 dti = 1.0f / delta.dt;
-               delta.posVec = (cp - pos) * dti;
-               delta.rotVec.z = mRot.z - rot.z;
+               F32 dti = 1.0f / mDelta.dt;
+			   mDelta.posVec = (cp - pos) * dti;
+			   mDelta.rotVec.z = mRot.z - rot.z;
 
-               if(delta.rotVec.z > M_PI_F)
-                  delta.rotVec.z -= M_2PI_F;
-               else if(delta.rotVec.z < -M_PI_F)
-                  delta.rotVec.z += M_2PI_F;
+               if(mDelta.rotVec.z > M_PI_F)
+                  mDelta.rotVec.z -= M_2PI_F;
+               else if(mDelta.rotVec.z < -M_PI_F)
+                  mDelta.rotVec.z += M_2PI_F;
 
-               delta.rotVec.z *= dti;
+			   mDelta.rotVec.z *= dti;
             }
-            delta.pos = pos;
-            delta.rot = rot;
+			mDelta.pos = pos;
+			mDelta.rot = rot;
             if (!ignore_updates)
                setPosition(pos,rot);
          }
@@ -6522,12 +6523,12 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       else 
       {
          // Set the player to the server position
-         delta.pos = pos;
-         delta.rot = rot;
-         delta.posVec.set(0.0f, 0.0f, 0.0f);
-         delta.rotVec.set(0.0f, 0.0f, 0.0f);
-         delta.warpTicks = 0;
-         delta.dt = 0.0f;
+         mDelta.pos = pos;
+         mDelta.rot = rot;
+		 mDelta.posVec.set(0.0f, 0.0f, 0.0f);
+		 mDelta.rotVec.set(0.0f, 0.0f, 0.0f);
+		 mDelta.warpTicks = 0;
+		 mDelta.dt = 0.0f;
          if (!ignore_updates)
             setPosition(pos,rot);
       }
@@ -7517,7 +7518,7 @@ U32 Player::lockAnimation()
    return last_anim_lock_tag;
 }
 
-ConsoleMethod(Player, isAnimationLocked, bool, 2, 2, "isAnimationLocked()")
+DefineEngineMethod(Player, isAnimationLocked, bool, (),, "")
 {
    return object->isAnimationLocked();
 }
@@ -7533,14 +7534,13 @@ void Player::setLookAnimationOverride(bool flag)
 #endif
 }
 
-ConsoleMethod(Player, setLookAnimationOverride, void, 3, 3, "setLookAnimationOverride(flag)")
+DefineEngineMethod(Player, setLookAnimationOverride, void, (bool flag),, "")
 {
-   object->setLookAnimationOverride(dAtob(argv[2]));
+   object->setLookAnimationOverride(flag);
 }
 
-ConsoleMethod(Player, copyHeadRotation, void, 3, 3, "copyHeadRotation(other_player)")
+DefineEngineMethod(Player, copyHeadRotation, void, (Player* other_player),, "")
 {
-   Player* other_player = dynamic_cast<Player*>(Sim::findObject(argv[2]));
    if (other_player)
       object->copyHeadRotation(other_player);
 }
@@ -7609,9 +7609,9 @@ void Player::restoreMovement(U32 tag)
    }
 }
 
-ConsoleMethod(Player, setMovementSpeedBias, void, 3, 3, "setMovementSpeedBias(F32 bias)")
+DefineEngineMethod(Player, setMovementSpeedBias, void, (F32 bias),, "setMovementSpeedBias(F32 bias)")
 {
-   object->setMovementSpeedBias(dAtof(argv[2]));
+   object->setMovementSpeedBias(bias);
 }
 
 void Player::overrideFootfallFX(bool decals, bool sounds, bool dust) 
@@ -7642,12 +7642,11 @@ void Player::setControllers(Vector<OpenVRTrackedObject*> controllerList)
    mControllers[1] = controllerList.size() > 1 ? controllerList[1] : NULL;
 }
 
-ConsoleMethod(Player, setVRControllers, void, 4, 4, "")
+DefineEngineMethod(Player, setVRControllers, void, (OpenVRTrackedObject* controllerL, OpenVRTrackedObject* controllerR,, "")
 {
-   OpenVRTrackedObject *controllerL, *controllerR;
    Vector<OpenVRTrackedObject*> list;
 
-   if (Sim::findObject(argv[2], controllerL))
+   if (controllerL)
    {
       list.push_back(controllerL);
    }
@@ -7656,7 +7655,7 @@ ConsoleMethod(Player, setVRControllers, void, 4, 4, "")
       list.push_back(NULL);
    }
 
-   if (Sim::findObject(argv[3], controllerR))
+   if (controllerR)
    {
       list.push_back(controllerR);
    }

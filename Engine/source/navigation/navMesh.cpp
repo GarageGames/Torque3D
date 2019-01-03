@@ -95,13 +95,13 @@ EventManager *NavMesh::getEventManager()
    return smEventManager;
 }
 
-DefineConsoleFunction(getNavMeshEventManager, S32, (),,
+DefineEngineFunction(getNavMeshEventManager, S32, (),,
    "@brief Get the EventManager object for all NavMesh updates.")
 {
    return NavMesh::getEventManager()->getId();
 }
 
-DefineConsoleFunction(NavMeshUpdateAll, void, (S32 objid, bool remove), (0, false),
+DefineEngineFunction(NavMeshUpdateAll, void, (S32 objid, bool remove), (0, false),
    "@brief Update all NavMesh tiles that intersect the given object's world box.")
 {
    SceneObject *obj;
@@ -123,7 +123,7 @@ DefineConsoleFunction(NavMeshUpdateAll, void, (S32 objid, bool remove), (0, fals
       obj->enableCollision();
 }
 
-DefineConsoleFunction(NavMeshUpdateAroundObject, void, (S32 objid, bool remove), (0, false),
+DefineEngineFunction(NavMeshUpdateAroundObject, void, (S32 objid, bool remove), (0, false),
    "@brief Update all NavMesh tiles that intersect the given object's world box.")
 {
    SceneObject *obj;
@@ -146,7 +146,7 @@ DefineConsoleFunction(NavMeshUpdateAroundObject, void, (S32 objid, bool remove),
 }
 
 
-DefineConsoleFunction(NavMeshIgnore, void, (S32 objid, bool _ignore), (0, true),
+DefineEngineFunction(NavMeshIgnore, void, (S32 objid, bool _ignore), (0, true),
    "@brief Flag this object as not generating a navmesh result.")
 {
    SceneObject *obj;
@@ -156,7 +156,7 @@ DefineConsoleFunction(NavMeshIgnore, void, (S32 objid, bool _ignore), (0, true),
       obj->mPathfindingIgnore = _ignore;
 }
 
-DefineConsoleFunction(NavMeshUpdateOne, void, (S32 meshid, S32 objid, bool remove), (0, 0, false),
+DefineEngineFunction(NavMeshUpdateOne, void, (S32 meshid, S32 objid, bool remove), (0, 0, false),
    "@brief Update all tiles in a given NavMesh that intersect the given object's world box.")
 {
    NavMesh *mesh;
@@ -1232,10 +1232,10 @@ bool NavMesh::createCoverPoints()
          float segs[MAX_SEGS*6];
          int nsegs = 0;
          query->getPolyWallSegments(ref, &f, segs, NULL, &nsegs, MAX_SEGS);
-         for(int j = 0; j < nsegs; ++j)
+         for(int segIDx = 0; segIDx < nsegs; ++segIDx)
          {
-            const float* sa = &segs[j*6];
-            const float* sb = &segs[j*6+3];
+            const float* sa = &segs[segIDx *6];
+            const float* sb = &segs[segIDx *6+3];
             Point3F a = RCtoDTS(sa), b = RCtoDTS(sb);
             F32 len = (b - a).len();
             if(len < mWalkableRadius * 2)
@@ -1244,7 +1244,7 @@ bool NavMesh::createCoverPoints()
             edge.normalize();
             // Number of points to try placing - for now, one at each end.
             U32 pointCount = (len > mWalkableRadius * 4) ? 2 : 1;
-            for(U32 i = 0; i < pointCount; i++)
+            for(U32 pointIDx = 0; pointIDx < pointCount; pointIDx++)
             {
                MatrixF mat;
                Point3F pos;
@@ -1254,10 +1254,10 @@ bool NavMesh::createCoverPoints()
                // Otherwise, stand off from edge ends.
                else
                {
-                  if(i % 2)
-                     pos = a + edge * (i/2+1) * mWalkableRadius;
+                  if(pointIDx % 2)
+                     pos = a + edge * (pointIDx /2+1) * mWalkableRadius;
                   else
-                     pos = b - edge * (i/2+1) * mWalkableRadius;
+                     pos = b - edge * (pointIDx /2+1) * mWalkableRadius;
                }
                CoverPointData data;
                if(testEdgeCover(pos, edge, data))
@@ -1332,7 +1332,7 @@ bool NavMesh::testEdgeCover(const Point3F &pos, const VectorF &dir, CoverPointDa
 
 void NavMesh::renderToDrawer()
 {
-   dd.clear();
+	mDbgDraw.clear();
    // Recast debug draw
    NetObject *no = getServerObject();
    if(no)
@@ -1341,12 +1341,12 @@ void NavMesh::renderToDrawer()
 
       if(n->nm)
       {
-         dd.beginGroup(0);
-         duDebugDrawNavMesh       (&dd, *n->nm, 0);
-         dd.beginGroup(1);
-         duDebugDrawNavMeshPortals(&dd, *n->nm);
-         dd.beginGroup(2);
-         duDebugDrawNavMeshBVTree (&dd, *n->nm);
+         mDbgDraw.beginGroup(0);
+         duDebugDrawNavMesh       (&mDbgDraw, *n->nm, 0);
+		 mDbgDraw.beginGroup(1);
+         duDebugDrawNavMeshPortals(&mDbgDraw, *n->nm);
+		 mDbgDraw.beginGroup(2);
+         duDebugDrawNavMeshBVTree (&mDbgDraw, *n->nm);
       }
    }
 }
@@ -1398,16 +1398,16 @@ void NavMesh::render(ObjectRenderInst *ri, SceneRenderState *state, BaseMatInsta
          int alpha = 80;
          if(!n->isSelected() || !Con::getBoolVariable("$Nav::EditorOpen"))
             alpha = 20;
-         dd.overrideColor(duRGBA(255, 0, 0, alpha));
+		 mDbgDraw.overrideColor(duRGBA(255, 0, 0, alpha));
       }
       else
       {
-         dd.cancelOverride();
+		  mDbgDraw.cancelOverride();
       }
       
-      if((!gEditingMission && n->mAlwaysRender) || (gEditingMission && Con::getBoolVariable("$Nav::Editor::renderMesh", 1))) dd.renderGroup(0);
-      if(Con::getBoolVariable("$Nav::Editor::renderPortals")) dd.renderGroup(1);
-      if(Con::getBoolVariable("$Nav::Editor::renderBVTree"))  dd.renderGroup(2);
+      if((!gEditingMission && n->mAlwaysRender) || (gEditingMission && Con::getBoolVariable("$Nav::Editor::renderMesh", 1))) mDbgDraw.renderGroup(0);
+      if(Con::getBoolVariable("$Nav::Editor::renderPortals")) mDbgDraw.renderGroup(1);
+      if(Con::getBoolVariable("$Nav::Editor::renderBVTree"))  mDbgDraw.renderGroup(2);
    }
 }
 

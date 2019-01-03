@@ -412,7 +412,7 @@ void ParticleEmitterData::packData(BitStream* stream)
 #if defined(AFX_CAP_PARTICLE_POOLS) 
    if (stream->writeFlag(pool_datablock))
    {
-     stream->writeRangedU32(packed ? SimObjectId((uintptr_t)pool_datablock) : pool_datablock->getId(), DataBlockObjectIdFirst, DataBlockObjectIdLast);
+     stream->writeRangedU32(mPacked ? SimObjectId((uintptr_t)pool_datablock) : pool_datablock->getId(), DataBlockObjectIdFirst, DataBlockObjectIdLast);
      stream->write(pool_index);
      stream->writeFlag(pool_depth_fade);
      stream->writeFlag(pool_radial_fade);
@@ -608,8 +608,9 @@ bool ParticleEmitterData::onAdd()
 
       // First we parse particleString into a list of particle name tokens 
       Vector<char*> dataBlocks(__FILE__, __LINE__);
-      char* tokCopy = new char[dStrlen(particleString) + 1];
-      dStrcpy(tokCopy, particleString);
+      dsize_t tokLen = dStrlen(particleString) + 1;
+      char* tokCopy = new char[tokLen];
+      dStrcpy(tokCopy, particleString, tokLen);
 
       char* currTok = dStrtok(tokCopy, " \t");
       while (currTok != NULL) 
@@ -1389,7 +1390,7 @@ void ParticleEmitter::emitParticles(const Point3F& start,
 
                Point3F a = last_part->acc;
                a -= last_part->vel * last_part->dataBlock->dragCoefficient;
-               a -= mWindVelocity * last_part->dataBlock->windCoefficient;
+               a += mWindVelocity * last_part->dataBlock->windCoefficient;
                //a += Point3F(0.0f, 0.0f, -9.81f) * last_part->dataBlock->gravityCoefficient;
                a.z += -9.81f*last_part->dataBlock->gravityCoefficient; // as long as gravity is a constant, this is faster
 
@@ -1749,7 +1750,7 @@ void ParticleEmitter::update( U32 ms )
    {
       Point3F a = part->acc;
       a -= part->vel * part->dataBlock->dragCoefficient;
-      a -= mWindVelocity * part->dataBlock->windCoefficient;
+      a += mWindVelocity * part->dataBlock->windCoefficient;
       a.z += -9.81f*part->dataBlock->gravityCoefficient; // AFX -- as long as gravity is a constant, this is faster
 
       part->vel += a * t;

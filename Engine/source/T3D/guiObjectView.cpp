@@ -367,7 +367,7 @@ void GuiObjectView::setObjectModel( const String& modelName )
    // Initialize camera values.
    
    mOrbitPos = mModel->getShape()->center;
-   mMinOrbitDist = mModel->getShape()->radius;
+   mMinOrbitDist = mModel->getShape()->mRadius;
 
    // Initialize animation.
    

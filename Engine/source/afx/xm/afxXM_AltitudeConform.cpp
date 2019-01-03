@@ -60,13 +60,13 @@ class afxXM_AltitudeConform : public afxXM_WeightedBase
 {
   typedef afxXM_WeightedBase Parent;
 
-  afxXM_AltitudeConformData*  db;
-  SceneContainer*             container;
-  bool                        do_freeze;
-  bool                        is_frozen;
-  F32                         terrain_alt;
-  F32                         interior_alt;
-  Point3F                     conformed_pos;
+  afxXM_AltitudeConformData*  mConformData;
+  SceneContainer*             mContainer;
+  bool                        mDo_freeze;
+  bool                        mIs_frozen;
+  F32                         mTerrain_alt;
+  F32                         mInterior_alt;
+  Point3F                     mConformed_pos;
 
 public:
   /*C*/         afxXM_AltitudeConform(afxXM_AltitudeConformData*, afxEffectWrapper*, bool on_server);
@@ -157,24 +157,24 @@ afxXM_Base* afxXM_AltitudeConformData::create(afxEffectWrapper* fx, bool on_serv
 afxXM_AltitudeConform::afxXM_AltitudeConform(afxXM_AltitudeConformData* db, afxEffectWrapper* fxw, bool on_server) 
 : afxXM_WeightedBase(db, fxw) 
 { 
-  this->db = db;
-  container = (on_server) ? &gServerContainer : &gClientContainer;
-  do_freeze = db->do_freeze;
-  is_frozen = false;
-  terrain_alt = -1.0f;
-  interior_alt = -1.0f;
-  conformed_pos.zero();
+  mConformData = db;
+  mContainer = (on_server) ? &gServerContainer : &gClientContainer;
+  mDo_freeze = db->do_freeze;
+  mIs_frozen = false;
+  mTerrain_alt = -1.0f;
+  mInterior_alt = -1.0f;
+  mConformed_pos.zero();
 }
 
 void afxXM_AltitudeConform::updateParams(F32 dt, F32 elapsed, afxXM_Params& params)
 {
-  if (is_frozen)
+  if (mIs_frozen)
   {
-    if (terrain_alt >= 0.0f)
-      fx_wrapper->setTerrainAltitude(terrain_alt);
-    if (interior_alt >= 0.0f)
-      fx_wrapper->setInteriorAltitude(interior_alt);
-    params.pos = conformed_pos;
+    if (mTerrain_alt >= 0.0f)
+      fx_wrapper->setTerrainAltitude(mTerrain_alt);
+    if (mInterior_alt >= 0.0f)
+      fx_wrapper->setInteriorAltitude(mInterior_alt);
+    params.pos = mConformed_pos;
     return;
   }
 
@@ -185,53 +185,51 @@ void afxXM_AltitudeConform::updateParams(F32 dt, F32 elapsed, afxXM_Params& para
   // find primary ground
   Point3F above_pos(params.pos); above_pos.z += 0.1f;
   Point3F below_pos(params.pos); below_pos.z -= 10000;
-  hit1 = container->castRay(above_pos, below_pos, db->interior_types | db->terrain_types, &rInfo1);
+  hit1 = mContainer->castRay(above_pos, below_pos, mConformData->interior_types | mConformData->terrain_types, &rInfo1);
 
   // find secondary ground
   if (hit1 && rInfo1.object)
   {
-    hit1_is_interior = ((rInfo1.object->getTypeMask() & db->interior_types) != 0);
-    U32 mask = (hit1_is_interior) ? db->terrain_types : db->interior_types;
-    Point3F above_pos(params.pos); above_pos.z += 0.1f;
-    Point3F below_pos(params.pos); below_pos.z -= 10000;
-    hit2 = container->castRay(above_pos, below_pos, mask, &rInfo2);
+    hit1_is_interior = ((rInfo1.object->getTypeMask() & mConformData->interior_types) != 0);
+    U32 mask = (hit1_is_interior) ? mConformData->terrain_types : mConformData->interior_types;
+    hit2 = mContainer->castRay(above_pos, below_pos, mask, &rInfo2);
   }
 
   if (hit1)
   {
     F32 wt_factor = calc_weight_factor(elapsed);
     F32 incoming_z = params.pos.z;
-    F32 ground1_z = rInfo1.point.z + db->height;  
+    F32 ground1_z = rInfo1.point.z + mConformData->height;
     F32 pos_z = ground1_z + (1.0f - wt_factor)*(incoming_z - ground1_z);
 
     if (hit1_is_interior)
     {
-      interior_alt = incoming_z - pos_z;
-      fx_wrapper->setInteriorAltitude(interior_alt);
-      if (db->do_interiors)
+      mInterior_alt = incoming_z - pos_z;
+      fx_wrapper->setInteriorAltitude(mInterior_alt);
+      if (mConformData->do_interiors)
         params.pos.z = pos_z;
     }
     else
     {
-      terrain_alt = incoming_z - pos_z;
-      fx_wrapper->setTerrainAltitude(terrain_alt);
-      if (db->do_terrain)
+      mTerrain_alt = incoming_z - pos_z;
+      fx_wrapper->setTerrainAltitude(mTerrain_alt);
+      if (mConformData->do_terrain)
         params.pos.z = pos_z;
     }
 
     if (hit2)
     {
-      F32 ground2_z = rInfo2.point.z + db->height;
+      F32 ground2_z = rInfo2.point.z + mConformData->height;
       F32 z2 = ground2_z + (1.0f - wt_factor)*(incoming_z - ground2_z);
       if (hit1_is_interior)
       {
-        terrain_alt = incoming_z - z2;
-        fx_wrapper->setTerrainAltitude(terrain_alt);
+        mTerrain_alt = incoming_z - z2;
+        fx_wrapper->setTerrainAltitude(mTerrain_alt);
       }
       else
       {
-        interior_alt = incoming_z - z2;
-        fx_wrapper->setInteriorAltitude(interior_alt);
+        mInterior_alt = incoming_z - z2;
+        fx_wrapper->setInteriorAltitude(mInterior_alt);
       }
     }
 
@@ -241,19 +239,19 @@ void afxXM_AltitudeConform::updateParams(F32 dt, F32 elapsed, afxXM_Params& para
       RayInfo rInfo0;
       Point3F lookup_from_pos(params.pos); lookup_from_pos.z -= 0.1f;
       Point3F lookup_to_pos(params.pos); lookup_to_pos.z += 10000;
-      if (container->castRay(lookup_from_pos, lookup_to_pos, TerrainObjectType, &rInfo0))
+      if (mContainer->castRay(lookup_from_pos, lookup_to_pos, TerrainObjectType, &rInfo0))
       {
-        F32 ground2_z = rInfo0.point.z + db->height;
+        F32 ground2_z = rInfo0.point.z + mConformData->height;
         F32 z2 = ground2_z + (1.0f - wt_factor)*(incoming_z - ground2_z);
-        terrain_alt = z2 - incoming_z;
-        fx_wrapper->setTerrainAltitude(terrain_alt);
+        mTerrain_alt = z2 - incoming_z;
+        fx_wrapper->setTerrainAltitude(mTerrain_alt);
       }
     }
 
-    if (do_freeze)
+    if (mDo_freeze)
     {
-      conformed_pos = params.pos;
-      is_frozen = true;
+      mConformed_pos = params.pos;
+      mIs_frozen = true;
     }
   }
 }

@@ -495,7 +495,7 @@ DefineEngineFunction(getDirectoryList, String, ( const char* path, S32 depth ), 
    // Copy the directory names to the buffer.
    for (S32 i = 0; i < directories.size(); i++)
    {
-      dStrcpy(p, directories[i]);
+      dStrcpy(p, directories[i], length - (p - buffer));
       p += dStrlen(directories[i]);
       // Tab separated.
       p[0] = '\t';
@@ -537,7 +537,7 @@ DefineEngineFunction( fileModifiedTime, String, ( const char* fileName ),,
    String fileStr = Platform::localTimeToString( lt );
    
    char *buffer = Con::getReturnBuffer( fileStr.size() );
-   dStrcpy( buffer, fileStr );   
+   dStrcpy( buffer, fileStr, fileStr.size() );
    
    return buffer;
 }
@@ -560,7 +560,7 @@ DefineEngineFunction( fileCreatedTime, String, ( const char* fileName ),,
    String fileStr = Platform::localTimeToString( lt );
 
    char *buffer = Con::getReturnBuffer( fileStr.size() );
-   dStrcpy( buffer, fileStr );  
+   dStrcpy( buffer, fileStr, fileStr.size() );
 
    return buffer;
 }
@@ -609,7 +609,7 @@ DefineEngineFunction(fileBase, String, ( const char* fileName ),,
    S32 pathLen = dStrlen( fileName );
    FrameTemp<char> szPathCopy( pathLen + 1);
 
-   dStrcpy( szPathCopy, fileName );
+   dStrcpy( szPathCopy, fileName, pathLen + 1 );
    forwardslash( szPathCopy );
 
    const char *path = dStrrchr(szPathCopy, '/');
@@ -617,8 +617,9 @@ DefineEngineFunction(fileBase, String, ( const char* fileName ),,
       path = szPathCopy;
    else
       path++;
-   char *ret = Con::getReturnBuffer(dStrlen(path) + 1);
-   dStrcpy(ret, path);
+   dsize_t retLen = dStrlen(path) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, path, retLen);
    char *ext = dStrrchr(ret, '.');
    if(ext)
       *ext = 0;
@@ -635,7 +636,7 @@ DefineEngineFunction(fileName, String, ( const char* fileName ),,
    S32 pathLen = dStrlen( fileName );
    FrameTemp<char> szPathCopy( pathLen + 1);
 
-   dStrcpy( szPathCopy, fileName );
+   dStrcpy( szPathCopy, fileName, pathLen + 1 );
    forwardslash( szPathCopy );
 
    const char *name = dStrrchr(szPathCopy, '/');
@@ -643,8 +644,9 @@ DefineEngineFunction(fileName, String, ( const char* fileName ),,
       name = szPathCopy;
    else
       name++;
-   char *ret = Con::getReturnBuffer(dStrlen(name));
-   dStrcpy(ret, name);
+   dsize_t retLen = dStrlen(name) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, name, retLen);
    return ret;
 }
 
@@ -658,7 +660,7 @@ DefineEngineFunction(filePath, String, ( const char* fileName ),,
    S32 pathLen = dStrlen( fileName );
    FrameTemp<char> szPathCopy( pathLen + 1);
 
-   dStrcpy( szPathCopy, fileName );
+   dStrcpy( szPathCopy, fileName, pathLen + 1 );
    forwardslash( szPathCopy );
 
    const char *path = dStrrchr(szPathCopy, '/');

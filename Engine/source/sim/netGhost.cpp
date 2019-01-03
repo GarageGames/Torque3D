@@ -428,7 +428,7 @@ void NetConnection::ghostWritePacket(BitStream *bstream, PacketNotify *notify)
    //
    for(i = mGhostZeroUpdateIndex - 1; i >= 0 && !bstream->isFull(); i--)
    {
-      GhostInfo *walk = mGhostArray[i];
+	   walk = mGhostArray[i];
 		if(walk->flags & (GhostInfo::KillingGhost | GhostInfo::Ghosting))
 		   continue;
 		

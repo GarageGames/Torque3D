@@ -1384,7 +1384,7 @@ bool Explosion::explode()
       mEndingMS = U32(mExplosionInstance->getScaledDuration(mExplosionThread) * 1000.0f);
 
       mObjScale.convolve(mDataBlock->explosionScale);
-      mObjBox = mDataBlock->explosionShape->bounds;
+      mObjBox = mDataBlock->explosionShape->mBounds;
       resetWorldBox();
    }
 

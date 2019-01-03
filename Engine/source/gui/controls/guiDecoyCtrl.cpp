@@ -142,7 +142,6 @@ void GuiDecoyCtrl::onMouseMove(const GuiEvent &event)
    if(mIsDecoy == true)
    {
 	    mVisible = false;
-		GuiControl *parent = getParent();
 		GuiControl *tempControl = parent->findHitControl(localPoint);
 
 		//the decoy control has the responsibility of keeping track of the decoyed controls status

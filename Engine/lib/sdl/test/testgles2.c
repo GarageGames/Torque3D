@@ -1,5 +1,5 @@
 /*
-  Copyright (r) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,7 +20,8 @@
 
 #include "SDL_test_common.h"
 
-#if defined(__IPHONEOS__) || defined(__ANDROID__) || defined(__EMSCRIPTEN__) || defined(__NACL__)
+#if defined(__IPHONEOS__) || defined(__ANDROID__) || defined(__EMSCRIPTEN__) || defined(__NACL__) \
+    || defined(__WINDOWS__) || defined(__LINUX__)
 #define HAVE_OPENGLES2
 #endif
 
@@ -58,7 +59,7 @@ static int LoadContext(GLES2_Context * data)
     do { \
         data->func = SDL_GL_GetProcAddress(#func); \
         if ( ! data->func ) { \
-            return SDL_SetError("Couldn't load GLES2 function %s: %s\n", #func, SDL_GetError()); \
+            return SDL_SetError("Couldn't load GLES2 function %s: %s", #func, SDL_GetError()); \
         } \
     } while ( 0 );
 #endif /* __SDL_NOGETPROCADDR__ */

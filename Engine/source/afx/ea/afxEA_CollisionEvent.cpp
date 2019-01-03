@@ -107,16 +107,16 @@ bool afxEA_CollisionEvent::ea_update(F32 dt)
   afxConstraint* pos_constraint = getPosConstraint();
   set_shape((pos_constraint) ? dynamic_cast<ShapeBase*>(pos_constraint->getSceneObject()) : 0);
 
-  if (choreographer && trigger_mask != 0)
+  if (mChoreographer && trigger_mask != 0)
   {
     if (triggered)
     {
-      choreographer->setTriggerMask(trigger_mask | choreographer->getTriggerMask());
+      mChoreographer->setTriggerMask(trigger_mask | mChoreographer->getTriggerMask());
       triggered = false;
     }
     else
     {
-      choreographer->setTriggerMask(~trigger_mask & choreographer->getTriggerMask());
+      mChoreographer->setTriggerMask(~trigger_mask & mChoreographer->getTriggerMask());
     }
   }
 
@@ -136,7 +136,7 @@ void afxEA_CollisionEvent::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxCollisionEventData* orig_db = script_data;
     script_data = new afxCollisionEventData(*orig_db, true);
-    orig_db->performSubstitutions(script_data, choreographer, group_index);
+    orig_db->performSubstitutions(script_data, mChoreographer, mGroup_index);
   }
 }
 
@@ -162,7 +162,7 @@ void afxEA_CollisionEvent::set_shape(ShapeBase* new_shape)
 
 void afxEA_CollisionEvent::collisionNotify(SceneObject* obj0, SceneObject* obj1, const VectorF& vel)
 {
-  if (obj0 != shape || !choreographer || !choreographer->getDataBlock())
+  if (obj0 != shape || !mChoreographer || !mChoreographer->getDataBlock())
     return;
 
   if (script_data->method_name != ST_NULLSTRING)
@@ -171,8 +171,8 @@ void afxEA_CollisionEvent::collisionNotify(SceneObject* obj0, SceneObject* obj1,
     dSprintf(arg_buf, 256, "%g %g %g", vel.x, vel.y, vel.z);
 
     // CALL SCRIPT afxChoreographerData::method(%spell, %obj0, %obj1, %velocity)
-    Con::executef(choreographer->getDataBlock(), script_data->method_name, 
-                  choreographer->getIdString(),
+    Con::executef(mChoreographer->getDataBlock(), script_data->method_name,
+                  mChoreographer->getIdString(),
                   (obj0) ? obj0->getIdString() : "", 
                   (obj1) ? obj1->getIdString() : "",
                   arg_buf,

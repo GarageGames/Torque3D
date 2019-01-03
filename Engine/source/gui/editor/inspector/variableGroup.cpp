@@ -151,6 +151,9 @@ bool GuiInspectorVariableGroup::inspectGroup()
       fieldGui->setInspectorField(NULL, mFields[i]->mFieldLabel);
       fieldGui->setDocs(mFields[i]->mFieldDescription);
 
+      if(mFields[i]->mSetCallbackName != StringTable->EmptyString())
+         fieldGui->setSpecialEditCallbackName(mFields[i]->mSetCallbackName);
+
       /*if (mFields[i]->mSetCallbackName != StringTable->EmptyString())
       {
          fieldGui->on.notify()
@@ -247,12 +250,12 @@ GuiInspectorField* GuiInspectorVariableGroup::createInspectorField()
    return NULL;
 }
 
-DefineConsoleMethod(GuiInspectorVariableGroup, createInspectorField, GuiInspectorField*, (),, "createInspectorField()")
+DefineEngineMethod(GuiInspectorVariableGroup, createInspectorField, GuiInspectorField*, (),, "createInspectorField()")
 {
    return object->createInspectorField();
 }
 
-DefineConsoleMethod(GuiInspectorVariableGroup, addInspectorField, void, (GuiInspectorField* field), (nullAsType<GuiInspectorField*>()), "addInspectorField( GuiInspectorFieldObject )")
+DefineEngineMethod(GuiInspectorVariableGroup, addInspectorField, void, (GuiInspectorField* field), (nullAsType<GuiInspectorField*>()), "addInspectorField( GuiInspectorFieldObject )")
 {
    object->addInspectorField(field);
 }

@@ -1004,7 +1004,7 @@ bool GuiParticleGraphCtrl::renderGraphTooltip(Point2I cursorPos, StringTableEntr
    return true;
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setSelectedPoint, void, (S32 point), , "(int point)"
+DefineEngineMethod(GuiParticleGraphCtrl, setSelectedPoint, void, (S32 point), , "(int point)"
               "Set the selected point on the graph.\n"
            "@return No return value")
 {
@@ -1016,7 +1016,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, setSelectedPoint, void, (S32 point), ,
    object->setSelectedPoint( point );
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setSelectedPlot, void, (S32 plotID), , "(int plotID)"
+DefineEngineMethod(GuiParticleGraphCtrl, setSelectedPlot, void, (S32 plotID), , "(int plotID)"
               "Set the selected plot (a.k.a. graph)."
            "@return No return value" )
 {
@@ -1028,7 +1028,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, setSelectedPlot, void, (S32 plotID), ,
    object->setSelectedPlot( plotID );
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, clearGraph, void, (S32 plotID), , "(int plotID)"
+DefineEngineMethod(GuiParticleGraphCtrl, clearGraph, void, (S32 plotID), , "(int plotID)"
               "Clear the graph of the given plot."
            "@return No return value")
 {
@@ -1040,14 +1040,14 @@ DefineConsoleMethod(GuiParticleGraphCtrl, clearGraph, void, (S32 plotID), , "(in
    object->clearGraph( plotID );
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, clearAllGraphs, void, (), , "()"
+DefineEngineMethod(GuiParticleGraphCtrl, clearAllGraphs, void, (), , "()"
               "Clear all of the graphs."
            "@return No return value")
 {
    object->clearAllGraphs();
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, addPlotPoint, S32, (S32 plotID, F32 x, F32 y, bool setAdded), (true), "(int plotID, float x, float y, bool setAdded = true;)"
+DefineEngineMethod(GuiParticleGraphCtrl, addPlotPoint, S32, (S32 plotID, F32 x, F32 y, bool setAdded), (true), "(int plotID, float x, float y, bool setAdded = true;)"
               "Add a data point to the given plot."
            "@return")
 {
@@ -1060,7 +1060,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, addPlotPoint, S32, (S32 plotID, F32 x,
    return object->addPlotPoint( plotID, Point2F(x, y), setAdded);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, insertPlotPoint, void, (S32 plotID, S32 i, F32 x, F32 y), , "(int plotID, int i, float x, float y)\n"
+DefineEngineMethod(GuiParticleGraphCtrl, insertPlotPoint, void, (S32 plotID, S32 i, F32 x, F32 y), , "(int plotID, int i, float x, float y)\n"
               "Insert a data point to the given plot and plot position.\n"
            "@param plotID The plot you want to access\n"
            "@param i The data point.\n"
@@ -1075,7 +1075,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, insertPlotPoint, void, (S32 plotID, S3
    object->insertPlotPoint( plotID, i, Point2F(x, y));
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, changePlotPoint, S32, (S32 plotID, S32 i, F32 x, F32 y), , "(int plotID, int i, float x, float y)"
+DefineEngineMethod(GuiParticleGraphCtrl, changePlotPoint, S32, (S32 plotID, S32 i, F32 x, F32 y), , "(int plotID, int i, float x, float y)"
               "Change a data point to the given plot and plot position.\n"
            "@param plotID The plot you want to access\n"
            "@param i The data point.\n"
@@ -1090,21 +1090,21 @@ DefineConsoleMethod(GuiParticleGraphCtrl, changePlotPoint, S32, (S32 plotID, S32
    return object->changePlotPoint( plotID, i, Point2F(x, y));
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getSelectedPlot, S32, (), , "() "
+DefineEngineMethod(GuiParticleGraphCtrl, getSelectedPlot, S32, (), , "() "
               "Gets the selected Plot (a.k.a. graph).\n"
            "@return The plot's ID.")
 {
   return object->getSelectedPlot();
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getSelectedPoint, S32, (), , "()"
+DefineEngineMethod(GuiParticleGraphCtrl, getSelectedPoint, S32, (), , "()"
               "Gets the selected Point on the Plot (a.k.a. graph)."
            "@return The last selected point ID")
 {
    return object->getSelectedPoint();
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, isExistingPoint, bool, (S32 plotID, S32 samples), , "(int plotID, int samples)"
+DefineEngineMethod(GuiParticleGraphCtrl, isExistingPoint, bool, (S32 plotID, S32 samples), , "(int plotID, int samples)"
               "@return Returns true or false whether or not the point in the plot passed is an existing point.")
 {
 
@@ -1119,7 +1119,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, isExistingPoint, bool, (S32 plotID, S3
    return object->isExistingPoint(plotID, samples);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getPlotPoint, Point2F, (S32 plotID, S32 samples), , "(int plotID, int samples)"
+DefineEngineMethod(GuiParticleGraphCtrl, getPlotPoint, Point2F, (S32 plotID, S32 samples), , "(int plotID, int samples)"
               "Get a data point from the plot specified, samples from the start of the graph."
            "@return The data point ID")
 {
@@ -1137,7 +1137,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, getPlotPoint, Point2F, (S32 plotID, S3
    return object->getPlotPoint(plotID, samples);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getPlotIndex, S32, (S32 plotID, F32 x, F32 y), , "(int plotID, float x, float y)\n"
+DefineEngineMethod(GuiParticleGraphCtrl, getPlotIndex, S32, (S32 plotID, F32 x, F32 y), , "(int plotID, float x, float y)\n"
               "Gets the index of the point passed on the plotID passed (graph ID).\n"
            "@param plotID The plot you wish to check.\n"
            "@param x,y The coordinates of the point to get.\n"
@@ -1151,7 +1151,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, getPlotIndex, S32, (S32 plotID, F32 x,
    return object->getPlotIndex(plotID, x, y);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getGraphColor, LinearColorF, (S32 plotID), , "(int plotID)"
+DefineEngineMethod(GuiParticleGraphCtrl, getGraphColor, LinearColorF, (S32 plotID), , "(int plotID)"
               "Get the color of the graph passed."
            "@return Returns the color of the graph as a string of RGB values formatted as \"R G B\"")
 {
@@ -1165,7 +1165,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, getGraphColor, LinearColorF, (S32 plot
    
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getGraphMin, Point2F, (S32 plotID), , "(int plotID) "
+DefineEngineMethod(GuiParticleGraphCtrl, getGraphMin, Point2F, (S32 plotID), , "(int plotID) "
               "Get the minimum values of the graph ranges.\n"
            "@return Returns the minimum of the range formatted as \"x-min y-min\"")
 {
@@ -1177,7 +1177,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, getGraphMin, Point2F, (S32 plotID), , 
    return object->getGraphMin(plotID);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getGraphMax, Point2F, (S32 plotID), , "(int plotID) "
+DefineEngineMethod(GuiParticleGraphCtrl, getGraphMax, Point2F, (S32 plotID), , "(int plotID) "
            "Get the maximum values of the graph ranges.\n"
            "@return Returns the maximum of the range formatted as \"x-max y-max\"")
 {
@@ -1190,7 +1190,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, getGraphMax, Point2F, (S32 plotID), , 
     
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getGraphName, const char*, (S32 plotID), , "(int plotID) "
+DefineEngineMethod(GuiParticleGraphCtrl, getGraphName, const char*, (S32 plotID), , "(int plotID) "
               "Get the name of the graph passed.\n"
            "@return Returns the name of the plot")
 {
@@ -1207,7 +1207,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, getGraphName, const char*, (S32 plotID
    return retBuffer;
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMin, void, (S32 plotID, F32 minX, F32 minY), , "(int plotID, float minX, float minY) "
+DefineEngineMethod(GuiParticleGraphCtrl, setGraphMin, void, (S32 plotID, F32 minX, F32 minY), , "(int plotID, float minX, float minY) "
            "Set the min values of the graph of plotID.\n"
            "@param plotID The plot to modify\n"
            "@param minX,minY The minimum bound of the value range.\n"
@@ -1223,7 +1223,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMin, void, (S32 plotID, F32 mi
    object->setGraphMin(plotID, Point2F(minX, minY));
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMinX, void, (S32 plotID, F32 minX), , "(int plotID, float minX) "
+DefineEngineMethod(GuiParticleGraphCtrl, setGraphMinX, void, (S32 plotID, F32 minX), , "(int plotID, float minX) "
            "Set the min X value of the graph of plotID.\n"
            "@param plotID The plot to modify.\n"
            "@param minX The minimum x value.\n"
@@ -1239,7 +1239,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMinX, void, (S32 plotID, F32 m
    object->setGraphMinX(plotID, minX);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMinY, void, (S32 plotID, F32 minX), , "(int plotID, float minY) "
+DefineEngineMethod(GuiParticleGraphCtrl, setGraphMinY, void, (S32 plotID, F32 minX), , "(int plotID, float minY) "
            "Set the min Y value of the graph of plotID."
            "@param plotID The plot to modify.\n"
            "@param minY The minimum y value.\n"
@@ -1255,7 +1255,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMinY, void, (S32 plotID, F32 m
    object->setGraphMinY(plotID, minX);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMax, void, (S32 plotID, F32 maxX, F32 maxY), , "(int plotID, float maxX, float maxY) "
+DefineEngineMethod(GuiParticleGraphCtrl, setGraphMax, void, (S32 plotID, F32 maxX, F32 maxY), , "(int plotID, float maxX, float maxY) "
            "Set the max values of the graph of plotID."
            "@param plotID The plot to modify\n"
            "@param maxX,maxY The maximum bound of the value range.\n"
@@ -1271,7 +1271,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMax, void, (S32 plotID, F32 ma
    object->setGraphMax(plotID, Point2F(maxX, maxY));
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMaxX, void, (S32 plotID, F32 maxX), , "(int plotID, float maxX)"
+DefineEngineMethod(GuiParticleGraphCtrl, setGraphMaxX, void, (S32 plotID, F32 maxX), , "(int plotID, float maxX)"
            "Set the max X value of the graph of plotID."
            "@param plotID The plot to modify.\n"
            "@param maxX The maximum x value.\n"
@@ -1287,7 +1287,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMaxX, void, (S32 plotID, F32 m
    object->setGraphMaxX(plotID, maxX);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMaxY, void, (S32 plotID, F32 maxX), , "(int plotID, float maxY)"
+DefineEngineMethod(GuiParticleGraphCtrl, setGraphMaxY, void, (S32 plotID, F32 maxX), , "(int plotID, float maxY)"
            "Set the max Y value of the graph of plotID."
            "@param plotID The plot to modify.\n"
            "@param maxY The maximum y value.\n"
@@ -1303,7 +1303,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMaxY, void, (S32 plotID, F32 m
    object->setGraphMaxY(plotID, maxX);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setGraphHidden, void, (S32 plotID, bool isHidden), , "(int plotID, bool isHidden)"
+DefineEngineMethod(GuiParticleGraphCtrl, setGraphHidden, void, (S32 plotID, bool isHidden), , "(int plotID, bool isHidden)"
            "Set whether the graph number passed is hidden or not."
            "@return No return value.")
 {
@@ -1317,7 +1317,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, setGraphHidden, void, (S32 plotID, boo
    object->setGraphHidden(plotID, isHidden);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setAutoGraphMax, void, (bool autoMax), , "(bool autoMax) "
+DefineEngineMethod(GuiParticleGraphCtrl, setAutoGraphMax, void, (bool autoMax), , "(bool autoMax) "
            "Set whether the max will automatically be set when adding points "
            "(ie if you add a value over the current max, the max is increased to that value).\n"
            "@return No return value.")
@@ -1325,35 +1325,35 @@ DefineConsoleMethod(GuiParticleGraphCtrl, setAutoGraphMax, void, (bool autoMax),
    object->setAutoGraphMax(autoMax);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setAutoRemove, void, (bool autoRemove), , "(bool autoRemove) "
+DefineEngineMethod(GuiParticleGraphCtrl, setAutoRemove, void, (bool autoRemove), , "(bool autoRemove) "
            "Set whether or not a point should be deleted when you drag another one over it."
            "@return No return value.")
 {
    object->setAutoRemove(autoRemove);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setRenderAll, void, (bool autoRemove), , "(bool renderAll)"
+DefineEngineMethod(GuiParticleGraphCtrl, setRenderAll, void, (bool autoRemove), , "(bool renderAll)"
            "Set whether or not a position should be rendered on every point or just the last selected."
            "@return No return value.")
 {
    object->setRenderAll(autoRemove);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setPointXMovementClamped, void, (bool autoRemove), , "(bool clamped)"
+DefineEngineMethod(GuiParticleGraphCtrl, setPointXMovementClamped, void, (bool autoRemove), , "(bool clamped)"
            "Set whether the x position of the selected graph point should be clamped"
            "@return No return value.")
 {
    object->setPointXMovementClamped(autoRemove);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setRenderGraphTooltip, void, (bool autoRemove), , "(bool renderGraphTooltip)"
+DefineEngineMethod(GuiParticleGraphCtrl, setRenderGraphTooltip, void, (bool autoRemove), , "(bool renderGraphTooltip)"
            "Set whether or not to render the graph tooltip."
            "@return No return value.")
 {
    object->setRenderGraphTooltip(autoRemove);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, setGraphName, void, (S32 plotID, const char * graphName), , "(int plotID, string graphName) "
+DefineEngineMethod(GuiParticleGraphCtrl, setGraphName, void, (S32 plotID, const char * graphName), , "(int plotID, string graphName) "
            "Set the name of the given plot.\n"
            "@param plotID The plot to modify.\n"
            "@param graphName The name to set on the plot.\n"
@@ -1369,7 +1369,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, setGraphName, void, (S32 plotID, const
    object->setGraphName(plotID, graphName);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, resetSelectedPoint, void, (), , "()"
+DefineEngineMethod(GuiParticleGraphCtrl, resetSelectedPoint, void, (), , "()"
            "This will reset the currently selected point to nothing."
            "@return No return value.")
 {

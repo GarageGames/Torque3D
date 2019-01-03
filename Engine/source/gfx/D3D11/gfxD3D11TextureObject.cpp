@@ -65,59 +65,56 @@ GFXLockedRect *GFXD3D11TextureObject::lock(U32 mipLevel /*= 0*/, RectI *inRect /
 {
    AssertFatal( !mLocked, "GFXD3D11TextureObject::lock - The texture is already locked!" );
 
-   D3D11_MAPPED_SUBRESOURCE mapInfo;
-
-   if( mProfile->isRenderTarget() )
+   if( !mStagingTex ||
+      mStagingTex->getWidth() != getWidth() ||
+      mStagingTex->getHeight() != getHeight() )
    {
-      //AssertFatal( 0, "GFXD3D11TextureObject::lock - Need to handle mapping render targets" );
-      if( !mLockTex || 
-          mLockTex->getWidth() != getWidth() ||
-          mLockTex->getHeight() != getHeight() )
-      {
-         mLockTex.set( getWidth(), getHeight(), mFormat, &GFXSystemMemTextureProfile, avar("%s() - mLockTex (line %d)", __FUNCTION__, __LINE__) );
-      }
+      mStagingTex.set( getWidth(), getHeight(), mFormat, &GFXSystemMemTextureProfile, avar("%s() - mLockTex (line %d)", __FUNCTION__, __LINE__) );
+   }
 
-      PROFILE_START(GFXD3D11TextureObject_lockRT);
+   ID3D11DeviceContext* pContext = D3D11DEVICECONTEXT;
+   D3D11_MAPPED_SUBRESOURCE mapInfo;
+   U32 offset = 0;
+   mLockedSubresource = D3D11CalcSubresource(mipLevel, 0, getMipLevels());
+   GFXD3D11TextureObject* pD3DStagingTex = (GFXD3D11TextureObject*)&(*mStagingTex);
 
-      GFXD3D11Device* dev = D3D11;
+   //map staging texture
+   HRESULT hr = pContext->Map(pD3DStagingTex->get2DTex(), mLockedSubresource, D3D11_MAP_READ, 0, &mapInfo);
 
-      GFXD3D11TextureObject* to = (GFXD3D11TextureObject*) &(*mLockTex);
-      dev->getDeviceContext()->CopyResource(to->get2DTex(), mD3DTexture);
+   if (FAILED(hr))
+      AssertFatal(false, "GFXD3D11TextureObject:lock - failed to map render target resource!");
 
-      mLockedSubresource = D3D11CalcSubresource(0, 0, 1);
-      HRESULT hr =  dev->getDeviceContext()->Map(to->get2DTex(), mLockedSubresource, D3D11_MAP_READ, 0, &mapInfo);
-      
-      if (FAILED(hr))
-         AssertFatal(false, "GFXD3D11TextureObject:lock- failed to map render target resource!");
+   const U32 width = mTextureSize.x >> mipLevel;
+   const U32 height = mTextureSize.y >> mipLevel;
 
-      mLocked = true;
+   //calculate locked box region and offset
+   if (inRect)
+   {
+      if ((inRect->point.x + inRect->extent.x > width) || (inRect->point.y + inRect->extent.y > height))
+         AssertFatal(false, "GFXD3D11TextureObject::lock - Rectangle too big!");
 
+      mLockBox.top = inRect->point.y;
+      mLockBox.left = inRect->point.x;
+      mLockBox.bottom = inRect->point.y + inRect->extent.y;
+      mLockBox.right = inRect->point.x + inRect->extent.x;
+      mLockBox.back = 1;
+      mLockBox.front = 0;
 
-      PROFILE_END();
+      //calculate offset
+      offset = inRect->point.x * getFormatByteSize() + inRect->point.y * mapInfo.RowPitch;
    }
    else
    {
-      RECT r;
-
-      if(inRect)
-      {
-         r.top  = inRect->point.y;
-         r.left = inRect->point.x;
-         r.bottom = inRect->point.y + inRect->extent.y;
-         r.right  = inRect->point.x + inRect->extent.x;
-      }
-
-      mLockedSubresource = D3D11CalcSubresource(mipLevel, 0, getMipLevels());
-      HRESULT hr = D3D11DEVICECONTEXT->Map(mD3DTexture, mLockedSubresource, D3D11_MAP_WRITE_DISCARD, 0, &mapInfo);
-      
-      if ( FAILED(hr) )
-         AssertFatal(false, "GFXD3D11TextureObject::lock - Failed to map subresource.");
-
-      mLocked = true;
-
+      mLockBox.top = 0;
+      mLockBox.left = 0;
+      mLockBox.bottom = height;
+      mLockBox.right = width;
+      mLockBox.back = 1;
+      mLockBox.front = 0;
    }
 
-   mLockRect.pBits = static_cast<U8*>(mapInfo.pData);
+   mLocked = true;
+   mLockRect.pBits = static_cast<U8*>(mapInfo.pData) + offset;
    mLockRect.Pitch = mapInfo.RowPitch;
 
    return (GFXLockedRect*)&mLockRect;
@@ -127,22 +124,22 @@ void GFXD3D11TextureObject::unlock(U32 mipLevel)
 {
    AssertFatal( mLocked, "GFXD3D11TextureObject::unlock - Attempting to unlock a surface that has not been locked" );
 
-   if( mProfile->isRenderTarget() )
-   {
-      //AssertFatal( 0, "GFXD3D11TextureObject::unlock - Need to handle mapping render targets" );
-      GFXD3D11TextureObject* to = (GFXD3D11TextureObject*)&(*mLockTex);
-      
-      D3D11->getDeviceContext()->Unmap(to->get2DTex(), mLockedSubresource);
-      
-      mLockedSubresource = 0;
-      mLocked = false;
-   }
-   else
-   {
-      D3D11DEVICECONTEXT->Unmap(get2DTex(), mLockedSubresource);
-      mLockedSubresource = 0;
-      mLocked = false;
-   }
+   //profile in the unlock function because all the heavy lifting is done here
+   PROFILE_START(GFXD3D11TextureObject_lockRT);
+
+   ID3D11DeviceContext* pContext = D3D11DEVICECONTEXT;
+   GFXD3D11TextureObject* pD3DStagingTex = (GFXD3D11TextureObject*)&(*mStagingTex);
+   ID3D11Texture2D *pStagingTex = pD3DStagingTex->get2DTex();
+
+   //unmap staging texture
+   pContext->Unmap(pStagingTex, mLockedSubresource);
+   //copy lock box region from the staging texture to our regular texture
+   pContext->CopySubresourceRegion(mD3DTexture, mLockedSubresource, mLockBox.left, mLockBox.top, 0, pStagingTex, mLockedSubresource, &mLockBox);
+
+   PROFILE_END();
+
+   mLockedSubresource = 0;
+   mLocked = false;
 }
 
 void GFXD3D11TextureObject::release()
@@ -186,10 +183,10 @@ bool GFXD3D11TextureObject::copyToBmp(GBitmap* bmp)
 
    PROFILE_START(GFXD3D11TextureObject_copyToBmp);
 
-   AssertFatal(bmp->getWidth() == getWidth(), "doh");
-   AssertFatal(bmp->getHeight() == getHeight(), "doh");
-   U32 width = getWidth();
-   U32 height = getHeight();
+   AssertFatal(bmp->getWidth() == getWidth(), "GFXD3D11TextureObject::copyToBmp - source/dest width does not match");
+   AssertFatal(bmp->getHeight() == getHeight(), "GFXD3D11TextureObject::copyToBmp - source/dest height does not match");
+   const U32 width = getWidth();
+   const U32 height = getHeight();
 
    bmp->setHasTransparency(mHasTransparency);
 
@@ -204,21 +201,45 @@ bool GFXD3D11TextureObject::copyToBmp(GBitmap* bmp)
       destBytesPerPixel = 3;
    else
       // unsupported
-      AssertFatal(false, "unsupported bitmap format");
+      AssertFatal(false, "GFXD3D11TextureObject::copyToBmp - unsupported bitmap format");
+   
+   //create temp staging texture
+   D3D11_TEXTURE2D_DESC desc;
+   static_cast<ID3D11Texture2D*>(mD3DTexture)->GetDesc(&desc);
+   desc.BindFlags = 0;
+   desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
+   desc.Usage = D3D11_USAGE_STAGING;
 
+   ID3D11Texture2D* pStagingTexture = NULL;
+   HRESULT hr = D3D11DEVICE->CreateTexture2D(&desc, NULL, &pStagingTexture);
+   if (FAILED(hr))
+   {
+      Con::errorf("GFXD3D11TextureObject::copyToBmp - Failed to create staging texture"); 
+      return false;
+   }
 
-   // lock the texture
-   DXGI_MAPPED_RECT* lockRect = (DXGI_MAPPED_RECT*) lock();
+   //copy the classes texture to the staging texture
+   D3D11DEVICECONTEXT->CopyResource(pStagingTexture, mD3DTexture);
+
+   //map the staging resource
+   D3D11_MAPPED_SUBRESOURCE mappedRes;
+   hr = D3D11DEVICECONTEXT->Map(pStagingTexture, 0, D3D11_MAP_READ, 0, &mappedRes);
+   if (FAILED(hr))
+   {
+      //cleanup
+      SAFE_RELEASE(pStagingTexture);
+      Con::errorf("GFXD3D11TextureObject::copyToBmp - Failed to map staging texture");
+      return false;
+   }
 
    // set pointers
-   U8* srcPtr = (U8*)lockRect->pBits;
+   const U8* srcPtr = (U8*)mappedRes.pData;
    U8* destPtr = bmp->getWritableBits();
 
    // we will want to skip over any D3D cache data in the source texture
-   const S32 sourceCacheSize = lockRect->Pitch - width * sourceBytesPerPixel;
-   AssertFatal(sourceCacheSize >= 0, "copyToBmp: cache size is less than zero?");
+   const S32 sourceCacheSize = mappedRes.RowPitch - width * sourceBytesPerPixel;
+   AssertFatal(sourceCacheSize >= 0, "GFXD3D11TextureObject::copyToBmp - cache size is less than zero?");
 
-   PROFILE_START(GFXD3D11TextureObject_copyToBmp_pixCopy);
    // copy data into bitmap
    for (U32 row = 0; row < height; ++row)
    {
@@ -239,15 +260,14 @@ bool GFXD3D11TextureObject::copyToBmp(GBitmap* bmp)
       // skip past the cache data for this row (if any)
       srcPtr += sourceCacheSize;
    }
-   PROFILE_END();
 
    // assert if we stomped or underran memory
-   AssertFatal(U32(destPtr - bmp->getWritableBits()) == width * height * destBytesPerPixel, "copyToBmp: doh, memory error");
-   AssertFatal(U32(srcPtr - (U8*)lockRect->pBits) == height * lockRect->Pitch, "copyToBmp: doh, memory error");
+   AssertFatal(U32(destPtr - bmp->getWritableBits()) == width * height * destBytesPerPixel, "GFXD3D11TextureObject::copyToBmp - memory error");
+   AssertFatal(U32(srcPtr - (U8*)mappedRes.pData) == height * mappedRes.RowPitch, "GFXD3D11TextureObject::copyToBmp - memory error");
 
-   // unlock
-   unlock();
+   D3D11DEVICECONTEXT->Unmap(pStagingTexture, 0);
 
+   SAFE_RELEASE(pStagingTexture);
    PROFILE_END();
 
    return true;

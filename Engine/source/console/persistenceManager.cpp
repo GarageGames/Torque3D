@@ -950,7 +950,7 @@ void PersistenceManager::updateToken( const U32 lineNumber, const U32 linePositi
    char* postString = ( char* ) dMalloc( postStringLen + 1 );
    if( needQuotes )
       postString[ 0 ] = '"';
-   dStrcpy( &postString[ needQuotes ? 1 : 0 ], postStringSrc );
+   dStrcpy( &postString[ needQuotes ? 1 : 0 ], postStringSrc, postStringLen + (needQuotes ? 0 : 1) );
    postString[ postStringLen ] = 0;
 
    // Calculate the length of our new line
@@ -967,10 +967,10 @@ void PersistenceManager::updateToken( const U32 lineNumber, const U32 linePositi
 
    // Build the new line with the
    // preString + newValue + postString
-   dStrcat(newLine, preString);
+   dStrcat(newLine, preString, newLineLen + 1);
    if ( newValue )
-      dStrcat(newLine, newValue);
-   dStrcat(newLine, postString);
+      dStrcat(newLine, newValue, newLineLen + 1);
+   dStrcat(newLine, postString, newLineLen + 1);
 
    // Clear our existing line
    if (mLineBuffer[lineNumber])
@@ -1243,7 +1243,7 @@ PersistenceManager::ParsedObject* PersistenceManager::writeNewObject(SimObject* 
    char* indent = getObjectIndent(parentObject);
 
    if (parentObject)
-      dStrcat(indent, "   \0");
+      dStrcat(indent, "   \0", 2048);
 
    // Write out the beginning of the object declaration
    const char* dclToken = "new";
@@ -2190,14 +2190,14 @@ void PersistenceManager::deleteObjectsFromFile(const char* fileName)
    clearAll();
 }
 
-DefineConsoleMethod( PersistenceManager, deleteObjectsFromFile, void, ( const char * fileName ), , "( fileName )"
+DefineEngineMethod( PersistenceManager, deleteObjectsFromFile, void, ( const char * fileName ), , "( fileName )"
               "Delete all of the objects that are created from the given file." )
 {
    // Delete Objects.
    object->deleteObjectsFromFile( fileName );
 }
 
-DefineConsoleMethod( PersistenceManager, setDirty, void,  ( const char * objName, const char * fileName ), (""), "(SimObject object, [filename])"
+DefineEngineMethod( PersistenceManager, setDirty, void,  ( const char * objName, const char * fileName ), (""), "(SimObject object, [filename])"
               "Mark an existing SimObject as dirty (will be written out when saveDirty() is called).")
 {
    SimObject *dirtyObject = NULL;
@@ -2226,7 +2226,7 @@ DefineConsoleMethod( PersistenceManager, setDirty, void,  ( const char * objName
    }
 }
 
-DefineConsoleMethod( PersistenceManager, removeDirty, void, ( const char * objName ), , "(SimObject object)"
+DefineEngineMethod( PersistenceManager, removeDirty, void, ( const char * objName ), , "(SimObject object)"
               "Remove a SimObject from the dirty list.")
 {
    SimObject *dirtyObject = NULL;
@@ -2243,7 +2243,7 @@ DefineConsoleMethod( PersistenceManager, removeDirty, void, ( const char * objNa
       object->removeDirty(dirtyObject);
 }
 
-DefineConsoleMethod( PersistenceManager, isDirty, bool, ( const char * objName ), , "(SimObject object)"
+DefineEngineMethod( PersistenceManager, isDirty, bool, ( const char * objName ), , "(SimObject object)"
               "Returns true if the SimObject is on the dirty list.")
 {
    SimObject *dirtyObject = NULL;
@@ -2262,19 +2262,19 @@ DefineConsoleMethod( PersistenceManager, isDirty, bool, ( const char * objName )
    return false;
 }
 
-DefineConsoleMethod( PersistenceManager, hasDirty, bool, (), , "()"
+DefineEngineMethod( PersistenceManager, hasDirty, bool, (), , "()"
               "Returns true if the manager has dirty objects to save." )
 {
    return object->hasDirty();
 }
 
-DefineConsoleMethod( PersistenceManager, getDirtyObjectCount, S32, (), , "()"
+DefineEngineMethod( PersistenceManager, getDirtyObjectCount, S32, (), , "()"
               "Returns the number of dirty objects." )
 {
    return object->getDirtyList().size();
 }
 
-DefineConsoleMethod( PersistenceManager, getDirtyObject, S32, (S32 index), , "( index )"
+DefineEngineMethod( PersistenceManager, getDirtyObject, S32, (S32 index), , "( index )"
               "Returns the ith dirty object." )
 {
    if ( index < 0 || index >= object->getDirtyList().size() )
@@ -2290,7 +2290,7 @@ DefineConsoleMethod( PersistenceManager, getDirtyObject, S32, (S32 index), , "( 
    return ( dirtyObject.getObject() ) ? dirtyObject.getObject()->getId() : 0;
 }
 
-DefineConsoleMethod( PersistenceManager, listDirty, void, (), , "()"
+DefineEngineMethod( PersistenceManager, listDirty, void, (), , "()"
               "Prints the dirty list to the console.")
 {
    const PersistenceManager::DirtyList dirtyList = object->getDirtyList();
@@ -2318,13 +2318,13 @@ DefineConsoleMethod( PersistenceManager, listDirty, void, (), , "()"
    }
 }
 
-DefineConsoleMethod( PersistenceManager, saveDirty, bool, (), , "()"
+DefineEngineMethod( PersistenceManager, saveDirty, bool, (), , "()"
               "Saves all of the SimObject's on the dirty list to their respective files.")
 {
    return object->saveDirty();
 }
 
-DefineConsoleMethod( PersistenceManager, saveDirtyObject, bool, (const char * objName), , "(SimObject object)"
+DefineEngineMethod( PersistenceManager, saveDirtyObject, bool, (const char * objName), , "(SimObject object)"
               "Save a dirty SimObject to it's file.")
 {
    SimObject *dirtyObject = NULL;
@@ -2342,13 +2342,13 @@ DefineConsoleMethod( PersistenceManager, saveDirtyObject, bool, (const char * ob
    return false;
 }
 
-DefineConsoleMethod( PersistenceManager, clearAll, void, (), , "()"
+DefineEngineMethod( PersistenceManager, clearAll, void, (), , "()"
               "Clears all the tracked objects without saving them." )
 {
    object->clearAll();
 }
 
-DefineConsoleMethod( PersistenceManager, removeObjectFromFile, void, (const char * objName, const char * filename),("") , "(SimObject object, [filename])"
+DefineEngineMethod( PersistenceManager, removeObjectFromFile, void, (const char * objName, const char * filename),("") , "(SimObject object, [filename])"
               "Remove an existing SimObject from a file (can optionally specify a different file than \
                the one it was created in.")
 {
@@ -2371,7 +2371,7 @@ DefineConsoleMethod( PersistenceManager, removeObjectFromFile, void, (const char
    }
 }
 
-DefineConsoleMethod( PersistenceManager, removeField, void, (const char * objName, const char * fieldName), , "(SimObject object, string fieldName)"
+DefineEngineMethod( PersistenceManager, removeField, void, (const char * objName, const char * fieldName), , "(SimObject object, string fieldName)"
               "Remove a specific field from an object declaration.")
 {
    SimObject *dirtyObject = NULL;

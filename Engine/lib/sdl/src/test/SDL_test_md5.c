@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -334,3 +334,5 @@ static void SDLTest_Md5Transform(MD5UINT4 * buf, MD5UINT4 * in)
   buf[2] += c;
   buf[3] += d;
 }
+
+/* vi: set ts=4 sw=4 expandtab: */

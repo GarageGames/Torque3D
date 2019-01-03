@@ -314,7 +314,7 @@ void StaticShape::unpackUpdate(NetConnection *connection, BitStream *bstream)
 // This appears to be legacy T2 stuff
 // Marked internal, as this is flagged to be deleted
 // [8/1/2010 mperry]
-DefineConsoleMethod( StaticShape, setPoweredState, void, (bool isPowered), , "(bool isPowered)"
+DefineEngineMethod( StaticShape, setPoweredState, void, (bool isPowered), , "(bool isPowered)"
            "@internal")
 {
    if(!object->isServerObject())
@@ -322,7 +322,7 @@ DefineConsoleMethod( StaticShape, setPoweredState, void, (bool isPowered), , "(b
    object->setPowered(isPowered);
 }
 
-DefineConsoleMethod( StaticShape, getPoweredState, bool, (), , "@internal")
+DefineEngineMethod( StaticShape, getPoweredState, bool, (), , "@internal")
 {
    if(!object->isServerObject())
       return(false);

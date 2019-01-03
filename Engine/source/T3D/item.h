@@ -88,7 +88,7 @@ class Item: public ShapeBase
       Point3F warpOffset;
       F32     dt;
    };
-   StateDelta delta;
+   StateDelta mDelta;
 
    // Static attributes
    ItemData* mDataBlock;

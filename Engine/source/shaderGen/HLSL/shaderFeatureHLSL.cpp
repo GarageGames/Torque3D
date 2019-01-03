@@ -1109,7 +1109,6 @@ void DiffuseFeatureHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       targ = ShaderFeature::RenderTarget1;
 
       col = (Var*)LangElement::find("col1");
-      MultiLine * meta = new MultiLine;
       if (!col)
       {
          // create color var
@@ -1117,7 +1116,7 @@ void DiffuseFeatureHLSL::processPix(   Vector<ShaderComponent*> &componentList,
          col->setType("fragout");
          col->setName(getOutputTargetVarName(targ));
          col->setStructName("OUT");
-         meta->addStatement(new GenOp("   @ = float4(1.0);\r\n", col));
+         meta->addStatement(new GenOp("   @ = float4(1.0,1.0,1.0,1.0);\r\n", col));
       }
    }
 
@@ -1158,7 +1157,7 @@ void DiffuseVertColorFeatureHLSL::processVert(  Vector< ShaderComponent* >& comp
 
       ShaderConnector* connectComp = dynamic_cast< ShaderConnector* >( componentList[ C_CONNECTOR ] );
       AssertFatal( connectComp, "DiffuseVertColorFeatureGLSL::processVert - C_CONNECTOR is not a ShaderConnector" );
-      Var* outColor = connectComp->getElement( RT_COLOR );
+      outColor = connectComp->getElement( RT_COLOR );
       outColor->setName( "vertColor" );
       outColor->setStructName( "OUT" );
       outColor->setType( "float4" );
@@ -1487,7 +1486,7 @@ void VertLitHLSL::processVert(   Vector<ShaderComponent*> &componentList,
 
       // Grab the connector color
       ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-      Var *outColor = connectComp->getElement( RT_COLOR );
+      outColor = connectComp->getElement( RT_COLOR );
       outColor->setName( "vertColor" );
       outColor->setStructName( "OUT" );
       outColor->setType( "float4" );

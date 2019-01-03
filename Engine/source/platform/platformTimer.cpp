@@ -160,12 +160,12 @@ S32 ScriptTimerMan::stopTimer( S32 id )
 
 ScriptTimerMan gScriptTimerMan;
 
-DefineConsoleFunction( startPrecisionTimer, S32, (), , "startPrecisionTimer() - Create and start a high resolution platform timer. Returns the timer id." )
+DefineEngineFunction( startPrecisionTimer, S32, (), , "startPrecisionTimer() - Create and start a high resolution platform timer. Returns the timer id." )
 {
    return gScriptTimerMan.startTimer();
 }
 
-DefineConsoleFunction( stopPrecisionTimer, S32, ( S32 id), , "stopPrecisionTimer( S32 id ) - Stop and destroy timer with the passed id.  Returns the elapsed milliseconds." )
+DefineEngineFunction( stopPrecisionTimer, S32, ( S32 id), , "stopPrecisionTimer( S32 id ) - Stop and destroy timer with the passed id.  Returns the elapsed milliseconds." )
 {
    return gScriptTimerMan.stopTimer( id );
 }

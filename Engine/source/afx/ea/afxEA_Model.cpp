@@ -119,18 +119,18 @@ bool afxEA_Model::ea_update(F32 dt)
     }
     deleteNotify(model);
 
-    model->setSequenceRateFactor(datablock->rate_factor/prop_time_factor);
-    model->setSortPriority(datablock->sort_priority);
+    model->setSequenceRateFactor(mDatablock->rate_factor/ mProp_time_factor);
+    model->setSortPriority(mDatablock->sort_priority);
   }
 
   if (model)
   {
-    if (do_fades)
+    if (mDo_fades)
     {
-      model->setFadeAmount(fade_value);
+      model->setFadeAmount(mFade_value);
     }
-    model->setTransform(updated_xfm);
-    model->setScale(updated_scale);
+    model->setTransform(mUpdated_xfm);
+    model->setScale(mUpdated_scale);
   }
 
   return true;
@@ -141,10 +141,10 @@ void afxEA_Model::ea_finish(bool was_stopped)
   if (!model)
     return;
   
-  if (in_scope && ew_timing.residue_lifetime > 0)
+  if (mIn_scope && mEW_timing.residue_lifetime > 0)
   {
     clearNotify(model);
-    afxResidueMgr::add(ew_timing.residue_lifetime, ew_timing.residue_fadetime, model);
+    afxResidueMgr::add(mEW_timing.residue_lifetime, mEW_timing.residue_fadetime, model);
     model = 0;
   }
   else
@@ -203,7 +203,7 @@ void afxEA_Model::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxModelData* orig_db = model_data;
     model_data = new afxModelData(*orig_db, true);
-    orig_db->performSubstitutions(model_data, choreographer, group_index);
+    orig_db->performSubstitutions(model_data, mChoreographer, mGroup_index);
   }
 }
 

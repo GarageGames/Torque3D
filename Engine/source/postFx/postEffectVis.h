@@ -104,6 +104,11 @@ public:
    static const char* getSingletonName() { return "PostEffectVis"; }
 };
 
+class PfxVis
+{
+   DECLARE_STATIC_CLASS(PfxVis)
+};
+
 /// Returns the PostEffectVis singleton.
 #define PFXVIS ManagedSingleton<PostEffectVis>::instance()
 

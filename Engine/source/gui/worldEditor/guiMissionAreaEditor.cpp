@@ -95,7 +95,7 @@ void GuiMissionAreaEditorCtrl::setSelectedMissionArea( MissionArea *missionArea 
       Con::executef( this, "onMissionAreaSelected" );
 }
 
-DefineConsoleMethod( GuiMissionAreaEditorCtrl, setSelectedMissionArea, void, (const char * missionAreaName), (""), "" )
+DefineEngineMethod( GuiMissionAreaEditorCtrl, setSelectedMissionArea, void, (const char * missionAreaName), (""), "" )
 {
    if ( dStrcmp( missionAreaName, "" )==0 )
       object->setSelectedMissionArea(NULL);
@@ -107,7 +107,7 @@ DefineConsoleMethod( GuiMissionAreaEditorCtrl, setSelectedMissionArea, void, (co
    }
 }
 
-DefineConsoleMethod( GuiMissionAreaEditorCtrl, getSelectedMissionArea, const char*, (), , "" )
+DefineEngineMethod( GuiMissionAreaEditorCtrl, getSelectedMissionArea, const char*, (), , "" )
 {
    MissionArea *missionArea = object->getSelectedMissionArea();
    if ( !missionArea )

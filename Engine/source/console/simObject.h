@@ -293,7 +293,7 @@ class SimObject: public ConsoleObject, public TamlCallbacks
       };
       
       // dictionary information stored on the object
-      StringTableEntry objectName;
+      StringTableEntry mObjectName;
       StringTableEntry mOriginalName;
       SimObject*       nextNameObject;
       SimObject*       nextManagerNameObject;
@@ -358,7 +358,7 @@ class SimObject: public ConsoleObject, public TamlCallbacks
          { static_cast<SimObject*>(object)->setSuperClassNamespace(data); return false; };
 
             static bool writeObjectName(void* obj, StringTableEntry pFieldName)
-         { SimObject* simObject = static_cast<SimObject*>(obj); return simObject->objectName != NULL && simObject->objectName != StringTable->EmptyString(); }
+         { SimObject* simObject = static_cast<SimObject*>(obj); return simObject->mObjectName != NULL && simObject->mObjectName != StringTable->EmptyString(); }
       static bool writeCanSaveDynamicFields(void* obj, StringTableEntry pFieldName)  
          { return static_cast<SimObject*>(obj)->mCanSaveFieldDictionary == false; }
       static bool writeInternalName(void* obj, StringTableEntry pFieldName)          
@@ -455,7 +455,6 @@ class SimObject: public ConsoleObject, public TamlCallbacks
       {
          T* object = new T;
          object->incRefCount();
-         object->registerObject();
          return object;
       }
 
@@ -761,7 +760,7 @@ class SimObject: public ConsoleObject, public TamlCallbacks
       const char* getIdString() const { return mIdString; }
                   
       /// Return the name of this object.
-      StringTableEntry getName() const { return objectName; }
+      StringTableEntry getName() const { return mObjectName; }
 
       /// Return the SimGroup that this object is contained in.  Never NULL except for
       /// RootGroup and unregistered objects.

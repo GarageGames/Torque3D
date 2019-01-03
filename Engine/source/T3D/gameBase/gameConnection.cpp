@@ -59,7 +59,9 @@
 #include "core/stream/fileStream.h"
 #endif 
 
+#ifdef TORQUE_AFX_ENABLED
 #include "afx/arcaneFX.h"
+#endif
 //----------------------------------------------------------------------------
 #define MAX_MOVE_PACKET_SENDS 4
 
@@ -190,12 +192,14 @@ bool GameConnection::client_cache_on = false;
 //----------------------------------------------------------------------------
 GameConnection::GameConnection()
 {
+#ifdef TORQUE_AFX_ENABLED
    mRolloverObj = NULL;
    mPreSelectedObj = NULL;
    mSelectedObj = NULL;
    mChangedSelectedObj = false;
    mPreSelectTimestamp = 0;
    zoned_in = false;
+#endif
    
 #ifdef AFX_CAP_DATABLOCK_CACHE 
    client_db_stream = new InfiniteBitStream;
@@ -322,7 +326,7 @@ DefineEngineMethod( GameConnection, setJoinPassword, void, (const char* password
    object->setJoinPassword(password);
 }
 
-ConsoleMethod(GameConnection, setConnectArgs, void, 3, 17,
+DefineEngineStringlyVariadicMethod(GameConnection, setConnectArgs, void, 3, 17,
    "(const char* args) @brief On the client, pass along a variable set of parameters to the server.\n\n"
    
    "Once the connection is established with the server, the server calls its onConnect() method "
@@ -1159,6 +1163,7 @@ void GameConnection::readPacket(BitStream *bstream)
    {
       mMoveList->clientReadMovePacket(bstream);
 
+#ifdef TORQUE_AFX_ENABLED
       // selected object - do we have a change in status?
       if (bstream->readFlag()) 
       { 
@@ -1170,6 +1175,8 @@ void GameConnection::readPacket(BitStream *bstream)
          else
             setSelectedObj(NULL);
       }
+#endif
+
       bool hadFlash = mDamageFlash > 0 || mWhiteOut > 0;
       mDamageFlash = 0;
       mWhiteOut = 0;
@@ -1413,6 +1420,7 @@ void GameConnection::writePacket(BitStream *bstream, PacketNotify *note)
       // all the damage flash & white out
 
       S32 gIndex = -1;
+#ifdef TORQUE_AFX_ENABLED
       if (mChangedSelectedObj)
       {
          S32 gidx;
@@ -1441,6 +1449,7 @@ void GameConnection::writePacket(BitStream *bstream, PacketNotify *note)
       }
       else
          bstream->writeFlag(false);
+#endif
 		 
       if (!mControlObject.isNull())
       {
@@ -2436,46 +2445,43 @@ DefineEngineMethod( GameConnection, getVisibleGhostDistance, F32, (),,
    return object->getVisibleGhostDistance();
 }
 
+#ifdef TORQUE_AFX_ENABLED 
 // The object selection code here is, in part, based, on functionality described
 // in the following resource:
 // Object Selection in Torque by Dave Myers 
 //   http://www.garagegames.com/index.php?sec=mg&mod=resource&page=view&qid=7335
 
-ConsoleMethod(GameConnection, setSelectedObj, bool, 3, 4, "(object, [propagate_to_client])")
+DefineEngineMethod(GameConnection, setSelectedObj, bool, (SceneObject* obj, bool propagate_to_client), (false), "")
 {
-   SceneObject* pending_selection;
-   if (!Sim::findObject(argv[2], pending_selection))
+   if (!obj)
       return false;
 
-   bool propagate_to_client = (argc > 3) ? dAtob(argv[3]) : false;
-   object->setSelectedObj(pending_selection, propagate_to_client);
+   object->setSelectedObj(obj, propagate_to_client);
 
    return true;
 }
 
-ConsoleMethod(GameConnection, getSelectedObj, S32, 2, 2, "()")
+DefineEngineMethod(GameConnection, getSelectedObj, SimObject*, (),, "")
 {
-   SimObject* selected = object->getSelectedObj();
-   return (selected) ? selected->getId(): -1;
+   return object->getSelectedObj();
 }
 
-ConsoleMethod(GameConnection, clearSelectedObj, void, 2, 3, "([propagate_to_client])")
+DefineEngineMethod(GameConnection, clearSelectedObj, void, (bool propagate_to_client), (false), "")
 {
-   bool propagate_to_client = (argc > 2) ? dAtob(argv[2]) : false;
    object->setSelectedObj(NULL, propagate_to_client);
 }
 
-ConsoleMethod(GameConnection, setPreSelectedObjFromRollover, void, 2, 2, "()")
+DefineEngineMethod(GameConnection, setPreSelectedObjFromRollover, void, (),, "")
 {
    object->setPreSelectedObjFromRollover();
 }
 
-ConsoleMethod(GameConnection, clearPreSelectedObj, void, 2, 2, "()")
+DefineEngineMethod(GameConnection, clearPreSelectedObj, void, (),, "")
 {
    object->clearPreSelectedObj();
 }
 
-ConsoleMethod(GameConnection, setSelectedObjFromPreSelected, void, 2, 2, "()")
+DefineEngineMethod(GameConnection, setSelectedObjFromPreSelected, void, (),, "")
 {
    object->setSelectedObjFromPreSelected();
 }
@@ -2564,6 +2570,7 @@ void GameConnection::onDeleteNotify(SimObject* obj)
 
    Parent::onDeleteNotify(obj);
 }
+#endif
 
 #ifdef AFX_CAP_DATABLOCK_CACHE 
 
@@ -2711,33 +2718,32 @@ void GameConnection::resetDatablockCache()
    afx_saved_db_cache_CRC = 0xffffffff;
 }
 
-ConsoleFunction(resetDatablockCache, void, 1, 1, "resetDatablockCache()")
+DefineEngineFunction(resetDatablockCache, void, (),,"")
 {
    GameConnection::resetDatablockCache();
 }
 
-ConsoleFunction(isDatablockCacheSaved, bool, 1, 1, "resetDatablockCache()")
+DefineEngineFunction(isDatablockCacheSaved, bool, (),,"")
 {
    return afx_saved_db_cache;
 }
 
-ConsoleFunction(getDatablockCacheCRC, S32, 1, 1, "getDatablockCacheCRC()")
+DefineEngineFunction(getDatablockCacheCRC, S32, (),,"")
 {
    return (S32)afx_saved_db_cache_CRC;
 }
 
-ConsoleFunction(extractDatablockCacheCRC, S32, 2, 2, "extractDatablockCacheCRC(filename)")
+DefineEngineFunction(extractDatablockCacheCRC, S32, (const char* fileName),,"")
 {
    FileStream f_stream;
-   const char* fileName = argv[1];
-   if(!f_stream.open(fileName, Torque::FS::File::Read))
+   if (!f_stream.open(fileName, Torque::FS::File::Read))
    {
       Con::errorf("Failed to open file '%s'.", fileName);
       return -1;
    }
 
    U32 stream_sz = f_stream.getStreamSize();
-   if (stream_sz < 4*32)
+   if (stream_sz < 4 * 32)
    {
       Con::errorf("File '%s' is not a valid datablock cache.", fileName);
       f_stream.close();
@@ -2766,17 +2772,16 @@ ConsoleFunction(extractDatablockCacheCRC, S32, 2, 2, "extractDatablockCacheCRC(f
    return (S32)crc_code;
 }
 
-ConsoleFunction(setDatablockCacheCRC, void, 2, 2, "setDatablockCacheCRC(crc)")
+DefineEngineFunction(setDatablockCacheCRC, void, (U32 crc), , "")
 {
    GameConnection *conn = GameConnection::getConnectionToServer();
-   if(!conn)
+   if (!conn)
       return;
 
-   U32 crc_u = (U32)dAtoi(argv[1]);
-   conn->setServerCacheCRC(crc_u);
+   conn->setServerCacheCRC(crc);
 }
 
-ConsoleMethod( GameConnection, saveDatablockCache, void, 2, 2, "saveDatablockCache()")
+DefineEngineMethod(GameConnection, saveDatablockCache, void, (),, "")
 {
    if (GameConnection::serverCacheEnabled() && !afx_saved_db_cache)
    {
@@ -2791,14 +2796,14 @@ ConsoleMethod( GameConnection, saveDatablockCache, void, 2, 2, "saveDatablockCac
       Con::expandScriptFilename(filename_buffer, sizeof(filename_buffer), filename.c_str());
       Torque::Path givenPath(Torque::Path::CompressPath(filename_buffer));
       Torque::FS::FileNodeRef fileRef = Torque::FS::GetFileNode(givenPath);
-      if ( fileRef == NULL )
+      if (fileRef == NULL)
          Con::errorf("saveDatablockCache() failed to get CRC for file '%s'.", filename.c_str());
       else
          afx_saved_db_cache_CRC = (S32)fileRef->getChecksum();
    }
 }
 
-ConsoleMethod( GameConnection, loadDatablockCache, void, 2, 2, "loadDatablockCache()")
+DefineEngineMethod(GameConnection, loadDatablockCache, void, (),, "")
 {
    if (GameConnection::clientCacheEnabled())
    {
@@ -2806,7 +2811,7 @@ ConsoleMethod( GameConnection, loadDatablockCache, void, 2, 2, "loadDatablockCac
    }
 }
 
-ConsoleMethod( GameConnection, loadDatablockCache_Begin, bool, 2, 2, "loadDatablockCache_Begin()")
+DefineEngineMethod(GameConnection, loadDatablockCache_Begin, bool, (),, "")
 {
    if (GameConnection::clientCacheEnabled())
    {
@@ -2816,7 +2821,7 @@ ConsoleMethod( GameConnection, loadDatablockCache_Begin, bool, 2, 2, "loadDatabl
    return false;
 }
 
-ConsoleMethod( GameConnection, loadDatablockCache_Continue, bool, 2, 2, "loadDatablockCache_Continue()")
+DefineEngineMethod(GameConnection, loadDatablockCache_Continue, bool, (),, "")
 {
    if (GameConnection::clientCacheEnabled())
    {

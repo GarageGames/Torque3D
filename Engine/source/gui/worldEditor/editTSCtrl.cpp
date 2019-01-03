@@ -702,12 +702,12 @@ void EditTSCtrl::calcOrthoCamOffset(F32 mousex, F32 mousey, U8 modifier)
          break;
 
       case DisplayTypeFront:
-         mOrthoCamTrans.x += mousex * mOrthoFOV * camScale;
+         mOrthoCamTrans.x -= mousex * mOrthoFOV * camScale;
          mOrthoCamTrans.z += mousey * mOrthoFOV * camScale;
          break;
 
       case DisplayTypeBack:
-         mOrthoCamTrans.x -= mousex * mOrthoFOV * camScale;
+         mOrthoCamTrans.x += mousex * mOrthoFOV * camScale;
          mOrthoCamTrans.z += mousey * mOrthoFOV * camScale;
          break;
 
@@ -1125,17 +1125,17 @@ bool EditTSCtrl::processCameraQuery(CameraQuery * query)
                break;
 
             case DisplayTypeFront:
-               camRot.setColumn(0, Point3F(-1.0,  0.0,  0.0));
-               camRot.setColumn(1, Point3F( 0.0, -1.0,  0.0));
-               camRot.setColumn(2, Point3F( 0.0,  0.0,  1.0));
-               camPos.y = getMax(camPos.y + smMinSceneBounds.y, sceneBounds.maxExtents.y + camBuffer);
+               camRot.setColumn(0, Point3F(1.0, 0.0, 0.0));
+               camRot.setColumn(1, Point3F(0.0, 1.0, 0.0));
+               camRot.setColumn(2, Point3F(0.0, 0.0, 1.0));
+               camPos.y = getMin(camPos.y - smMinSceneBounds.y, sceneBounds.minExtents.y - camBuffer);
                break;
 
             case DisplayTypeBack:
-               camRot.setColumn(0, Point3F(1.0,  0.0,  0.0));
-               camRot.setColumn(1, Point3F(0.0,  1.0,  0.0));
-               camRot.setColumn(2, Point3F(0.0,  0.0,  1.0));
-               camPos.y = getMin(camPos.y - smMinSceneBounds.y, sceneBounds.minExtents.y - camBuffer);
+               camRot.setColumn(0, Point3F(-1.0, 0.0, 0.0));
+               camRot.setColumn(1, Point3F(0.0, -1.0, 0.0));
+               camRot.setColumn(2, Point3F(0.0, 0.0, 1.0));
+               camPos.y = getMax(camPos.y + smMinSceneBounds.y, sceneBounds.maxExtents.y + camBuffer);
                break;
 
             case DisplayTypeLeft:

@@ -325,7 +325,7 @@ TEST(Maths, RotationF_Calculations)
 };
 #endif
 
-DefineConsoleFunction(AddRotation, RotationF, (RotationF a, RotationF b), ,
+DefineEngineFunction(AddRotation, RotationF, (RotationF a, RotationF b), ,
    "Adds two rotations together.\n"
    "@param a Rotation one."
    "@param b Rotation two."
@@ -335,7 +335,7 @@ DefineConsoleFunction(AddRotation, RotationF, (RotationF a, RotationF b), ,
    return a + b;
 }
  
-DefineConsoleFunction(SubtractRotation, RotationF, (RotationF a, RotationF b), ,
+DefineEngineFunction(SubtractRotation, RotationF, (RotationF a, RotationF b), ,
    "Subtracts two rotations.\n"
    "@param a Rotation one."
    "@param b Rotation two."
@@ -345,7 +345,7 @@ DefineConsoleFunction(SubtractRotation, RotationF, (RotationF a, RotationF b), ,
    return a - b;
 }
  
-DefineConsoleFunction(InterpolateRotation, RotationF, (RotationF a, RotationF b, F32 factor), ,
+DefineEngineFunction(InterpolateRotation, RotationF, (RotationF a, RotationF b, F32 factor), ,
    "Interpolates between two rotations.\n"
    "@param a Rotation one."
    "@param b Rotation two."
@@ -358,7 +358,7 @@ DefineConsoleFunction(InterpolateRotation, RotationF, (RotationF a, RotationF b,
    return result;
 }
  
-DefineConsoleFunction(RotationLookAt, RotationF, (Point3F origin, Point3F target, Point3F up),
+DefineEngineFunction(RotationLookAt, RotationF, (Point3F origin, Point3F target, Point3F up),
    (Point3F(0, 0, 0), Point3F(0, 0, 0), Point3F(0, 0, 1)),
    "Provides a rotation orientation to look at a target from a given position.\n"
    "@param origin Position of the object doing the looking."
@@ -372,7 +372,7 @@ DefineConsoleFunction(RotationLookAt, RotationF, (Point3F origin, Point3F target
    return result;
 }
 
-DefineConsoleFunction(setRotationRightVector, RotationF, (RotationF rot, VectorF rightVec), ,
+DefineEngineFunction(setRotationRightVector, RotationF, (RotationF rot, VectorF rightVec), ,
    "Sets the right vector of the rotation.\n"
    "@param Starting rotation."
    "@param New up vector."
@@ -383,7 +383,7 @@ DefineConsoleFunction(setRotationRightVector, RotationF, (RotationF rot, VectorF
    return rot;
 }
 
-DefineConsoleFunction(setRotationUpVector, RotationF, (RotationF rot, VectorF upVec), ,
+DefineEngineFunction(setRotationUpVector, RotationF, (RotationF rot, VectorF upVec), ,
    "Sets the up vector of the rotation.\n"
    "@param Starting rotation."
    "@param New up vector."
@@ -394,14 +394,14 @@ DefineConsoleFunction(setRotationUpVector, RotationF, (RotationF rot, VectorF up
    return rot;
 }
 
-DefineConsoleFunction(getRotationForwardVector, VectorF, (RotationF rot), ,
+DefineEngineFunction(getRotationForwardVector, VectorF, (RotationF rot), ,
    "Get the forward vector of a rotation.\n"
    "@ingroup Math")
 {
    return rot.asMatrixF().getForwardVector();
 }
 
-DefineConsoleFunction(getRotationRightVector, VectorF, (RotationF rot), ,
+DefineEngineFunction(getRotationRightVector, VectorF, (RotationF rot), ,
    "Gets the right vector of a rotation.\n"
    "@param Our rotation."
    "@ingroup Math")
@@ -409,7 +409,7 @@ DefineConsoleFunction(getRotationRightVector, VectorF, (RotationF rot), ,
    return rot.asMatrixF().getRightVector();
 }
 
-DefineConsoleFunction(getRotationUpVector, VectorF, (RotationF rot), ,
+DefineEngineFunction(getRotationUpVector, VectorF, (RotationF rot), ,
    "Gets the up vector of a rotation.\n"
    "@param Our rotation."
    "@ingroup Math")
@@ -417,7 +417,7 @@ DefineConsoleFunction(getRotationUpVector, VectorF, (RotationF rot), ,
    return rot.asMatrixF().getUpVector();
 }
 
-DefineConsoleFunction(getRotationDirection, Point3F, (RotationF rot),,
+DefineEngineFunction(getRotationDirection, Point3F, (RotationF rot),,
    "Gets the direction from the rotation's angles.\n"
    "@param Our rotation."
    "@ingroup Math")

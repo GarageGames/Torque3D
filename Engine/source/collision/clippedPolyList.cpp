@@ -270,10 +270,10 @@ void ClippedPolyList::end()
             iv.mask = 0;
 
             // Test against the remaining planes
-            for (U32 i = p + 1; i < mPlaneList.size(); i++)
-               if (mPlaneList[i].distToPlane(iv.point) > 0) 
+            for (U32 rP = p + 1; rP < mPlaneList.size(); rP++)
+               if (mPlaneList[rP].distToPlane(iv.point) > 0)
                {
-                  iv.mask = 1 << i;
+                  iv.mask = 1 << rP;
                   break;
                }
          }
@@ -330,7 +330,7 @@ void ClippedPolyList::cullUnusedVerts()
    for ( vIter = mVertexList.begin(); vIter != mVertexList.end(); vIter++, i++ )
    {
       // Is this vertex used?
-      iNextIter = find( mIndexList.begin(), mIndexList.end(), i );
+      iNextIter = T3D::find( mIndexList.begin(), mIndexList.end(), i );
       if ( iNextIter != mIndexList.end() )
          continue;
 
@@ -346,7 +346,7 @@ void ClippedPolyList::cullUnusedVerts()
 
       for ( nextVIter = vIter + 1; nextVIter != mVertexList.end(); nextVIter++, n++ )
       {
-         iNextIter = find( mIndexList.begin(), mIndexList.end(), n );
+         iNextIter = T3D::find( mIndexList.begin(), mIndexList.end(), n );
          
          // If we found a used vertex
          // grab its index for later use

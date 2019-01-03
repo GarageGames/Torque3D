@@ -276,7 +276,7 @@ void GuiFileTreeCtrl::recurseInsert( Item* parent, StringTableEntry path )
 
    char szPathCopy [ 1024 ];
    dMemset( szPathCopy, 0, 1024 );
-   dStrcpy( szPathCopy, path );
+   dStrcpy( szPathCopy, path, 1024 );
 
    // Jump over the first character if it's a root /
    char *curPos = szPathCopy;
@@ -379,18 +379,18 @@ void GuiFileTreeCtrl::recurseInsert( Item* parent, StringTableEntry path )
 
 }
 
-DefineConsoleMethod( GuiFileTreeCtrl, getSelectedPath, const char*, (), , "getSelectedPath() - returns the currently selected path in the tree")
+DefineEngineMethod( GuiFileTreeCtrl, getSelectedPath, const char*, (), , "getSelectedPath() - returns the currently selected path in the tree")
 {
    const String& path = object->getSelectedPath();
    return Con::getStringArg( path );
 }
 
-DefineConsoleMethod( GuiFileTreeCtrl, setSelectedPath, bool, (const char * path), , "setSelectedPath(path) - expands the tree to the specified path")
+DefineEngineMethod( GuiFileTreeCtrl, setSelectedPath, bool, (const char * path), , "setSelectedPath(path) - expands the tree to the specified path")
 {
    return object->setSelectedPath( path );
 }
 
-DefineConsoleMethod( GuiFileTreeCtrl, reload, void, (), , "() - Reread the directory tree hierarchy." )
+DefineEngineMethod( GuiFileTreeCtrl, reload, void, (), , "() - Reread the directory tree hierarchy." )
 {
    object->updateTree();
 }

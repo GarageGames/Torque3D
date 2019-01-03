@@ -39,6 +39,9 @@
 #include "gfx/gfxCardProfile.h"
 #include "gfx/gfxTextureProfile.h"
 
+#ifndef TORQUE_BASIC_LIGHTING
+F32 AdvancedLightManager::smProjectedShadowFilterDistance = 40.0f;
+#endif
 
 ImplementEnumType( ShadowType,
    "\n\n"
@@ -702,7 +705,7 @@ LightShadowMap* AdvancedLightManager::findShadowMapForObject( SimObject *object 
    return sceneLight->getLight()->getExtended<ShadowMapParams>()->getShadowMap();
 }
 
-DefineConsoleFunction( setShadowVizLight, const char*, (const char* name), (""), "")
+DefineEngineFunction( setShadowVizLight, const char*, (const char* name), (""), "")
 {
    static const String DebugTargetName( "AL_ShadowVizTexture" );
 

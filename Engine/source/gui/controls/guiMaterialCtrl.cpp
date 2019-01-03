@@ -167,7 +167,7 @@ void GuiMaterialCtrl::onRender( Point2I offset, const RectI &updateRect )
    GFX->setTexture( 0, NULL );
 }
 
-DefineConsoleMethod( GuiMaterialCtrl, setMaterial, bool, ( const char * materialName ), , "( string materialName )"
+DefineEngineMethod( GuiMaterialCtrl, setMaterial, bool, ( const char * materialName ), , "( string materialName )"
                "Set the material to be displayed in the control." )
 {
    return object->setMaterial( materialName );

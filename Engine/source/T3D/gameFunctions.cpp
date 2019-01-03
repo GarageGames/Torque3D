@@ -114,7 +114,7 @@ static U32 sgServerQueryIndex = 0;
 //SERVER FUNCTIONS ONLY
 ConsoleFunctionGroupBegin( Containers, "Spatial query functions. <b>Server side only!</b>");
 
-DefineConsoleFunction( containerFindFirst, const char*, (U32 typeMask, Point3F origin, Point3F size), , "(int mask, Point3F point, float x, float y, float z)"
+DefineEngineFunction( containerFindFirst, const char*, (U32 typeMask, Point3F origin, Point3F size), , "(int mask, Point3F point, float x, float y, float z)"
    "@brief Find objects matching the bitmask type within a box centered at point, with extents x, y, z.\n\n"
    "@returns The first object found, or an empty string if nothing was found.  Thereafter, you can get more "
    "results using containerFindNext()."
@@ -146,7 +146,7 @@ DefineConsoleFunction( containerFindFirst, const char*, (U32 typeMask, Point3F o
    return buff;
 }
 
-DefineConsoleFunction( containerFindNext, const char*, (), , "()"
+DefineEngineFunction( containerFindNext, const char*, (), , "()"
    "@brief Get more results from a previous call to containerFindFirst().\n\n"
    "@note You must call containerFindFirst() to begin the search.\n"
    "@returns The next object found, or an empty string if nothing else was found.\n"

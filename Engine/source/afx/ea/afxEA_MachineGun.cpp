@@ -110,15 +110,15 @@ bool afxEA_MachineGun::ea_update(F32 dt)
 {
   if (!shooting)
   {
-    start_time = elapsed;
+    start_time = mElapsed;
     shooting = true;
   }
   else
   {
     F32 next_shot = start_time + (shot_count+1)*shot_gap;
-    while (next_shot < elapsed)
+    while (next_shot < mElapsed)
     {
-      if (in_scope)
+      if (mIn_scope)
         launch_projectile();
       next_shot += shot_gap;
       shot_count++;
@@ -141,7 +141,7 @@ void afxEA_MachineGun::launch_projectile()
   if (bullet_data->getSubstitutionCount() > 0)
   {
     next_bullet = new ProjectileData(*bullet_data, true);
-    bullet_data->performSubstitutions(next_bullet, choreographer, group_index);
+    bullet_data->performSubstitutions(next_bullet, mChoreographer, mGroup_index);
   }
 
   projectile->onNewDataBlock(next_bullet, false);
@@ -151,10 +151,10 @@ void afxEA_MachineGun::launch_projectile()
   afxConstraint* pos_cons = getPosConstraint();
   ShapeBase* src_obj = (pos_cons) ? (dynamic_cast<ShapeBase*>(pos_cons->getSceneObject())) : 0;
 
-  Point3F dir_vec = updated_aim - updated_pos;
+  Point3F dir_vec = mUpdated_aim - mUpdated_pos;
   dir_vec.normalizeSafe();
   dir_vec *= muzzle_vel;
-  projectile->init(updated_pos, dir_vec, src_obj);
+  projectile->init(mUpdated_pos, dir_vec, src_obj);
   if (!projectile->registerObject())
   {
     delete projectile;
@@ -162,7 +162,7 @@ void afxEA_MachineGun::launch_projectile()
     Con::errorf("afxEA_MachineGun::launch_projectile() -- projectile failed to register.");
   }
   if (projectile)
-    projectile->setDataField(StringTable->insert("afxOwner"), 0, choreographer->getIdString());
+    projectile->setDataField(StringTable->insert("afxOwner"), 0, mChoreographer->getIdString());
 }
 
 void afxEA_MachineGun::do_runtime_substitutions()
@@ -173,7 +173,7 @@ void afxEA_MachineGun::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxMachineGunData* orig_db = gun_data;
     gun_data = new afxMachineGunData(*orig_db, true);
-    orig_db->performSubstitutions(gun_data, choreographer, group_index);
+    orig_db->performSubstitutions(gun_data, mChoreographer, mGroup_index);
   }
 }
 

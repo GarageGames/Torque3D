@@ -26,7 +26,7 @@
 
 #include "console/engineAPI.h"
 
-DefineConsoleMethod(AssetQuery, clear, void, (),,"Clears all asset Id results."
+DefineEngineMethod(AssetQuery, clear, void, (),,"Clears all asset Id results."
    "Clears all asset Id results.\n"
    "@return () No return value.\n")
 {
@@ -36,7 +36,7 @@ DefineConsoleMethod(AssetQuery, clear, void, (),,"Clears all asset Id results."
 //-----------------------------------------------------------------------------
 
 
-DefineConsoleMethod(AssetQuery, set, bool, (S32 queryId), ,
+DefineEngineMethod(AssetQuery, set, bool, (S32 queryId), ,
    "Sets the asset query to a copy of the specified asset query.\n"
    "@param assetQuery The asset query to copy.\n"
    "@return Whether the operation succeeded or not.\n")
@@ -59,7 +59,7 @@ DefineConsoleMethod(AssetQuery, set, bool, (S32 queryId), ,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod(AssetQuery, getCount, S32, (), , 
+DefineEngineMethod(AssetQuery, getCount, S32, (), , 
    "Gets the count of asset Id results.\n"
    "@return (int)The count of asset Id results.\n")
 {
@@ -68,7 +68,7 @@ DefineConsoleMethod(AssetQuery, getCount, S32, (), ,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod(AssetQuery, getAsset, const char*, (S32 resultIndex), (-1), 
+DefineEngineMethod(AssetQuery, getAsset, const char*, (S32 resultIndex), (-1), 
    "Gets the asset Id at the specified query result index.\n"
    "@param resultIndex The query result index to use.\n"
    "@return (assetId)The asset Id at the specified index or NULL if not valid.\n")

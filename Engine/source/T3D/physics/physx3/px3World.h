@@ -23,14 +23,14 @@
 #ifndef _PX3WORLD_H_
 #define _PX3WORLD_H_
 
+#ifndef _PHYSX3_H_
+#include "T3D/physics/physx3/px3.h"
+#endif
 #ifndef _T3D_PHYSICS_PHYSICSWORLD_H_
 #include "T3D/physics/physicsWorld.h"
 #endif
 #ifndef _MMATH_H_
 #include "math/mMath.h"
-#endif
-#ifndef _PHYSX3_H_
-#include "T3D/physics/physx3/px3.h"
 #endif
 #ifndef _TVECTOR_H_
 #include "core/util/tVector.h"
@@ -51,26 +51,29 @@ enum Px3CollisionGroup
 class Px3World : public PhysicsWorld
 {
 protected:
-
    physx::PxScene* mScene;
    bool mIsEnabled;
    bool mIsSimulating;
    bool mIsServer;
-   bool mIsSceneLocked;
+   bool mIsSceneLocked;   
    U32 mTickCount;
    ProcessList *mProcessList;
    F32 mEditorTimeScale;
    bool mErrorReport;
-   physx::PxRenderBuffer *mRenderBuffer;
    physx::PxControllerManager* mControllerManager;
+   physx::PxRenderBuffer *mRenderBuffer;
+   F32 mAccumulator;
    static Px3ConsoleStream *smErrorCallback;
    static physx::PxDefaultAllocator smMemoryAlloc;
    static physx::PxFoundation* smFoundation;
    static physx::PxCooking *smCooking;
-   static physx::PxProfileZoneManager* smProfileZoneManager;
    static physx::PxDefaultCpuDispatcher* smCpuDispatcher;
-   static physx::PxVisualDebuggerConnection* smPvdConnection;
-   F32 mAccumulator;
+#ifndef TORQUE_OS_MAC
+   static physx::PxCudaContextManager* smCudaContextManager;
+#endif
+   static physx::PxPvd* smPvdConnection;
+   static physx::PxPvdTransport* smPvdTransport;
+   
    bool _simulate(const F32 dt);
 
 public:
@@ -86,21 +89,20 @@ public:
    virtual PhysicsBody* castRay( const Point3F &start, const Point3F &end, U32 bodyTypes = BT_All );
    virtual void explosion( const Point3F &pos, F32 radius, F32 forceMagnitude ); 
    virtual bool isEnabled() const { return mIsEnabled; }
-   physx::PxScene* getScene(){ return mScene;}
+   physx::PxScene* getScene(){ return mScene; }
    void setEnabled( bool enabled );
    U32 getTick() { return mTickCount; }
    void tickPhysics( U32 elapsedMs );
    void getPhysicsResults();
    void setEditorTimeScale( F32 timeScale ) { mEditorTimeScale = timeScale; }
    const F32 getEditorTimeScale() const { return mEditorTimeScale; }
-   void releaseWriteLock();
-   bool isServer(){return mIsServer;}
+   bool isServer() { return mIsServer; }
+   
    physx::PxController* createController( physx::PxControllerDesc &desc );
    void lockScene();
    void unlockScene();
    //static
    static bool restartSDK( bool destroyOnly = false, Px3World *clientWorld = NULL, Px3World *serverWorld = NULL );
-   static void releaseWriteLocks();
    static physx::PxCooking *getCooking();
    static void lockScenes();
    static void unlockScenes();

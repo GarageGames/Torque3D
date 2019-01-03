@@ -558,12 +558,12 @@ void Sun::_onUnselected()
    Parent::_onUnselected();
 }
 
-DefineConsoleMethod(Sun, apply, void, (), , "")
+DefineEngineMethod(Sun, apply, void, (), , "")
 {
    object->inspectPostApply();
 }
 
-DefineConsoleMethod(Sun, animate, void, ( F32 duration, F32 startAzimuth, F32 endAzimuth, F32 startElevation, F32 endElevation ), , "animate( F32 duration, F32 startAzimuth, F32 endAzimuth, F32 startElevation, F32 endElevation )")
+DefineEngineMethod(Sun, animate, void, ( F32 duration, F32 startAzimuth, F32 endAzimuth, F32 startElevation, F32 endElevation ), , "animate( F32 duration, F32 startAzimuth, F32 endAzimuth, F32 startElevation, F32 endElevation )")
 {
 
    object->animate(duration, startAzimuth, endAzimuth, startElevation, endElevation);

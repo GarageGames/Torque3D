@@ -146,7 +146,7 @@ bool afxEA_GuiController::ea_update(F32 dt)
   if (ts_ctrl && !controller_data->preserve_pos)
   {
     Point3F screen_pos;
-    if (ts_ctrl->project(updated_pos, &screen_pos))
+    if (ts_ctrl->project(mUpdated_pos, &screen_pos))
     {
       const Point2I ext = gui_control->getExtent();
       Point2I newpos(screen_pos.x - ext.x/2, screen_pos.y - ext.y/2);
@@ -155,12 +155,12 @@ bool afxEA_GuiController::ea_update(F32 dt)
   }
 
   if (progress_base)
-    progress_base->setProgress((ew_timing.lifetime > 0.0) ? life_elapsed/ew_timing.lifetime : 0.0f);
+    progress_base->setProgress((mEW_timing.lifetime > 0.0) ? mLife_elapsed / mEW_timing.lifetime : 0.0f);
   else if (progress_ctrl)
-    progress_ctrl->setScriptValue((ew_timing.lifetime > 0.0) ? avar("%g", life_elapsed/ew_timing.lifetime) : 0);
+    progress_ctrl->setScriptValue((mEW_timing.lifetime > 0.0) ? avar("%g", mLife_elapsed / mEW_timing.lifetime) : 0);
 
-  if (do_fades)
-    gui_control->setFadeAmount(fade_value);
+  if (mDo_fades)
+    gui_control->setFadeAmount(mFade_value);
 
   return true;
 }
@@ -182,7 +182,7 @@ void afxEA_GuiController::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxGuiControllerData* orig_db = controller_data;
     controller_data = new afxGuiControllerData(*orig_db, true);
-    orig_db->performSubstitutions(controller_data, choreographer, group_index);
+    orig_db->performSubstitutions(controller_data, mChoreographer, mGroup_index);
   }
 }
 

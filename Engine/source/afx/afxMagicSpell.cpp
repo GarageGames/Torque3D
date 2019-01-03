@@ -53,19 +53,19 @@ void afxMagicSpellData::ewValidator::validateType(SimObject* object, void* typeP
     switch (id)
     {
     case CASTING_PHRASE:
-      spelldata->casting_fx_list.push_back(*ew);
+      spelldata->mCasting_fx_list.push_back(*ew);
       break;
     case LAUNCH_PHRASE:
-      spelldata->launch_fx_list.push_back(*ew);
+      spelldata->mLaunch_fx_list.push_back(*ew);
       break;
     case DELIVERY_PHRASE:
-      spelldata->delivery_fx_list.push_back(*ew);
+      spelldata->mDelivery_fx_list.push_back(*ew);
       break;
     case IMPACT_PHRASE:
-      spelldata->impact_fx_list.push_back(*ew);
+      spelldata->mImpact_fx_list.push_back(*ew);
       break;
     case LINGER_PHRASE:
-      spelldata->linger_fx_list.push_back(*ew);
+      spelldata->mLinger_fx_list.push_back(*ew);
       break;
     }
     *ew = 0;
@@ -140,70 +140,70 @@ IMPLEMENT_CALLBACK( afxMagicSpellData, onActivate, void,
 
 afxMagicSpellData::afxMagicSpellData()
 {
-  casting_dur = 0.0f;
-  delivery_dur = 0.0f;
-  linger_dur = 0.0f;
+  mCasting_dur = 0.0f;
+  mDelivery_dur = 0.0f;
+  mLinger_dur = 0.0f;
 
-  n_casting_loops = 1;
-  n_delivery_loops = 1;
-  n_linger_loops = 1;
+  mNum_casting_loops = 1;
+  mNum_delivery_loops = 1;
+  mNum_linger_loops = 1;
 
-  extra_casting_time = 0.0f;
-  extra_delivery_time = 0.0f;
-  extra_linger_time = 0.0f;
+  mExtra_casting_time = 0.0f;
+  mExtra_delivery_time = 0.0f;
+  mExtra_linger_time = 0.0f;
 
   // interrupt flags
-  do_move_interrupts = true;
-  move_interrupt_speed = 2.0f;
+  mDo_move_interrupts = true;
+  mMove_interrupt_speed = 2.0f;
 
   // delivers projectile spells
-  missile_db = 0;
-  launch_on_server_signal = false;
-  primary_target_types = PlayerObjectType;
+  mMissile_db = 0;
+  mLaunch_on_server_signal = false;
+  mPrimary_target_types = PlayerObjectType;
 
   // dummy entry holds effect-wrapper pointer while a special validator
   // grabs it and adds it to an appropriate effects list
-  dummy_fx_entry = NULL;
+  mDummy_fx_entry = NULL;
 
   // marked true if datablock ids need to
   // be converted into pointers
-  do_id_convert = false;
+  mDo_id_convert = false;
 }
 
 afxMagicSpellData::afxMagicSpellData(const afxMagicSpellData& other, bool temp_clone) : afxChoreographerData(other, temp_clone)
 {
-  casting_dur = other.casting_dur;
-  delivery_dur = other.delivery_dur;
-  linger_dur = other.linger_dur;
-  n_casting_loops = other.n_casting_loops;
-  n_delivery_loops = other.n_delivery_loops;
-  n_linger_loops = other.n_linger_loops;
-  extra_casting_time = other.extra_casting_time;
-  extra_delivery_time = other.extra_delivery_time;
-  extra_linger_time = other.extra_linger_time;
-  do_move_interrupts = other.do_move_interrupts;
-  move_interrupt_speed = other.move_interrupt_speed;
-  missile_db = other.missile_db;
-  launch_on_server_signal = other.launch_on_server_signal;
-  primary_target_types = other.primary_target_types;
+  mCasting_dur = other.mCasting_dur;
+  mDelivery_dur = other.mDelivery_dur;
+  mLinger_dur = other.mLinger_dur;
+  mNum_casting_loops = other.mNum_casting_loops;
+  mNum_delivery_loops = other.mNum_delivery_loops;
+  mNum_linger_loops = other.mNum_linger_loops;
+  mExtra_casting_time = other.mExtra_casting_time;
+  mExtra_delivery_time = other.mExtra_delivery_time;
+  mExtra_linger_time = other.mExtra_linger_time;
+  mDo_move_interrupts = other.mDo_move_interrupts;
+  mMove_interrupt_speed = other.mMove_interrupt_speed;
+  mMissile_db = other.mMissile_db;
+  mLaunch_on_server_signal = other.mLaunch_on_server_signal;
+  mPrimary_target_types = other.mPrimary_target_types;
 
-  dummy_fx_entry = other.dummy_fx_entry;
-  do_id_convert = other.do_id_convert;
+  mDummy_fx_entry = other.mDummy_fx_entry;
+  mDo_id_convert = other.mDo_id_convert;
 
-  casting_fx_list = other.casting_fx_list;
-  launch_fx_list = other.launch_fx_list;
-  delivery_fx_list = other.delivery_fx_list;
-  impact_fx_list = other.impact_fx_list;
-  linger_fx_list = other.linger_fx_list;
+  mCasting_fx_list = other.mCasting_fx_list;
+  mLaunch_fx_list = other.mLaunch_fx_list;
+  mDelivery_fx_list = other.mDelivery_fx_list;
+  mImpact_fx_list = other.mImpact_fx_list;
+  mLinger_fx_list = other.mLinger_fx_list;
 }
 
 void afxMagicSpellData::reloadReset()
 {
-  casting_fx_list.clear();
-  launch_fx_list.clear();
-  delivery_fx_list.clear();
-  impact_fx_list.clear();
-  linger_fx_list.clear();
+  mCasting_fx_list.clear();
+  mLaunch_fx_list.clear();
+  mDelivery_fx_list.clear();
+  mImpact_fx_list.clear();
+  mLinger_fx_list.clear();
 }
 
 #define myOffset(field) Offset(field, afxMagicSpellData)
@@ -219,54 +219,54 @@ void afxMagicSpellData::initPersistFields()
   // for each effect list, dummy_fx_entry is set and then a validator adds it to the appropriate effects list
 
   addGroup("Casting Stage");
-  addField("castingDur",            TypeF32,        myOffset(casting_dur),
+  addField("castingDur",            TypeF32,        myOffset(mCasting_dur),
     "...");
-  addField("numCastingLoops",       TypeS32,        myOffset(n_casting_loops),
+  addField("numCastingLoops",       TypeS32,        myOffset(mNum_casting_loops),
     "...");
-  addField("extraCastingTime",      TypeF32,        myOffset(extra_casting_time),
+  addField("extraCastingTime",      TypeF32,        myOffset(mExtra_casting_time),
     "...");
-  addFieldV("addCastingEffect", TYPEID<afxEffectBaseData>(), Offset(dummy_fx_entry, afxMagicSpellData), &_castingPhrase,
+  addFieldV("addCastingEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_castingPhrase,
     "...");
   endGroup("Casting Stage");
 
   addGroup("Delivery Stage");
-  addField("deliveryDur",           TypeF32,        myOffset(delivery_dur),
+  addField("deliveryDur",           TypeF32,        myOffset(mDelivery_dur),
     "...");
-  addField("numDeliveryLoops",      TypeS32,        myOffset(n_delivery_loops),
+  addField("numDeliveryLoops",      TypeS32,        myOffset(mNum_delivery_loops),
     "...");
-  addField("extraDeliveryTime",     TypeF32,        myOffset(extra_delivery_time),
+  addField("extraDeliveryTime",     TypeF32,        myOffset(mExtra_delivery_time),
     "...");
-  addFieldV("addLaunchEffect", TYPEID<afxEffectBaseData>(), Offset(dummy_fx_entry, afxMagicSpellData), &_launchPhrase,
+  addFieldV("addLaunchEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_launchPhrase,
     "...");
-  addFieldV("addDeliveryEffect", TYPEID<afxEffectBaseData>(), Offset(dummy_fx_entry, afxMagicSpellData), &_deliveryPhrase,
+  addFieldV("addDeliveryEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_deliveryPhrase,
     "...");
   endGroup("Delivery Stage");
 
   addGroup("Linger Stage");
-  addField("lingerDur",             TypeF32,        myOffset(linger_dur),
+  addField("lingerDur",             TypeF32,        myOffset(mLinger_dur),
     "...");
-  addField("numLingerLoops",        TypeS32,        myOffset(n_linger_loops),
+  addField("numLingerLoops",        TypeS32,        myOffset(mNum_linger_loops),
     "...");
-  addField("extraLingerTime",       TypeF32,        myOffset(extra_linger_time),
+  addField("extraLingerTime",       TypeF32,        myOffset(mExtra_linger_time),
     "...");
-  addFieldV("addImpactEffect", TYPEID<afxEffectBaseData>(), Offset(dummy_fx_entry, afxMagicSpellData), &_impactPhrase,
+  addFieldV("addImpactEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_impactPhrase,
     "...");
-  addFieldV("addLingerEffect", TYPEID<afxEffectBaseData>(), Offset(dummy_fx_entry, afxMagicSpellData), &_lingerPhrase,
+  addFieldV("addLingerEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_lingerPhrase,
     "...");
   endGroup("Linger Stage");
 
   // interrupt flags
-  addField("allowMovementInterrupts", TypeBool,     myOffset(do_move_interrupts),
+  addField("allowMovementInterrupts", TypeBool,     myOffset(mDo_move_interrupts),
     "...");
-  addField("movementInterruptSpeed",  TypeF32,      myOffset(move_interrupt_speed),
+  addField("movementInterruptSpeed",  TypeF32,      myOffset(mMove_interrupt_speed),
     "...");
 
   // delivers projectile spells
-  addField("missile",               TYPEID<afxMagicMissileData>(), myOffset(missile_db),
+  addField("missile",               TYPEID<afxMagicMissileData>(), myOffset(mMissile_db),
     "...");
-  addField("launchOnServerSignal",  TypeBool,                   myOffset(launch_on_server_signal),
+  addField("launchOnServerSignal",  TypeBool,                   myOffset(mLaunch_on_server_signal),
     "...");
-  addField("primaryTargetTypes",    TypeS32,                    myOffset(primary_target_types),
+  addField("primaryTargetTypes",    TypeS32,                    myOffset(mPrimary_target_types),
     "...");
 
 
@@ -286,8 +286,8 @@ bool afxMagicSpellData::onAdd()
   if (Parent::onAdd() == false)
     return false;
 
-  if (missile_db != NULL && delivery_dur == 0.0)
-    delivery_dur = -1;
+  if (mMissile_db != NULL && mDelivery_dur == 0.0)
+    mDelivery_dur = -1;
 
   return true;
 }
@@ -311,61 +311,61 @@ void afxMagicSpellData::packData(BitStream* stream)
 {
 	Parent::packData(stream);
 
-  stream->write(casting_dur);
-  stream->write(delivery_dur);
-  stream->write(linger_dur);
+  stream->write(mCasting_dur);
+  stream->write(mDelivery_dur);
+  stream->write(mLinger_dur);
   //
-  stream->write(n_casting_loops);
-  stream->write(n_delivery_loops);
-  stream->write(n_linger_loops);
+  stream->write(mNum_casting_loops);
+  stream->write(mNum_delivery_loops);
+  stream->write(mNum_linger_loops);
   //
-  stream->write(extra_casting_time);
-  stream->write(extra_delivery_time);
-  stream->write(extra_linger_time);
+  stream->write(mExtra_casting_time);
+  stream->write(mExtra_delivery_time);
+  stream->write(mExtra_linger_time);
 
-  stream->writeFlag(do_move_interrupts);
-  stream->write(move_interrupt_speed);
+  stream->writeFlag(mDo_move_interrupts);
+  stream->write(mMove_interrupt_speed);
 
-  writeDatablockID(stream, missile_db, packed);
-  stream->write(launch_on_server_signal);
-  stream->write(primary_target_types);
+  writeDatablockID(stream, mMissile_db, mPacked);
+  stream->write(mLaunch_on_server_signal);
+  stream->write(mPrimary_target_types);
 
-  pack_fx(stream, casting_fx_list, packed);
-  pack_fx(stream, launch_fx_list, packed);
-  pack_fx(stream, delivery_fx_list, packed);
-  pack_fx(stream, impact_fx_list, packed);
-  pack_fx(stream, linger_fx_list, packed);
+  pack_fx(stream, mCasting_fx_list, mPacked);
+  pack_fx(stream, mLaunch_fx_list, mPacked);
+  pack_fx(stream, mDelivery_fx_list, mPacked);
+  pack_fx(stream, mImpact_fx_list, mPacked);
+  pack_fx(stream, mLinger_fx_list, mPacked);
 }
 
 void afxMagicSpellData::unpackData(BitStream* stream)
 {
   Parent::unpackData(stream);
 
-  stream->read(&casting_dur);
-  stream->read(&delivery_dur);
-  stream->read(&linger_dur);
+  stream->read(&mCasting_dur);
+  stream->read(&mDelivery_dur);
+  stream->read(&mLinger_dur);
   //
-  stream->read(&n_casting_loops);
-  stream->read(&n_delivery_loops);
-  stream->read(&n_linger_loops);
+  stream->read(&mNum_casting_loops);
+  stream->read(&mNum_delivery_loops);
+  stream->read(&mNum_linger_loops);
   //
-  stream->read(&extra_casting_time);
-  stream->read(&extra_delivery_time);
-  stream->read(&extra_linger_time);
+  stream->read(&mExtra_casting_time);
+  stream->read(&mExtra_delivery_time);
+  stream->read(&mExtra_linger_time);
 
-  do_move_interrupts = stream->readFlag();
-  stream->read(&move_interrupt_speed);
+  mDo_move_interrupts = stream->readFlag();
+  stream->read(&mMove_interrupt_speed);
 
-  missile_db = (afxMagicMissileData*) readDatablockID(stream);
-  stream->read(&launch_on_server_signal);
-  stream->read(&primary_target_types);
+  mMissile_db = (afxMagicMissileData*) readDatablockID(stream);
+  stream->read(&mLaunch_on_server_signal);
+  stream->read(&mPrimary_target_types);
 
-  do_id_convert = true;
-  unpack_fx(stream, casting_fx_list);
-  unpack_fx(stream, launch_fx_list);
-  unpack_fx(stream, delivery_fx_list);
-  unpack_fx(stream, impact_fx_list);
-  unpack_fx(stream, linger_fx_list);
+  mDo_id_convert = true;
+  unpack_fx(stream, mCasting_fx_list);
+  unpack_fx(stream, mLaunch_fx_list);
+  unpack_fx(stream, mDelivery_fx_list);
+  unpack_fx(stream, mImpact_fx_list);
+  unpack_fx(stream, mLinger_fx_list);
 }
 
 bool afxMagicSpellData::writeField(StringTableEntry fieldname, const char* value)
@@ -414,25 +414,25 @@ bool afxMagicSpellData::preload(bool server, String &errorStr)
   // Resolve objects transmitted from server
   if (!server)
   {
-    if (do_id_convert)
+    if (mDo_id_convert)
     {
-      SimObjectId missile_id = SimObjectId((uintptr_t)missile_db);
+      SimObjectId missile_id = SimObjectId((uintptr_t)mMissile_db);
       if (missile_id != 0)
       {
         // try to convert id to pointer
-        if (!Sim::findObject(missile_id, missile_db))
+        if (!Sim::findObject(missile_id, mMissile_db))
         {
           Con::errorf(ConsoleLogEntry::General,
             "afxMagicSpellData::preload() -- bad datablockId: 0x%x (missile)",
             missile_id);
         }
       }
-      expand_fx_list(casting_fx_list, "casting");
-      expand_fx_list(launch_fx_list, "launch");
-      expand_fx_list(delivery_fx_list, "delivery");
-      expand_fx_list(impact_fx_list, "impact");
-      expand_fx_list(linger_fx_list, "linger");
-      do_id_convert = false;
+      expand_fx_list(mCasting_fx_list, "casting");
+      expand_fx_list(mLaunch_fx_list, "launch");
+      expand_fx_list(mDelivery_fx_list, "delivery");
+      expand_fx_list(mImpact_fx_list, "impact");
+      expand_fx_list(mLinger_fx_list, "linger");
+	  mDo_id_convert = false;
     }
   }
 
@@ -441,14 +441,14 @@ bool afxMagicSpellData::preload(bool server, String &errorStr)
 
 void afxMagicSpellData::gatherConstraintDefs(Vector<afxConstraintDef>& defs)
 {
-  afxConstraintDef::gather_cons_defs(defs, casting_fx_list);
-  afxConstraintDef::gather_cons_defs(defs, launch_fx_list);
-  afxConstraintDef::gather_cons_defs(defs, delivery_fx_list);
-  afxConstraintDef::gather_cons_defs(defs, impact_fx_list);
-  afxConstraintDef::gather_cons_defs(defs, linger_fx_list);
+  afxConstraintDef::gather_cons_defs(defs, mCasting_fx_list);
+  afxConstraintDef::gather_cons_defs(defs, mLaunch_fx_list);
+  afxConstraintDef::gather_cons_defs(defs, mDelivery_fx_list);
+  afxConstraintDef::gather_cons_defs(defs, mImpact_fx_list);
+  afxConstraintDef::gather_cons_defs(defs, mLinger_fx_list);
 
-  if (missile_db)
-    missile_db->gather_cons_defs(defs);
+  if (mMissile_db)
+    mMissile_db->gather_cons_defs(defs);
 }
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//
@@ -472,7 +472,7 @@ DefineEngineMethod(afxMagicSpellData, addCastingEffect, void, (afxEffectBaseData
     return;
   }
 
-  object->casting_fx_list.push_back(effect);
+  object->mCasting_fx_list.push_back(effect);
 }
 
 DefineEngineMethod(afxMagicSpellData, addLaunchEffect, void, (afxEffectBaseData* effect),,
@@ -488,7 +488,7 @@ DefineEngineMethod(afxMagicSpellData, addLaunchEffect, void, (afxEffectBaseData*
     return;
   }
 
-  object->launch_fx_list.push_back(effect);
+  object->mLaunch_fx_list.push_back(effect);
 }
 
 DefineEngineMethod(afxMagicSpellData, addDeliveryEffect, void, (afxEffectBaseData* effect),,
@@ -504,7 +504,7 @@ DefineEngineMethod(afxMagicSpellData, addDeliveryEffect, void, (afxEffectBaseDat
     return;
   }
 
-  object->delivery_fx_list.push_back(effect);
+  object->mDelivery_fx_list.push_back(effect);
 }
 
 DefineEngineMethod(afxMagicSpellData, addImpactEffect, void, (afxEffectBaseData* effect),,
@@ -520,7 +520,7 @@ DefineEngineMethod(afxMagicSpellData, addImpactEffect, void, (afxEffectBaseData*
     return;
   }
 
-  object->impact_fx_list.push_back(effect);
+  object->mImpact_fx_list.push_back(effect);
 }
 
 DefineEngineMethod(afxMagicSpellData, addLingerEffect, void, (afxEffectBaseData* effect),,
@@ -536,7 +536,7 @@ DefineEngineMethod(afxMagicSpellData, addLingerEffect, void, (afxEffectBaseData*
     return;
   }
 
-  object->linger_fx_list.push_back(effect);
+  object->mLinger_fx_list.push_back(effect);
 }
 
 
@@ -568,9 +568,9 @@ IMPLEMENT_GLOBAL_CALLBACK( onCastingEnd, void, (), (),
 class CastingPhrase_C : public afxPhrase
 {
   typedef afxPhrase Parent;
-  ShapeBase*    caster;
-  bool          notify_castbar;
-  F32           castbar_progress;
+  ShapeBase*    mCaster;
+  bool          mNotify_castbar;
+  F32           mCastbar_progress;
 public:
   /*C*/         CastingPhrase_C(ShapeBase* caster, bool notify_castbar);
   virtual void  start(F32 startstamp, F32 timestamp);
@@ -582,17 +582,17 @@ public:
 CastingPhrase_C::CastingPhrase_C(ShapeBase* c, bool notify)
   : afxPhrase(false, true)
 {
-  caster = c;
-  notify_castbar = notify;
-  castbar_progress = 0.0f;
+  mCaster = c;
+  mNotify_castbar = notify;
+  mCastbar_progress = 0.0f;
 }
 
 void CastingPhrase_C::start(F32 startstamp, F32 timestamp)
 {
   Parent::start(startstamp, timestamp); //START
-  if (notify_castbar)
+  if (mNotify_castbar)
   {
-    castbar_progress = 0.0f;
+    mCastbar_progress = 0.0f;
     onCastingStart_callback();
   }
 }
@@ -601,16 +601,16 @@ void CastingPhrase_C::update(F32 dt, F32 timestamp)
 {
   Parent::update(dt, timestamp);
 
-  if (!notify_castbar)
+  if (!mNotify_castbar)
     return;
 
-  if (dur > 0 && n_loops > 0)
+  if (mDur > 0 && mNum_loops > 0)
   {
-    F32 nfrac = (timestamp - starttime)/(dur*n_loops);
-    if (nfrac - castbar_progress > 1.0f/200.0f)
+    F32 nfrac = (timestamp - mStartTime)/(mDur*mNum_loops);
+    if (nfrac - mCastbar_progress > 1.0f/200.0f)
     {
-      castbar_progress = (nfrac < 1.0f) ? nfrac : 1.0f;
-      onCastingProgressUpdate_callback(castbar_progress);
+      mCastbar_progress = (nfrac < 1.0f) ? nfrac : 1.0f;
+      onCastingProgressUpdate_callback(mCastbar_progress);
     }
   }
 }
@@ -618,20 +618,20 @@ void CastingPhrase_C::update(F32 dt, F32 timestamp)
 void CastingPhrase_C::stop(F32 timestamp)
 {
   Parent::stop(timestamp);
-  if (notify_castbar)
+  if (mCastbar_progress)
   {
     onCastingEnd_callback();
-    notify_castbar = false;
+    mNotify_castbar = false;
   }
 }
 
 void CastingPhrase_C::interrupt(F32 timestamp)
 {
   Parent::interrupt(timestamp);
-  if (notify_castbar)
+  if (mNotify_castbar)
   {
     onCastingEnd_callback();
-    notify_castbar = false;
+	mNotify_castbar = false;
   }
 }
 
@@ -733,25 +733,25 @@ void afxMagicSpell::init()
   //mNetFlags.set(Ghostable | ScopeAlways);
   mNetFlags.clear(Ghostable | ScopeAlways);
 
-  datablock = NULL;
-  exeblock = NULL;
-  missile_db = NULL;
+  mDatablock = NULL;
+  mExeblock = NULL;
+  mMissile_db = NULL;
 
-  caster = NULL;
-  target = NULL;
+  mCaster = NULL;
+  mTarget = NULL;
 
-  caster_field = NULL;
-  target_field = NULL;
+  mCaster_field = NULL;
+  mTarget_field = NULL;
 
-  caster_scope_id = 0;
-  target_scope_id = 0;
-  target_is_shape = false;
+  mCaster_scope_id = 0;
+  mTarget_scope_id = 0;
+  mTarget_is_shape = false;
 
-  constraints_initialized = false;
-  scoping_initialized = false;
+  mConstraints_initialized = false;
+  mScoping_initialized = false;
 
-  spell_state = (U8) INACTIVE_STATE;
-  spell_elapsed = 0;
+  mSpell_state = (U8) INACTIVE_STATE;
+  mSpell_elapsed = 0;
 
   // define named constraints
   constraint_mgr->defineConstraint(OBJECT_CONSTRAINT,  CASTER_CONS);
@@ -764,24 +764,24 @@ void afxMagicSpell::init()
 
   for (S32 i = 0; i < NUM_PHRASES; i++)
   {
-    phrases[i] = NULL;
-    tfactors[i] = 1.0f;
+    mPhrases[i] = NULL;
+    mTfactors[i] = 1.0f;
   }
 
-  notify_castbar = false;
-  overall_time_factor = 1.0f;
+  mNotify_castbar = false;
+  mOverall_time_factor = 1.0f;
 
-  camera_cons_obj = 0;
+  mCamera_cons_obj = 0;
 
-  marks_mask = 0;
+  mMarks_mask = 0;
 
-  missile = NULL;
-  missile_is_armed = false;
-  impacted_obj = NULL;
-  impact_pos.zero();
-  impact_norm.set(0,0,1);
-  impacted_scope_id = 0;
-  impacted_is_shape = false;
+  mMissile = NULL;
+  mMissile_is_armed = false;
+  mImpacted_obj = NULL;
+  mImpact_pos.zero();
+  mImpact_norm.set(0,0,1);
+  mImpacted_scope_id = 0;
+  mImpacted_is_shape = false;
 }
 
 afxMagicSpell::afxMagicSpell()
@@ -795,18 +795,18 @@ afxMagicSpell::afxMagicSpell(ShapeBase* caster, SceneObject* target)
   started_with_newop = false;
   init();
 
-  this->caster = caster;
+  mCaster = caster;
   if (caster)
   {
-    caster_field = caster;
+    mCaster_field = caster;
     deleteNotify(caster);
     processAfter(caster);
   }
 
-  this->target = target;
+  mTarget = target;
   if (target)
   {
-    target_field = target;
+    mTarget_field = target;
     deleteNotify(target);
   }
 }
@@ -815,26 +815,26 @@ afxMagicSpell::~afxMagicSpell()
 {
   for (S32 i = 0; i < NUM_PHRASES; i++)
   {
-    if (phrases[i])
+    if (mPhrases[i])
     {
-      phrases[i]->interrupt(spell_elapsed);
-      delete phrases[i];
+      mPhrases[i]->interrupt(mSpell_elapsed);
+      delete mPhrases[i];
     }
   }
 
-  if (missile)
-    missile->deleteObject();
+  if (mMissile)
+    mMissile->deleteObject();
 
-  if (missile_db && missile_db->isTempClone())
+  if (mMissile_db && mMissile_db->isTempClone())
   {
-    delete missile_db;
-    missile_db = 0;
+    delete mMissile_db;
+    mMissile_db = 0;
   }
 
-   if (datablock && datablock->isTempClone())
+   if (mDatablock && mDatablock->isTempClone())
    {
-     delete datablock;
-     datablock = 0;
+     delete mDatablock;
+	 mDatablock = 0;
    }
 }
 
@@ -844,8 +844,8 @@ afxMagicSpell::~afxMagicSpell()
 
 bool afxMagicSpell::onNewDataBlock(GameBaseData* dptr, bool reload)
 {
-  datablock = dynamic_cast<afxMagicSpellData*>(dptr);
-  if (!datablock || !Parent::onNewDataBlock(dptr, reload))
+  mDatablock = dynamic_cast<afxMagicSpellData*>(dptr);
+  if (!mDatablock || !Parent::onNewDataBlock(dptr, reload))
     return false;
 
   if (isServerObject() && started_with_newop)
@@ -855,18 +855,18 @@ bool afxMagicSpell::onNewDataBlock(GameBaseData* dptr, bool reload)
     assignDynamicFieldsFrom(dptr, arcaneFX::sParameterFieldPrefix, true);
   }
 
-  exeblock = datablock;
-  missile_db = datablock->missile_db;
+  mExeblock = mDatablock;
+  mMissile_db = mDatablock->mMissile_db;
 
   if (isClientObject())
   {
     // make a temp datablock clone if there are substitutions
-    if (datablock->getSubstitutionCount() > 0)
+    if (mDatablock->getSubstitutionCount() > 0)
     {
-      afxMagicSpellData* orig_db = datablock;
-      datablock = new afxMagicSpellData(*orig_db, true);
-      exeblock = orig_db;
-      missile_db = datablock->missile_db;
+      afxMagicSpellData* orig_db = mDatablock;
+	  mDatablock = new afxMagicSpellData(*orig_db, true);
+	  mExeblock = orig_db;
+	  mMissile_db = mDatablock->mMissile_db;
       // Don't perform substitutions yet, the spell's dynamic fields haven't
       // arrived yet and the substitutions may refer to them. Hold off and do
       // in in the onAdd() method.
@@ -875,13 +875,13 @@ bool afxMagicSpell::onNewDataBlock(GameBaseData* dptr, bool reload)
   else if (started_with_newop)
   {
     // make a temp datablock clone if there are substitutions
-    if (datablock->getSubstitutionCount() > 0)
+    if (mDatablock->getSubstitutionCount() > 0)
     {
-      afxMagicSpellData* orig_db = datablock;
-      datablock = new afxMagicSpellData(*orig_db, true);
-      exeblock = orig_db;
-      orig_db->performSubstitutions(datablock, this, ranking);
-      missile_db = datablock->missile_db;
+      afxMagicSpellData* orig_db = mDatablock;
+	  mDatablock = new afxMagicSpellData(*orig_db, true);
+	  mExeblock = orig_db;
+      orig_db->performSubstitutions(mDatablock, this, ranking);
+	  mMissile_db = mDatablock->mMissile_db;
     }
   }
 
@@ -913,12 +913,12 @@ bool afxMagicSpell::onAdd()
 
   if (isClientObject())
   {
-    if (datablock->isTempClone())
+    if (mDatablock->isTempClone())
     {
-      afxMagicSpellData* orig_db = (afxMagicSpellData*)exeblock;
-      orig_db->performSubstitutions(datablock, this, ranking);
-      missile_db = datablock->missile_db;
-      notify_castbar = (notify_castbar && (datablock->casting_dur > 0.0f));
+      afxMagicSpellData* orig_db = (afxMagicSpellData*)mExeblock;
+      orig_db->performSubstitutions(mDatablock, this, ranking);
+	  mMissile_db = mDatablock->mMissile_db;
+      mNotify_castbar = (mNotify_castbar && (mDatablock->mCasting_dur > 0.0f));
     }
   }
   else if (started_with_newop && !postpone_activation)
@@ -940,37 +940,37 @@ void afxMagicSpell::onDeleteNotify(SimObject* obj)
 {
   // caster deleted?
   ShapeBase* shape = dynamic_cast<ShapeBase*>(obj);
-  if (shape == caster)
+  if (shape == mCaster)
   {
     clearProcessAfter();
-    caster = NULL;
-    caster_field = NULL;
-    caster_scope_id = 0;
+	mCaster = NULL;
+    mCaster_field = NULL;
+	mCaster_scope_id = 0;
   }
 
   // target deleted?
   SceneObject* scene_obj = dynamic_cast<SceneObject*>(obj);
-  if (scene_obj == target)
+  if (scene_obj == mTarget)
   {
-    target = NULL;
-    target_field = NULL;
-    target_scope_id = 0;
-    target_is_shape = false;
+    mTarget = NULL;
+    mTarget_field = NULL;
+    mTarget_scope_id = 0;
+    mTarget_is_shape = false;
   }
 
   // impacted_obj deleted?
-  if (scene_obj == impacted_obj)
+  if (scene_obj == mImpacted_obj)
   {
-    impacted_obj = NULL;
-    impacted_scope_id = 0;
-    impacted_is_shape = false;
+    mImpacted_obj = NULL;
+    mImpacted_scope_id = 0;
+    mImpacted_is_shape = false;
   }
 
   // missile deleted?
   afxMagicMissile* missile = dynamic_cast<afxMagicMissile*>(obj);
-  if (missile != NULL && missile == this->missile)
+  if (missile != NULL && missile == mMissile)
   {
-    this->missile = NULL;
+    mMissile = NULL;
   }
 
   // something else
@@ -980,9 +980,9 @@ void afxMagicSpell::onDeleteNotify(SimObject* obj)
 // static
 void afxMagicSpell::initPersistFields()
 {
-  addField("caster", TYPEID<SimObject>(), Offset(caster_field, afxMagicSpell),
+  addField("caster", TYPEID<SimObject>(), Offset(mCaster_field, afxMagicSpell),
     "...");
-  addField("target", TYPEID<SimObject>(), Offset(target_field, afxMagicSpell),
+  addField("target", TYPEID<SimObject>(), Offset(mTarget_field, afxMagicSpell),
     "...");
 
   Parent::initPersistFields();
@@ -993,31 +993,31 @@ void afxMagicSpell::initPersistFields()
 void afxMagicSpell::pack_constraint_info(NetConnection* conn, BitStream* stream)
 {
   // pack caster's ghost index or scope id if not yet ghosted
-  if (stream->writeFlag(caster != NULL))
+  if (stream->writeFlag(mCaster != NULL))
   {
-    S32 ghost_idx = conn->getGhostIndex(caster);
+    S32 ghost_idx = conn->getGhostIndex(mCaster);
     if (stream->writeFlag(ghost_idx != -1))
       stream->writeRangedU32(U32(ghost_idx), 0, NetConnection::MaxGhostCount);
     else
     {
-      bool bit = (caster) ? (caster->getScopeId() > 0) : false;
+      bool bit = (mCaster) ? (mCaster->getScopeId() > 0) : false;
       if (stream->writeFlag(bit))
-        stream->writeInt(caster->getScopeId(), NetObject::SCOPE_ID_BITS);
+        stream->writeInt(mCaster->getScopeId(), NetObject::SCOPE_ID_BITS);
     }
   }
 
   // pack target's ghost index or scope id if not yet ghosted
-  if (stream->writeFlag(target != NULL))
+  if (stream->writeFlag(mTarget != NULL))
   {
-    S32 ghost_idx = conn->getGhostIndex(target);
+    S32 ghost_idx = conn->getGhostIndex(mTarget);
     if (stream->writeFlag(ghost_idx != -1))
       stream->writeRangedU32(U32(ghost_idx), 0, NetConnection::MaxGhostCount);
     else
     {
-      if (stream->writeFlag(target->getScopeId() > 0))
+      if (stream->writeFlag(mTarget->getScopeId() > 0))
       {
-        stream->writeInt(target->getScopeId(), NetObject::SCOPE_ID_BITS);
-        stream->writeFlag(dynamic_cast<ShapeBase*>(target) != NULL); // is shape?
+        stream->writeInt(mTarget->getScopeId(), NetObject::SCOPE_ID_BITS);
+        stream->writeFlag(dynamic_cast<ShapeBase*>(mTarget) != NULL); // is shape?
       }
     }
   }
@@ -1027,51 +1027,51 @@ void afxMagicSpell::pack_constraint_info(NetConnection* conn, BitStream* stream)
 
 void afxMagicSpell::unpack_constraint_info(NetConnection* conn, BitStream* stream)
 {
-  caster = NULL;
-  caster_field = NULL;
-  caster_scope_id = 0;
+  mCaster = NULL;
+  mCaster_field = NULL;
+  mCaster_scope_id = 0;
   if (stream->readFlag()) // has caster
   {
     if (stream->readFlag()) // has ghost_idx
     {
       S32 ghost_idx = stream->readRangedU32(0, NetConnection::MaxGhostCount);
-      caster = dynamic_cast<ShapeBase*>(conn->resolveGhost(ghost_idx));
-      if (caster)
+	  mCaster = dynamic_cast<ShapeBase*>(conn->resolveGhost(ghost_idx));
+      if (mCaster)
       {
-        caster_field = caster;
-        deleteNotify(caster);
-        processAfter(caster);
+        mCaster_field = mCaster;
+        deleteNotify(mCaster);
+        processAfter(mCaster);
       }
     }
     else
     {
       if (stream->readFlag()) // has scope_id (is always a shape)
-        caster_scope_id = stream->readInt(NetObject::SCOPE_ID_BITS);
+		  mCaster_scope_id = stream->readInt(NetObject::SCOPE_ID_BITS);
     }
   }
 
-  target = NULL;
-  target_field = NULL;
-  target_scope_id = 0;
-  target_is_shape = false;
+  mTarget = NULL;
+  mTarget_field = NULL;
+  mTarget_scope_id = 0;
+  mTarget_is_shape = false;
   if (stream->readFlag()) // has target
   {
     if (stream->readFlag()) // has ghost_idx
     {
       S32 ghost_idx = stream->readRangedU32(0, NetConnection::MaxGhostCount);
-      target = dynamic_cast<SceneObject*>(conn->resolveGhost(ghost_idx));
-      if (target)
+      mTarget = dynamic_cast<SceneObject*>(conn->resolveGhost(ghost_idx));
+      if (mTarget)
       {
-        target_field = target;
-        deleteNotify(target);
+        mTarget_field = mTarget;
+        deleteNotify(mTarget);
       }
     }
     else
     {
       if (stream->readFlag()) // has scope_id
       {
-        target_scope_id = stream->readInt(NetObject::SCOPE_ID_BITS);
-        target_is_shape = stream->readFlag(); // is shape?
+        mTarget_scope_id = stream->readInt(NetObject::SCOPE_ID_BITS);
+        mTarget_is_shape = stream->readFlag(); // is shape?
       }
     }
   }
@@ -1089,9 +1089,9 @@ U32 afxMagicSpell::packUpdate(NetConnection* conn, U32 mask, BitStream* stream)
   if (stream->writeFlag(mask & InitialUpdateMask))
   {
     // pack extra object's ghost index or scope id if not yet ghosted
-    if (stream->writeFlag(dynamic_cast<NetObject*>(extra) != 0))
+    if (stream->writeFlag(dynamic_cast<NetObject*>(mExtra) != 0))
     {
-      NetObject* net_extra = (NetObject*)extra;
+      NetObject* net_extra = (NetObject*)mExtra;
       S32 ghost_idx = conn->getGhostIndex(net_extra);
       if (stream->writeFlag(ghost_idx != -1))
          stream->writeRangedU32(U32(ghost_idx), 0, NetConnection::MaxGhostCount);
@@ -1108,12 +1108,12 @@ U32 afxMagicSpell::packUpdate(NetConnection* conn, U32 mask, BitStream* stream)
     stream->write(exec_conds_mask);
 
     // flag if this client owns the spellcaster
-    bool client_owns_caster = is_caster_client(caster, dynamic_cast<GameConnection*>(conn));
+    bool client_owns_caster = is_caster_client(mCaster, dynamic_cast<GameConnection*>(conn));
     stream->writeFlag(client_owns_caster);
 
     // pack per-phrase time-factor values
     for (S32 i = 0; i < NUM_PHRASES; i++)
-      stream->write(tfactors[i]);
+      stream->write(mTfactors[i]);
 
     // flag if this conn is zoned-in yet
     bool zoned_in = client_owns_caster;
@@ -1129,10 +1129,10 @@ U32 afxMagicSpell::packUpdate(NetConnection* conn, U32 mask, BitStream* stream)
   // StateEvent or SyncEvent
   if (stream->writeFlag((mask & StateEventMask) || (mask & SyncEventMask)))
   {
-    stream->write(marks_mask);
-    stream->write(spell_state);
+    stream->write(mMarks_mask);
+    stream->write(mSpell_state);
     stream->write(state_elapsed());
-    stream->write(spell_elapsed);
+    stream->write(mSpell_elapsed);
   }
 
   // SyncEvent
@@ -1142,44 +1142,44 @@ U32 afxMagicSpell::packUpdate(NetConnection* conn, U32 mask, BitStream* stream)
   }
 
   // LaunchEvent
-  if (stream->writeFlag((mask & LaunchEventMask) && (marks_mask & MARK_LAUNCH) && missile))
+  if (stream->writeFlag((mask & LaunchEventMask) && (mMarks_mask & MARK_LAUNCH) && mMissile))
   {
     F32 vel; Point3F vel_vec;
-    missile->getStartingVelocityValues(vel, vel_vec);
+    mMissile->getStartingVelocityValues(vel, vel_vec);
     // pack launch vector and velocity
     stream->write(vel);
     mathWrite(*stream, vel_vec);
   }
 
   // ImpactEvent
-  if (stream->writeFlag(((mask & ImpactEventMask) || (mask & SyncEventMask)) && (marks_mask & MARK_IMPACT)))
+  if (stream->writeFlag(((mask & ImpactEventMask) || (mask & SyncEventMask)) && (mMarks_mask & MARK_IMPACT)))
   {
     // pack impact objects's ghost index or scope id if not yet ghosted
-    if (stream->writeFlag(impacted_obj != NULL))
+    if (stream->writeFlag(mImpacted_obj != NULL))
     {
-      S32 ghost_idx = conn->getGhostIndex(impacted_obj);
+      S32 ghost_idx = conn->getGhostIndex(mImpacted_obj);
       if (stream->writeFlag(ghost_idx != -1))
         stream->writeRangedU32(U32(ghost_idx), 0, NetConnection::MaxGhostCount);
       else
       {
-        if (stream->writeFlag(impacted_obj->getScopeId() > 0))
+        if (stream->writeFlag(mImpacted_obj->getScopeId() > 0))
         {
-          stream->writeInt(impacted_obj->getScopeId(), NetObject::SCOPE_ID_BITS);
-          stream->writeFlag(dynamic_cast<ShapeBase*>(impacted_obj) != NULL);
+          stream->writeInt(mImpacted_obj->getScopeId(), NetObject::SCOPE_ID_BITS);
+          stream->writeFlag(dynamic_cast<ShapeBase*>(mImpacted_obj) != NULL);
         }
       }
     }
 
     // pack impact position and normal
-    mathWrite(*stream, impact_pos);
-    mathWrite(*stream, impact_norm);
+    mathWrite(*stream, mImpact_pos);
+    mathWrite(*stream, mImpact_norm);
     stream->write(exec_conds_mask);
 
     ShapeBase* temp_shape;
-    stream->writeFlag(caster != 0 && caster->getDamageState() == ShapeBase::Enabled);
-    temp_shape = dynamic_cast<ShapeBase*>(target);
+    stream->writeFlag(mCaster != 0 && mCaster->getDamageState() == ShapeBase::Enabled);
+    temp_shape = dynamic_cast<ShapeBase*>(mTarget);
     stream->writeFlag(temp_shape != 0 && temp_shape->getDamageState() == ShapeBase::Enabled);
-    temp_shape = dynamic_cast<ShapeBase*>(impacted_obj);
+    temp_shape = dynamic_cast<ShapeBase*>(mImpacted_obj);
     stream->writeFlag(temp_shape != 0 && temp_shape->getDamageState() == ShapeBase::Enabled);
   }
 
@@ -1201,14 +1201,14 @@ bool afxMagicSpell::remap_builtin_constraint(SceneObject* obj, const char* cons_
     return true;
   if (cons_name_ste == TARGET_CONS)
   {
-    if (obj && target && obj != target && !target_cons_id.undefined())
+    if (obj && mTarget && obj != mTarget && !mTarget_cons_id.undefined())
     {
-      target = obj;
-      constraint_mgr->setReferenceObject(target_cons_id, target);
+      mTarget = obj;
+      constraint_mgr->setReferenceObject(mTarget_cons_id, mTarget);
       if (isServerObject())
       {
-        if (target->isScopeable())
-          constraint_mgr->addScopeableObject(target);
+        if (mTarget->isScopeable())
+          constraint_mgr->addScopeableObject(mTarget);
       }
     }
     return true;
@@ -1252,7 +1252,7 @@ void afxMagicSpell::unpackUpdate(NetConnection * conn, BitStream * stream)
       if (stream->readFlag()) // is ghost_idx
       {
         S32 ghost_idx = stream->readRangedU32(0, NetConnection::MaxGhostCount);
-        extra = dynamic_cast<SimObject*>(conn->resolveGhost(ghost_idx));
+		mExtra = dynamic_cast<SimObject*>(conn->resolveGhost(ghost_idx));
       }
       else
       {
@@ -1271,11 +1271,11 @@ void afxMagicSpell::unpackUpdate(NetConnection * conn, BitStream * stream)
     // enable castbar updates
     bool client_owns_caster = stream->readFlag();
     if (client_owns_caster)
-      notify_castbar = Con::isFunction("onCastingStart");
+      mNotify_castbar = Con::isFunction("onCastingStart");
 
     // unpack per-phrase time-factor values
     for (S32 i = 0; i < NUM_PHRASES; i++)
-      stream->read(&tfactors[i]);
+      stream->read(&mTfactors[i]);
 
     // if client is marked as fully zoned in
     if ((zoned_in = stream->readFlag()) == true)
@@ -1294,7 +1294,7 @@ void afxMagicSpell::unpackUpdate(NetConnection * conn, BitStream * stream)
     stream->read(&new_spell_state);
     stream->read(&new_state_elapsed);
     stream->read(&new_spell_elapsed);
-    marks_mask = new_marks_mask;
+    mMarks_mask = new_marks_mask;
   }
 
   // SyncEvent
@@ -1310,42 +1310,42 @@ void afxMagicSpell::unpackUpdate(NetConnection * conn, BitStream * stream)
     F32 vel; Point3F vel_vec;
     stream->read(&vel);
     mathRead(*stream, &vel_vec);
-    if (missile)
+    if (mMissile)
     {
-      missile->setStartingVelocity(vel);
-      missile->setStartingVelocityVector(vel_vec);
+      mMissile->setStartingVelocity(vel);
+	  mMissile->setStartingVelocityVector(vel_vec);
     }
   }
 
   // ImpactEvent
   if (stream->readFlag())
   {
-    if (impacted_obj)
-      clearNotify(impacted_obj);
-    impacted_obj = NULL;
-    impacted_scope_id = 0;
-    impacted_is_shape = false;
+    if (mImpacted_obj)
+      clearNotify(mImpacted_obj);
+    mImpacted_obj = NULL;
+    mImpacted_scope_id = 0;
+    mImpacted_is_shape = false;
     if (stream->readFlag()) // is impacted_obj
     {
       if (stream->readFlag()) // is ghost_idx
       {
         S32 ghost_idx = stream->readRangedU32(0, NetConnection::MaxGhostCount);
-        impacted_obj = dynamic_cast<SceneObject*>(conn->resolveGhost(ghost_idx));
-        if (impacted_obj)
-          deleteNotify(impacted_obj);
+        mImpacted_obj = dynamic_cast<SceneObject*>(conn->resolveGhost(ghost_idx));
+        if (mImpacted_obj)
+          deleteNotify(mImpacted_obj);
       }
       else
       {
         if (stream->readFlag()) // has scope_id
         {
-          impacted_scope_id = stream->readInt(NetObject::SCOPE_ID_BITS);
-          impacted_is_shape = stream->readFlag(); // is shape?
+          mImpacted_scope_id = stream->readInt(NetObject::SCOPE_ID_BITS);
+          mImpacted_is_shape = stream->readFlag(); // is shape?
         }
       }
     }
 
-    mathRead(*stream, &impact_pos);
-    mathRead(*stream, &impact_norm);
+    mathRead(*stream, &mImpact_pos);
+    mathRead(*stream, &mImpact_norm);
     stream->read(&exec_conds_mask);
 
     bool caster_alive = stream->readFlag();
@@ -1353,18 +1353,18 @@ void afxMagicSpell::unpackUpdate(NetConnection * conn, BitStream * stream)
     bool impacted_alive = stream->readFlag();
 
     afxConstraint* cons;
-    if ((cons = constraint_mgr->getConstraint(caster_cons_id)) != 0)
+    if ((cons = constraint_mgr->getConstraint(mCaster_cons_id)) != 0)
       cons->setLivingState(caster_alive);
-    if ((cons = constraint_mgr->getConstraint(target_cons_id)) != 0)
+    if ((cons = constraint_mgr->getConstraint(mTarget_cons_id)) != 0)
       cons->setLivingState(target_alive);
-    if ((cons = constraint_mgr->getConstraint(impacted_cons_id)) != 0)
+    if ((cons = constraint_mgr->getConstraint(mImpacted_cons_id)) != 0)
       cons->setLivingState(impacted_alive);
   }
 
   //~~~~~~~~~~~~~~~~~~~~//
 
   if (!zoned_in)
-    spell_state = LATE_STATE;
+    mSpell_state = LATE_STATE;
 
   // need to adjust state info to get all synced up with spell on server
   if (do_sync_event && !initial_update)
@@ -1383,23 +1383,23 @@ bool afxMagicSpell::state_expired()
 {
   afxPhrase* phrase = NULL;
 
-  switch (spell_state)
+  switch (mSpell_state)
   {
   case CASTING_STATE:
-    phrase = phrases[CASTING_PHRASE];
+    phrase = mPhrases[CASTING_PHRASE];
     break;
   case DELIVERY_STATE:
-    phrase = phrases[DELIVERY_PHRASE];
+    phrase = mPhrases[DELIVERY_PHRASE];
     break;
   case LINGER_STATE:
-    phrase = phrases[LINGER_PHRASE];
+    phrase = mPhrases[LINGER_PHRASE];
     break;
   }
 
   if (phrase)
   {
-    if (phrase->expired(spell_elapsed))
-      return (!phrase->recycle(spell_elapsed));
+    if (phrase->expired(mSpell_elapsed))
+      return (!phrase->recycle(mSpell_elapsed));
     return false;
   }
 
@@ -1410,83 +1410,83 @@ F32 afxMagicSpell::state_elapsed()
 {
   afxPhrase* phrase = NULL;
 
-  switch (spell_state)
+  switch (mSpell_state)
   {
   case CASTING_STATE:
-    phrase = phrases[CASTING_PHRASE];
+    phrase = mPhrases[CASTING_PHRASE];
     break;
   case DELIVERY_STATE:
-    phrase = phrases[DELIVERY_PHRASE];
+    phrase = mPhrases[DELIVERY_PHRASE];
     break;
   case LINGER_STATE:
-    phrase = phrases[LINGER_PHRASE];
+    phrase = mPhrases[LINGER_PHRASE];
     break;
   }
 
-  return (phrase) ? phrase->elapsed(spell_elapsed) : 0.0f;
+  return (phrase) ? phrase->elapsed(mSpell_elapsed) : 0.0f;
 }
 
 void afxMagicSpell::init_constraints()
 {
-  if (constraints_initialized)
+  if (mConstraints_initialized)
   {
     //Con::printf("CONSTRAINTS ALREADY INITIALIZED");
     return;
   }
 
   Vector<afxConstraintDef> defs;
-  datablock->gatherConstraintDefs(defs);
+  mDatablock->gatherConstraintDefs(defs);
 
   constraint_mgr->initConstraintDefs(defs, isServerObject());
 
   if (isServerObject())
   {
-    caster_cons_id = constraint_mgr->setReferenceObject(CASTER_CONS, caster);
-    target_cons_id = constraint_mgr->setReferenceObject(TARGET_CONS, target);
+    mCaster_cons_id = constraint_mgr->setReferenceObject(CASTER_CONS, mCaster);
+    mTarget_cons_id = constraint_mgr->setReferenceObject(TARGET_CONS, mTarget);
 #if defined(AFX_CAP_SCOPE_TRACKING)
-    if (caster && caster->isScopeable())
-      constraint_mgr->addScopeableObject(caster);
+    if (mCaster && mCaster->isScopeable())
+      constraint_mgr->addScopeableObject(mCaster);
 
-    if (target && target->isScopeable())
-      constraint_mgr->addScopeableObject(target);
+    if (mTarget && mTarget->isScopeable())
+      constraint_mgr->addScopeableObject(mTarget);
 #endif
 
     // find local camera
-    camera_cons_obj = get_camera();
-    if (camera_cons_obj)
-      camera_cons_id = constraint_mgr->setReferenceObject(CAMERA_CONS, camera_cons_obj);
+	mCamera_cons_obj = get_camera();
+    if (mCamera_cons_obj)
+      mCamera_cons_id = constraint_mgr->setReferenceObject(CAMERA_CONS, mCamera_cons_obj);
   }
   else // if (isClientObject())
   {
-    if (caster)
-      caster_cons_id = constraint_mgr->setReferenceObject(CASTER_CONS, caster);
-    else if (caster_scope_id > 0)
-      caster_cons_id = constraint_mgr->setReferenceObjectByScopeId(CASTER_CONS, caster_scope_id, true);
+    if (mCaster)
+      mCaster_cons_id = constraint_mgr->setReferenceObject(CASTER_CONS, mCaster);
+    else if (mCaster_scope_id > 0)
+      mCaster_cons_id = constraint_mgr->setReferenceObjectByScopeId(CASTER_CONS, mCaster_scope_id, true);
 
-    if (target)
-      target_cons_id = constraint_mgr->setReferenceObject(TARGET_CONS, target);
-    else if (target_scope_id > 0)
-      target_cons_id = constraint_mgr->setReferenceObjectByScopeId(TARGET_CONS, target_scope_id, target_is_shape);
+    if (mTarget)
+      mTarget_cons_id = constraint_mgr->setReferenceObject(TARGET_CONS, mTarget);
+    else if (mTarget_scope_id > 0)
+      mTarget_cons_id = constraint_mgr->setReferenceObjectByScopeId(TARGET_CONS, mTarget_scope_id, mTarget_is_shape);
 
     // find local camera
-    camera_cons_obj = get_camera();
-    if (camera_cons_obj)
-      camera_cons_id = constraint_mgr->setReferenceObject(CAMERA_CONS, camera_cons_obj);
+	mCamera_cons_obj = get_camera();
+    if (mCamera_cons_obj)
+      mCamera_cons_id = constraint_mgr->setReferenceObject(CAMERA_CONS, mCamera_cons_obj);
 
     // find local listener
     Point3F listener_pos;
     listener_pos = SFX->getListener().getTransform().getPosition();
-    listener_cons_id = constraint_mgr->setReferencePoint(LISTENER_CONS, listener_pos);
+    mListener_cons_id = constraint_mgr->setReferencePoint(LISTENER_CONS, listener_pos);
   }
 
   constraint_mgr->adjustProcessOrdering(this);
 
-  constraints_initialized = true;
+  mConstraints_initialized = true;
 }
 
 void afxMagicSpell::init_scoping()
 {
-  if (scoping_initialized)
+  if (mScoping_initialized)
   {
     //Con::printf("SCOPING ALREADY INITIALIZED");
     return;
@@ -1504,65 +1504,65 @@ void afxMagicSpell::init_scoping()
       mNetFlags.set(Ghostable);
       setScopeAlways();
     }
-    scoping_initialized = true;
+    mScoping_initialized = true;
   }
 }
 
 void afxMagicSpell::setup_casting_fx()
 {
   if (isServerObject())
-    phrases[CASTING_PHRASE] = new afxPhrase(isServerObject(), true);
+    mPhrases[CASTING_PHRASE] = new afxPhrase(isServerObject(), true);
   else
-    phrases[CASTING_PHRASE] = new CastingPhrase_C(caster, notify_castbar);
+    mPhrases[CASTING_PHRASE] = new CastingPhrase_C(mCaster, mNotify_castbar);
 
-  if (phrases[CASTING_PHRASE])
-    phrases[CASTING_PHRASE]->init(datablock->casting_fx_list, datablock->casting_dur, this,
-                                  tfactors[CASTING_PHRASE], datablock->n_casting_loops, 0,
-                                  datablock->extra_casting_time);
+  if (mPhrases[CASTING_PHRASE])
+    mPhrases[CASTING_PHRASE]->init(mDatablock->mCasting_fx_list, mDatablock->mCasting_dur, this,
+                                  mTfactors[CASTING_PHRASE], mDatablock->mNum_casting_loops, 0,
+                                  mDatablock->mExtra_casting_time);
 }
 
 void afxMagicSpell::setup_launch_fx()
 {
-  phrases[LAUNCH_PHRASE] = new afxPhrase(isServerObject(), false);
-  if (phrases[LAUNCH_PHRASE])
-    phrases[LAUNCH_PHRASE]->init(datablock->launch_fx_list, -1, this,
-                                 tfactors[LAUNCH_PHRASE], 1);
+  mPhrases[LAUNCH_PHRASE] = new afxPhrase(isServerObject(), false);
+  if (mPhrases[LAUNCH_PHRASE])
+    mPhrases[LAUNCH_PHRASE]->init(mDatablock->mLaunch_fx_list, -1, this,
+                                 mTfactors[LAUNCH_PHRASE], 1);
 }
 
 void afxMagicSpell::setup_delivery_fx()
 {
-  phrases[DELIVERY_PHRASE] = new afxPhrase(isServerObject(), true);
-  if (phrases[DELIVERY_PHRASE])
+  mPhrases[DELIVERY_PHRASE] = new afxPhrase(isServerObject(), true);
+  if (mPhrases[DELIVERY_PHRASE])
   {
-    phrases[DELIVERY_PHRASE]->init(datablock->delivery_fx_list, datablock->delivery_dur, this,
-                                   tfactors[DELIVERY_PHRASE], datablock->n_delivery_loops, 0,
-                                   datablock->extra_delivery_time);
+    mPhrases[DELIVERY_PHRASE]->init(mDatablock->mDelivery_fx_list, mDatablock->mDelivery_dur, this,
+                                   mTfactors[DELIVERY_PHRASE], mDatablock->mNum_delivery_loops, 0,
+                                   mDatablock->mExtra_delivery_time);
   }
 }
 
 void afxMagicSpell::setup_impact_fx()
 {
-  phrases[IMPACT_PHRASE] = new afxPhrase(isServerObject(), false);
-  if (phrases[IMPACT_PHRASE])
+  mPhrases[IMPACT_PHRASE] = new afxPhrase(isServerObject(), false);
+  if (mPhrases[IMPACT_PHRASE])
   {
-    phrases[IMPACT_PHRASE]->init(datablock->impact_fx_list, -1, this,
-                                 tfactors[IMPACT_PHRASE], 1);
+    mPhrases[IMPACT_PHRASE]->init(mDatablock->mImpact_fx_list, -1, this,
+                                 mTfactors[IMPACT_PHRASE], 1);
   }
 }
 
 void afxMagicSpell::setup_linger_fx()
 {
-  phrases[LINGER_PHRASE] = new afxPhrase(isServerObject(), true);
-  if (phrases[LINGER_PHRASE])
-    phrases[LINGER_PHRASE]->init(datablock->linger_fx_list, datablock->linger_dur, this,
-                                 tfactors[LINGER_PHRASE], datablock->n_linger_loops, 0,
-                                 datablock->extra_linger_time);
+  mPhrases[LINGER_PHRASE] = new afxPhrase(isServerObject(), true);
+  if (mPhrases[LINGER_PHRASE])
+    mPhrases[LINGER_PHRASE]->init(mDatablock->mLinger_fx_list, mDatablock->mLinger_dur, this,
+                                 mTfactors[LINGER_PHRASE], mDatablock->mNum_linger_loops, 0,
+                                 mDatablock->mExtra_linger_time);
 }
 
 bool afxMagicSpell::cleanup_over()
 {
   for (S32 i = 0; i < NUM_PHRASES; i++)
-    if (phrases[i] && !phrases[i]->isEmpty())
+    if (mPhrases[i] && !mPhrases[i]->isEmpty())
       return false;
 
   return true;
@@ -1576,67 +1576,67 @@ bool afxMagicSpell::cleanup_over()
 
 void afxMagicSpell::init_missile_s(afxMagicMissileData* mm_db)
 {
-  if (missile)
-    clearNotify(missile);
+  if (mMissile)
+    clearNotify(mMissile);
 
   // create the missile
-  missile = new afxMagicMissile(true, false);
-  missile->setSubstitutionData(this, ranking);
-  missile->setDataBlock(mm_db);
-  missile->setChoreographer(this);
-  if (!missile->registerObject())
+  mMissile = new afxMagicMissile(true, false);
+  mMissile->setSubstitutionData(this, ranking);
+  mMissile->setDataBlock(mm_db);
+  mMissile->setChoreographer(this);
+  if (!mMissile->registerObject())
   {
     Con::errorf("afxMagicSpell: failed to register missile instance.");
-    delete missile;
-    missile = NULL;
+    delete mMissile;
+	mMissile = NULL;
   }
 
-  if (missile)
+  if (mMissile)
   {
-    deleteNotify(missile);
-    registerForCleanup(missile);
+    deleteNotify(mMissile);
+    registerForCleanup(mMissile);
   }
 }
 
 void afxMagicSpell::launch_missile_s()
 {
-  if (missile)
+  if (mMissile)
   {
-    missile->launch();
-    constraint_mgr->setReferenceObject(MISSILE_CONS, missile);
+	  mMissile->launch();
+    constraint_mgr->setReferenceObject(MISSILE_CONS, mMissile);
   }
 }
 
 void afxMagicSpell::init_missile_c(afxMagicMissileData* mm_db)
 {
-  if (missile)
-    clearNotify(missile);
+  if (mMissile)
+    clearNotify(mMissile);
 
   // create the missile
-  missile = new afxMagicMissile(false, true);
-  missile->setSubstitutionData(this, ranking);
-  missile->setDataBlock(mm_db);
-  missile->setChoreographer(this);
-  if (!missile->registerObject())
+  mMissile = new afxMagicMissile(false, true);
+  mMissile->setSubstitutionData(this, ranking);
+  mMissile->setDataBlock(mm_db);
+  mMissile->setChoreographer(this);
+  if (!mMissile->registerObject())
   {
     Con::errorf("afxMagicSpell: failed to register missile instance.");
-    delete missile;
-    missile = NULL;
+    delete mMissile;
+	mMissile = NULL;
   }
 
-  if (missile)
+  if (mMissile)
   {
-    deleteNotify(missile);
-    registerForCleanup(missile);
+    deleteNotify(mMissile);
+    registerForCleanup(mMissile);
   }
 }
 
 void afxMagicSpell::launch_missile_c()
 {
-  if (missile)
+  if (mMissile)
   {
-    missile->launch();
-    constraint_mgr->setReferenceObject(MISSILE_CONS, missile);
+    mMissile->launch();
+    constraint_mgr->setReferenceObject(MISSILE_CONS, mMissile);
   }
 }
 
@@ -1652,19 +1652,19 @@ void afxMagicSpell::impactNotify(const Point3F& p, const Point3F& n, SceneObject
     return;
 
   ///impact_time_ms = spell_elapsed_ms;
-  if (impacted_obj)
-      clearNotify(impacted_obj);
-  impacted_obj = obj;
-  impact_pos = p;
-  impact_norm = n;
+  if (mImpacted_obj)
+      clearNotify(mImpacted_obj);
+  mImpacted_obj = obj;
+  mImpact_pos = p;
+  mImpact_norm = n;
 
-  if (impacted_obj != NULL)
+  if (mImpacted_obj != NULL)
   {
-    deleteNotify(impacted_obj);
+    deleteNotify(mImpacted_obj);
     exec_conds_mask |= IMPACTED_SOMETHING;
-    if (impacted_obj == target)
+    if (mImpacted_obj == mTarget)
       exec_conds_mask |= IMPACTED_TARGET;
-    if (impacted_obj->getTypeMask() & datablock->primary_target_types)
+    if (mImpacted_obj->getTypeMask() & mDatablock->mPrimary_target_types)
       exec_conds_mask |= IMPACTED_PRIMARY;
   }
 
@@ -1673,9 +1673,9 @@ void afxMagicSpell::impactNotify(const Point3F& p, const Point3F& n, SceneObject
 
   postSpellEvent(IMPACT_EVENT);
 
-  if (missile)
-    clearNotify(missile);
-  missile = NULL;
+  if (mMissile)
+    clearNotify(mMissile);
+  mMissile = NULL;
 }
 
 void afxMagicSpell::executeScriptEvent(const char* method, afxConstraint* cons,
@@ -1692,9 +1692,9 @@ void afxMagicSpell::executeScriptEvent(const char* method, afxConstraint* cons,
            aa.axis.x, aa.axis.y, aa.axis.z, aa.angle);
 
   // CALL SCRIPT afxChoreographerData::method(%spell, %caster, %constraint, %transform, %data)
-  Con::executef(exeblock, method,
+  Con::executef(mExeblock, method,
                 getIdString(),
-                (caster) ? caster->getIdString() : "",
+                (mCaster) ? mCaster->getIdString() : "",
                 (cons_obj) ? cons_obj->getIdString() : "",
                 arg_buf,
                 data);
@@ -1709,7 +1709,7 @@ void afxMagicSpell::inflictDamage(const char * label, const char* flavor, SimObj
   // CALL SCRIPT afxMagicSpellData::onDamage()
   //    onDamage(%spell, %label, %type, %damaged_obj, %amount, %count, %pos, %ad_amount,
   //             %radius, %impulse)
-  datablock->onDamage_callback(this, label, flavor, target_id, amount, n, pos, ad_amount, radius, impulse);
+  mDatablock->onDamage_callback(this, label, flavor, target_id, amount, n, pos, ad_amount, radius, impulse);
 }
 
 
@@ -1718,68 +1718,68 @@ void afxMagicSpell::inflictDamage(const char * label, const char* flavor, SimObj
 
 void afxMagicSpell::process_server()
 {
-  if (spell_state != INACTIVE_STATE)
-    spell_elapsed += TickSec;
+  if (mSpell_state != INACTIVE_STATE)
+    mSpell_elapsed += TickSec;
 
-  U8 pending_state = spell_state;
+  U8 pending_state = mSpell_state;
 
   // check for state changes
-  switch (spell_state)
+  switch (mSpell_state)
   {
 
   case INACTIVE_STATE:
-    if (marks_mask & MARK_ACTIVATE)
+    if (mMarks_mask & MARK_ACTIVATE)
       pending_state = CASTING_STATE;
     break;
 
   case CASTING_STATE:
-    if (datablock->casting_dur > 0.0f && datablock->do_move_interrupts && is_caster_moving())
+    if (mDatablock->mCasting_dur > 0.0f && mDatablock->mDo_move_interrupts && is_caster_moving())
     {
-      displayScreenMessage(caster, "SPELL INTERRUPTED.");
+      displayScreenMessage(mCaster, "SPELL INTERRUPTED.");
       postSpellEvent(INTERRUPT_SPELL_EVENT);
     }
-    if (marks_mask & MARK_INTERRUPT_CASTING)
+    if (mMarks_mask & MARK_INTERRUPT_CASTING)
       pending_state = CLEANUP_STATE;
-    else if (marks_mask & MARK_END_CASTING)
+    else if (mMarks_mask & MARK_END_CASTING)
       pending_state = DELIVERY_STATE;
-    else if (marks_mask & MARK_LAUNCH)
+    else if (mMarks_mask & MARK_LAUNCH)
       pending_state = DELIVERY_STATE;
     else if (state_expired())
       pending_state = DELIVERY_STATE;
     break;
 
   case DELIVERY_STATE:
-    if (marks_mask & MARK_INTERRUPT_DELIVERY)
+    if (mMarks_mask & MARK_INTERRUPT_DELIVERY)
       pending_state = CLEANUP_STATE;
-    else if (marks_mask & MARK_END_DELIVERY)
+    else if (mMarks_mask & MARK_END_DELIVERY)
       pending_state = LINGER_STATE;
-    else if (marks_mask & MARK_IMPACT)
+    else if (mMarks_mask & MARK_IMPACT)
       pending_state = LINGER_STATE;
     else if (state_expired())
       pending_state = LINGER_STATE;
     break;
 
   case LINGER_STATE:
-    if (marks_mask & MARK_INTERRUPT_LINGER)
+    if (mMarks_mask & MARK_INTERRUPT_LINGER)
       pending_state = CLEANUP_STATE;
-    else if (marks_mask & MARK_END_LINGER)
+    else if (mMarks_mask & MARK_END_LINGER)
       pending_state = CLEANUP_STATE;
-    else if (marks_mask & MARK_SHUTDOWN)
+    else if (mMarks_mask & MARK_SHUTDOWN)
       pending_state = CLEANUP_STATE;
     else if (state_expired())
       pending_state = CLEANUP_STATE;
     break;
 
   case CLEANUP_STATE:
-    if ((marks_mask & MARK_INTERRUPT_CLEANUP) || cleanup_over())
+    if ((mMarks_mask & MARK_INTERRUPT_CLEANUP) || cleanup_over())
       pending_state = DONE_STATE;
     break;
   }
 
-  if (spell_state != pending_state)
+  if (mSpell_state != pending_state)
     change_state_s(pending_state);
 
-  if (spell_state == INACTIVE_STATE)
+  if (mSpell_state == INACTIVE_STATE)
     return;
 
   //--------------------------//
@@ -1788,23 +1788,23 @@ void afxMagicSpell::process_server()
   constraint_mgr->sample(TickSec, Platform::getVirtualMilliseconds());
 
   for (S32 i = 0; i < NUM_PHRASES; i++)
-    if (phrases[i])
-      phrases[i]->update(TickSec, spell_elapsed);
+    if (mPhrases[i])
+      mPhrases[i]->update(TickSec, mSpell_elapsed);
 
-  if (missile_is_armed)
+  if (mMissile_is_armed)
   {
     launch_missile_s();
-    missile_is_armed = false;
+	mMissile_is_armed = false;
   }
 }
 
 void afxMagicSpell::change_state_s(U8 pending_state)
 {
-  if (spell_state == pending_state)
+  if (mSpell_state == pending_state)
     return;
 
   // LEAVING THIS STATE
-  switch (spell_state)
+  switch (mSpell_state)
   {
   case INACTIVE_STATE:
     break;
@@ -1823,7 +1823,7 @@ void afxMagicSpell::change_state_s(U8 pending_state)
     break;
   }
 
-  spell_state = pending_state;
+  mSpell_state = pending_state;
 
   // ENTERING THIS STATE
   switch (pending_state)
@@ -1851,29 +1851,29 @@ void afxMagicSpell::enter_done_state_s()
 {
   postSpellEvent(DEACTIVATE_EVENT);
 
-  if (marks_mask & MARK_INTERRUPTS)
+  if (mMarks_mask & MARK_INTERRUPTS)
   {
     Sim::postEvent(this, new ObjectDeleteEvent, Sim::getCurrentTime() + 500);
   }
   else
   {
-    F32 done_time = spell_elapsed;
+    F32 done_time = mSpell_elapsed;
 
     for (S32 i = 0; i < NUM_PHRASES; i++)
     {
-      if (phrases[i])
+      if (mPhrases[i])
       {
         F32 phrase_done;
-        if (phrases[i]->willStop() && phrases[i]->isInfinite())
-          phrase_done = spell_elapsed + phrases[i]->calcAfterLife();
+        if (mPhrases[i]->willStop() && mPhrases[i]->isInfinite())
+          phrase_done = mSpell_elapsed + mPhrases[i]->calcAfterLife();
         else
-          phrase_done = phrases[i]->calcDoneTime();
+          phrase_done = mPhrases[i]->calcDoneTime();
         if (phrase_done > done_time)
           done_time = phrase_done;
       }
     }
 
-    F32 time_left = done_time - spell_elapsed;
+    F32 time_left = done_time - mSpell_elapsed;
     if (time_left < 0)
       time_left = 0;
 
@@ -1881,7 +1881,7 @@ void afxMagicSpell::enter_done_state_s()
   }
 
   // CALL SCRIPT afxMagicSpellData::onDeactivate(%spell)
-  datablock->onDeactivate_callback(this);
+  mDatablock->onDeactivate_callback(this);
 }
 
 void afxMagicSpell::enter_casting_state_s()
@@ -1891,90 +1891,90 @@ void afxMagicSpell::enter_casting_state_s()
 
   // stamp constraint-mgr starting time and reset spell timer
   constraint_mgr->setStartTime(Platform::getVirtualMilliseconds());
-  spell_elapsed = 0;
+  mSpell_elapsed = 0;
 
   setup_dynamic_constraints();
 
   // start casting effects
   setup_casting_fx();
-  if (phrases[CASTING_PHRASE])
-    phrases[CASTING_PHRASE]->start(spell_elapsed, spell_elapsed);
+  if (mPhrases[CASTING_PHRASE])
+    mPhrases[CASTING_PHRASE]->start(mSpell_elapsed, mSpell_elapsed);
 
   // initialize missile
-  if (missile_db)
+  if (mMissile_db)
   {
-    missile_db = missile_db->cloneAndPerformSubstitutions(this, ranking);
-    init_missile_s(missile_db);
+    mMissile_db = mMissile_db->cloneAndPerformSubstitutions(this, ranking);
+    init_missile_s(mMissile_db);
   }
 }
 
 void afxMagicSpell::leave_casting_state_s()
 {
-  if (phrases[CASTING_PHRASE])
+  if (mPhrases[CASTING_PHRASE])
   {
-    if (marks_mask & MARK_INTERRUPT_CASTING)
+    if (mMarks_mask & MARK_INTERRUPT_CASTING)
     {
       //Con::printf("INTERRUPT CASTING (S)");
-      phrases[CASTING_PHRASE]->interrupt(spell_elapsed);
+      mPhrases[CASTING_PHRASE]->interrupt(mSpell_elapsed);
     }
     else
     {
       //Con::printf("LEAVING CASTING (S)");
-      phrases[CASTING_PHRASE]->stop(spell_elapsed);
+      mPhrases[CASTING_PHRASE]->stop(mSpell_elapsed);
     }
   }
 
-  if (marks_mask & MARK_INTERRUPT_CASTING)
+  if (mMarks_mask & MARK_INTERRUPT_CASTING)
   {
     // CALL SCRIPT afxMagicSpellData::onInterrupt(%spell, %caster)
-    datablock->onInterrupt_callback(this, caster);
+    mDatablock->onInterrupt_callback(this, mCaster);
   }
 }
 
 void afxMagicSpell::enter_delivery_state_s()
 {
   // CALL SCRIPT afxMagicSpellData::onLaunch(%spell, %caster, %target, %missile)
-  datablock->onLaunch_callback(this, caster, target, missile);
+  mDatablock->onLaunch_callback(this, mCaster, mTarget, mMissile);
 
-  if (datablock->launch_on_server_signal)
+  if (mDatablock->mLaunch_on_server_signal)
     postSpellEvent(LAUNCH_EVENT);
 
-  missile_is_armed = true;
+  mMissile_is_armed = true;
 
   // start launch effects
   setup_launch_fx();
-  if (phrases[LAUNCH_PHRASE])
-    phrases[LAUNCH_PHRASE]->start(spell_elapsed, spell_elapsed); //START
+  if (mPhrases[LAUNCH_PHRASE])
+    mPhrases[LAUNCH_PHRASE]->start(mSpell_elapsed, mSpell_elapsed); //START
 
   // start delivery effects
   setup_delivery_fx();
-  if (phrases[DELIVERY_PHRASE])
-    phrases[DELIVERY_PHRASE]->start(spell_elapsed, spell_elapsed); //START
+  if (mPhrases[DELIVERY_PHRASE])
+    mPhrases[DELIVERY_PHRASE]->start(mSpell_elapsed, mSpell_elapsed); //START
 }
 
 void afxMagicSpell::leave_delivery_state_s()
 {
-  if (phrases[DELIVERY_PHRASE])
+  if (mPhrases[DELIVERY_PHRASE])
   {
-    if (marks_mask & MARK_INTERRUPT_DELIVERY)
+    if (mMarks_mask & MARK_INTERRUPT_DELIVERY)
     {
       //Con::printf("INTERRUPT DELIVERY (S)");
-      phrases[DELIVERY_PHRASE]->interrupt(spell_elapsed);
+      mPhrases[DELIVERY_PHRASE]->interrupt(mSpell_elapsed);
     }
     else
     {
       //Con::printf("LEAVING DELIVERY (S)");
-      phrases[DELIVERY_PHRASE]->stop(spell_elapsed);
+      mPhrases[DELIVERY_PHRASE]->stop(mSpell_elapsed);
     }
   }
 
-  if (!missile && !(marks_mask & MARK_IMPACT))
+  if (!mMissile && !(mMarks_mask & MARK_IMPACT))
   {
-    if (target)
+    if (mTarget)
     {
-      Point3F p = afxMagicSpell::getShapeImpactPos(target);
+      Point3F p = afxMagicSpell::getShapeImpactPos(mTarget);
       Point3F n = Point3F(0,0,1);
-      impactNotify(p, n, target);
+      impactNotify(p, n, mTarget);
     }
     else
     {
@@ -1987,57 +1987,57 @@ void afxMagicSpell::leave_delivery_state_s()
 
 void afxMagicSpell::enter_linger_state_s()
 {
-  if (impacted_obj)
+  if (mImpacted_obj)
   {
-    impacted_cons_id = constraint_mgr->setReferenceObject(IMPACTED_OBJECT_CONS, impacted_obj);
+    mImpacted_cons_id = constraint_mgr->setReferenceObject(IMPACTED_OBJECT_CONS, mImpacted_obj);
 #if defined(AFX_CAP_SCOPE_TRACKING)
-    if (impacted_obj->isScopeable())
-      constraint_mgr->addScopeableObject(impacted_obj);
+    if (mImpacted_obj->isScopeable())
+      constraint_mgr->addScopeableObject(mImpacted_obj);
 #endif
   }
   else
-    constraint_mgr->setReferencePoint(IMPACTED_OBJECT_CONS, impact_pos, impact_norm);
-  constraint_mgr->setReferencePoint(IMPACT_POINT_CONS, impact_pos, impact_norm);
+    constraint_mgr->setReferencePoint(IMPACTED_OBJECT_CONS, mImpact_pos, mImpact_norm);
+  constraint_mgr->setReferencePoint(IMPACT_POINT_CONS, mImpact_pos, mImpact_norm);
   constraint_mgr->setReferenceObject(MISSILE_CONS, 0);
 
   // start impact effects
   setup_impact_fx();
-  if (phrases[IMPACT_PHRASE])
-    phrases[IMPACT_PHRASE]->start(spell_elapsed, spell_elapsed); //START
+  if (mPhrases[IMPACT_PHRASE])
+    mPhrases[IMPACT_PHRASE]->start(mSpell_elapsed, mSpell_elapsed); //START
 
   // start linger effects
   setup_linger_fx();
-  if (phrases[LINGER_PHRASE])
-    phrases[LINGER_PHRASE]->start(spell_elapsed, spell_elapsed); //START
+  if (mPhrases[LINGER_PHRASE])
+    mPhrases[LINGER_PHRASE]->start(mSpell_elapsed, mSpell_elapsed); //START
 
 #if 0 // code temporarily replaced with old callback technique in order to avoid engine bug.
   // CALL SCRIPT afxMagicSpellData::onImpact(%spell, %caster, %impactedObj, %impactedPos, %impactedNorm)
-  datablock->onImpact_callback(this, caster, impacted_obj, impact_pos, impact_norm);
+  mDatablock->onImpact_callback(this, mCaster, mImpacted_obj, mImpact_pos, mImpact_norm);
 #else
   char pos_buf[128];
-  dSprintf(pos_buf, sizeof(pos_buf), "%g %g %g", impact_pos.x, impact_pos.y, impact_pos.z);
+  dSprintf(pos_buf, sizeof(pos_buf), "%g %g %g", mImpact_pos.x, mImpact_pos.y, mImpact_pos.z);
   char norm_buf[128];
-  dSprintf(norm_buf, sizeof(norm_buf), "%g %g %g", impact_norm.x, impact_norm.y, impact_norm.z);
-  Con::executef(exeblock, "onImpact", getIdString(),
-     (caster) ? caster->getIdString(): "",
-     (impacted_obj) ? impacted_obj->getIdString(): "",
+  dSprintf(norm_buf, sizeof(norm_buf), "%g %g %g", mImpact_norm.x, mImpact_norm.y, mImpact_norm.z);
+  Con::executef(mExeblock, "onImpact", getIdString(),
+     (mCaster) ? mCaster->getIdString(): "",
+     (mImpacted_obj) ? mImpacted_obj->getIdString(): "",
      pos_buf, norm_buf);
 #endif
 }
 
 void afxMagicSpell::leave_linger_state_s()
 {
-  if (phrases[LINGER_PHRASE])
+  if (mPhrases[LINGER_PHRASE])
   {
-    if (marks_mask & MARK_INTERRUPT_LINGER)
+    if (mMarks_mask & MARK_INTERRUPT_LINGER)
     {
       //Con::printf("INTERRUPT LINGER (S)");
-      phrases[LINGER_PHRASE]->interrupt(spell_elapsed);
+      mPhrases[LINGER_PHRASE]->interrupt(mSpell_elapsed);
     }
     else
     {
       //Con::printf("LEAVING LINGER (S)");
-      phrases[LINGER_PHRASE]->stop(spell_elapsed);
+      mPhrases[LINGER_PHRASE]->stop(mSpell_elapsed);
     }
   }
 }
@@ -2049,25 +2049,25 @@ void afxMagicSpell::leave_linger_state_s()
 
 void afxMagicSpell::process_client(F32 dt)
 {
-  spell_elapsed += dt; //SPELL_ELAPSED
+  mSpell_elapsed += dt; //SPELL_ELAPSED
 
-  U8 pending_state = spell_state;
+  U8 pending_state = mSpell_state;
 
   // check for state changes
-  switch (spell_state)
+  switch (mSpell_state)
   {
   case INACTIVE_STATE:
-    if (marks_mask & MARK_ACTIVATE)
+    if (mMarks_mask & MARK_ACTIVATE)
       pending_state = CASTING_STATE;
     break;
   case CASTING_STATE:
-    if (marks_mask & MARK_INTERRUPT_CASTING)
+    if (mMarks_mask & MARK_INTERRUPT_CASTING)
       pending_state = CLEANUP_STATE;
-    else if (marks_mask & MARK_END_CASTING)
+    else if (mMarks_mask & MARK_END_CASTING)
       pending_state = DELIVERY_STATE;
-    else if (datablock->launch_on_server_signal)
+    else if (mDatablock->mLaunch_on_server_signal)
     {
-      if (marks_mask & MARK_LAUNCH)
+      if (mMarks_mask & MARK_LAUNCH)
         pending_state = DELIVERY_STATE;
     }
     else
@@ -2077,45 +2077,45 @@ void afxMagicSpell::process_client(F32 dt)
     }
     break;
   case DELIVERY_STATE:
-    if (marks_mask & MARK_INTERRUPT_DELIVERY)
+    if (mMarks_mask & MARK_INTERRUPT_DELIVERY)
       pending_state = CLEANUP_STATE;
-    else if (marks_mask & MARK_END_DELIVERY)
+    else if (mMarks_mask & MARK_END_DELIVERY)
       pending_state = LINGER_STATE;
-    else if (marks_mask & MARK_IMPACT)
+    else if (mMarks_mask & MARK_IMPACT)
       pending_state = LINGER_STATE;
     else
       state_expired();
     break;
   case LINGER_STATE:
-    if (marks_mask & MARK_INTERRUPT_LINGER)
+    if (mMarks_mask & MARK_INTERRUPT_LINGER)
       pending_state = CLEANUP_STATE;
-    else if (marks_mask & MARK_END_LINGER)
+    else if (mMarks_mask & MARK_END_LINGER)
       pending_state = CLEANUP_STATE;
-    else if (marks_mask & MARK_SHUTDOWN)
+    else if (mMarks_mask & MARK_SHUTDOWN)
       pending_state = CLEANUP_STATE;
     else if (state_expired())
       pending_state = CLEANUP_STATE;
     break;
   case CLEANUP_STATE:
-    if ((marks_mask & MARK_INTERRUPT_CLEANUP) || cleanup_over())
+    if ((mMarks_mask & MARK_INTERRUPT_CLEANUP) || cleanup_over())
       pending_state = DONE_STATE;
     break;
   }
 
-  if (spell_state != pending_state)
+  if (mSpell_state != pending_state)
     change_state_c(pending_state);
 
-  if (spell_state == INACTIVE_STATE)
+  if (mSpell_state == INACTIVE_STATE)
     return;
 
   //--------------------------//
 
   // update the listener constraint position
-  if (!listener_cons_id.undefined())
+  if (!mListener_cons_id.undefined())
   {
     Point3F listener_pos;
     listener_pos = SFX->getListener().getTransform().getPosition();
-    constraint_mgr->setReferencePoint(listener_cons_id, listener_pos);
+    constraint_mgr->setReferencePoint(mListener_cons_id, listener_pos);
   }
 
   // find local camera position
@@ -2123,10 +2123,10 @@ void afxMagicSpell::process_client(F32 dt)
   SceneObject* current_cam = get_camera(&cam_pos);
 
   // detect camera changes
-  if (!camera_cons_id.undefined() && current_cam != camera_cons_obj)
+  if (!mCamera_cons_id.undefined() && current_cam != mCamera_cons_obj)
   {
-    constraint_mgr->setReferenceObject(camera_cons_id, current_cam);
-    camera_cons_obj = current_cam;
+    constraint_mgr->setReferenceObject(mCamera_cons_id, current_cam);
+	mCamera_cons_obj = current_cam;
   }
 
   // sample the constraints
@@ -2134,23 +2134,23 @@ void afxMagicSpell::process_client(F32 dt)
 
   // update active effects lists
   for (S32 i = 0; i < NUM_PHRASES; i++)
-    if (phrases[i])
-      phrases[i]->update(dt, spell_elapsed);
+    if (mPhrases[i])
+      mPhrases[i]->update(dt, mSpell_elapsed);
 
-  if (missile_is_armed)
+  if (mMissile_is_armed)
   {
     launch_missile_c();
-    missile_is_armed = false;
+	mMissile_is_armed = false;
   }
 }
 
 void afxMagicSpell::change_state_c(U8 pending_state)
 {
-  if (spell_state == pending_state)
+  if (mSpell_state == pending_state)
     return;
 
   // LEAVING THIS STATE
-  switch (spell_state)
+  switch (mSpell_state)
   {
   case INACTIVE_STATE:
     break;
@@ -2169,7 +2169,7 @@ void afxMagicSpell::change_state_c(U8 pending_state)
     break;
   }
 
-  spell_state = pending_state;
+  mSpell_state = pending_state;
 
   // ENTERING THIS STATE
   switch (pending_state)
@@ -2177,13 +2177,13 @@ void afxMagicSpell::change_state_c(U8 pending_state)
   case INACTIVE_STATE:
     break;
   case CASTING_STATE:
-    enter_casting_state_c(spell_elapsed);
+    enter_casting_state_c(mSpell_elapsed);
     break;
   case DELIVERY_STATE:
-    enter_delivery_state_c(spell_elapsed);
+    enter_delivery_state_c(mSpell_elapsed);
     break;
   case LINGER_STATE:
-    enter_linger_state_c(spell_elapsed);
+    enter_linger_state_c(mSpell_elapsed);
     break;
   case CLEANUP_STATE:
     break;
@@ -2195,113 +2195,113 @@ void afxMagicSpell::change_state_c(U8 pending_state)
 void afxMagicSpell::enter_casting_state_c(F32 starttime)
 {
   // stamp constraint-mgr starting time
-  constraint_mgr->setStartTime(Platform::getVirtualMilliseconds() - (U32)(spell_elapsed*1000));
+  constraint_mgr->setStartTime(Platform::getVirtualMilliseconds() - (U32)(mSpell_elapsed *1000));
   //spell_elapsed = 0; //SPELL_ELAPSED
 
   setup_dynamic_constraints();
 
   // start casting effects and castbar
   setup_casting_fx();
-  if (phrases[CASTING_PHRASE])
-    phrases[CASTING_PHRASE]->start(starttime, spell_elapsed); //START
+  if (mPhrases[CASTING_PHRASE])
+    mPhrases[CASTING_PHRASE]->start(starttime, mSpell_elapsed); //START
 
   // initialize missile
-  if (missile_db)
+  if (mMissile_db)
   {
-    missile_db = missile_db->cloneAndPerformSubstitutions(this, ranking);
-    init_missile_c(missile_db);
+    mMissile_db = mMissile_db->cloneAndPerformSubstitutions(this, ranking);
+    init_missile_c(mMissile_db);
   }
 }
 
 void afxMagicSpell::leave_casting_state_c()
 {
-  if (phrases[CASTING_PHRASE])
+  if (mPhrases[CASTING_PHRASE])
   {
-    if (marks_mask & MARK_INTERRUPT_CASTING)
+    if (mMarks_mask & MARK_INTERRUPT_CASTING)
     {
       //Con::printf("INTERRUPT CASTING (C)");
-      phrases[CASTING_PHRASE]->interrupt(spell_elapsed);
+      mPhrases[CASTING_PHRASE]->interrupt(mSpell_elapsed);
     }
     else
     {
       //Con::printf("LEAVING CASTING (C)");
-      phrases[CASTING_PHRASE]->stop(spell_elapsed);
+      mPhrases[CASTING_PHRASE]->stop(mSpell_elapsed);
     }
   }
 }
 
 void afxMagicSpell::enter_delivery_state_c(F32 starttime)
 {
-  missile_is_armed = true;
+  mMissile_is_armed = true;
 
   setup_launch_fx();
-  if (phrases[LAUNCH_PHRASE])
-    phrases[LAUNCH_PHRASE]->start(starttime, spell_elapsed); //START
+  if (mPhrases[LAUNCH_PHRASE])
+    mPhrases[LAUNCH_PHRASE]->start(starttime, mSpell_elapsed); //START
 
   setup_delivery_fx();
-  if (phrases[DELIVERY_PHRASE])
-    phrases[DELIVERY_PHRASE]->start(starttime, spell_elapsed); //START
+  if (mPhrases[DELIVERY_PHRASE])
+    mPhrases[DELIVERY_PHRASE]->start(starttime, mSpell_elapsed); //START
 }
 
 void afxMagicSpell::leave_delivery_state_c()
 {
-  if (missile)
+  if (mMissile)
   {
-    clearNotify(missile);
-    missile->deleteObject();
-    missile = NULL;
+    clearNotify(mMissile);
+	mMissile->deleteObject();
+	mMissile = NULL;
   }
 
-  if (phrases[DELIVERY_PHRASE])
+  if (mPhrases[DELIVERY_PHRASE])
   {
-    if (marks_mask & MARK_INTERRUPT_DELIVERY)
+    if (mMarks_mask & MARK_INTERRUPT_DELIVERY)
     {
       //Con::printf("INTERRUPT DELIVERY (C)");
-      phrases[DELIVERY_PHRASE]->interrupt(spell_elapsed);
+      mPhrases[DELIVERY_PHRASE]->interrupt(mSpell_elapsed);
     }
     else
     {
       //Con::printf("LEAVING DELIVERY (C)");
-      phrases[DELIVERY_PHRASE]->stop(spell_elapsed);
+      mPhrases[DELIVERY_PHRASE]->stop(mSpell_elapsed);
     }
   }
 }
 
 void afxMagicSpell::enter_linger_state_c(F32 starttime)
 {
-  if (impacted_obj)
-    impacted_cons_id = constraint_mgr->setReferenceObject(IMPACTED_OBJECT_CONS, impacted_obj);
-  else if (impacted_scope_id > 0)
-    impacted_cons_id = constraint_mgr->setReferenceObjectByScopeId(IMPACTED_OBJECT_CONS, impacted_scope_id, impacted_is_shape);
+  if (mImpacted_obj)
+    mImpacted_cons_id = constraint_mgr->setReferenceObject(IMPACTED_OBJECT_CONS, mImpacted_obj);
+  else if (mImpacted_scope_id > 0)
+    mImpacted_cons_id = constraint_mgr->setReferenceObjectByScopeId(IMPACTED_OBJECT_CONS, mImpacted_scope_id, mImpacted_is_shape);
   else
-    constraint_mgr->setReferencePoint(IMPACTED_OBJECT_CONS, impact_pos, impact_norm);
-  constraint_mgr->setReferencePoint(IMPACT_POINT_CONS, impact_pos, impact_norm);
+    constraint_mgr->setReferencePoint(IMPACTED_OBJECT_CONS, mImpact_pos, mImpact_norm);
+  constraint_mgr->setReferencePoint(IMPACT_POINT_CONS, mImpact_pos, mImpact_norm);
   constraint_mgr->setReferenceObject(MISSILE_CONS, 0);
 
   setup_impact_fx();
-  if (phrases[IMPACT_PHRASE])
-    phrases[IMPACT_PHRASE]->start(starttime, spell_elapsed); //START
+  if (mPhrases[IMPACT_PHRASE])
+    mPhrases[IMPACT_PHRASE]->start(starttime, mSpell_elapsed); //START
 
   setup_linger_fx();
-  if (phrases[LINGER_PHRASE])
+  if (mPhrases[LINGER_PHRASE])
   {
-    phrases[LINGER_PHRASE]->start(starttime, spell_elapsed); //START
+    mPhrases[LINGER_PHRASE]->start(starttime, mSpell_elapsed); //START
   }
 }
 
 void afxMagicSpell::leave_linger_state_c()
 {
-  if (phrases[LINGER_PHRASE])
+  if (mPhrases[LINGER_PHRASE])
   {
-    if (marks_mask & MARK_INTERRUPT_LINGER)
+    if (mMarks_mask & MARK_INTERRUPT_LINGER)
     {
       //Con::printf("INTERRUPT LINGER (C)");
-      phrases[LINGER_PHRASE]->interrupt(spell_elapsed);
+      mPhrases[LINGER_PHRASE]->interrupt(mSpell_elapsed);
     }
     else
     {
       //Con::printf("LEAVING LINGER (C)");
-      phrases[LINGER_PHRASE]->stop(spell_elapsed);
+      mPhrases[LINGER_PHRASE]->stop(mSpell_elapsed);
     }
   }
 }
@@ -2312,15 +2312,15 @@ void afxMagicSpell::sync_client(U16 marks, U8 state, F32 elapsed, F32 spell_elap
   //            marks, name_from_state(spell_state), name_from_state(state), elapsed,
   //            spell_elapsed);
 
-  if (spell_state != LATE_STATE)
+  if (mSpell_state != LATE_STATE)
     return;
 
-  marks_mask = marks;
+  mMarks_mask = marks;
 
   // don't want to be started on late zoning clients
-  if (!datablock->exec_on_new_clients)
+  if (!mDatablock->exec_on_new_clients)
   {
-    spell_state = DONE_STATE;
+    mSpell_state = DONE_STATE;
   }
 
   // it looks like we're ghosting pretty late and
@@ -2328,31 +2328,31 @@ void afxMagicSpell::sync_client(U16 marks, U8 state, F32 elapsed, F32 spell_elap
   else if ((marks & (MARK_INTERRUPTS | MARK_DEACTIVATE | MARK_SHUTDOWN)) ||
            (((marks & MARK_IMPACT) || (marks & MARK_END_DELIVERY)) && (marks & MARK_END_LINGER)))
   {
-    spell_state = DONE_STATE;
+    mSpell_state = DONE_STATE;
   }
 
   // it looks like we should be in the linger state.
   else if ((marks & MARK_IMPACT) ||
            (((marks & MARK_LAUNCH) || (marks & MARK_END_CASTING)) && (marks & MARK_END_DELIVERY)))
   {
-    spell_state = LINGER_STATE;
-    this->spell_elapsed = spell_elapsed;
+    mSpell_state = LINGER_STATE;
+    mSpell_elapsed = spell_elapsed;
     enter_linger_state_c(spell_elapsed-elapsed);
   }
 
   // it looks like we should be in the delivery state.
   else if ((marks & MARK_LAUNCH) || (marks & MARK_END_CASTING))
   {
-    spell_state = DELIVERY_STATE;
-    this->spell_elapsed = spell_elapsed;
+    mSpell_state = DELIVERY_STATE;
+	mSpell_elapsed = spell_elapsed;
     enter_delivery_state_c(spell_elapsed-elapsed);
   }
 
   // it looks like we should be in the casting state.
   else if (marks & MARK_ACTIVATE)
   {
-    spell_state = CASTING_STATE; //SPELL_STATE
-    this->spell_elapsed = spell_elapsed;
+    mSpell_state = CASTING_STATE; //SPELL_STATE
+	mSpell_elapsed = spell_elapsed;
     enter_casting_state_c(spell_elapsed-elapsed);
   }
 }
@@ -2367,39 +2367,39 @@ void afxMagicSpell::postSpellEvent(U8 event)
   switch (event)
   {
   case ACTIVATE_EVENT:
-    marks_mask |= MARK_ACTIVATE;
+    mMarks_mask |= MARK_ACTIVATE;
     break;
   case LAUNCH_EVENT:
-    marks_mask |= MARK_LAUNCH;
+    mMarks_mask |= MARK_LAUNCH;
     setMaskBits(LaunchEventMask);
     break;
   case IMPACT_EVENT:
-    marks_mask |= MARK_IMPACT;
+    mMarks_mask |= MARK_IMPACT;
     setMaskBits(ImpactEventMask);
     break;
   case SHUTDOWN_EVENT:
-    marks_mask |= MARK_SHUTDOWN;
+    mMarks_mask |= MARK_SHUTDOWN;
     break;
   case DEACTIVATE_EVENT:
-    marks_mask |= MARK_DEACTIVATE;
+    mMarks_mask |= MARK_DEACTIVATE;
     break;
   case INTERRUPT_PHASE_EVENT:
-    if (spell_state == CASTING_STATE)
-      marks_mask |= MARK_END_CASTING;
-    else if (spell_state == DELIVERY_STATE)
-      marks_mask |= MARK_END_DELIVERY;
-    else if (spell_state == LINGER_STATE)
-      marks_mask |= MARK_END_LINGER;
+    if (mSpell_state == CASTING_STATE)
+      mMarks_mask |= MARK_END_CASTING;
+    else if (mSpell_state == DELIVERY_STATE)
+      mMarks_mask |= MARK_END_DELIVERY;
+    else if (mSpell_state == LINGER_STATE)
+      mMarks_mask |= MARK_END_LINGER;
     break;
   case INTERRUPT_SPELL_EVENT:
-    if (spell_state == CASTING_STATE)
-      marks_mask |= MARK_INTERRUPT_CASTING;
-    else if (spell_state == DELIVERY_STATE)
-      marks_mask |= MARK_INTERRUPT_DELIVERY;
-    else if (spell_state == LINGER_STATE)
-      marks_mask |= MARK_INTERRUPT_LINGER;
-    else if (spell_state == CLEANUP_STATE)
-      marks_mask |= MARK_INTERRUPT_CLEANUP;
+    if (mSpell_state == CASTING_STATE)
+      mMarks_mask |= MARK_INTERRUPT_CASTING;
+    else if (mSpell_state == DELIVERY_STATE)
+      mMarks_mask |= MARK_INTERRUPT_DELIVERY;
+    else if (mSpell_state == LINGER_STATE)
+      mMarks_mask |= MARK_INTERRUPT_LINGER;
+    else if (mSpell_state == CLEANUP_STATE)
+      mMarks_mask |= MARK_INTERRUPT_CLEANUP;
     break;
   }
 }
@@ -2407,7 +2407,7 @@ void afxMagicSpell::postSpellEvent(U8 event)
 void afxMagicSpell::resolveTimeFactors()
 {
   for (S32 i = 0; i < NUM_PHRASES; i++)
-    tfactors[i] *= overall_time_factor;
+    mTfactors[i] *= mOverall_time_factor;
 }
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
@@ -2416,10 +2416,10 @@ void afxMagicSpell::finish_startup()
 {
 #if !defined(BROKEN_POINT_IN_WATER)
   // test if caster is in water
-  if (caster)
+  if (mCaster)
   {
-    Point3F pos = caster->getPosition();
-    if (caster->pointInWater(pos))
+    Point3F pos = mCaster->getPosition();
+    if (mCaster->pointInWater(pos))
       exec_conds_mask |= CASTER_IN_WATER;
   }
 #endif
@@ -2480,7 +2480,7 @@ afxMagicSpell::cast_spell(afxMagicSpellData* datablock, ShapeBase* caster, Scene
   // create a new spell instance
   afxMagicSpell* spell = new afxMagicSpell(caster, target);
   spell->setDataBlock(datablock);
-  spell->exeblock = exeblock;
+  spell->mExeblock = exeblock;
   spell->setExtra(extra);
 
   // copy dynamic fields from the param holder to the spell
@@ -2527,28 +2527,28 @@ Point3F afxMagicSpell::getShapeImpactPos(SceneObject* obj)
 
 void afxMagicSpell::restoreObject(SceneObject* obj)
 {
-  if (obj->getScopeId() == caster_scope_id && dynamic_cast<ShapeBase*>(obj) != NULL)
+  if (obj->getScopeId() == mCaster_scope_id && dynamic_cast<ShapeBase*>(obj) != NULL)
   {
-    caster_scope_id = 0;
-    caster = (ShapeBase*)obj;
-    caster_field = caster;
-    deleteNotify(caster);
-    processAfter(caster);
+    mCaster_scope_id = 0;
+	mCaster = (ShapeBase*)obj;
+	mCaster_field = mCaster;
+    deleteNotify(mCaster);
+    processAfter(mCaster);
   }
 
-  if (obj->getScopeId() == target_scope_id)
+  if (obj->getScopeId() == mTarget_scope_id)
   {
-    target_scope_id = 0;
-    target = obj;
-    target_field = target;
-    deleteNotify(target);
+    mTarget_scope_id = 0;
+	mTarget = obj;
+    mTarget_field = mTarget;
+    deleteNotify(mTarget);
   }
 
-  if (obj->getScopeId() == impacted_scope_id)
+  if (obj->getScopeId() == mImpacted_scope_id)
   {
-    impacted_scope_id = 0;
-    impacted_obj = obj;
-    deleteNotify(impacted_obj);
+    mImpacted_scope_id = 0;
+	mImpacted_obj = obj;
+    deleteNotify(mImpacted_obj);
   }
 }
 
@@ -2561,23 +2561,23 @@ bool afxMagicSpell::activationCallInit(bool postponed)
     return false;
   }
 
-  if (!caster_field)
+  if (!mCaster_field)
   {
     Con::errorf("afxMagicSpell::activate() -- no spellcaster specified.");
     return false;
   }
 
-  caster = dynamic_cast<ShapeBase*>(caster_field);
-  if (!caster)
+  mCaster = dynamic_cast<ShapeBase*>(mCaster_field);
+  if (!mCaster)
   {
     Con::errorf("afxMagicSpell::activate() -- spellcaster is not a ShapeBase derived object.");
     return false;
   }
 
-  if (target_field)
+  if (mTarget_field)
   {
-    target = dynamic_cast<SceneObject*>(target_field);
-    if (!target)
+    mTarget = dynamic_cast<SceneObject*>(mTarget_field);
+    if (!mTarget)
       Con::warnf("afxMagicSpell::activate() -- target is not a SceneObject derived object.");
   }
 
@@ -2591,11 +2591,11 @@ void afxMagicSpell::activate()
   // to happen prior to object registration.
   Sim::postEvent(this, new SpellFinishStartupEvent, Sim::getCurrentTime());
 
-  caster_field = caster;
-  target_field = target;
+  mCaster_field = mCaster;
+  mTarget_field = mTarget;
 
   // CALL SCRIPT afxMagicSpellData::onActivate(%spell, %caster, %target)
-  datablock->onActivate_callback(this, caster, target);
+  mDatablock->onActivate_callback(this, mCaster, mTarget);
 }
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
@@ -2633,29 +2633,29 @@ DefineEngineMethod(afxMagicSpell, getImpactedObject, S32, (),,
   return (imp_obj) ? imp_obj->getId() : -1;
 }
 
-ConsoleMethod(afxMagicSpell, setTimeFactor, void, 3, 4, "(F32 factor) or (string phase, F32 factor)"
-              "Sets the time-factor for the spell, either overall or for a specific phrase.\n\n"
-              "@ingroup AFX")
+DefineEngineStringlyVariadicMethod(afxMagicSpell, setTimeFactor, void, 3, 4, "(F32 factor) or (string phase, F32 factor)"
+   "Sets the time-factor for the spell, either overall or for a specific phrase.\n\n"
+   "@ingroup AFX")
 {
-  if (argc == 3)
-    object->setTimeFactor(dAtof(argv[2]));
-  else
-  {
-    if (dStricmp(argv[2], "overall") == 0)
-      object->setTimeFactor(dAtof(argv[3]));
-    else if (dStricmp(argv[2], "casting") == 0)
-      object->setTimeFactor(afxMagicSpell::CASTING_PHRASE, dAtof(argv[3]));
-    else if (dStricmp(argv[2], "launch") == 0)
-      object->setTimeFactor(afxMagicSpell::LAUNCH_PHRASE, dAtof(argv[3]));
-    else if (dStricmp(argv[2], "delivery") == 0)
-      object->setTimeFactor(afxMagicSpell::DELIVERY_PHRASE, dAtof(argv[3]));
-    else if (dStricmp(argv[2], "impact") == 0)
-      object->setTimeFactor(afxMagicSpell::IMPACT_PHRASE, dAtof(argv[3]));
-    else if (dStricmp(argv[2], "linger") == 0)
-      object->setTimeFactor(afxMagicSpell::LINGER_PHRASE, dAtof(argv[3]));
-    else
-      Con::errorf("afxMagicSpell::setTimeFactor() -- unknown spell phrase [%s].", argv[2].getStringValue());
-  }
+   if (argc == 3)
+      object->setTimeFactor(dAtof(argv[2]));
+   else
+   {
+      if (dStricmp(argv[2], "overall") == 0)
+         object->setTimeFactor(dAtof(argv[3]));
+      else if (dStricmp(argv[2], "casting") == 0)
+         object->setTimeFactor(afxMagicSpell::CASTING_PHRASE, dAtof(argv[3]));
+      else if (dStricmp(argv[2], "launch") == 0)
+         object->setTimeFactor(afxMagicSpell::LAUNCH_PHRASE, dAtof(argv[3]));
+      else if (dStricmp(argv[2], "delivery") == 0)
+         object->setTimeFactor(afxMagicSpell::DELIVERY_PHRASE, dAtof(argv[3]));
+      else if (dStricmp(argv[2], "impact") == 0)
+         object->setTimeFactor(afxMagicSpell::IMPACT_PHRASE, dAtof(argv[3]));
+      else if (dStricmp(argv[2], "linger") == 0)
+         object->setTimeFactor(afxMagicSpell::LINGER_PHRASE, dAtof(argv[3]));
+      else
+         Con::errorf("afxMagicSpell::setTimeFactor() -- unknown spell phrase [%s].", argv[2].getStringValue());
+   }
 }
 
 DefineEngineMethod(afxMagicSpell, interruptStage, void, (),,

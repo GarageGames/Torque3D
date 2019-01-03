@@ -756,13 +756,13 @@ void TSShape::removeMeshFromObject(S32 objIndex, S32 meshIndex)
                if (meshes[k] == NULL)
                   continue;
 
-               if (meshes[k]->parentMesh == idxToRemove)
+               if (meshes[k]->mParentMesh == idxToRemove)
                {
-                  meshes[k]->parentMesh = -1;
+                  meshes[k]->mParentMesh = -1;
                }
-               else if (meshes[k]->parentMesh > idxToRemove)
+               else if (meshes[k]->mParentMesh > idxToRemove)
                {
-                  meshes[k]->parentMesh--;
+                  meshes[k]->mParentMesh--;
                }
             }
 
@@ -800,13 +800,13 @@ void TSShape::removeMeshFromObject(S32 objIndex, S32 meshIndex)
          if (meshes[k] == NULL)
             continue;
 
-         if (meshes[k]->parentMesh == idxToRemove)
+         if (meshes[k]->mParentMesh == idxToRemove)
          {
-            meshes[k]->parentMesh = -1;
+            meshes[k]->mParentMesh = -1;
          }
-         else if (meshes[k]->parentMesh > idxToRemove)
+         else if (meshes[k]->mParentMesh > idxToRemove)
          {
-            meshes[k]->parentMesh--;
+            meshes[k]->mParentMesh--;
          }
       }
 
@@ -937,8 +937,8 @@ TSMesh* TSShape::copyMesh( const TSMesh* srcMesh ) const
       return mesh;      // return an empty mesh
 
    // Copy mesh elements
-   mesh->indices = srcMesh->indices;
-   mesh->primitives = srcMesh->primitives;
+   mesh->mIndices = srcMesh->mIndices;
+   mesh->mPrimitives = srcMesh->mPrimitives;
    mesh->numFrames = srcMesh->numFrames;
    mesh->numMatFrames = srcMesh->numMatFrames;
    mesh->vertsPerFrame = srcMesh->vertsPerFrame;
@@ -948,8 +948,8 @@ TSMesh* TSShape::copyMesh( const TSMesh* srcMesh ) const
    // Copy vertex data in an *unpacked* form
    mesh->copySourceVertexDataFrom(srcMesh);
 
-   mesh->createTangents(mesh->verts, mesh->norms);
-   mesh->encodedNorms.set(NULL, 0);
+   mesh->createTangents(mesh->mVerts, mesh->mNorms);
+   mesh->mEncodedNorms.set(NULL, 0);
 
    mesh->computeBounds();
 
@@ -1108,12 +1108,12 @@ bool TSShape::addMesh(TSShape* srcShape, const String& srcMeshName, const String
    // Copy materials used by the source mesh (only if from a different shape)
    if (srcShape != this)
    {
-      for (S32 i = 0; i < mesh->primitives.size(); i++)
+      for (S32 i = 0; i < mesh->mPrimitives.size(); i++)
       {
-         if (!(mesh->primitives[i].matIndex & TSDrawPrimitive::NoMaterial))
+         if (!(mesh->mPrimitives[i].matIndex & TSDrawPrimitive::NoMaterial))
          {
-            S32 drawType = (mesh->primitives[i].matIndex & (~TSDrawPrimitive::MaterialMask));
-            S32 srcMatIndex = mesh->primitives[i].matIndex & TSDrawPrimitive::MaterialMask;
+            S32 drawType = (mesh->mPrimitives[i].matIndex & (~TSDrawPrimitive::MaterialMask));
+            S32 srcMatIndex = mesh->mPrimitives[i].matIndex & TSDrawPrimitive::MaterialMask;
             const String& matName = srcShape->materialList->getMaterialName(srcMatIndex);
 
             // Add the material if it does not already exist
@@ -1124,7 +1124,7 @@ bool TSShape::addMesh(TSShape* srcShape, const String& srcMeshName, const String
                materialList->push_back(matName, srcShape->materialList->getFlags(srcMatIndex));
             }
 
-            mesh->primitives[i].matIndex = drawType | destMatIndex;
+            mesh->mPrimitives[i].matIndex = drawType | destMatIndex;
          }
       }
    }

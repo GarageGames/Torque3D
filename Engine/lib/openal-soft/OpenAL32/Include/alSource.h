@@ -1,11 +1,14 @@
 #ifndef _AL_SOURCE_H_
 #define _AL_SOURCE_H_
 
-#define MAX_SENDS                 4
-
+#include "bool.h"
 #include "alMain.h"
 #include "alu.h"
 #include "hrtf.h"
+#include "atomic.h"
+
+#define MAX_SENDS      16
+#define DEFAULT_SENDS  2
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,102 +16,14 @@ extern "C" {
 
 struct ALbuffer;
 struct ALsource;
-struct ALsourceProps;
 
 
 typedef struct ALbufferlistitem {
-    struct ALbuffer *buffer;
-    struct ALbufferlistitem *volatile next;
+    ATOMIC(struct ALbufferlistitem*) next;
+    ALsizei max_samples;
+    ALsizei num_buffers;
+    struct ALbuffer *buffers[];
 } ALbufferlistitem;
-
-
-struct ALsourceProps {
-    ATOMIC(ALfloat)   Pitch;
-    ATOMIC(ALfloat)   Gain;
-    ATOMIC(ALfloat)   OuterGain;
-    ATOMIC(ALfloat)   MinGain;
-    ATOMIC(ALfloat)   MaxGain;
-    ATOMIC(ALfloat)   InnerAngle;
-    ATOMIC(ALfloat)   OuterAngle;
-    ATOMIC(ALfloat)   RefDistance;
-    ATOMIC(ALfloat)   MaxDistance;
-    ATOMIC(ALfloat)   RollOffFactor;
-    ATOMIC(ALfloat)   Position[3];
-    ATOMIC(ALfloat)   Velocity[3];
-    ATOMIC(ALfloat)   Direction[3];
-    ATOMIC(ALfloat)   Orientation[2][3];
-    ATOMIC(ALboolean) HeadRelative;
-    ATOMIC(enum DistanceModel) DistanceModel;
-    ATOMIC(ALboolean) DirectChannels;
-
-    ATOMIC(ALboolean) DryGainHFAuto;
-    ATOMIC(ALboolean) WetGainAuto;
-    ATOMIC(ALboolean) WetGainHFAuto;
-    ATOMIC(ALfloat)   OuterGainHF;
-
-    ATOMIC(ALfloat) AirAbsorptionFactor;
-    ATOMIC(ALfloat) RoomRolloffFactor;
-    ATOMIC(ALfloat) DopplerFactor;
-
-    ATOMIC(ALfloat) StereoPan[2];
-
-    ATOMIC(ALfloat) Radius;
-
-    /** Direct filter and auxiliary send info. */
-    struct {
-        ATOMIC(ALfloat) Gain;
-        ATOMIC(ALfloat) GainHF;
-        ATOMIC(ALfloat) HFReference;
-        ATOMIC(ALfloat) GainLF;
-        ATOMIC(ALfloat) LFReference;
-    } Direct;
-    struct {
-        ATOMIC(struct ALeffectslot*) Slot;
-        ATOMIC(ALfloat) Gain;
-        ATOMIC(ALfloat) GainHF;
-        ATOMIC(ALfloat) HFReference;
-        ATOMIC(ALfloat) GainLF;
-        ATOMIC(ALfloat) LFReference;
-    } Send[MAX_SENDS];
-
-    ATOMIC(struct ALsourceProps*) next;
-};
-
-
-typedef struct ALvoice {
-    struct ALsourceProps Props;
-
-    struct ALsource *volatile Source;
-
-    /** Current target parameters used for mixing. */
-    ALint Step;
-
-    /* If not 'moving', gain/coefficients are set directly without fading. */
-    ALboolean Moving;
-
-    ALboolean IsHrtf;
-
-    ALuint Offset; /* Number of output samples mixed since starting. */
-
-    alignas(16) ALfloat PrevSamples[MAX_INPUT_CHANNELS][MAX_PRE_SAMPLES];
-
-    BsincState SincState;
-
-    struct {
-        ALfloat (*Buffer)[BUFFERSIZE];
-        ALuint Channels;
-    } DirectOut;
-
-    struct {
-        ALfloat (*Buffer)[BUFFERSIZE];
-        ALuint Channels;
-    } SendOut[MAX_SENDS];
-
-    struct {
-        DirectParams Direct;
-        SendParams Send[MAX_SENDS];
-    } Chan[MAX_INPUT_CHANNELS];
-} ALvoice;
 
 
 typedef struct ALsource {
@@ -122,14 +37,17 @@ typedef struct ALsource {
     ALfloat   OuterAngle;
     ALfloat   RefDistance;
     ALfloat   MaxDistance;
-    ALfloat   RollOffFactor;
+    ALfloat   RolloffFactor;
     ALfloat   Position[3];
     ALfloat   Velocity[3];
     ALfloat   Direction[3];
     ALfloat   Orientation[2][3];
     ALboolean HeadRelative;
+    ALboolean Looping;
     enum DistanceModel DistanceModel;
+    enum Resampler Resampler;
     ALboolean DirectChannels;
+    enum SpatializeMode Spatialize;
 
     ALboolean DryGainHFAuto;
     ALboolean WetGainAuto;
@@ -162,7 +80,7 @@ typedef struct ALsource {
         ALfloat HFReference;
         ALfloat GainLF;
         ALfloat LFReference;
-    } Send[MAX_SENDS];
+    } *Send;
 
     /**
      * Last user-specified offset, and the offset type (bytes, samples, or
@@ -176,51 +94,22 @@ typedef struct ALsource {
 
     /** Source state (initial, playing, paused, or stopped) */
     ALenum state;
-    ALenum new_state;
 
-    /** Source Buffer Queue info. */
-    RWLock queue_lock;
-    ATOMIC(ALbufferlistitem*) queue;
-    ATOMIC(ALbufferlistitem*) current_buffer;
+    /** Source Buffer Queue head. */
+    ALbufferlistitem *queue;
 
-    /**
-     * Source offset in samples, relative to the currently playing buffer, NOT
-     * the whole queue, and the fractional (fixed-point) offset to the next
-     * sample.
+    ATOMIC_FLAG PropsClean;
+
+    /* Index into the context's Voices array. Lazily updated, only checked and
+     * reset when looking up the voice.
      */
-    ATOMIC(ALuint) position;
-    ATOMIC(ALuint) position_fraction;
-
-    ATOMIC(ALboolean) looping;
-
-    /** Current buffer sample info. */
-    ALuint NumChannels;
-    ALuint SampleSize;
-
-    ATOMIC(struct ALsourceProps*) Update;
-    ATOMIC(struct ALsourceProps*) FreeList;
+    ALint VoiceIdx;
 
     /** Self ID */
     ALuint id;
 } ALsource;
 
-inline void LockSourcesRead(ALCcontext *context)
-{ LockUIntMapRead(&context->SourceMap); }
-inline void UnlockSourcesRead(ALCcontext *context)
-{ UnlockUIntMapRead(&context->SourceMap); }
-inline void LockSourcesWrite(ALCcontext *context)
-{ LockUIntMapWrite(&context->SourceMap); }
-inline void UnlockSourcesWrite(ALCcontext *context)
-{ UnlockUIntMapWrite(&context->SourceMap); }
-
-inline struct ALsource *LookupSource(ALCcontext *context, ALuint id)
-{ return (struct ALsource*)LookupUIntMapKeyNoLock(&context->SourceMap, id); }
-inline struct ALsource *RemoveSource(ALCcontext *context, ALuint id)
-{ return (struct ALsource*)RemoveUIntMapKeyNoLock(&context->SourceMap, id); }
-
 void UpdateAllSourceProps(ALCcontext *context);
-ALvoid SetSourceState(ALsource *Source, ALCcontext *Context, ALenum state);
-ALboolean ApplyOffset(ALsource *Source);
 
 ALvoid ReleaseALSources(ALCcontext *Context);
 
