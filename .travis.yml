@@ -2,3 +2,10 @@ language: cpp
 compiler:
   - clang
   - gcc
+
+script:
+  - cp -r Templates/BaseGame/ My\ Projects/
+  - mkdir My\ Projects/BaseGame/travis/
+  - cd My\ Projects/BaseGame/travis/
+  - cmake ../../../.. -DTORQUE_APP_NAME=BaseGame -DCMAKE_BUILD_TYPE=Debug
+  - make
