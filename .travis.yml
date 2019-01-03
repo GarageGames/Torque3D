@@ -3,6 +3,10 @@ compiler:
   - clang
   - gcc
 
+install:
+  - sudo apt-get install git build-essential nasm xorg-dev ninja-build cmake
+  - sudo apt-get install libogg-dev libxft-dev libx11-dev libxxf86vm-dev libopenal-dev libfreetype6-dev libxcursor-dev libxinerama-dev libxi-dev libxrandr-dev libxss-dev libglu1-mesa-dev
+
 script:
   - pwd
   - ls
