@@ -305,7 +305,7 @@ void GuiNavEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 
    RayInfo ri;
 
-   U8 keys = Input::getModifierKeys();
+   U16 keys = Input::getModifierKeys();
    bool shift = keys & SI_LSHIFT;
    bool ctrl = keys & SI_LCTRL;
 
