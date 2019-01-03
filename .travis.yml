@@ -19,6 +19,7 @@ script:
   - pwd
   - cmake ../../../.. -DTORQUE_APP_NAME=BaseGame -DCMAKE_BUILD_TYPE=Release -Wno-deprecated
   - ls
-  - make
+  - make 2>/dev/null # Do the actual build, but ignore all the warnings
+  - make # build again. This time all output is printed but the warnings that happened earlier do not happen again
   - cd ../../game/
   - ls
