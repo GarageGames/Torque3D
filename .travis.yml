@@ -1,13 +1,16 @@
 language: cpp
-os:
-  - osx
-  - linux
-dist: xenial
-compiler:
-  - gcc
-  - clang
 
-env: CXXFLAGS="-fgnu-inline-asm -fasm-blocks"
+dist: xenial
+
+matrix:
+  include:
+    - os: osx
+      compiler: clang
+      env: if CXXFLAGS="-fgnu-inline-asm -fasm-blocks"
+    - os: linux
+      compiler: gcc
+    - os: linux
+      compiler: clang
 
 addons:
   apt:
@@ -27,9 +30,6 @@ addons:
       - libxss-dev
       - libglu1-mesa-dev
       - libgtk-3-dev
-  homebrew:
-    packages:
-      - nasm
 
 script:
   - pwd
