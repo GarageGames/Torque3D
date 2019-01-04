@@ -7,7 +7,7 @@ compiler:
   - gcc
   - clang
 
-env: CXXFLAGS="fgnu-inline-asm -fasm-blocks"
+env: CXXFLAGS="-fgnu-inline-asm -fasm-blocks"
 
 addons:
   apt:
