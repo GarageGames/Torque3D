@@ -1,8 +1,11 @@
 language: cpp
+os:
+  - linux
+  - osx
 dist: xenial
 compiler:
-  - clang
   - gcc
+  - clang
 
 addons:
   apt:
@@ -31,7 +34,7 @@ script:
   - mkdir My\ Projects/BaseGame/buildFiles/travis/
   - cd My\ Projects/BaseGame/buildFiles/travis/
   - pwd
-  - cmake ../../../.. -DTORQUE_APP_NAME=BaseGame -DCMAKE_BUILD_TYPE=Release -Wno-deprecated
+  - cmake ../../../.. -DTORQUE_APP_NAME=BaseGame -DCMAKE_BUILD_TYPE=Debug
   - ls
   - make 2>/dev/null # Do the actual build, but ignore all the warnings
   - make # build again. This time all output is printed but the warnings that happened earlier do not happen again
