@@ -1,7 +1,7 @@
 language: cpp
 os:
-  - linux
   - osx
+  - linux
 dist: xenial
 compiler:
   - gcc
@@ -29,7 +29,7 @@ addons:
 script:
   - pwd
   - ls
-  - cp -r Templates/BaseGame/ My\ Projects/
+  - cp -r Templates/BaseGame My\ Projects/
   - mkdir My\ Projects/BaseGame/buildFiles/
   - mkdir My\ Projects/BaseGame/buildFiles/travis/
   - cd My\ Projects/BaseGame/buildFiles/travis/
