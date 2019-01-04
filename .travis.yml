@@ -25,6 +25,9 @@ addons:
       - libxss-dev
       - libglu1-mesa-dev
       - libgtk-3-dev
+  homebrew:
+    packages:
+      - nasm
 
 script:
   - pwd
