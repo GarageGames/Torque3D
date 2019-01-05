@@ -32,16 +32,13 @@ addons:
       - libgtk-3-dev
 
 script:
-  - pwd
-  - ls
-  - cp -r Templates/BaseGame My\ Projects/
-  - mkdir My\ Projects/BaseGame/buildFiles/
-  - mkdir My\ Projects/BaseGame/buildFiles/travis/
-  - cd My\ Projects/BaseGame/buildFiles/travis/
-  - pwd
-  - cmake ../../../.. -DTORQUE_APP_NAME=BaseGame -DCMAKE_BUILD_TYPE=Debug
-  - ls
+  - mkdir My\ Projects/TestProject/
+  - mkdir My\ Projects/TestProject/buildFiles/
+  - mkdir My\ Projects/TestProject/buildFiles/travis/
+  - cd My\ Projects/TestProject/buildFiles/travis/
+  - cmake ../../../.. -DTORQUE_APP_NAME=TestProject -DCMAKE_BUILD_TYPE=Debug
   - make 2>/dev/null # Do the actual build, but ignore all the warnings
   - make # build again. This time all output is printed but the warnings that happened earlier do not happen again
+  - make install
   - cd ../../game/
   - ls
