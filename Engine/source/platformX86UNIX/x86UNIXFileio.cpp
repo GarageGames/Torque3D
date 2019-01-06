@@ -55,7 +55,7 @@
  #include "console/console.h"
  #include "core/strings/stringFunctions.h"
  #include "util/tempAlloc.h"
- #include "cinterface/cinterface.h"
+ #include "cinterface/c_controlInterface.h"
  #include "core/volume.h"
 
  #if defined(__FreeBSD__)

@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
-
+#include "console/engineAPI.h"
 #ifndef TORQUE_DEDICATED
 #include <SDL.h>
 #endif
@@ -203,10 +203,7 @@ void Platform::outputDebugString(const char *string, ...)
 
 //-----------------------------------------------------------------------------
 // testing function
-ConsoleFunction(debug_debugbreak, void, 1, 1, "debug_debugbreak()")
-{
-   Platform::debugBreak();
-}
+//DefineEngineFunction(debug_debugbreak, void, () , , "debug_debugbreak();");
 
 //-----------------------------------------------------------------------------
 void Platform::restartInstance()
