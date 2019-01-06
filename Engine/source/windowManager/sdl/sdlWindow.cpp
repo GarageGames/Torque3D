@@ -598,6 +598,7 @@ void PlatformWindowSDL::_processSDLEvent(SDL_Event &evt)
                SDL_GetWindowSize( mWindowHandle, &width, &height );
                mVideoMode.resolution.set( width, height );
                getGFXTarget()->resetMode();
+               resizeEvent.trigger(getWindowId(), width, height);
                break;
             }
 
