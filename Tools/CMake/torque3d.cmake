@@ -464,7 +464,7 @@ if(TORQUE_SDL)
        add_definitions(${GTK3_CFLAGS_OTHER})
 
 	   if(TORQUE_UseZenity)
-			set(BLACKLIST "nfd_win.cpp" "nfd_cocoa.m"  )
+			set(BLACKLIST "nfd_win.cpp" "nfd_cocoa.m" "nfd_gtk.c" )
 	   else()
 			set(BLACKLIST "nfd_win.cpp" "nfd_cocoa.m" "simple_exec.h" "nfd_zenity.c")
 	   endif()
