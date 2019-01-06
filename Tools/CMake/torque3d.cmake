@@ -463,11 +463,11 @@ if(TORQUE_SDL)
        # Add other flags to the compiler
        add_definitions(${GTK3_CFLAGS_OTHER})
 
-	   if(TORQUE_USE_ZENITY)
-			set(BLACKLIST "nfd_win.cpp" "nfd_cocoa.m" "nfd_gtk.c" )
-	   else()
-			set(BLACKLIST "nfd_win.cpp" "nfd_cocoa.m" "simple_exec.h" "nfd_zenity.c")
-	   endif()
+       if(TORQUE_USE_ZENITY)
+          set(BLACKLIST "nfd_win.cpp" "nfd_cocoa.m" "nfd_gtk.c" )
+       else()
+          set(BLACKLIST "nfd_win.cpp" "nfd_cocoa.m" "simple_exec.h" "nfd_zenity.c")
+       endif()
        addLib(nativeFileDialogs)
 
        set(BLACKLIST ""  )
