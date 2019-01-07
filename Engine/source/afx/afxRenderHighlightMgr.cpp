@@ -151,7 +151,13 @@ void afxRenderHighlightMgr::render( SceneRenderState *state )
             matrixSet.setProjection(*passRI->projection);
             mat->setTransforms(matrixSet, state);
 
-            mat->setSceneInfo(state, sgData);
+			// Setup HW skinning transforms if applicable
+			if (mat->usesHardwareSkinning())
+			{
+				mat->setNodeTransforms(passRI->mNodeTransforms, passRI->mNodeTransformCount);
+			}
+
+			mat->setSceneInfo(state, sgData);
             mat->setBuffers(passRI->vertBuff, passRI->primBuff);
 
             if ( passRI->prim )
