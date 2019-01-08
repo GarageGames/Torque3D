@@ -388,7 +388,7 @@ void GuiBitmapButtonCtrl::setBitmapHandles(GFXTexHandle normal, GFXTexHandle hig
 
 GuiBitmapButtonCtrl::Modifier GuiBitmapButtonCtrl::getCurrentModifier()
 {   
-   U8 modifierKeys = Input::getModifierKeys();
+   U16 modifierKeys = Input::getModifierKeys();
 
    if( modifierKeys & SI_PRIMARY_CTRL )
       return ModifierCtrl;

@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#ifndef TORQUE_SDL
 #include "platformWin32/platformWin32.h"
 #include "platformWin32/winDirectInput.h"
 #include "platformWin32/winDInputDevice.h"
@@ -943,3 +944,4 @@ DefineEngineFunction( rumble, void, (const char * device, F32 xRumble, F32 yRumb
       Con::printf( "DirectInput/XInput is not enabled." );
    }
 }
+#endif //!TORQUE_SDL

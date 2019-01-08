@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#ifndef TORQUE_SDL
 #ifndef INITGUID
 #define INITGUID
 #endif
@@ -1587,5 +1588,4 @@ bool DInputDevice::joystickDetected()
    return( smDeviceCount[ JoystickDeviceType ] > 0 );
 }
 
-
-
+#endif //!TORQUE_SDL

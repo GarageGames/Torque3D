@@ -26,9 +26,6 @@
 #include "platform/input/IProcessInput.h"
 
 
-extern InputModifiers convertModifierBits(const U32 in);
-
-
 //-----------------------------------------------------------------------------
 // Constructor/Destructor
 //-----------------------------------------------------------------------------
@@ -87,11 +84,21 @@ void WindowInputGenerator::generateInputEvent( InputEventInfo &inputEvent )
 
    if (inputEvent.action == SI_MAKE && inputEvent.deviceType == KeyboardDeviceType)
    {
+      U32 realMods = inputEvent.modifier;
+      if (realMods & SI_SHIFT)
+         realMods |= SI_SHIFT;
+      if (realMods & SI_CTRL)
+         realMods |= SI_CTRL;
+      if (realMods & SI_ALT)
+         realMods |= SI_ALT;
+      if (realMods & SI_MAC_OPT)
+         realMods |= SI_MAC_OPT;
+
       for (int i = 0; i < mAcceleratorMap.size(); ++i)
       {
          const AccKeyMap &acc = mAcceleratorMap[i];
          if (!mWindow->getKeyboardTranslation() &&
-            ((acc.modifier == inputEvent.modifier && acc.modifier != 0) || (acc.modifier == 0 && inputEvent.modifier == 0))
+            ((acc.modifier == realMods && acc.modifier != 0) || (acc.modifier == 0 && realMods == 0))
             && acc.keyCode == inputEvent.objInst)
          {
             Con::evaluatef(acc.cmd);
@@ -141,11 +148,7 @@ void WindowInputGenerator::handleMouseMove( WindowId did, U32 modifier, S32 x, S
    event.deviceType = MouseDeviceType;
    event.deviceInst = 0;
    event.objType    = SI_AXIS;
-#ifdef TORQUE_SDL
    event.modifier = modifier;
-#else
-   event.modifier = convertModifierBits(modifier);
-#endif
    event.ascii      = 0;
 
    // Generate delta movement along each axis
@@ -231,11 +234,7 @@ void WindowInputGenerator::handleMouseButton( WindowId did, U32 modifiers, U32 a
    event.deviceInst = 0;
    event.objType    = SI_BUTTON;
    event.objInst    = (InputObjectInstances)(KEY_BUTTON0 + button);
-#ifdef TORQUE_SDL
    event.modifier = modifiers;
-#else
-   event.modifier = convertModifierBits(modifiers);
-#endif
    event.ascii      = 0;
    event.action     = (action==IA_MAKE) ? SI_MAKE : SI_BREAK;
    event.fValue     = (action==IA_MAKE) ? 1.0 : 0.0;
@@ -252,11 +251,7 @@ void WindowInputGenerator::handleMouseWheel( WindowId did, U32 modifiers, S32 wh
    event.deviceType = MouseDeviceType;
    event.deviceInst = 0;
    event.objType    = SI_AXIS;
-#ifdef TORQUE_SDL
    event.modifier = modifiers;
-#else
-   event.modifier = convertModifierBits(modifiers);
-#endif
    event.ascii      = 0;
    event.action     = SI_MOVE;
 
@@ -289,11 +284,7 @@ void WindowInputGenerator::handleCharInput( WindowId did, U32 modifier, U16 key 
    event.deviceInst  = 0;
    event.objType     = SI_KEY;
    event.objInst     = KEY_NULL;
-#ifdef TORQUE_SDL
    event.modifier = modifier;
-#else
-   event.modifier = convertModifierBits(modifier);
-#endif
    event.ascii       = key;
    event.action      = SI_MAKE;
    event.fValue      = 1.0;
@@ -305,7 +296,7 @@ void WindowInputGenerator::handleCharInput( WindowId did, U32 modifier, U16 key 
 }
 
 
-void WindowInputGenerator::handleKeyboard( WindowId did, U32 modifier, U32 action, U16 key )
+void WindowInputGenerator::handleKeyboard( WindowId did, U32 modifier, U32 action, S32 keySym, U16 key )
 {
    if( !mInputController || !mFocused )
       return;
@@ -314,12 +305,9 @@ void WindowInputGenerator::handleKeyboard( WindowId did, U32 modifier, U32 actio
    event.deviceType  = KeyboardDeviceType;
    event.deviceInst  = 0;
    event.objType     = SI_KEY;
-   event.objInst     = (InputObjectInstances)key;
-#ifdef TORQUE_SDL
+   event.objInst     = (U32)key;
    event.modifier    = modifier;
-#else
-   event.modifier = convertModifierBits(modifier);
-#endif
+   event.iValue      = keySym;
    event.ascii       = 0;
 
    switch(action)
@@ -341,7 +329,7 @@ void WindowInputGenerator::handleKeyboard( WindowId did, U32 modifier, U32 actio
 
       // If we encounter an unknown don't submit the event.
    default:
-      //Con::warnf("GuiCanvas::handleKeyboard - got an unknown action type %d!", action);
+      //Con::warnf("WindowInputGenerator::handleKeyboard - got an unknown action type %d!", action);
       return;
    }
 

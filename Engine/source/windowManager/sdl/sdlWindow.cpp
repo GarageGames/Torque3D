@@ -44,52 +44,6 @@
 #define IDI_ICON1 107
 #endif
 
-namespace 
-{
-   U32 getTorqueModFromSDL(U16 mod)
-   {
-      U32 ret = 0;
-
-      if (mod & KMOD_LSHIFT)
-      {
-         ret |= SI_LSHIFT;
-         ret |= SI_SHIFT;
-      }
-
-      if (mod & KMOD_RSHIFT)
-      {
-         ret |= SI_RSHIFT;
-         ret |= SI_SHIFT;
-      }
-
-      if (mod & KMOD_LCTRL)
-      {
-         ret |= SI_LCTRL;
-         ret |= SI_CTRL;
-      }
-
-      if (mod & KMOD_RCTRL)
-      {
-         ret |= SI_RCTRL;
-         ret |= SI_CTRL;
-      }
-
-      if (mod & KMOD_LALT)
-      {
-         ret |= SI_LALT;
-         ret |= SI_ALT;
-      }
-
-      if (mod & KMOD_RALT)
-      {
-         ret |= SI_RALT;
-         ret |= SI_ALT;
-      }
-
-      return ret;
-   }
-}
-
 PlatformWindowSDL::PlatformWindowSDL():
 mOwningManager(NULL),
 mNextWindow(NULL),
@@ -443,19 +397,16 @@ void PlatformWindowSDL::defaultRender()
 
 void PlatformWindowSDL::_triggerMouseLocationNotify(const SDL_Event& evt)
 {
-   U32 mods = getTorqueModFromSDL(SDL_GetModState());
-
    if(!mMouseLocked)
-      mouseEvent.trigger(getWindowId(), mods, evt.motion.x, evt.motion.y, false);
+      mouseEvent.trigger(getWindowId(), (U32) Input::getModifierKeys(), evt.motion.x, evt.motion.y, false);
    else
-      mouseEvent.trigger(getWindowId(), mods, evt.motion.xrel, evt.motion.yrel, true);
+      mouseEvent.trigger(getWindowId(), (U32) Input::getModifierKeys(), evt.motion.xrel, evt.motion.yrel, true);
 }
 
 void PlatformWindowSDL::_triggerMouseWheelNotify(const SDL_Event& evt)
 {
-   U32 mods = getTorqueModFromSDL(SDL_GetModState());
    S32 wheelDelta = Con::getIntVariable("$pref::Input::MouseWheelSpeed", 120);
-   wheelEvent.trigger(getWindowId(), mods, evt.wheel.x * wheelDelta, evt.wheel.y * wheelDelta);
+   wheelEvent.trigger(getWindowId(), (U32) Input::getModifierKeys(), evt.wheel.x * wheelDelta, evt.wheel.y * wheelDelta);
 }
 
 void PlatformWindowSDL::_triggerMouseButtonNotify(const SDL_Event& event)
@@ -474,18 +425,22 @@ void PlatformWindowSDL::_triggerMouseButtonNotify(const SDL_Event& event)
       case SDL_BUTTON_MIDDLE:
          button = 2;
          break;
+      case SDL_BUTTON_X1:
+         button = 3;
+         break;
+      case SDL_BUTTON_X2:
+         button = 4;
+         break;
       default:
          return;
    }
    
-   U32 mod = getTorqueModFromSDL( SDL_GetModState() );
-   buttonEvent.trigger(getWindowId(), mod, action, button );
+   buttonEvent.trigger(getWindowId(), (U32) Input::getModifierKeys(), action, button );
 }
 
 void PlatformWindowSDL::_triggerKeyNotify(const SDL_Event& evt)
 {
    U32 inputAction = IA_MAKE;
-   SDL_Keysym tKey = evt.key.keysym;
 
    if(evt.type == SDL_KEYUP)
    {
@@ -497,11 +452,11 @@ void PlatformWindowSDL::_triggerKeyNotify(const SDL_Event& evt)
       inputAction = IA_REPEAT;
    }
 
-   U32 torqueModifiers = getTorqueModFromSDL(evt.key.keysym.mod);
-   U32 torqueKey = KeyMapSDL::getTorqueScanCodeFromSDL(tKey.scancode);
-   if(tKey.scancode)
+   if(evt.key.keysym.scancode)
    {
-      keyEvent.trigger(getWindowId(), torqueModifiers, inputAction, torqueKey);
+      U32 mods = evt.key.keysym.mod & cTorqueMods;
+      Input::setModifierKeys((U16) mods);
+      keyEvent.trigger(getWindowId(), mods, inputAction, evt.key.keysym.sym, evt.key.keysym.scancode);
       //Con::printf("Key %d : %d", tKey.sym, inputAction);
 
       if (inputAction == IA_MAKE && SDL_IsTextInputActive())
@@ -513,7 +468,8 @@ void PlatformWindowSDL::_triggerKeyNotify(const SDL_Event& evt)
             // Turn off Text input, and the next frame turn it back on. This tells SDL
             // to not generate a text event for this global action map key.
             SDL_StopTextInput();
-            mOwningManager->updateSDLTextInputState(PlatformWindowManagerSDL::KeyboardInputState::TEXT_INPUT);
+            if (mEnableKeyboardTranslation)
+               mOwningManager->updateSDLTextInputState(PlatformWindowManagerSDL::KeyboardInputState::TEXT_INPUT);
          }
       }
    }
@@ -521,7 +477,7 @@ void PlatformWindowSDL::_triggerKeyNotify(const SDL_Event& evt)
 
 void PlatformWindowSDL::_triggerTextNotify(const SDL_Event& evt)
 {
-    U32 mod = getTorqueModFromSDL( SDL_GetModState() );
+    U32 mod = Input::getModifierKeys();
    
    if( !evt.text.text[1] ) // get a char
    {
@@ -532,7 +488,7 @@ void PlatformWindowSDL::_triggerTextNotify(const SDL_Event& evt)
    }
    else // get a wchar string
    {
-      const U32 len = strlen(evt.text.text);
+      const U32 len = (U32) strlen(evt.text.text);
       U16 wchar[16] = {};
       dMemcpy(wchar, evt.text.text, sizeof(char)*len);
 

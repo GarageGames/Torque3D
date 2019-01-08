@@ -170,20 +170,6 @@ ConsoleDocClass( ActionMap,
    
 );
 
-// This is used for determing keys that have ascii codes for the foreign keyboards. IsAlpha doesn't work on foreign keys.
-static inline bool dIsDecentChar(U8 c)
-{
-   return ((U8(0xa0) <= c) || (( U8(0x21) <= c) && (c <= U8(0x7e))) || ((U8(0x91) <= c) && (c <= U8(0x92))));
-}
-
-struct AsciiMapping
-{
-   const char* pDescription;
-   U16         asciiCode;
-};
-
-extern AsciiMapping gAsciiMap[];
-
 //------------------------------------------------------------------------------
 //-------------------------------------- Action maps
 //
@@ -491,76 +477,16 @@ bool ActionMap::createEventDescriptor(const char* pEventString, EventDescriptor*
    //
    AssertFatal(dStrlen(pObjectString) != 0, "Error, no key was specified!");
 
-   if (dStrlen(pObjectString) == 1)
+   InputEventManager::VirtualMapData* data = INPUTMGR->findKeyboardMap(pObjectString);
+   if (data == NULL)
+      data = INPUTMGR->findVirtualMap(pObjectString);
+   if(data)
    {
-      if (dIsDecentChar(*pObjectString)) // includes foreign chars
-      {
-         U16 asciiCode = (*pObjectString);
-         // clear out the FF in upper 8bits for foreign keys??
-         asciiCode &= 0xFF;
-         U16 keyCode = Input::getKeyCode(asciiCode);
-         if ( keyCode >= KEY_0 )
-         {
-            pDescriptor->eventType = SI_KEY;
-            pDescriptor->eventCode = keyCode;
-            return true;
-         }
-         else if (dIsalpha(*pObjectString) == true)
-         {
-            pDescriptor->eventType = SI_KEY;
-            pDescriptor->eventCode = KEY_A+dTolower(*pObjectString)-'a';
-            return true;
-         }
-         else if (dIsdigit(*pObjectString) == true)
-         {
-            pDescriptor->eventType = SI_KEY;
-            pDescriptor->eventCode = KEY_0+(*pObjectString)-'0';
-            return true;
-         }
-      }
-      return false;
+      pDescriptor->eventType = data->type;
+      pDescriptor->eventCode = data->code;
+      return true;
    }
-   else
-   {
-      pDescriptor->eventCode = 0;
-      // Gotta search through the Ascii table...
-      for (U16 i = 0; gAsciiMap[i].asciiCode != 0xFFFF; i++)
-      {
-         if (dStricmp(pObjectString, gAsciiMap[i].pDescription) == 0)
-         {
-            U16 asciiCode = gAsciiMap[i].asciiCode;
-            U16 keyCode   = Input::getKeyCode(asciiCode);
-            if ( keyCode >= KEY_0 )
-            {
-               pDescriptor->eventType = SI_KEY;
-               pDescriptor->eventCode = keyCode;
-               return(true);
 
-            }
-            else
-            {
-               break;
-            }
-         }
-      }
-      // Didn't find an ascii match. Check the virtual map table
-      //for (U32 j = 0; gVirtualMap[j].code != 0xFFFFFFFF; j++)
-      //{
-      //   if (dStricmp(pObjectString, gVirtualMap[j].pDescription) == 0)
-      //   {
-      //      pDescriptor->eventType = gVirtualMap[j].type;
-      //      pDescriptor->eventCode = gVirtualMap[j].code;
-      //      return true;
-      //   }
-      //}
-      InputEventManager::VirtualMapData* data = INPUTMGR->findVirtualMap(pObjectString);
-      if(data)
-      {
-         pDescriptor->eventType = data->type;
-         pDescriptor->eventCode = data->code;
-         return true;
-      }
-   }
    return false;
 }
 
@@ -697,8 +623,7 @@ const ActionMap::Node* ActionMap::findNode(const U32 inDeviceType, const U32 inD
       // Special case for an ANYKEY bind...
       if (pDeviceMap->nodeMap[i].action == KEY_ANYKEY 
          && pDeviceMap->nodeMap[i].modifiers == realMods 
-         && dIsDecentChar(inAction)
-         && inAction <= U8_MAX)
+         && inAction <= SI_ANY)
          return &pDeviceMap->nodeMap[i];
 
       if (pDeviceMap->nodeMap[i].modifiers == realMods 
@@ -1116,60 +1041,16 @@ const char* ActionMap::getModifierString(const U32 modifiers)
 //------------------------------------------------------------------------------
 bool ActionMap::getKeyString(const U32 action, char* buffer)
 {
-   U16 asciiCode = 0;
-
-   // This is a special case.... numpad keys do have ascii values
-   // but for the purposes of this method we want to return the 
-   // description from the gVirtualMap.
-   if ( !( KEY_NUMPAD0 <= action && action <= KEY_NUMPAD9 ) )
-      asciiCode = Input::getAscii( action, STATE_LOWER );
-
-//   if (action >= KEY_A && action <= KEY_Z) {
-//      buffer[0] = char(action - KEY_A + 'a');
-//      buffer[1] = '\0';
-//      return true;
-//   } else if (action >= KEY_0 && action <= KEY_9) {
-//      buffer[0] = char(action - KEY_0 + '0');
-//      buffer[1] = '\0';
-   if ( (asciiCode != 0) && dIsDecentChar((char)asciiCode))
-   {
-      for (U32 i = 0; gAsciiMap[i].asciiCode != 0xFFFF; i++) {
-         if (gAsciiMap[i].asciiCode == asciiCode)
-         {
-            dStrcpy(buffer, gAsciiMap[i].pDescription, 16);
-            return true;
-         }
-      }
-      // Must not have found a string for that ascii code just record the char
-      buffer[0] = char(asciiCode);
-      buffer[1] = '\0';
-      return true;
-   }
+   const char* desc;
+   if (action <= SI_ANY)
+      desc = INPUTMGR->findKeyboardMapDescFromCode(action);
    else
+      desc = INPUTMGR->findVirtualMapDescFromCode(action);
+
+   if(desc)
    {
-      if (action >= KEY_A && action <= KEY_Z)
-      {
-         buffer[0] = char(action - KEY_A + 'a');
-         buffer[1] = '\0';
-         return true;
-      }
-      else if (action >= KEY_0 && action <= KEY_9) {
-         buffer[0] = char(action - KEY_0 + '0');
-         buffer[1] = '\0';
-         return true;
-      }
-      //for (U32 i = 0; gVirtualMap[i].code != 0xFFFFFFFF; i++) {
-      //   if (gVirtualMap[i].code == action) {
-      //      dStrcpy(buffer, gVirtualMap[i].pDescription, 16);
-      //      return true;
-      //   }
-      //}
-      const char* desc = INPUTMGR->findVirtualMapDescFromCode(action);
-      if(desc)
-      {
-         dStrcpy(buffer, desc, 16);
-         return true;
-      }
+      dStrcpy(buffer, desc, 16);
+      return true;
    }
 
    Con::errorf( "ActionMap::getKeyString: no string for action %d", action );
@@ -1204,11 +1085,7 @@ bool ActionMap::processBindCmd(const char *device, const char *action, const cha
        ( eventDescriptor.eventCode == SI_RXAXIS ) ||
        ( eventDescriptor.eventCode == SI_RYAXIS ) ||
        ( eventDescriptor.eventCode == SI_RZAXIS ) ||
-       ( eventDescriptor.eventCode == SI_SLIDER ) ||
-       ( eventDescriptor.eventCode == SI_XPOV ) ||
-       ( eventDescriptor.eventCode == SI_YPOV ) ||
-       ( eventDescriptor.eventCode == SI_XPOV2 ) ||
-       ( eventDescriptor.eventCode == SI_YPOV2 ) )
+       ( eventDescriptor.eventCode == SI_SLIDER ) )
    {
       Con::warnf( "ActionMap::processBindCmd - Cannot use 'bindCmd' with a move event type. Use 'bind' instead." );
       return false;
@@ -1380,11 +1257,7 @@ bool ActionMap::processHoldBind(const char *device, const char *action, const ch
       (eventDescriptor.eventCode == SI_RXAXIS) ||
       (eventDescriptor.eventCode == SI_RYAXIS) ||
       (eventDescriptor.eventCode == SI_RZAXIS) ||
-      (eventDescriptor.eventCode == SI_SLIDER) ||
-      (eventDescriptor.eventCode == SI_XPOV) ||
-      (eventDescriptor.eventCode == SI_YPOV) ||
-      (eventDescriptor.eventCode == SI_XPOV2) ||
-      (eventDescriptor.eventCode == SI_YPOV2))
+      (eventDescriptor.eventCode == SI_SLIDER))
    {
       Con::warnf("ActionMap::processBindCmd - Cannot use 'bindCmd' with a move event type. Use 'bind' instead.");
       return false;
@@ -1827,60 +1700,6 @@ bool ActionMap::handleEvent(const InputEventInfo* pEvent)
 bool ActionMap::handleEventGlobal(const InputEventInfo* pEvent)
 {
    return getGlobalMap()->processAction( pEvent );
-}
-
-//------------------------------------------------------------------------------
-bool ActionMap::checkAsciiGlobal( U16 key, U32 modifiers )
-{
-   // Does this ascii map to a key?
-   U16 keyCode = Input::getKeyCode(key);
-   if(keyCode == 0)
-      return false;
-
-   // Grab the action map set.
-   SimSet* pActionMapSet = Sim::getActiveActionMapSet();
-   AssertFatal(pActionMapSet && pActionMapSet->size() != 0,
-      "error, no ActiveMapSet or no global action map...");
-
-   // Grab the device maps for the first ActionMap.
-   Vector<DeviceMap*> &maps = ((ActionMap*)pActionMapSet->first())->mDeviceMaps;
-
-   // Find the keyboard.
-   DeviceMap *keyMap = NULL;
-   for(S32 i=0; i<maps.size(); i++)
-   {
-      // CodeReview Doesn't deal with multiple keyboards [bjg, 5/16/07]
-      if(maps[i]->deviceType == KeyboardDeviceType)
-      {
-         keyMap = maps[i];
-         break;
-      }
-   }
-
-   if(!keyMap)
-      return false;
-
-   // Normalize modifiers.
-   U32 realMods = modifiers;
-   if (realMods & SI_SHIFT)
-      realMods |= SI_SHIFT;
-   if (realMods & SI_CTRL)
-      realMods |= SI_CTRL;
-   if (realMods & SI_ALT)
-      realMods |= SI_ALT;
-   if (realMods & SI_MAC_OPT)
-      realMods |= SI_MAC_OPT;
-
-   // Now find a matching node, if there is one.
-   for(S32 i=0; i<keyMap->nodeMap.size(); i++)
-   {
-      Node &n = keyMap->nodeMap[i];
-
-      if(n.action == keyCode && (n.modifiers == modifiers))
-         return true;
-   }
-
-   return false;
 }
 
 void ActionMap::clearAllBreaks()
@@ -2344,81 +2163,3 @@ DefineEngineMethod( ActionMap, getDeadZone, const char*, ( const char* device, c
 {
    return object->getDeadZone( device, action );   
 }
-
-//------------------------------------------------------------------------------
-AsciiMapping gAsciiMap[] =
-{
-   //--- KEYBOARD EVENTS
-   //
-   { "space",           0x0020 },
-   //{ "exclamation",     0x0021 },
-   { "doublequote",     0x0022 },
-   //{ "pound",           0x0023 },
-   //{ "ampersand",       0x0026 },
-   { "apostrophe",      0x0027 },
-   //{ "lparen",          0x0028 },
-   //{ "rparen",          0x0029 },
-   { "comma",           0x002c },
-   { "minus",           0x002d },
-   { "period",          0x002e },
-   //{ "slash",           0x002f },
-   //{ "colon",           0x003a },
-   //{ "semicolon",       0x003b },
-   //{ "lessthan",        0x003c },
-   //{ "equals",          0x003d },
-   //{ "morethan",        0x003e },
-   //{ "lbracket",        0x005b },
-   { "backslash",       0x005c },
-   //{ "rbracket",        0x005d },
-   //{ "circumflex",      0x005e },
-   //{ "underscore",      0x005f },
-   { "grave",           0x0060 },
-   //{ "tilde",           0x007e },
-   //{ "vertbar",         0x007c },
-   //{ "exclamdown",      0x00a1 },
-   //{ "cent",            0x00a2 },
-   //{ "sterling",        0x00a3 },
-   //{ "currency",        0x00a4 },
-   //{ "brokenbar",       0x00a6 },
-   //{ "ring",            0x00b0 },
-   //{ "plusminus",       0x00b1 },
-   { "super2",          0x00b2 },
-   { "super3",          0x00b3 },
-   { "acute",           0x00b4 },
-   //{ "mu",              0x00b5 },
-   //{ "ordmasculine",    0x00ba },
-   //{ "questiondown",    0x00bf },
-   //{ "gemandbls",       0x00df },
-   //{ "agrave",          0x00e0 },
-   //{ "aacute",          0x00e1 },
-   //{ "acircumflex",     0x00e2 },
-   //{ "atilde",          0x00e3 },
-   //{ "adieresis",       0x00e4 },
-   //{ "aring",           0x00e5 },
-   //{ "ae",              0x00e6 },
-   //{ "ccedille",        0x00e7 },
-   //{ "egrave",          0x00e8 },
-   //{ "eacute",          0x00e9 },
-   //{ "ecircumflex",     0x00ea },
-   //{ "edieresis",       0x00eb },
-   //{ "igrave",          0x00ec },
-   //{ "iacute",          0x00ed },
-   //{ "icircumflex",     0x00ee },
-   //{ "idieresis",       0x00ef },
-   //{ "ntilde",          0x00f1 },
-   //{ "ograve",          0x00f2 },
-   //{ "oacute",          0x00f3 },
-   //{ "ocircumflex",     0x00f4 },
-   //{ "otilde",          0x00f5 },
-   //{ "odieresis",       0x00f6 },
-   //{ "divide",          0x00f7 },
-   //{ "oslash",          0x00f8 },
-   //{ "ugrave",          0x00f9 },
-   //{ "uacute",          0x00fa },
-   //{ "ucircumflex",     0x00fb },
-   //{ "udieresis",       0x00fc },
-   //{ "ygrave",          0x00fd },
-   //{ "thorn",           0x00fe },
-   //{ "ydieresis",       0x00ff },
-   { "nomatch",         0xFFFF }
-};

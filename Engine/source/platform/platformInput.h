@@ -90,7 +90,7 @@ protected:
    static bool smActive;
 
    /// Current modifier keys.
-   static U8 smModifierKeys;
+   static U16 smModifierKeys;
 
    static bool smLastKeyboardActivated;
    static bool smLastMouseActivated;
@@ -106,9 +106,6 @@ public:
    static void activate();
    static void deactivate();
 
-   static U16  getAscii( U16 keyCode, KEY_STATE keyState );
-   static U16  getKeyCode( U16 asciiCode );
-
    static bool isEnabled();
    static bool isActive();
 
@@ -116,8 +113,8 @@ public:
 
    static InputManager* getManager();
 
-   static U8 getModifierKeys() {return smModifierKeys;}
-   static void setModifierKeys(U8 mod) {smModifierKeys = mod;}
+   static U16 getModifierKeys() {return smModifierKeys;}
+   static void setModifierKeys(U16 mod) {smModifierKeys = mod;}
 #ifdef LOG_INPUT
    static void log( const char* format, ... );
 #endif

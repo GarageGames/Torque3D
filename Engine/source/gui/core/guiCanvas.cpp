@@ -1024,22 +1024,19 @@ bool GuiCanvas::processGamepadEvent(InputEventInfo &inputEvent)
       switch (inputEvent.objInst)
       {
       case SI_ZAXIS:
-      case XI_LEFT_TRIGGER:
-      case XI_RIGHT_TRIGGER:
+      case SI_RZAXIS:
          decay = &zDecay[inputEvent.deviceInst];
          lastClickTime = &zLastClickTime[inputEvent.deviceInst];
          break;
 
       case SI_YAXIS:
-      case XI_THUMBLY:
-      case XI_THUMBRY:
+      case SI_RYAXIS:
          decay = &yDecay[inputEvent.deviceInst];
          lastClickTime = &yLastClickTime[inputEvent.deviceInst];
          break;
 
       case SI_XAXIS:
-      case XI_THUMBLX:
-      case XI_THUMBRX:
+      case SI_RXAXIS:
       default:
          decay = &xDecay[inputEvent.deviceInst];
          lastClickTime = &xLastClickTime[inputEvent.deviceInst];
@@ -1074,14 +1071,12 @@ bool GuiCanvas::processGamepadEvent(InputEventInfo &inputEvent)
 
          switch (inputEvent.objInst)
          {
-         case XI_LEFT_TRIGGER:
-         case XI_RIGHT_TRIGGER:
+         case SI_ZAXIS:
+         case SI_RZAXIS:
             return mFirstResponder->onGamepadTrigger(mLastEvent);
 
-         case SI_ZAXIS:
          case SI_YAXIS:
-         case XI_THUMBLY:
-         case XI_THUMBRY:
+         case SI_RYAXIS:
             if (negative)
             {
                return mFirstResponder->onGamepadAxisDown(mLastEvent);
@@ -1092,8 +1087,7 @@ bool GuiCanvas::processGamepadEvent(InputEventInfo &inputEvent)
             }
 
          case SI_XAXIS:
-         case XI_THUMBLX:
-         case XI_THUMBRX:
+         case SI_RXAXIS:
          default:
             if (negative)
             {
