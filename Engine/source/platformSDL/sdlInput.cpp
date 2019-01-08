@@ -27,25 +27,17 @@
 
 #include "sdlInput.h"
 #include "platform/platformInput.h"
+#include "sdlInputManager.h"
 #include "SDL.h"
 
-#ifdef LOG_INPUT
-#include <time.h>
-#include <stdarg.h>
-#endif
-
 // Static class variables:
-InputManager*  Input::smManager;
+InputManager*  Input::smManager = NULL;
 bool           Input::smActive;
 U16            Input::smModifierKeys;
 bool           Input::smLastKeyboardActivated;
 bool           Input::smLastMouseActivated;
 bool           Input::smLastJoystickActivated;
 InputEvent     Input::smInputEvent;
-
-#ifdef LOG_INPUT
-static HANDLE gInputLog;
-#endif
 
 //------------------------------------------------------------------------------
 void Input::init()
@@ -65,22 +57,15 @@ void Input::init()
    setModifierKeys(0);
    Con::printf( "" );
 
+   smManager = new SDLInputManager;
+   if (smManager)
+   {
+      SDLInputManager::init();
+   }
+
    // Set ourselves to participate in per-frame processing.
    Process::notify(Input::process, PROCESS_INPUT_ORDER);
 
-}
-
-//------------------------------------------------------------------------------
-DefineEngineFunction(isJoystickDetected, bool, (),, "")
-{
-   return(SDL_NumJoysticks() > 0);
-}
-
-//------------------------------------------------------------------------------
-DefineEngineFunction(getJoystickAxes, const char*, (const char* instance), , "")
-{
-   // TODO SDL
-   return("");
 }
 
 //------------------------------------------------------------------------------
@@ -90,6 +75,13 @@ void Input::destroy()
 
    SDL_QuitSubSystem( SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMECONTROLLER );
 
+   if (smManager)
+   {
+      if (smManager->isEnabled())
+         smManager->disable();
+      delete smManager;
+      smManager = NULL;
+   }
 }
 
 //------------------------------------------------------------------------------
@@ -117,8 +109,8 @@ void Input::activate()
    //ImmReleaseContext( getWin32WindowHandle(), winState.imeHandle );
 #endif
 
-   if ( !Con::getBoolVariable( "$enableDirectInput" ) )
-      return;
+   if (smManager && !smManager->isEnabled())
+      smManager->enable();
 
    if ( smManager && smManager->isEnabled() && !smActive )
    {
@@ -130,7 +122,10 @@ void Input::activate()
 //------------------------------------------------------------------------------
 void Input::deactivate()
 {
-   if ( smManager && smManager->isEnabled() && smActive )
+   if (smManager && smManager->isEnabled())
+      smManager->disable();
+
+   if (smActive)
    {
       smActive = false;
       Con::printf( "Input deactivated." );
