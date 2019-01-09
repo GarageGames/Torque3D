@@ -24,6 +24,7 @@
 #import "console/console.h"
 #import "math/mMath.h"
 #import "core/strings/stringFunctions.h"
+#include "console/engineAPI.h"
 
 extern void mInstallLibrary_C();
 extern void mInstallLibrary_Vec();
@@ -51,7 +52,13 @@ void Platform::setMathControlStateKnown()
 }
 
 //--------------------------------------
-ConsoleFunction( MathInit, void, 1, 10, "(DETECT|C|SSE)")
+DefineEngineStringlyVariadicFunction( mathInit, void, 1, 10, "( ... )"
+                                     "@brief Install the math library with specified extensions.\n\n"
+                                     "Possible parameters are:\n\n"
+                                     "    - 'DETECT' Autodetect math lib settings.\n\n"
+                                     "    - 'C' Enable the C math routines. C routines are always enabled.\n\n"
+                                     "    - 'SSE' Enable SSE math routines.\n\n"
+                                     "@ingroup Math")
 {
    U32 properties = CPU_PROP_C;  // C entensions are always used
    
