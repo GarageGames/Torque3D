@@ -836,7 +836,7 @@ public:
 /// Define a call-in point for calling into the engine.  Unlike with DefineEngineFunction, the statically
 /// callable function will be confined to the namespace of the given class.
 ///
-/// @param name The name of the C++ class (or a registered export scope).
+/// @param classname The name of the C++ class (or a registered export scope).
 /// @param name The name of the method as it should be seen by the control layer.
 /// @param returnType The value type returned to the control layer.
 /// @param args The argument list as it would appear on the function definition
