@@ -166,8 +166,11 @@ bool GuiInputCtrl::onInputEvent( const InputEventInfo &event )
             if (!mSendModifierEvents)
                return false;
 
-            const char* actionString = INPUTMGR->findKeyboardMapDescFromCode(event.objInst);
-            onInputEvent_callback(deviceString, actionString, 1);
+            char keyString[32];
+            if (!ActionMap::getKeyString(event.objInst, keyString))
+               return false;
+
+            onInputEvent_callback(deviceString, keyString, 1);
          }
          else
          {
