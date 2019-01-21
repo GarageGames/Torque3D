@@ -118,7 +118,7 @@ U16 Input::getKeyCode( U16 asciiCode )
     char c[2];
     c[0]= asciiCode;
     c[1] = NULL;
-    return KeyMapSDL::getTorqueScanCodeFromSDL( SDL_GetScancodeFromName( c ) );
+    return KeyMapSDL::getTorqueScanCodeFromSDL( SDL_GetScancodeFromKey( SDL_GetKeyFromName(c) ) );
 }
 
 //------------------------------------------------------------------------------
