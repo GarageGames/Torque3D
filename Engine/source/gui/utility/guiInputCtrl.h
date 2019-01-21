@@ -32,23 +32,31 @@
 /// to script.  This is useful for implementing custom keyboard handling code.
 class GuiInputCtrl : public GuiMouseEventCtrl
 {
-   public:
+protected:
+   bool mSendAxisEvents;
+   bool mSendBreakEvents;
+   bool mSendModifierEvents;
 
-      typedef GuiMouseEventCtrl Parent;
-   
-      // GuiControl.
-      virtual bool onWake();
-      virtual void onSleep();
+public:
 
-      virtual bool onInputEvent( const InputEventInfo &event );
-      
-      static void initPersistFields();
+   typedef GuiMouseEventCtrl Parent;
 
-      DECLARE_CONOBJECT(GuiInputCtrl);
-      DECLARE_CATEGORY( "Gui Other Script" );
-      DECLARE_DESCRIPTION( "A control that locks the mouse and reports all keyboard input events to script." );
+   GuiInputCtrl();
 
-	  DECLARE_CALLBACK( void, onInputEvent, ( const char* device, const char* action, bool state ));
+   // GuiControl.
+   virtual bool onWake();
+   virtual void onSleep();
+
+   virtual bool onInputEvent( const InputEventInfo &event );
+
+   static void initPersistFields();
+
+   DECLARE_CONOBJECT(GuiInputCtrl);
+   DECLARE_CATEGORY( "Gui Other Script" );
+   DECLARE_DESCRIPTION( "A control that locks the mouse and reports all input events to script." );
+
+   DECLARE_CALLBACK( void, onInputEvent, ( const char* device, const char* action, bool state ));
+   DECLARE_CALLBACK(void, onAxisEvent, (const char* device, const char* action, F32 axisValue));
 };
 
 #endif // _GUI_INPUTCTRL_H
