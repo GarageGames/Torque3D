@@ -33,5 +33,4 @@ singleton Material( TestSkyCubemapMat )
 {
    cubemap = TestSkyCubemap;
    materialTag0 = "Skies";
-   isSky = true;
 };
