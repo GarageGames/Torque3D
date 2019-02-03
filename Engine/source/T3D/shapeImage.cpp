@@ -1202,7 +1202,7 @@ void ShapeBaseImageData::unpackData(BitStream* stream)
    }
 
    projectile = (stream->readFlag() ?
-                 (ProjectileData*)stream->readRangedU32(DataBlockObjectIdFirst,
+                 (ProjectileData*)(uintptr_t)stream->readRangedU32(DataBlockObjectIdFirst,
                                                         DataBlockObjectIdLast) : 0);
 
    cloakable = stream->readFlag();
@@ -1340,7 +1340,7 @@ void ShapeBaseImageData::unpackData(BitStream* stream)
 
          if (stream->readFlag())
          {
-            s.emitter = (ParticleEmitterData*) stream->readRangedU32(DataBlockObjectIdFirst,
+            s.emitter = (ParticleEmitterData*)(uintptr_t)stream->readRangedU32(DataBlockObjectIdFirst,
                                                                      DataBlockObjectIdLast);
             stream->read(&s.emitterTime);
 

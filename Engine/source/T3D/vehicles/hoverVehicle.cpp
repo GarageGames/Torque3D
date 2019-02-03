@@ -411,13 +411,13 @@ void HoverVehicleData::unpackData(BitStream* stream)
 
    for (S32 i = 0; i < MaxSounds; i++)
       sound[i] = stream->readFlag()?
-         (SFXProfile*) stream->readRangedU32(DataBlockObjectIdFirst,
+         (SFXProfile*)(uintptr_t)stream->readRangedU32(DataBlockObjectIdFirst,
                                                DataBlockObjectIdLast): 0;
 
    for (S32 j = 0; j < MaxJetEmitters; j++) {
       jetEmitter[j] = NULL;
       if (stream->readFlag())
-         jetEmitter[j] = (ParticleEmitterData*)stream->readRangedU32(DataBlockObjectIdFirst,
+         jetEmitter[j] = (ParticleEmitterData*)(uintptr_t)stream->readRangedU32(DataBlockObjectIdFirst,
                                                                      DataBlockObjectIdLast);
    }
 

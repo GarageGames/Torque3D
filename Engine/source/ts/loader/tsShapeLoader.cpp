@@ -412,7 +412,7 @@ void TSShapeLoader::generateObjects()
          AppMesh* mesh = subshape->objMeshes[iMesh];
          mesh->detailSize = 2;
          String name = String::GetTrailingNumber( mesh->getName(), mesh->detailSize );
-         name = getUniqueName( name, cmpMeshNameAndSize, meshNames, &(subshape->objMeshes), (void*)mesh->detailSize );
+         name = getUniqueName( name, cmpMeshNameAndSize, meshNames, &(subshape->objMeshes), (void*)(uintptr_t)mesh->detailSize );
          meshNames.push_back( name );
 
          // Fix up any collision details that don't have a negative detail level.

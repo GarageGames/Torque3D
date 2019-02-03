@@ -282,14 +282,14 @@ void FlyingVehicleData::unpackData(BitStream* stream)
    for (S32 i = 0; i < MaxSounds; i++) {
       sound[i] = NULL;
       if (stream->readFlag())
-         sound[i] = (SFXProfile*)stream->readRangedU32(DataBlockObjectIdFirst,
+         sound[i] = (SFXProfile*)(uintptr_t)stream->readRangedU32(DataBlockObjectIdFirst,
                                                          DataBlockObjectIdLast);
    }
 
    for (S32 j = 0; j < MaxJetEmitters; j++) {
       jetEmitter[j] = NULL;
       if (stream->readFlag())
-         jetEmitter[j] = (ParticleEmitterData*)stream->readRangedU32(DataBlockObjectIdFirst,
+         jetEmitter[j] = (ParticleEmitterData*)(uintptr_t)stream->readRangedU32(DataBlockObjectIdFirst,
                                                                      DataBlockObjectIdLast);
    }
 

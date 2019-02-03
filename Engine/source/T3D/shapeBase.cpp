@@ -3259,7 +3259,7 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
             st.play = stream->readFlag();
             if ( st.play ) 
             {
-               st.profile = (SFXTrack*) stream->readRangedU32(  DataBlockObjectIdFirst,
+               st.profile = (SFXTrack*)(uintptr_t)stream->readRangedU32(  DataBlockObjectIdFirst,
                                                                 DataBlockObjectIdLast );
             }
 

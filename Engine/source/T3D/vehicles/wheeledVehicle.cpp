@@ -494,7 +494,7 @@ void WheeledVehicleData::unpackData(BitStream* stream)
    Parent::unpackData(stream);
 
    tireEmitter = stream->readFlag()?
-      (ParticleEmitterData*) stream->readRangedU32(DataBlockObjectIdFirst,
+      (ParticleEmitterData*)(uintptr_t)stream->readRangedU32(DataBlockObjectIdFirst,
          DataBlockObjectIdLast): 0;
 
    for (S32 i = 0; i < MaxSounds; i++)

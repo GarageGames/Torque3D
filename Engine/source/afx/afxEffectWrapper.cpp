@@ -608,7 +608,7 @@ void afxEffectWrapperData::unpack_mods(BitStream* stream, afxXM_BaseData* mods[]
 {
   S32 n_mods = stream->readInt(6);
   for (int i = 0; i < n_mods; i++)
-    mods[i] = (afxXM_BaseData*) readDatablockID(stream);
+    mods[i] = (afxXM_BaseData*)(uintptr_t)readDatablockID(stream);
 }
 
 bool afxEffectWrapperData::preload(bool server, String &errorStr)

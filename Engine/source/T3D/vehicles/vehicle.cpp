@@ -374,7 +374,7 @@ void VehicleData::unpackData(BitStream* stream)
    for (i = 0; i < Body::MaxSounds; i++) {
       body.sound[i] = NULL;
       if (stream->readFlag())
-         body.sound[i] = (SFXProfile*)stream->readRangedU32(DataBlockObjectIdFirst,
+         body.sound[i] = (SFXProfile*)(uintptr_t)stream->readRangedU32(DataBlockObjectIdFirst,
                                                               DataBlockObjectIdLast);
    }
 
