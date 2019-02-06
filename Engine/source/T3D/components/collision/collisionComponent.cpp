@@ -538,7 +538,6 @@ PhysicsCollision* CollisionComponent::buildColShapes()
          for (S32 o = start; o < end; o++)
          {
             const TSShape::Object &object = shape->objects[o];
-            const String &meshName = shape->names[object.nameIndex];
 
             if (object.numMeshes <= detail.objectDetailNum)
                continue;

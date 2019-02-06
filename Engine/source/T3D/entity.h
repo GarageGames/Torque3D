@@ -309,7 +309,6 @@ Vector<T*> Entity::getComponents()
    Vector<T*> foundObjects;
 
    T *curObj;
-   Component* comp;
 
    // Loop through our child objects.
    for (U32 i = 0; i < mComponents.size(); i++)

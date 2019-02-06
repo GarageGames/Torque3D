@@ -553,7 +553,6 @@ void renderFrame(GFXTextureTargetRef* target, MatrixF transform, Frustum frustum
       GFX->setStateBlock(mDefaultGuiSB);
 
       GFXTargetRef origTarget = GFX->getActiveRenderTarget();
-      U32 origStyle = GFX->getCurrentRenderStyle();
 
       // Clear the zBuffer so GUI doesn't hose object rendering accidentally
       GFX->clear(GFXClearZBuffer, ColorI(20, 20, 20), 1.0f, 0);

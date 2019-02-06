@@ -21,11 +21,9 @@ void MeshRenderSystem::render(SceneManager *sceneManager, SceneRenderState* stat
    for (U32 i = 0; i < count; i++)
    {
       //Server side items exist for data, but we don't actually render them
-      bool isClient = MeshRenderSystemInterface::all[i]->mIsClient;
       if (!MeshRenderSystemInterface::all[i]->mIsClient)
          continue;
 
-      bool isStatic = MeshRenderSystemInterface::all[i]->mStatic;
       if (MeshRenderSystemInterface::all[i]->mStatic)
          continue;
 

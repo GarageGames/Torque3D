@@ -230,7 +230,6 @@ namespace PlatformNetState
       // which are required for LAN queries (PC->Xbox connectivity).  The wire protocol still
       // uses the VDP packet structure, though.
       S32 protocol = IPPROTO_UDP;
-      bool useVDP = false;
 #ifdef TORQUE_DISABLE_PC_CONNECTIVITY
       // Xbox uses a VDP (voice/data protocol) socket for networking
       protocol = IPPROTO_VDP;
@@ -1956,7 +1955,6 @@ void Net::enableMulticast()
 
          if (error == NoError)
          {
-            NetAddress listenAddress;
             char listenAddressStr[256];
             Net::addressToString(&multicastAddress, listenAddressStr);
             Con::printf("Multicast initialized on %s", listenAddressStr);

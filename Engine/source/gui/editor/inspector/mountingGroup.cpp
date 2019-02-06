@@ -133,9 +133,6 @@ bool GuiInspectorMountingGroup::inspectGroup()
    clearFields();
    
    bool bNewItems = false;
-   bool bMakingArray = false;
-   GuiStackControl *pArrayStack = NULL;
-   GuiRolloutCtrl *pArrayRollout = NULL;
    bool bGrabItems = false;
 
    AbstractClassRep* commonAncestorClass = findCommonAncestorClass();
@@ -240,7 +237,6 @@ void GuiInspectorMountingGroup::updateAllFields()
 void GuiInspectorMountingGroup::onMouseMove(const GuiEvent &event)
 {
 	//mParent->mOverDivider = false;
-	bool test = false;
 }
 
 DefineEngineMethod(GuiInspectorMountingGroup, inspectGroup, bool, (),, "Refreshes the dynamic fields in the inspector.")
