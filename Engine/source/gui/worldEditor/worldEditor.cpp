@@ -816,6 +816,21 @@ void WorldEditor::terrainSnapSelection(Selection* sel, U8 modifier, Point3F gizm
    {
       mStuckToGround = true;
 
+      const F32 OffsetZValueMin = 0.01f;
+
+      if (mTerrainSnapOffsetZ)
+      {
+         if (mOffsetZValue == 0.0f)
+         {
+            ri.point.z += OffsetZValueMin;
+         }
+         else
+         {
+            ri.point.z += mOffsetZValue;
+         }
+         
+      }
+      
       sel->offset(ri.point - centroid, (!mUseGroupCenter && mGridSnap) ? mGridPlaneSize : 0.f);
 
       if(mTerrainSnapAlignment != AlignNone)
@@ -1795,6 +1810,9 @@ WorldEditor::WorldEditor()
    mStickToGround = false;
    mStuckToGround = false;
    mTerrainSnapAlignment = AlignNone;
+   mTerrainSnapOffsetZ = false;
+   mOffsetZValue = 0.0f;
+
    mDropAtBounds = false;
    mDropBelowCameraOffset = 15.0f;
    mDropAtScreenCenterScalar = 1.0f;
@@ -2788,6 +2806,8 @@ void WorldEditor::initPersistFields()
 
       addField( "isDirty",                TypeBool,   Offset(mIsDirty, WorldEditor) );
       addField( "stickToGround",          TypeBool,   Offset(mStickToGround, WorldEditor) );
+      addField("TerrainSnapOffsetZ",      TypeBool,   Offset(mTerrainSnapOffsetZ, WorldEditor));
+      addField("OffsetZValue",            TypeF32,    Offset(mOffsetZValue, WorldEditor));
       //addField("sameScaleAllAxis", TypeBool, Offset(mSameScaleAllAxis, WorldEditor));
       addField( "toggleIgnoreList",       TypeBool,   Offset(mToggleIgnoreList, WorldEditor) );
 
