@@ -1153,9 +1153,9 @@ void GFXDrawUtil::_drawSolidCapsule( const GFXStateBlockDesc &desc, const Point3
    for (S32 i=0; i<numPoints + 1; i++)
    {
       S32 imod = i % numPoints;      
-      verts[2 * i].point = Point3F( circlePoints[imod].x * radius, circlePoints[imod].y * radius, height );
+      verts[2 * i].point = Point3F( circlePoints[imod].x * radius, circlePoints[imod].y * radius, height/2 );
       verts[2 * i].color = color;
-      verts[2 * i + 1].point = Point3F( circlePoints[imod].x * radius, circlePoints[imod].y * radius, -height );
+      verts[2 * i + 1].point = Point3F( circlePoints[imod].x * radius, circlePoints[imod].y * radius, -height/2 );
       verts[2 * i + 1].color = color;
    }
 
@@ -1163,7 +1163,7 @@ void GFXDrawUtil::_drawSolidCapsule( const GFXStateBlockDesc &desc, const Point3
 
    // Apply xfm if we were passed one.
    for ( U32 i = 0; i < totalNumPnts; i++ )
-      mat.mulP( verts[i].point );
+      mat.mulV( verts[i].point );
 
    // Apply position offset
    for ( U32 i = 0; i < totalNumPnts; i++ )
