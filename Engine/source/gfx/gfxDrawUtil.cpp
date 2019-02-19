@@ -845,7 +845,7 @@ void GFXDrawUtil::_drawWireCube( const GFXStateBlockDesc &desc, const Point3F &s
    if ( xfm != NULL )
    {
       for ( U32 i = 0; i < 30; i++ )
-         xfm->mulP( verts[i].point );
+         xfm->mulV( verts[i].point );
    }
 
    // Apply position offset
