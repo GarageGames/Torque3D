@@ -89,9 +89,6 @@ bool GuiConsole::onWake()
 S32 GuiConsole::getMaxWidth(S32 startIndex, S32 endIndex)
 {
    //sanity check
-   U32 size;
-   ConsoleLogEntry *log;
-
    if (startIndex < 0 || (U32)endIndex >= mFilteredLog.size() || startIndex > endIndex)
       return 0;
 
@@ -190,9 +187,6 @@ void GuiConsole::onPreRender()
 
 void GuiConsole::onRenderCell(Point2I offset, Point2I cell, bool /*selected*/, bool /*mouseOver*/)
 {
-   U32 size;
-   ConsoleLogEntry *log;
-   
    ConsoleLogEntry &entry = mFilteredLog[cell.y];
    switch (entry.mLevel)
    {
@@ -209,9 +203,6 @@ void GuiConsole::onRenderCell(Point2I offset, Point2I cell, bool /*selected*/, b
 void GuiConsole::onCellSelected( Point2I cell )
 {
    Parent::onCellSelected( cell );
-
-   U32 size;
-   ConsoleLogEntry* log;
 
    ConsoleLogEntry& entry = mFilteredLog[cell.y];
    onMessageSelected_callback( entry.mLevel, entry.mString );

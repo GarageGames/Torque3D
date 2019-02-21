@@ -3877,8 +3877,6 @@ void WorldEditor::makeSelectionAMesh(const char *filename)
    fabMat.inverse();
 
    MatrixF objMat;
-   SimObject *obj = NULL;
-   SceneObject *sObj = NULL;
 
    Vector< SceneObject* > objectList;
 

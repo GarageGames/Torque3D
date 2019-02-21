@@ -621,8 +621,6 @@ void AnimationComponent::advanceThreads(F32 dt)
       Thread& st = mAnimationThreads[i];
       if (st.thread && st.sequence != -1)
       {
-         bool cyclic = getShape()->sequences[st.sequence].isCyclic();
-
          if (!getShape()->sequences[st.sequence].isCyclic() &&
             !st.atEnd &&
             ((st.timescale > 0.f) ? mOwnerShapeInstance->getPos(st.thread) >= 1.0 : mOwnerShapeInstance->getPos(st.thread) <= 0))

@@ -719,8 +719,6 @@ bool ConvexShape::buildExportPolyList(ColladaUtils::ExportData* exportData, cons
    //Convex shapes only have the one 'level', so we'll just rely on the export post-process to back-fill
    if (isServerObject() && getClientObject())
    {
-      ConvexShape* clientShape = dynamic_cast<ConvexShape*>(getClientObject());
-
       exportData->meshData.increment();
 
       //Prep a meshData for this shape in particular

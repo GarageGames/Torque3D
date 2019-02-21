@@ -216,7 +216,7 @@ void Frustum::setNearFarDist( F32 nearDist, F32 farDist )
    // Recalculate the frustum.
    MatrixF xfm( mTransform );
 
-   const F32 CENTER_EPSILON = 0.001;
+   const F32 CENTER_EPSILON = 0.001f;
    F32 centerX = mNearLeft + (mNearRight - mNearLeft) * 0.5;
    F32 centerY = mNearBottom + (mNearTop - mNearBottom) * 0.5;
    if ((centerX > CENTER_EPSILON || centerX < -CENTER_EPSILON) || (centerY > CENTER_EPSILON || centerY < -CENTER_EPSILON) )

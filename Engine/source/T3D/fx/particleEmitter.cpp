@@ -490,7 +490,7 @@ void ParticleEmitterData::unpackData(BitStream* stream)
 #if defined(AFX_CAP_PARTICLE_POOLS) 
    if (stream->readFlag())
    {
-      pool_datablock = (afxParticlePoolData*)stream->readRangedU32(DataBlockObjectIdFirst, DataBlockObjectIdLast);
+      pool_datablock = (afxParticlePoolData*)(uintptr_t)stream->readRangedU32(DataBlockObjectIdFirst, DataBlockObjectIdLast);
       stream->read(&pool_index);
       pool_depth_fade = stream->readFlag();
       pool_radial_fade = stream->readFlag();

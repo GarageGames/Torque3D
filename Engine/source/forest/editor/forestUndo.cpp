@@ -55,7 +55,7 @@ void ForestCreateUndoAction::addItem( ForestItemData *data,
    // We store the datablock ID rather than the actual pointer
    // since the pointer could go bad.
    SimObjectId dataId = item.getData()->getId();
-   mItems.last().setData( (ForestItemData*)dataId );
+   mItems.last().setData( (ForestItemData*)(uintptr_t)dataId );
 }
 
 void ForestCreateUndoAction::redo()
@@ -110,7 +110,7 @@ void ForestDeleteUndoAction::removeItem( const ForestItem &item )
    SimObjectId dataId = item.getData()->getId();
 
    mItems.push_back( item );
-   mItems.last().setData( (ForestItemData*)dataId );
+   mItems.last().setData( (ForestItemData*)(uintptr_t)dataId );
    mData->removeItem( item.getKey(), item.getPosition() );
 }
 
@@ -171,7 +171,7 @@ void ForestUpdateAction::saveItem( const ForestItem &item )
    // We store the datablock ID rather than the actual pointer
    // since the pointer could go bad.
    SimObjectId dataId = item.getData()->getId();   
-   mItems.last().setData( (ForestItemData*)dataId );   
+   mItems.last().setData( (ForestItemData*)(uintptr_t)dataId );   
 }
 
 void ForestUpdateAction::_swapState()
@@ -215,7 +215,7 @@ void ForestUpdateAction::_swapState()
                          item.getScale() );
 
       // Save the state before this swap for the next swap.      
-      newItem.setData( (ForestItemData*)data->getId() );
+      newItem.setData( (ForestItemData*)(uintptr_t)data->getId() );
       mItems.push_back( newItem );
    }
 

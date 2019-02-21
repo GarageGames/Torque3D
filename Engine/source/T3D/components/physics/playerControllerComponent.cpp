@@ -330,9 +330,6 @@ void PlayerControllerComponent::updateMove()
    }
 
    // Update current orientation
-   bool doStandardMove = true;
-   GameConnection* con = mOwner->getControllingClient();
-
    MatrixF zRot;
    zRot.set(EulerF(0.0f, 0.0f, mOwner->getRotation().asEulerF().z));
 
@@ -355,7 +352,6 @@ void PlayerControllerComponent::updateMove()
    mContactInfo.jump = false;
    mContactInfo.run = false;
 
-   bool jumpSurface = false, runSurface = false;
    if (!mOwner->isMounted())
       findContact(&mContactInfo.run, &mContactInfo.jump, &mContactInfo.contactNormal);
    if (mContactInfo.jump)
@@ -577,7 +573,6 @@ void PlayerControllerComponent::updatePos(const F32 travelTime)
    newPos = mPhysicsRep->move(mVelocity * travelTime, collisionList);
 
    bool haveCollisions = false;
-   bool wasFalling = mFalling;
    if (collisionList.getCount() > 0)
    {
       mFalling = false;

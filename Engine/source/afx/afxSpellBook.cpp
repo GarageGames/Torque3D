@@ -128,7 +128,7 @@ void afxSpellBookData::unpackData(BitStream* stream)
 
   do_id_convert = true;
   for (S32 i = 0; i < pages_per_book*spells_per_page; i++)
-    rpg_spells[i] = (afxRPGMagicSpellData*) readDatablockID(stream);
+    rpg_spells[i] = (afxRPGMagicSpellData*)(uintptr_t)readDatablockID(stream);
 }
 
 DefineEngineMethod(afxSpellBookData, getPageSlotIndex, S32, (Point2I bookSlot),,

@@ -77,11 +77,11 @@ _STRING_VALUE_LOOKUP_FXN(GFXStringBlendOp);
 
 #define INIT_LOOKUPTABLE( tablearray, enumprefix, type ) \
    for( S32 i = enumprefix##_FIRST; i < enumprefix##_COUNT; i++ ) \
-      tablearray[i] = (type)GFX_UNINIT_VAL;
+      tablearray[i] = (type)(uintptr_t)GFX_UNINIT_VAL;
 #define INIT_LOOKUPTABLE_EX( tablearray, enumprefix, type, typeTable ) \
    for( S32 i = enumprefix##_FIRST; i < enumprefix##_COUNT; i++ ) \
    {\
-      tablearray[i] = (type)GFX_UNINIT_VAL;\
+      tablearray[i] = (type)(uintptr_t)GFX_UNINIT_VAL;\
       typeTable[i] = &defaultStringValueLookup;\
    }
 

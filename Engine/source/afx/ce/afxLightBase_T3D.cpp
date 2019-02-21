@@ -195,8 +195,8 @@ void afxT3DLightBaseData::unpackData(BitStream* stream)
   stream->read( &mAnimState.animationPhase );
   stream->read( &mFlareScale );
 
-  mAnimationData = (LightAnimData*) readDatablockID(stream);
-  mFlareData = (LightFlareData*) readDatablockID(stream);
+  mAnimationData = (LightAnimData*)(uintptr_t)readDatablockID(stream);
+  mFlareData = (LightFlareData*)(uintptr_t)readDatablockID(stream);
 
   do_id_convert = true;
 }

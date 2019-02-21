@@ -1392,7 +1392,7 @@ void SceneContainer::getBinRange( const F32 min, const F32 max, U32& minBin, U32
          // This is truly lame, but it can happen.  There must be a better way to
          //  deal with this.
          if (minCoord == SceneContainer::csmTotalBinSize)
-            minCoord = SceneContainer::csmTotalBinSize - 0.01;
+            minCoord = SceneContainer::csmTotalBinSize - 0.01f;
       }
 
       AssertFatal(minCoord >= 0.0 && minCoord < SceneContainer::csmTotalBinSize, "Bad minCoord");
@@ -1415,7 +1415,7 @@ void SceneContainer::getBinRange( const F32 min, const F32 max, U32& minBin, U32
          // This is truly lame, but it can happen.  There must be a better way to
          //  deal with this.
          if (minCoord == SceneContainer::csmTotalBinSize)
-            minCoord = SceneContainer::csmTotalBinSize - 0.01;
+            minCoord = SceneContainer::csmTotalBinSize - 0.01f;
       }
       AssertFatal(minCoord >= 0.0 && minCoord < SceneContainer::csmTotalBinSize, "Bad minCoord");
 
@@ -1426,7 +1426,7 @@ void SceneContainer::getBinRange( const F32 min, const F32 max, U32& minBin, U32
          // This is truly lame, but it can happen.  There must be a better way to
          //  deal with this.
          if (maxCoord == SceneContainer::csmTotalBinSize)
-            maxCoord = SceneContainer::csmTotalBinSize - 0.01;
+            maxCoord = SceneContainer::csmTotalBinSize - 0.01f;
       }
       AssertFatal(maxCoord >= 0.0 && maxCoord < SceneContainer::csmTotalBinSize, "Bad maxCoord");
 

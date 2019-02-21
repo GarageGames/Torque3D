@@ -306,8 +306,6 @@ void Entity::onPostAdd()
 
 bool Entity::_setGameObject(void *object, const char *index, const char *data)
 {
-   Entity *e = static_cast<Entity*>(object);
-
    // Sanity!
    AssertFatal(data != NULL, "Cannot use a NULL asset Id.");
 
@@ -513,8 +511,6 @@ U32 Entity::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 
       for (U32 i = 0; i < mNetworkedComponents.size(); i++)
       {
-         NetworkedComponent::UpdateState state = mNetworkedComponents[i].updateState;
-
          if (mNetworkedComponents[i].updateState == NetworkedComponent::Adding)
          {
             const char* className = mComponents[mNetworkedComponents[i].componentIndex]->getClassName();
@@ -1381,7 +1377,6 @@ bool Entity::removeComponent(Component *comp, bool deleteComponent)
 //to re-add them. Need to implement a clean clear function that will clear the local list, and only delete unused behaviors during an update.
 void Entity::clearComponents(bool deleteComponents)
 {
-   bool srv = isServerObject();
    if (!deleteComponents)
    {
       while (mComponents.size() > 0)
@@ -1398,8 +1393,6 @@ void Entity::clearComponents(bool deleteComponents)
          if (comp)
          {
             comp->onComponentRemove(); //in case the behavior needs to do cleanup on the owner
-
-            bool removed = mComponents.remove(comp);
 
             //we only need to delete them on the server side. they'll be cleaned up on the client side
             //via the ghosting system for us
@@ -1663,7 +1656,6 @@ void Entity::notifyComponents(String signalFunction, String argA, String argB, S
 
 void Entity::setComponentsDirty()
 {
-   bool tmp = true;
    /*if (mToLoadComponents.empty())
       mStartComponentUpdate = true;
 
@@ -1694,7 +1686,6 @@ void Entity::setComponentsDirty()
 
 void Entity::setComponentDirty(Component *comp, bool forceUpdate)
 {
-   bool found = false;
    for (U32 i = 0; i < mComponents.size(); i++)
    {
       if (mComponents[i]->getId() == comp->getId())

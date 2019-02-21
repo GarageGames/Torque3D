@@ -237,8 +237,6 @@ bool CameraComponent::getCameraTransform(F32* pos,MatrixF* mat)
 {
    // Returns camera to world space transform
    // Handles first person / third person camera position
-   bool isServer = isServerObject();
-
    if (mTargetNodeIdx == -1)
    {
       if (mUseParentTransform)
@@ -479,7 +477,6 @@ void CameraComponent::setRotation(RotationF newRot)
 Frustum CameraComponent::getFrustum()
 {
    Frustum visFrustum;
-   F32 left, right, top, bottom;
    F32 aspectRatio = mClientScreen.x / mClientScreen.y;
 
    visFrustum.set(false, mDegToRad(mCameraFov), aspectRatio, 0.1f, 1000, mOwner->getTransform());

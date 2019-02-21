@@ -631,7 +631,7 @@ DefineEngineMethod( GuiListBoxCtrl, addItem, S32, (const char* newItem, const ch
      else if(elementCount == 1)
      {
          U32 objId = dAtoi( color );
-         return object->addItem( newItem, (void*)objId );
+         return object->addItem( newItem, (void*)(uintptr_t)objId );
      }
      else
      {
@@ -1523,7 +1523,7 @@ void GuiListBoxCtrl::_mirror()
 
       if ( !found )
       {                  
-         addItem( _makeMirrorItemName( curObj ), (void*)curId );         
+         addItem( _makeMirrorItemName( curObj ), (void*)(uintptr_t)curId );         
       }
    }
 }

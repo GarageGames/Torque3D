@@ -215,7 +215,7 @@ void afxPhraseEffectData::unpack_fx(BitStream* stream, afxEffectList& fx)
   fx.clear();
   S32 n_fx = stream->readInt(EFFECTS_PER_PHRASE_BITS);
   for (int i = 0; i < n_fx; i++)
-    fx.push_back((afxEffectWrapperData*)readDatablockID(stream));
+    fx.push_back((afxEffectWrapperData*)(uintptr_t)readDatablockID(stream));
 }
 
 void afxPhraseEffectData::packData(BitStream* stream)
