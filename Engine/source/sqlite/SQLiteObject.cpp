@@ -519,30 +519,33 @@ void SQLiteObject::escapeSingleQuotes(const char* source, char *dest)
 // calls the C++ class function.
 // FIX: change all these to DefineEngineMethod!
 
-ConsoleMethod(SQLiteObject, openDatabase, bool, 3, 3, "(const char* filename) Opens the database specifed by filename.  Returns true or false.")
+DefineEngineMethod(SQLiteObject, openDatabase, bool, (const char* filename),, "(const char* filename) Opens the database specifed by filename.  Returns true or false.")
 {
-	return object->OpenDatabase(argv[2]);
+	return object->OpenDatabase(filename);
 }
 
-DefineEngineMethod(SQLiteObject, loadOrSaveDb, bool, (const char* filename, bool isSave), ,
+DefineEngineMethod(SQLiteObject, loadOrSaveDb, bool, (const char* filename, bool isSave),,
 	"Loads or saves a cached database from the disk db specifed by filename. Second argument determines loading (false) or saving (true). Returns true or false.")
 {
 	return object->loadOrSaveDb(filename, isSave);
 }
 
-ConsoleMethod(SQLiteObject, closeDatabase, void, 2, 2, "Closes the active database.")
+DefineEngineMethod(SQLiteObject, closeDatabase, void, (),, "Closes the active database.")
 {
 	object->CloseDatabase();
 }
 
-ConsoleMethod(SQLiteObject, query, S32, 4, 0, "(const char* sql, S32 mode) Performs an SQL query on the open database and returns an identifier to a valid result set. mode is currently unused, and is reserved for future use.")
+
+
+DefineEngineStringlyVariadicMethod(SQLiteObject, query, S32, 1, 5,
+   "(const char* sql, S32 mode) Performs an SQL query on the open database and returns an identifier to a valid result set. mode is currently unused, and is reserved for future use.")
 {
 	S32 iCount;
 	S32 iIndex, iLen, iNewIndex, iArg, iArgLen, i;
 	char* szNew;
 
 	if (argc == 4)
-		return object->ExecuteSQL(argv[2]);
+		return object->ExecuteSQL(argv[1]);
 	else if (argc > 4)
 	{
 		// Support for printf type querys, as per Ben Garney's suggestion
@@ -552,10 +555,10 @@ ConsoleMethod(SQLiteObject, query, S32, 4, 0, "(const char* sql, S32 mode) Perfo
 
 		// scan the query and count the question marks
 		iCount = 0;
-		iLen = dStrlen(argv[2]);
+		iLen = dStrlen(argv[1]);
 		for (iIndex = 0; iIndex < iLen; iIndex++)
 		{
-			if (argv[2][iIndex] == '?')
+			if (argv[1][iIndex] == '?')
 				iCount++;
 		}
 
@@ -567,7 +570,7 @@ ConsoleMethod(SQLiteObject, query, S32, 4, 0, "(const char* sql, S32 mode) Perfo
 			// so now we need to calc the length of the new query string.  This is easily achieved.
 			// We simply take our base string length, subtract the question marks, then add in
 			// the number of total characters used by our arguments.
-			iLen = dStrlen(argv[2]) - iCount;
+			iLen = dStrlen(argv[1]) - iCount;
 			for (iIndex = 1; iIndex <= iCount; iIndex++)
 			{
 				iLen = iLen + dStrlen(argv[iIndex + 3]);
@@ -576,12 +579,12 @@ ConsoleMethod(SQLiteObject, query, S32, 4, 0, "(const char* sql, S32 mode) Perfo
 			szNew = new char[iLen];
 
 			// now we need to replace all the question marks with the actual arguments
-			iLen = dStrlen(argv[2]);
+			iLen = dStrlen(argv[1]);
 			iNewIndex = 0;
 			iArg = 1;
 			for (iIndex = 0; iIndex <= iLen; iIndex++)
 			{
-				if (argv[2][iIndex] == '?')
+				if (argv[1][iIndex] == '?')
 				{
 					// ok we need to replace this question mark with the actual argument
 					// and iterate our pointers and everything as needed.  This is no doubt
@@ -600,79 +603,79 @@ ConsoleMethod(SQLiteObject, query, S32, 4, 0, "(const char* sql, S32 mode) Perfo
 
 				}
 				else
-					szNew[iNewIndex] = argv[2][iIndex];
+					szNew[iNewIndex] = argv[1][iIndex];
 
 				iNewIndex++;
 			}
 		}
 		else
 			return 0; // incorrect number of question marks vs arguments
-		Con::printf("Old SQL: %s\nNew SQL: %s", argv[2].getStringValue(), szNew);
+		Con::printf("Old SQL: %s\nNew SQL: %s", argv[1].getStringValue(), szNew);
 		return object->ExecuteSQL(szNew);
 	}
 
 	return 0;
 }
 
-ConsoleMethod(SQLiteObject, clearResult, void, 3, 3, "(S32 resultSet) Clears memory used by the specified result set, and deletes the result set.")
+DefineEngineMethod(SQLiteObject, clearResult, void, (S32 resultSet),, "(S32 resultSet) Clears memory used by the specified result set, and deletes the result set.")
 {
-	object->ClearResultSet(dAtoi(argv[2]));
+	object->ClearResultSet(resultSet);
 }
 
-ConsoleMethod(SQLiteObject, nextRow, void, 3, 3, "(S32 resultSet) Moves the result set's row pointer to the next row.")
+DefineEngineMethod(SQLiteObject, nextRow, void, (S32 resultSet),, "(S32 resultSet) Moves the result set's row pointer to the next row.")
 {
 	sqlite_resultset* pResultSet;
-	pResultSet = object->GetResultSet(dAtoi(argv[2]));
+	pResultSet = object->GetResultSet(resultSet);
 	if (pResultSet)
 	{
 		pResultSet->iCurrentRow++;
 	}
 }
 
-ConsoleMethod(SQLiteObject, previousRow, void, 3, 3, "(S32 resultSet) Moves the result set's row pointer to the previous row")
+DefineEngineMethod(SQLiteObject, previousRow, void, (S32 resultSet),, "(S32 resultSet) Moves the result set's row pointer to the previous row")
 {
 	sqlite_resultset* pResultSet;
-	pResultSet = object->GetResultSet(dAtoi(argv[2]));
+	pResultSet = object->GetResultSet(resultSet);
 	if (pResultSet)
 	{
 		pResultSet->iCurrentRow--;
 	}
 }
 
-ConsoleMethod(SQLiteObject, firstRow, void, 3, 3, "(S32 resultSet) Moves the result set's row pointer to the very first row in the result set.")
+DefineEngineMethod(SQLiteObject, firstRow, void, (S32 resultSet),, "(S32 resultSet) Moves the result set's row pointer to the very first row in the result set.")
 {
 	sqlite_resultset* pResultSet;
-	pResultSet = object->GetResultSet(dAtoi(argv[2]));
+	pResultSet = object->GetResultSet(resultSet);
 	if (pResultSet)
 	{
 		pResultSet->iCurrentRow = 0;
 	}
 }
 
-ConsoleMethod(SQLiteObject, lastRow, void, 3, 3, "(S32 resultSet) Moves the result set's row pointer to the very last row in the result set.")
+DefineEngineMethod(SQLiteObject, lastRow, void, (S32 resultSet),, "(S32 resultSet) Moves the result set's row pointer to the very last row in the result set.")
 {
 	sqlite_resultset* pResultSet;
-	pResultSet = object->GetResultSet(dAtoi(argv[2]));
+	pResultSet = object->GetResultSet(resultSet);
 	if (pResultSet)
 	{
 		pResultSet->iCurrentRow = pResultSet->iNumRows - 1;
 	}
 }
 
-ConsoleMethod(SQLiteObject, setRow, void, 4, 4, "(S32 resultSet S32 row) Moves the result set's row pointer to the row specified.  Row indices start at 1 not 0.")
+DefineEngineMethod(SQLiteObject, setRow, void, (S32 resultSet, S32 row),, "(S32 resultSet S32 row) Moves the result set's row pointer to the row specified.  Row indices start at 1 not 0.")
 {
 	sqlite_resultset* pResultSet;
-	pResultSet = object->GetResultSet(dAtoi(argv[2]));
+	pResultSet = object->GetResultSet(resultSet);
 	if (pResultSet)
 	{
-		pResultSet->iCurrentRow = dAtoi(argv[3]) - 1;
+		pResultSet->iCurrentRow = row - 1;
 	}
 }
 
-ConsoleMethod(SQLiteObject, getRow, S32, 3, 3, "(S32 resultSet) Returns what row the result set's row pointer is currently on.")
+DefineEngineMethod(SQLiteObject, getRow, S32, (S32 resultSet),, "(S32 resultSet) Returns what row the result set's row pointer is currently on.")
 {
 	sqlite_resultset* pResultSet;
-	pResultSet = object->GetResultSet(dAtoi(argv[2]));
+	pResultSet = object->GetResultSet(resultSet);
 	if (pResultSet)
 	{
 		return pResultSet->iCurrentRow + 1;
@@ -681,10 +684,10 @@ ConsoleMethod(SQLiteObject, getRow, S32, 3, 3, "(S32 resultSet) Returns what row
 		return 0;
 }
 
-ConsoleMethod(SQLiteObject, numRows, S32, 3, 3, "(S32 resultSet) Returns the number of rows in the result set.")
+DefineEngineMethod(SQLiteObject, numRows, S32, (S32 resultSet),, "(S32 resultSet) Returns the number of rows in the result set.")
 {
 	sqlite_resultset* pResultSet;
-	pResultSet = object->GetResultSet(dAtoi(argv[2]));
+	pResultSet = object->GetResultSet(resultSet);
 	if (pResultSet)
 	{
 		return pResultSet->iNumRows;
@@ -693,10 +696,10 @@ ConsoleMethod(SQLiteObject, numRows, S32, 3, 3, "(S32 resultSet) Returns the num
 		return 0;
 }
 
-ConsoleMethod(SQLiteObject, numColumns, S32, 3, 3, "(S32 resultSet) Returns the number of columns in the result set.")
+DefineEngineMethod(SQLiteObject, numColumns, S32, (S32 resultSet),, "(S32 resultSet) Returns the number of columns in the result set.")
 {
 	sqlite_resultset* pResultSet;
-	pResultSet = object->GetResultSet(dAtoi(argv[2]));
+	pResultSet = object->GetResultSet(resultSet);
 	if (pResultSet)
 	{
 		return pResultSet->iNumCols;
@@ -705,33 +708,33 @@ ConsoleMethod(SQLiteObject, numColumns, S32, 3, 3, "(S32 resultSet) Returns the 
 		return 0;
 }
 
-ConsoleMethod(SQLiteObject, endOfResult, bool, 3, 3, "(S32 resultSet) Checks to see if the internal pointer for the specified result set is at the end, indicating there are no more rows left to read.")
+DefineEngineMethod(SQLiteObject, endOfResult, bool, (S32 resultSet),, "(S32 resultSet) Checks to see if the internal pointer for the specified result set is at the end, indicating there are no more rows left to read.")
 {
-	return object->EndOfResult(dAtoi(argv[2]));
+	return object->EndOfResult(resultSet);
 }
 
-ConsoleMethod(SQLiteObject, EOR, bool, 3, 3, "(S32 resultSet) Same as endOfResult().")
+DefineEngineMethod(SQLiteObject, EOR, bool, (S32 resultSet),, "(S32 resultSet) Same as endOfResult().")
 {
-	return object->EndOfResult(dAtoi(argv[2]));
+	return object->EndOfResult(resultSet);
 }
 
-ConsoleMethod(SQLiteObject, EOF, bool, 3, 3, "(S32 resultSet) Same as endOfResult().")
+DefineEngineMethod(SQLiteObject, EOFile, bool, (S32 resultSet),, "(S32 resultSet) Same as endOfResult().")
 {
-	return object->EndOfResult(dAtoi(argv[2]));
+	return object->EndOfResult(resultSet);
 }
 
-ConsoleMethod(SQLiteObject, getColumnIndex, S32, 4, 4, "(resultSet columnName) Looks up the specified column name in the specified result set, and returns the columns index number.  A return value of 0 indicates the lookup failed for some reason (usually this indicates you specified a column name that doesn't exist or is spelled wrong).")
+DefineEngineMethod(SQLiteObject, getColumnIndex, S32, (S32 resultSet, String columnName),, "(resultSet columnName) Looks up the specified column name in the specified result set, and returns the columns index number.  A return value of 0 indicates the lookup failed for some reason (usually this indicates you specified a column name that doesn't exist or is spelled wrong).")
 {
-	return object->GetColumnIndex(dAtoi(argv[2]), argv[3]);
+	return object->GetColumnIndex(resultSet, columnName);
 }
 
-ConsoleMethod(SQLiteObject, getColumnName, const char *, 4, 4, "(resultSet columnIndex) Looks up the specified column index in the specified result set, and returns the column's name.  A return value of an empty string indicates the lookup failed for some reason (usually this indicates you specified a column index that is invalid or exceeds the number of columns in the result set). Columns are index starting with 1 not 0")
+DefineEngineMethod(SQLiteObject, getColumnName, const char *, (S32 resultSet, S32 columnIndex), , "(resultSet columnIndex) Looks up the specified column index in the specified result set, and returns the column's name.  A return value of an empty string indicates the lookup failed for some reason (usually this indicates you specified a column index that is invalid or exceeds the number of columns in the result set). Columns are index starting with 1 not 0")
 {
 	sqlite_resultset* pResultSet;
 	sqlite_resultrow* pRow;
 	S32 iColumn;
 
-	pResultSet = object->GetResultSet(dAtoi(argv[2]));
+	pResultSet = object->GetResultSet(resultSet);
 	if (pResultSet)
 	{
 		pRow = pResultSet->vRows[pResultSet->iCurrentRow];
@@ -739,7 +742,7 @@ ConsoleMethod(SQLiteObject, getColumnName, const char *, 4, 4, "(resultSet colum
 			return "";
 
 		// We assume they specified column by index.  If they know the column name they wouldn't be calling this function :)
-		iColumn = dAtoi(argv[3]);
+		iColumn = columnIndex;
 		if (iColumn == 0)
 			return "";  // column indices start at 1, not 0
 
@@ -753,90 +756,91 @@ ConsoleMethod(SQLiteObject, getColumnName, const char *, 4, 4, "(resultSet colum
 		return "";
 }
 
-ConsoleMethod(SQLiteObject, getColumn, const char *, 4, 4, "(resultSet column) Returns the value of the specified column (Column can be specified by name or index) in the current row of the specified result set. If the call fails, the returned string will indicate the error.")
+DefineEngineStringlyVariadicMethod(SQLiteObject, getColumn, const char *, 4, 4, "(resultSet column) Returns the value of the specified column (Column can be specified by name or index) in the current row of the specified result set. If the call fails, the returned string will indicate the error.")
 {
-	sqlite_resultset* pResultSet;
-	sqlite_resultrow* pRow;
-	S32 iColumn;
+   sqlite_resultset* pResultSet;
+   sqlite_resultrow* pRow;
+   S32 iColumn;
 
-	pResultSet = object->GetResultSet(dAtoi(argv[2]));
-	if (pResultSet)
-	{
-		if (pResultSet->vRows.size() == 0)
-			return "NULL";
+   pResultSet = object->GetResultSet(dAtoi(argv[2]));
+   if (pResultSet)
+   {
+      if (pResultSet->vRows.size() == 0)
+         return "NULL";
 
-		pRow = pResultSet->vRows[pResultSet->iCurrentRow];
-		if (!pRow)
-			return "invalid_row";
+      pRow = pResultSet->vRows[pResultSet->iCurrentRow];
+      if (!pRow)
+         return "invalid_row";
 
-		// Is column specified by a name or an index?
-		iColumn = dAtoi(argv[3]);
-		if (iColumn == 0)
-		{
-			// column was specified by a name
-			iColumn = object->GetColumnIndex(dAtoi(argv[2]), argv[3]);
-			// if this is still 0 then we have some error
-			if (iColumn == 0)
-				return "invalid_column";
-		}
+      // Is column specified by a name or an index?
+      iColumn = dAtoi(argv[3]);
+      if (iColumn == 0)
+      {
+         // column was specified by a name
+         iColumn = object->GetColumnIndex(dAtoi(argv[2]), argv[3]);
+         // if this is still 0 then we have some error
+         if (iColumn == 0)
+            return "invalid_column";
+      }
 
-		// We temporarily padded the index in GetColumnIndex() so we could return a 
-		// 0 for error.  So now we need to drop it back down.
-		iColumn--;
+      // We temporarily padded the index in GetColumnIndex() so we could return a 
+      // 0 for error.  So now we need to drop it back down.
+      iColumn--;
 
-		// now we should have an index for our column data
-		if (pRow->vColumnValues[iColumn])
-			return pRow->vColumnValues[iColumn];
-		else
-			return "NULL";
-	}
-	else
-		return "invalid_result_set";
+      // now we should have an index for our column data
+      if (pRow->vColumnValues[iColumn])
+         return pRow->vColumnValues[iColumn];
+      else
+         return "NULL";
+   }
+   else
+      return "invalid_result_set";
 }
 
-ConsoleMethod(SQLiteObject, getColumnNumeric, F32, 4, 4, "(resultSet column) Returns the value of the specified column (Column can be specified by name or index) in the current row of the specified result set. If the call fails, the returned string will indicate the error.")
+DefineEngineStringlyVariadicMethod(SQLiteObject, getColumnNumeric, F32, 4, 4, "(resultSet column) Returns the value of the specified column (Column can be specified by name or index) in the current row of the specified result set. If the call fails, the returned string will indicate the error.")
 {
-	sqlite_resultset* pResultSet;
-	sqlite_resultrow* pRow;
-	S32 iColumn;
+   sqlite_resultset* pResultSet;
+   sqlite_resultrow* pRow;
+   S32 iColumn;
 
-	pResultSet = object->GetResultSet(dAtoi(argv[2]));
-	if (pResultSet)
-	{
+   pResultSet = object->GetResultSet(dAtoi(argv[2]));
+   if (pResultSet)
+   {
 
-		if (pResultSet->vRows.size() == 0)
-			return -1;
+      if (pResultSet->vRows.size() == 0)
+         return -1;
 
-		pRow = pResultSet->vRows[pResultSet->iCurrentRow];
-		if (!pRow)
-			return -1;//"invalid_row";
+      pRow = pResultSet->vRows[pResultSet->iCurrentRow];
+      if (!pRow)
+         return -1;//"invalid_row";
 
-		 // Is column specified by a name or an index?
-		iColumn = dAtoi(argv[3]);
-		if (iColumn == 0)
-		{
-			// column was specified by a name
-			iColumn = object->GetColumnIndex(dAtoi(argv[2]), argv[3]);
-			// if this is still 0 then we have some error
-			if (iColumn == 0)
-				return -1;//"invalid_column";
-		}
+       // Is column specified by a name or an index?
+      iColumn = dAtoi(argv[3]);
+      if (iColumn == 0)
+      {
+         // column was specified by a name
+         iColumn = object->GetColumnIndex(dAtoi(argv[2]), argv[3]);
+         // if this is still 0 then we have some error
+         if (iColumn == 0)
+            return -1;//"invalid_column";
+      }
 
-		// We temporarily padded the index in GetColumnIndex() so we could return a 
-		// 0 for error.  So now we need to drop it back down.
-		iColumn--;
+      // We temporarily padded the index in GetColumnIndex() so we could return a 
+      // 0 for error.  So now we need to drop it back down.
+      iColumn--;
 
-		// now we should have an index for our column data
-		if (pRow->vColumnValues[iColumn])
-			return dAtof(pRow->vColumnValues[iColumn]);
-		else
-			return 0;
-	}
-	else
-		return -1;//"invalid_result_set";
+      // now we should have an index for our column data
+      if (pRow->vColumnValues[iColumn])
+         return dAtof(pRow->vColumnValues[iColumn]);
+      else
+         return 0;
+   }
+   else
+      return -1;//"invalid_result_set";
 }
 
-ConsoleMethod(SQLiteObject, escapeString, const char *, 3, 3, "(string) Escapes the given string, making it safer to pass into a query.")
+
+DefineEngineMethod(SQLiteObject, escapeString, const char *, (String string),, "(string) Escapes the given string, making it safer to pass into a query.")
 {
 	// essentially what we need to do here is scan the string for any occurrences of: ', ", and \
     // and prepend them with a slash: \', \", \\
@@ -848,14 +852,14 @@ ConsoleMethod(SQLiteObject, escapeString, const char *, 3, 3, "(string) Escapes 
 	char* szNew;
 
 	iCount = 0;
-	iLen = dStrlen(argv[2]);
+	iLen = dStrlen(string);
 	for (iIndex = 0; iIndex < iLen; iIndex++)
 	{
-		if (argv[2][iIndex] == '\'')
+		if (string[iIndex] == '\'')
 			iCount++;
-		else if (argv[2][iIndex] == '\"')
+		else if (string[iIndex] == '\"')
 			iCount++;
-		else if (argv[2][iIndex] == '\\')
+		else if (string[iIndex] == '\\')
 			iCount++;
 
 	}
@@ -864,26 +868,26 @@ ConsoleMethod(SQLiteObject, escapeString, const char *, 3, 3, "(string) Escapes 
 	iNewIndex = 0;
 	for (iIndex = 0; iIndex <= iLen; iIndex++)
 	{
-		if (argv[2][iIndex] == '\'')
+		if (string[iIndex] == '\'')
 		{
 			szNew[iNewIndex] = '\\';
 			iNewIndex++;
 			szNew[iNewIndex] = '\'';
 		}
-		else if (argv[2][iIndex] == '\"')
+		else if (string[iIndex] == '\"')
 		{
 			szNew[iNewIndex] = '\\';
 			iNewIndex++;
 			szNew[iNewIndex] = '\"';
 		}
-		else if (argv[2][iIndex] == '\\')
+		else if (string[iIndex] == '\\')
 		{
 			szNew[iNewIndex] = '\\';
 			iNewIndex++;
 			szNew[iNewIndex] = '\\';
 		}
 		else
-			szNew[iNewIndex] = argv[2][iIndex];
+			szNew[iNewIndex] = string[iIndex];
 
 		iNewIndex++;
 	}
@@ -894,12 +898,12 @@ ConsoleMethod(SQLiteObject, escapeString, const char *, 3, 3, "(string) Escapes 
 }
 
 
-ConsoleMethod(SQLiteObject, numResultSets, S32, 2, 2, "numResultSets()")
+DefineEngineMethod(SQLiteObject, numResultSets, S32, (),, "numResultSets()")
 {
 	return object->numResultSets();
 }
 
-ConsoleMethod(SQLiteObject, getLastRowId, S32, 2, 2, "getLastRowId()")
+DefineEngineMethod(SQLiteObject, getLastRowId, S32, (), , "getLastRowId()")
 {
 	return object->getLastRowId();
 }
