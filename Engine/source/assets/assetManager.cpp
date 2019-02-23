@@ -130,8 +130,8 @@ void AssetManager::initPersistFields()
     // Call parent.
     Parent::initPersistFields();
 
-    addField( "EchoInfo", TypeBool, Offset(mEchoInfo, AssetManager), "Whether the asset manager echos extra information to the console or not." );
-    addField( "IgnoreAutoUnload", TypeBool, Offset(mIgnoreAutoUnload, AssetManager), "Whether the asset manager should ignore unloading of auto-unload assets or not." );
+    addField( "EchoInfo", TypeBool, false, Offset(mEchoInfo, AssetManager), "Whether the asset manager echos extra information to the console or not." );
+    addField( "IgnoreAutoUnload", TypeBool, true, Offset(mIgnoreAutoUnload, AssetManager), "Whether the asset manager should ignore unloading of auto-unload assets or not." );
 }
 
 //-----------------------------------------------------------------------------
@@ -228,7 +228,7 @@ bool AssetManager::loadModuleAutoLoadAssets(ModuleDefinition* pModuleDefinition)
    AssertFatal(pModuleDefinition != NULL, "Cannot auto load assets using a NULL module definition");
 
    // Does the module have any assets associated with it?
-   if (pModuleDefinition->getModuleAssets().empty())
+   if (pModuleDefinition->getModuleAssets().empty() && mEchoInfo)
    {
       // Yes, so warn.
       Con::warnf("Asset Manager: Cannot auto load assets to module '%s' as it has no existing assets.", pModuleDefinition->getSignature());

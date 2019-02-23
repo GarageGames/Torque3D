@@ -69,7 +69,7 @@ S32 QSORT_CALLBACK moduleDefinitionVersionIdSort( const void* a, const void* b )
 
 ModuleManager::ModuleManager() :
     mEnforceDependencies(true),
-    mEchoInfo(true),
+    mEchoInfo(false),
     mDatabaseLocks( 0 ),
     mIgnoreLoadedGroups(false)
 {
