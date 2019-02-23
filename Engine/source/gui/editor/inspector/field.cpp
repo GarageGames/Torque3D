@@ -50,7 +50,9 @@ GuiInspectorField::GuiInspectorField( GuiInspector* inspector,
    mField( field ), 
    mFieldArrayIndex( NULL ), 
    mEdit( NULL ),
-   mTargetObject(NULL)
+   mTargetObject(NULL),
+   mUseHeightOverride(false),
+   mHeightOverride(18)
 {
    if( field != NULL )
       mCaption    = field->pFieldname;
@@ -77,7 +79,9 @@ GuiInspectorField::GuiInspectorField()
    mTargetObject(NULL),
    mVariableName(StringTable->EmptyString()),
    mCallbackName(StringTable->EmptyString()),
-   mSpecialEditField(false)
+   mSpecialEditField(false),
+   mUseHeightOverride(false),
+   mHeightOverride(18)
 {
    setCanSave( false );
 }
@@ -112,7 +116,12 @@ bool GuiInspectorField::onAdd()
    if ( mEdit == NULL )
       return false;
 
-   setBounds(0,0,100,18);
+   S32 fieldHeight = 18;
+
+   if (mUseHeightOverride)
+      fieldHeight = mHeightOverride;
+
+   setBounds(0,0,100, fieldHeight);
 
    // Add our edit as a child
    addObject( mEdit );
