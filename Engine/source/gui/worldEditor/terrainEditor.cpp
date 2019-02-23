@@ -36,7 +36,7 @@
 #include "gui/worldEditor/terrainActions.h"
 #include "terrain/terrMaterial.h"
 
-
+#include "T3D/Scene.h"
 
 IMPLEMENT_CONOBJECT(TerrainEditor);
 
@@ -2405,10 +2405,10 @@ void TerrainEditor::reorderMaterial( S32 index, S32 orderPos )
 
 DefineEngineMethod( TerrainEditor, attachTerrain, void, (const char * terrain), (""), "(TerrainBlock terrain)")
 {
-   SimSet * missionGroup = dynamic_cast<SimSet*>(Sim::findObject("MissionGroup"));
-   if (!missionGroup)
+   Scene* scene = Scene::getRootScene();
+   if (!scene)
    {
-      Con::errorf(ConsoleLogEntry::Script, "TerrainEditor::attach: no mission group found");
+      Con::errorf(ConsoleLogEntry::Script, "TerrainEditor::attach: no scene found");
       return;
    }
 
@@ -2417,7 +2417,7 @@ DefineEngineMethod( TerrainEditor, attachTerrain, void, (const char * terrain), 
    // attach to first found terrainBlock
    if (dStrcmp (terrain,"")==0)
    {
-      for(SimSetIterator itr(missionGroup); *itr; ++itr)
+      for(SimSetIterator itr(scene); *itr; ++itr)
       {
          TerrainBlock* terrBlock = dynamic_cast<TerrainBlock*>(*itr);
 

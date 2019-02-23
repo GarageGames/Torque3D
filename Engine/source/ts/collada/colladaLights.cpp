@@ -30,6 +30,7 @@
 #include "T3D/pointLight.h"
 #include "T3D/spotLight.h"
 
+#include "T3D/Scene.h"
 
 //-----------------------------------------------------------------------------
 // Collada <light> elements are very similar, but are arranged as separate, unrelated
@@ -140,11 +141,11 @@ static void processNodeLights(AppNode* appNode, const MatrixF& offset, SimGroup*
 
 // Load lights from a collada file and add to the scene.
 DefineEngineFunction( loadColladaLights, bool, (const char * filename, const char * parentGroup, const char * baseObject), ("", ""),
-   "(string filename, SimGroup parentGroup=MissionGroup, SimObject baseObject=-1)"
+   "(string filename, SimGroup parentGroup=Scene, SimObject baseObject=-1)"
    "Load all light instances from a COLLADA (.dae) file and add to the scene.\n"
    "@param filename COLLADA filename to load lights from\n"
    "@param parentGroup (optional) name of an existing simgroup to add the new "
-   "lights to (defaults to MissionGroup)\n"
+   "lights to (defaults to root Scene)\n"
    "@param baseObject (optional) name of an object to use as the origin (useful "
    "if you are loading the lights for a collada scene and have moved or rotated "
    "the geometry)\n"
@@ -165,16 +166,16 @@ DefineEngineFunction( loadColladaLights, bool, (const char * filename, const cha
    Torque::Path path(filename);
 
    // Optional group to add the lights to. Create if it does not exist, and use
-   // the MissionGroup if not specified.
-   SimGroup* missionGroup = dynamic_cast<SimGroup*>(Sim::findObject("MissionGroup"));
+   // the root Scene if not specified.
+   Scene* scene = Scene::getRootScene();
    SimGroup* group = 0;
    if (!String::isEmpty(parentGroup)){
       if (!Sim::findObject(parentGroup, group)) {
          // Create the group if it could not be found
          group = new SimGroup;
          if (group->registerObject(parentGroup)) {
-            if (missionGroup)
-               missionGroup->addObject(group);
+            if (scene)
+               scene->addObject(group);
          }
          else {
             delete group;
@@ -183,7 +184,7 @@ DefineEngineFunction( loadColladaLights, bool, (const char * filename, const cha
       }
    }
    if (!group)
-      group = missionGroup;
+      group = scene;
 
    // Optional object to provide the base transform
    MatrixF offset(true);

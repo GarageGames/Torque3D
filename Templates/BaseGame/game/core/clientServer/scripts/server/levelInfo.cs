@@ -115,7 +115,7 @@ function sendLoadInfoToClient( %client )
 function parseMissionGroup( %className, %childGroup )
 {
    if( getWordCount( %childGroup ) == 0)
-      %currentGroup = "MissionGroup";
+      %currentGroup = getScene(0);
    else
       %currentGroup = %childGroup;
       
@@ -136,7 +136,7 @@ function parseMissionGroup( %className, %childGroup )
 function parseMissionGroupForIds( %className, %childGroup )
 {
    if( getWordCount( %childGroup ) == 0)
-      %currentGroup = $Game::MissionGroup;
+      %currentGroup = getScene(0);
    else
       %currentGroup = %childGroup;
       

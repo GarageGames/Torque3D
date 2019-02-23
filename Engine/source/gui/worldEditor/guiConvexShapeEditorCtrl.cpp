@@ -51,6 +51,8 @@
 #include "T3D/portal.h"
 #include "math/mPolyhedron.impl.h"
 
+#include "T3D/Scene.h"
+
 IMPLEMENT_CONOBJECT( GuiConvexEditorCtrl );
 
 ConsoleDocClass( GuiConvexEditorCtrl,
@@ -121,12 +123,12 @@ bool GuiConvexEditorCtrl::onWake()
    if ( !Parent::onWake() )
       return false;
 
-   SimGroup *missionGroup;
-   if ( !Sim::findObject( "MissionGroup", missionGroup ) )
+   Scene* scene = Scene::getRootScene();
+   if ( !scene )
       return true;
 
-   SimGroup::iterator itr = missionGroup->begin();
-   for ( ; itr != missionGroup->end(); itr++ )
+   SimGroup::iterator itr = scene->begin();
+   for ( ; itr != scene->end(); itr++ )
    {
       if ( dStrcmp( (*itr)->getClassName(), "ConvexShape" ) == 0 )
       {
@@ -166,8 +168,8 @@ void GuiConvexEditorCtrl::setVisible( bool val )
             mSavedGizmoFlags = -1;
          }
 
-         SimGroup* misGroup;
-         if (Sim::findObject("MissionGroup", misGroup))
+         Scene* scene = Scene::getRootScene();
+         if (scene != nullptr)
          {
             //Make our proxy objects "real" again
             for (U32 i = 0; i < mProxyObjects.size(); ++i)
@@ -184,7 +186,7 @@ void GuiConvexEditorCtrl::setVisible( bool val )
 
                SceneObject* polyObj = createPolyhedralObject(mProxyObjects[i].targetObjectClass.c_str(), mProxyObjects[i].shapeProxy);
 
-               misGroup->addObject(polyObj);
+               scene->addObject(polyObj);
 
                //Now, remove the convex proxy
                mProxyObjects[i].shapeProxy->deleteObject();
@@ -222,19 +224,19 @@ void GuiConvexEditorCtrl::setVisible( bool val )
          updateGizmoPos();
          mSavedGizmoFlags = mGizmoProfile->flags;
 
-         SimGroup* misGroup;
-         if (Sim::findObject("MissionGroup", misGroup))
+         Scene* scene = Scene::getRootScene();
+         if (scene != nullptr)
          {
-            for (U32 c = 0; c < misGroup->size(); ++c)
+            for (U32 c = 0; c < scene->size(); ++c)
             {
-               bool isTrigger = (misGroup->at(c)->getClassName() == StringTable->insert("Trigger"));
-               bool isZone = (misGroup->at(c)->getClassName() == StringTable->insert("Zone"));
-               bool isPortal = (misGroup->at(c)->getClassName() == StringTable->insert("Portal"));
-               bool isOccluder = (misGroup->at(c)->getClassName() == StringTable->insert("OcclusionVolume"));
+               bool isTrigger = (scene->at(c)->getClassName() == StringTable->insert("Trigger"));
+               bool isZone = (scene->at(c)->getClassName() == StringTable->insert("Zone"));
+               bool isPortal = (scene->at(c)->getClassName() == StringTable->insert("Portal"));
+               bool isOccluder = (scene->at(c)->getClassName() == StringTable->insert("OcclusionVolume"));
 
                if (isZone || isPortal || isOccluder)
                {
-                  SceneObject* sceneObj = static_cast<SceneObject*>(misGroup->at(c));
+                  SceneObject* sceneObj = static_cast<SceneObject*>(scene->at(c));
                   if (!sceneObj)
                   {
                      Con::errorf("WorldEditor::createConvexShapeFrom - Invalid object");
@@ -1350,9 +1352,9 @@ void GuiConvexEditorCtrl::setupShape( ConvexShape *shape )
    shape->registerObject();
    updateShape( shape );
 
-   SimGroup *group;
-   if ( Sim::findObject( "missionGroup", group ) )
-      group->addObject( shape );
+   Scene* scene = Scene::getRootScene();
+   if ( scene )
+      scene->addObject( shape );
 }
 
 void GuiConvexEditorCtrl::updateShape( ConvexShape *shape, S32 offsetFace )
@@ -1929,10 +1931,8 @@ ConvexEditorTool::EventResult ConvexEditorCreateTool::on3DMouseUp( const Gui3DMo
    }
    else if ( mStage == 0 )
    {
-      SimGroup *mg;
-      Sim::findObject( "MissionGroup", mg );
-
-      mg->addObject( mNewConvex );
+      SimGroup *scene = Scene::getRootScene();
+      scene->addObject( mNewConvex );
 
       mStage = -1;
 
@@ -2128,9 +2128,9 @@ ConvexShape* ConvexEditorCreateTool::extrudeShapeFromFace( ConvexShape *inShape,
    newShape->registerObject();
    mEditor->updateShape( newShape );
 
-   SimGroup *group;
-   if ( Sim::findObject( "missionGroup", group ) )
-      group->addObject( newShape );
+   Scene* scene = Scene::getRootScene();
+   if ( scene )
+      scene->addObject( newShape );
 
    return newShape;
 }

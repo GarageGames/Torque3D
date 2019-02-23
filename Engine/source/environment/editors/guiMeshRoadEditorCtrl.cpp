@@ -45,6 +45,8 @@
 #include "materials/materialDefinition.h"
 #include "T3D/prefab.h"
 
+#include "T3D/Scene.h"
+
 IMPLEMENT_CONOBJECT(GuiMeshRoadEditorCtrl);
 
 ConsoleDocClass( GuiMeshRoadEditorCtrl,
@@ -420,12 +422,14 @@ void GuiMeshRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 			
       newRoad->registerObject();
 
-      // Add to MissionGroup                              
-      SimGroup *missionGroup;
-      if ( !Sim::findObject( "MissionGroup", missionGroup ) )               
-         Con::errorf( "GuiMeshRoadEditorCtrl - could not find MissionGroup to add new MeshRoad" );
+      // Add to scene                              
+      Scene *scene;
+
+      scene = Scene::getRootScene();
+      if ( !scene)
+         Con::errorf( "GuiMeshRoadEditorCtrl - could not find Scene to add new MeshRoad" );
       else
-         missionGroup->addObject( newRoad );
+         scene->addObject( newRoad );
 
       Point3F pos( endPnt );
       pos.z += mDefaultDepth * 0.5f;

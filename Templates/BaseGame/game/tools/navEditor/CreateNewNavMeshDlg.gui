@@ -354,13 +354,13 @@ function CreateNewNavMeshDlg::create(%this)
 
    if(MeshMissionBounds.isStateOn())
    {
-      if(!isObject(MissionGroup))
+      if(!isObject(getScene(0)))
       {
-         MessageBoxOk("Error", "You must have a MissionGroup to use the mission bounds function.");
+         MessageBoxOk("Error", "You must have a Scene to use the mission bounds function.");
          return;
       }
       // Get maximum extents of all objects.
-      %box = MissionBoundsExtents(MissionGroup);
+      %box = MissionBoundsExtents(getScene(0));
       %pos = GetBoxCenter(%box);
       %scale = (GetWord(%box, 3) - GetWord(%box, 0)) / 2 + 5
          SPC (GetWord(%box, 4) - GetWord(%box, 1)) / 2 + 5
@@ -380,7 +380,7 @@ function CreateNewNavMeshDlg::create(%this)
          scale = %this-->MeshScale.getText();
       };
    }
-   MissionGroup.add(%mesh);
+   getScene(0).add(%mesh);
    NavEditorGui.selectObject(%mesh);
 
    Canvas.popDialog(CreateNewNavMeshDlg);

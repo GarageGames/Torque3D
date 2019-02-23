@@ -39,6 +39,8 @@
 #include "gui/worldEditor/undoActions.h"
 #include "materials/materialDefinition.h"
 
+#include "T3D/Scene.h"
+
 IMPLEMENT_CONOBJECT(GuiRoadEditorCtrl);
 
 ConsoleDocClass( GuiRoadEditorCtrl,
@@ -407,12 +409,12 @@ void GuiRoadEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
 
       newRoad->registerObject();
 
-      // Add to MissionGroup                              
-      SimGroup *missionGroup;
-      if ( !Sim::findObject( "MissionGroup", missionGroup ) )               
-         Con::errorf( "GuiDecalRoadEditorCtrl - could not find MissionGroup to add new DecalRoad" );
+      // Add to scene                              
+      Scene* scene = Scene::getRootScene();
+      if ( !scene )               
+         Con::errorf( "GuiDecalRoadEditorCtrl - could not find scene to add new DecalRoad" );
       else
-         missionGroup->addObject( newRoad );               
+         scene->addObject( newRoad );               
 
       newRoad->insertNode( tPos, mDefaultWidth, 0 );
       U32 newNode = newRoad->insertNode( tPos, mDefaultWidth, 1 );
@@ -722,7 +724,7 @@ void GuiRoadEditorCtrl::renderScene(const RectI & updateRect)
    // Draw the spline based from the client-side road
    // because the serverside spline is not actually reliable...
    // Can be incorrect if the DecalRoad is before the TerrainBlock
-   // in the MissionGroup.
+   // in the scene.
 
    if ( mHoverRoad && mHoverRoad != mSelRoad )
    {      

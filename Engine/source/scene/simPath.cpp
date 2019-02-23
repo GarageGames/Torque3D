@@ -35,6 +35,8 @@
 #include "renderInstance/renderPassManager.h"
 #include "console/engineAPI.h"
 
+#include "T3D/Scene.h"
+
 extern bool gEditingMission;
 
 //--------------------------------------------------------------------------
@@ -59,13 +61,13 @@ DefineEngineFunction(pathOnMissionLoadDone, void, (),,
    "@ingroup Networking")
 {
    // Need to load subobjects for all loaded interiors...
-   SimGroup* pMissionGroup = dynamic_cast<SimGroup*>(Sim::findObject("MissionGroup"));
-   AssertFatal(pMissionGroup != NULL, "Error, mission done loading and no mission group?");
+   Scene* scene = Scene::getRootScene();
+   AssertFatal(scene != NULL, "Error, mission done loading and no scene?");
 
    U32 currStart = 0;
    U32 currEnd   = 1;
    Vector<SimGroup*> groups;
-   groups.push_back(pMissionGroup);
+   groups.push_back(scene);
 
    while (true) {
       for (U32 i = currStart; i < currEnd; i++) {

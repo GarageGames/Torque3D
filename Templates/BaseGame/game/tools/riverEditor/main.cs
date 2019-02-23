@@ -178,7 +178,9 @@ function RiverEditorPlugin::onSaveMission( %this, %missionFile )
 {
    if( RiverEditorGui.isDirty )
    {
-      MissionGroup.save( %missionFile );
+      //Get our root scene, which would be the level
+      getScene(0).save( %missionFile );
+      
       RiverEditorGui.isDirty = false;
    }
 }
