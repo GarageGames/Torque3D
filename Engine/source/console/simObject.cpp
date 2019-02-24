@@ -2834,7 +2834,8 @@ DefineEngineMethod( SimObject, getFieldValue, const char*, ( const char* fieldNa
    "@param index Optional parameter to specify the index of an array field separately.\n"
    "@return The value of the given field or \"\" if undefined." )
 {
-   if (fieldName == "")
+   const U32 nameLen = dStrlen( fieldName );
+   if (nameLen == 0)
       return "";
 
    char fieldNameBuffer[ 1024 ];
