@@ -39,8 +39,7 @@ function GameObjectCreateBtn::onClick(%this)
 	//also, exec any components that may exist
    //find all GameObjectAssets
    %assetQuery = new AssetQuery();
-   if(!AssetDatabase.findAssetType(%assetQuery, "GameObjectAsset"))
-      return; //if we didn't find ANY, just exit
+   AssetDatabase.findAssetType(%assetQuery, "GameObjectAsset");
       
    %count = %assetQuery.getCount();
    
@@ -69,7 +68,7 @@ function GameObjectCreateBtn::onClick(%this)
       //get the selected module data
       %moduleName = GameObjectModuleList.getText();
       
-      %selectedEntity.gameObjectAsset = %moduleName @ ":" @ %className;
+      %selectedEntity.gameObject = %moduleName @ ":" @ %className;
       
       %path = "data/" @ %moduleName @ "/gameObjects/";
       

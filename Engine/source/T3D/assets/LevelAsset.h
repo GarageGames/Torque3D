@@ -44,6 +44,7 @@ class LevelAsset : public AssetBase
 {
    typedef AssetBase Parent;
 
+   StringTableEntry        mLevelName;
    StringTableEntry        mLevelFile;
    StringTableEntry        mPreviewImage;
 

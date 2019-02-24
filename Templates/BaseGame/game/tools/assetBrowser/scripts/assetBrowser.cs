@@ -1,4 +1,3 @@
-
 new SimGroup(AssetBrowserPreviewCache);
 
 //AssetBrowser.addToolbarButton
@@ -34,14 +33,84 @@ function AssetBrowser::addToolbarButton(%this)
 //
 function AssetBrowser::onAdd(%this)
 {
-   %this.isReImportingAsset = false;
 }
 
 function AssetBrowser::onWake(%this)
 {
-   %this.importAssetNewListArray = new ArrayObject();
+   // manage preview array
+   if(!isObject(AssetPreviewArray))
+      new ArrayObject(AssetPreviewArray);
+      
+   if(!isObject(ImportAssetTree))
+      new GuiTreeViewCtrl(ImportAssetTree);
+      
+   %this.importingFilesArray = new ArrayObject();
    %this.importAssetUnprocessedListArray = new ArrayObject();
    %this.importAssetFinalListArray = new ArrayObject();
+   
+   %this.isReImportingAsset = false;
+   %this.coreModulesFilter = false;
+   %this.onlyShowModulesWithAssets = false;
+   %this.treeFilterMode = "list";
+   
+   //First, build our our list of active modules
+   %modulesList = ModuleDatabase.findModules(true);
+   
+   %nonDefaultModuleCount = 0;
+   
+   for(%i=0; %i < getWordCount(%modulesList); %i++)
+   {
+      %moduleName = getWord(%modulesList, %i).ModuleId;
+      
+      %moduleGroup = getWord(%modulesList, %i).Group;
+      if((%moduleGroup $= "Core" || %moduleGroup $= "Tools") && !%this.coreModulesFilter)
+         continue;
+         
+      %nonDefaultModuleCount++;
+   }
+   
+   if(%nonDefaultModuleCount == 0)
+   {
+      MessageBoxYesNo( "Import Template Content?",
+         "You have no modules or content. Do you want to import a module from the template content?",
+         "AssetBrowser.ImportTemplateModules();", "" );
+   }
+}
+
+//Filters
+function AssetBrowser::showFilterPopup(%this)
+{
+   BrowserVisibilityPopup.showPopup(Canvas);
+}
+
+function AssetBrowser::viewCoreModulesFilter(%this)
+{
+   %this.coreModulesFilter = !%this.coreModulesFilter;
+   
+   BrowserVisibilityPopup.checkItem(0,%this.coreModulesFilter);
+    
+   AssetBrowser.loadFilters();
+}
+
+function AssetBrowser::viewPopulatedModulesFilter(%this)
+{
+   %this.onlyShowModulesWithAssets = !%this.onlyShowModulesWithAssets;
+   
+   BrowserVisibilityPopup.checkItem(1,%this.onlyShowModulesWithAssets);
+    
+   AssetBrowser.loadFilters();
+}
+
+function AssetBrowser::viewListFilter(%this)
+{
+   %this.treeFilterMode = "list";
+   AssetBrowser.loadFilters();
+}
+
+function AssetBrowser::viewTagsFilter(%this)
+{
+   %this.treeFilterMode = "tags";
+   AssetBrowser.loadFilters();
 }
 
 //Drag-Drop functionality
@@ -113,6 +182,11 @@ function AssetBrowser::hideDialog( %this )
 
 function AssetBrowser::buildPreviewArray( %this, %asset, %moduleName )
 {
+   if(!isObject(%this.previewData))
+   {
+      %this.previewData = new ScriptObject();      
+   }
+   
    %assetDesc = AssetDatabase.acquireAsset(%asset);
    %assetName = AssetDatabase.getAssetName(%asset);
    %previewImage = "core/art/warnmat";
@@ -142,8 +216,20 @@ function AssetBrowser::buildPreviewArray( %this, %asset, %moduleName )
 
    %tooltip = %assetName;
    
+   %doubleClickCommand = "AssetBrowser.editAsset( "@%assetDesc@" );";
+   
    if(%assetType $= "ShapeAsset")
    {
+      %this.previewData.assetName = %assetDesc.assetName;
+      %this.previewData.assetPath = %assetDesc.scriptFile;
+      %this.previewData.doubleClickCommand = %doubleClickCommand;
+      
+      %this.previewData.previewImage = "tools/assetBrowser/art/componentIcon";
+      
+      %this.previewData.assetFriendlyName = %assetDesc.friendlyName;
+      %this.previewData.assetDesc = %assetDesc.description;
+      %this.previewData.tooltip = %assetDesc.friendlyName @ "\n" @ %assetDesc;
+   
       %previewButton = new GuiObjectView()
       {
          className = "AssetPreviewControl";
@@ -218,111 +304,21 @@ function AssetBrowser::buildPreviewArray( %this, %asset, %moduleName )
    }
    else
    {
-      if(%assetType $= "ComponentAsset")
-      {
-         %assetPath = "data/" @ %moduleName @ "/components/" @ %assetName @ ".cs";
-         %doubleClickCommand = "EditorOpenFileInTorsion( "@%assetPath@", 0 );";
-         
-         %previewImage = "tools/assetBrowser/art/componentIcon";
-         
-         %assetFriendlyName = %assetDesc.friendlyName;
-         %assetDesc = %assetDesc.description;
-         %tooltip = %assetFriendlyName @ "\n" @ %assetDesc;
-      }
-      else if(%assetType $= "GameObjectAsset")
-      {
-         %assetPath = "data/" @ %moduleName @ "/gameObjects/" @ %assetName @ ".cs";
-         %doubleClickCommand = "EditorOpenFileInTorsion( "@%assetPath@", 0 );";
-         
-         %previewImage = "tools/assetBrowser/art/gameObjectIcon";
-         
-         %tooltip = %assetDesc.gameObjectName;
-      }
-      else if(%assetType $= "ImageAsset")
-      {
-         //nab the image and use it for the preview
-         %assetQuery = new AssetQuery();
-         %numAssetsFound = AssetDatabase.findAllAssets(%assetQuery);
-         
-         for( %i=0; %i < %numAssetsFound; %i++)
-         {
-             %assetId = %assetQuery.getAsset(%i);
-             %name = AssetDatabase.getAssetName(%assetId);
-             
-             if(%name $= %assetName)
-             {
-               %asset = AssetDatabase.acquireAsset(%assetId);
-               %previewImage = %asset.imageFile;
-               break;
-             }
-         }
-      }
-      else if(%assetType $= "StateMachineAsset")
-      {
-         %previewImage = "tools/assetBrowser/art/stateMachineIcon";
-      }
-      else if(%assetType $= "SoundAsset")
-      {
-         %previewImage = "tools/assetBrowser/art/soundIcon";
-      }
-      else if(%assetType $= "LevelAsset")
-      {
-         %previewImage = "tools/assetBrowser/art/levelIcon";
-      }
-      else if(%assetType $= "PostEffectAsset")
-      {
-         %previewImage = "tools/assetBrowser/art/postEffectIcon";
-      }
-      else if(%assetType $= "GUIAsset")
-      {
-         %previewImage = "tools/assetBrowser/art/guiIcon";
-      }
-      else if(%assetType $= "ScriptAsset")
-      {
-         if(%assetDesc.isServerSide)
-            %previewImage = "tools/assetBrowser/art/serverScriptIcon";
-         else
-            %previewImage = "tools/assetBrowser/art/clientScriptIcon";
-      }
-      else if(%assetType $= "MaterialAsset")
-      {
-         %previewImage = "";
-         //nab the image and use it for the preview
-         %assetQuery = new AssetQuery();
-         %numAssetsFound = AssetDatabase.findAllAssets(%assetQuery);
-         
-         for( %i=0; %i < %numAssetsFound; %i++)
-         {
-             %assetId = %assetQuery.getAsset(%i);
-             %name = AssetDatabase.getAssetName(%assetId);
-             
-             if(%name $= %assetName)
-             {
-               %asset = AssetDatabase.acquireAsset(%assetId);
-               %previewImage = %asset.materialDefinitionName.diffuseMap[0];
-               break;
-             }
-         }
-         
-         if(%previewImage $= "")
-            %previewImage = "tools/assetBrowser/art/materialIcon";
-      }
-      if(%assetType $= "ShapeAnimationAsset")
-      {
-         %previewImage = "tools/assetBrowser/art/animationIcon";
-      }
+      //Build out the preview
+      %buildCommand = %this @ ".build" @ %assetType @ "Preview(" @ %assetDesc @ "," @ %this.previewData @ ");";
+      eval(%buildCommand);
       
       %previewButton = new GuiBitmapButtonCtrl()
       {
          className = "AssetPreviewControl";
-         internalName = %assetName;
+         internalName = %this.previewData.assetName;
          HorizSizing = "right";
          VertSizing = "bottom";
          profile = "ToolsGuiButtonProfile";
          position = "10 4";
          extent = %previewSize;
          buttonType = "PushButton";
-         bitmap = %previewImage;
+         bitmap = %this.previewData.previewImage;
          Command = "";
          text = "";
          useStates = false;
@@ -345,7 +341,7 @@ function AssetBrowser::buildPreviewArray( %this, %asset, %moduleName )
    
    %previewBorder = new GuiButtonCtrl(){
          class = "AssetPreviewButton";
-         internalName = %assetName@"Border";
+         internalName = %this.previewData.assetName@"Border";
          HorizSizing = "right";
          VertSizing = "bottom";
          profile = "ToolsGuiThumbHighlightButtonProfile";
@@ -353,21 +349,21 @@ function AssetBrowser::buildPreviewArray( %this, %asset, %moduleName )
          extent = %previewSize.x + %previewBounds SPC %previewSize.y + 24;
          Variable = "";
          buttonType = "radioButton";
-         tooltip = %tooltip;
+         tooltip = %this.previewData.tooltip;
          Command = "AssetBrowser.updateSelection( $ThisControl.getParent().assetName, $ThisControl.getParent().moduleName );"; 
-		   altCommand = %doubleClickCommand;
+		   altCommand = %this.previewData.doubleClickCommand;
          groupNum = "0";
          useMouseEvents = true;
          text = "";
-         icon = %previewImage;
+         icon = %this.previewData.previewImage;
    };
    
    %previewNameCtrl = new GuiTextEditCtrl(){
          position = 0 SPC %previewSize.y + %previewBounds - 16;
          profile = ToolsGuiTextEditCenterProfile;
          extent = %previewSize.x + %previewBounds SPC 16;
-         text = %assetName;
-         originalAssetName = %assetName; //special internal field used in renaming assets
+         text = %this.previewData.assetName;
+         originalAssetName = %this.previewData.assetName; //special internal field used in renaming assets
          internalName = "AssetNameLabel";
          class = "AssetNameField";
          active = false;
@@ -381,32 +377,7 @@ function AssetBrowser::buildPreviewArray( %this, %asset, %moduleName )
    AssetBrowser-->materialSelection.add(%container);
    
    // add to the array object for reference later
-   AssetPreviewArray.add( %previewButton, %previewImage );
-}
-
-function AssetBrowser::loadImages( %this, %materialNum )
-{
-   // this will save us from spinning our wheels in case we don't exist
-   /*if( !AssetBrowser.visible )
-      return;
-   
-   // this schedule is here to dynamically load images
-   %previewButton = AssetPreviewArray.getKey(%materialNum);
-   %previewImage = AssetPreviewArray.getValue(%materialNum);
-   
-   if(%previewButton.getClassName() !$= "GuiObjectView")
-   {
-      %previewButton.setBitmap(%previewImage);
-      %previewButton.setText("");
-   }
-   
-   %materialNum++;
-   
-   /*if( %materialNum < AssetPreviewArray.count() )
-   {
-      %tempSchedule = %this.schedule(64, "loadImages", %materialNum);
-      MatEdScheduleArray.add( %tempSchedule, %materialNum );
-   }*/
+   AssetPreviewArray.add( %previewButton, %this.previewData.previewImage );
 }
 
 function AssetBrowser::loadFilters( %this )
@@ -417,62 +388,91 @@ function AssetBrowser::loadFilters( %this )
 
    AssetBrowser-->filterTree.insertItem(0, "Assets");
    
-   //First, build our our list of active modules
-   %modulesList = ModuleDatabase.findModules(true);
+   AssetPreviewArray.empty();
    
-   for(%i=0; %i < getWordCount(%modulesList); %i++)
+   if(%this.treeFilterMode $= "list")
    {
-      %moduleName = getWord(%modulesList, %i).ModuleId;
+      //First, build our our list of active modules
+      %modulesList = ModuleDatabase.findModules(true);
       
-      %moduleItemId = AssetBrowser-->filterTree.findItemByName(%moduleName);
-		
-		if(%moduleItemId == 0)
-		   %moduleItemId = AssetBrowser-->filterTree.insertItem(1, %moduleName, "", "", 1, 1); 
-   }
+      for(%i=0; %i < getWordCount(%modulesList); %i++)
+      {
+         %moduleName = getWord(%modulesList, %i).ModuleId;
+         
+         %moduleGroup = getWord(%modulesList, %i).Group;
+         if((%moduleGroup $= "Core" || %moduleGroup $= "Tools") && !%this.coreModulesFilter)
+            continue;
+         
+         %moduleItemId = AssetBrowser-->filterTree.findItemByName(%moduleName);
+         
+         if(%moduleItemId == 0)
+            %moduleItemId = AssetBrowser-->filterTree.insertItem(1, %moduleName, "", "", 1, 1); 
+      }
 
-   //Next, go through and list the asset categories
-   %assetQuery = new AssetQuery();
-   %numAssetsFound = AssetDatabase.findAllAssets(%assetQuery);
-   
-   for( %i=0; %i < %numAssetsFound; %i++)
+      //Next, go through and list the asset categories
+      %assetQuery = new AssetQuery();
+      %numAssetsFound = AssetDatabase.findAllAssets(%assetQuery);
+      
+      for( %i=0; %i < %numAssetsFound; %i++)
+      {
+          %assetId = %assetQuery.getAsset(%i);
+          
+         //first, get the asset's module, as our major categories
+         %module = AssetDatabase.getAssetModule(%assetId);
+         
+         %moduleName = %module.moduleId;
+         
+         %moduleGroup = %module.Group;
+         if((%moduleGroup $= "Core" || %moduleGroup $= "Tools") && !%this.coreModulesFilter)
+            continue;
+         
+         //first, see if this module Module is listed already
+         %moduleItemId = AssetBrowser-->filterTree.findItemByName(%moduleName);
+         
+         if(%moduleItemId == 0)
+            %moduleItemId = AssetBrowser-->filterTree.insertItem(1, %moduleName, "", "", 1, 1);
+            
+         %assetType = AssetDatabase.getAssetCategory(%assetId);
+         
+         if(%assetType $= "")
+         {
+            %assetType = AssetDatabase.getAssetType(%assetId);
+            if(%assetType $= "")
+               %assetType = "Misc";
+         }
+         
+         if(AssetBrowser.assetTypeFilter !$= "" && AssetBrowser.assetTypeFilter !$= %assetType)
+            continue;
+         
+         %assetTypeId = AssetBrowser-->filterTree.findChildItemByName(%moduleItemId, %assetType);
+         
+         if(%assetTypeId == 0)
+            %assetTypeId = AssetBrowser-->filterTree.insertItem(%moduleItemId, %assetType);
+      }
+
+      AssetBrowser-->filterTree.buildVisibleTree(true);
+   }
+   else if(%this.treeFilterMode $= "tags")
    {
-	    %assetId = %assetQuery.getAsset(%i);
-	    
-		//first, get the asset's module, as our major categories
-		%module = AssetDatabase.getAssetModule(%assetId);
-		
-		%moduleName = %module.moduleId;
-		
-		//These are core, native-level components, so we're not going to be messing with this module at all, skip it
-		if(%moduleName $= "CoreComponentsModule")
-		   continue;
-		
-		//first, see if this module Module is listed already
-		%moduleItemId = AssetBrowser-->filterTree.findItemByName(%moduleName);
-		
-		if(%moduleItemId == 0)
-		   %moduleItemId = AssetBrowser-->filterTree.insertItem(1, %moduleName, "", "", 1, 1);
-		   
-      %assetType = AssetDatabase.getAssetCategory(%assetId);
-		
-		if(%assetType $= "")
-		{
-		   %assetType = AssetDatabase.getAssetType(%assetId);
-		   if(%assetType $= "")
-			   %assetType = "Misc";
-		}
-		
-		if(AssetBrowser.assetTypeFilter !$= "" && AssetBrowser.assetTypeFilter !$= %assetType)
-		   continue;
-		
-		%assetTypeId = AssetBrowser-->filterTree.findChildItemByName(%moduleItemId, %assetType);
-		
-		if(%assetTypeId == 0)
-		   %assetTypeId = AssetBrowser-->filterTree.insertItem(%moduleItemId, %assetType);
+      
    }
-
-   AssetBrowser-->filterTree.buildVisibleTree(true);
    
+   %this.collapseTree();
+   
+   //Remove any modules that have no assets if we have that filter on
+   if(%this.onlyShowModulesWithAssets)
+   {
+      for(%i=0; %i < getWordCount(%modulesList); %i++)
+      {
+         %moduleName = getWord(%modulesList, %i).ModuleId;
+         
+         %moduleItemId = AssetBrowser-->filterTree.findItemByName(%moduleName);
+         
+         if(AssetBrowser-->filterTree.isParentItem(%moduleItemId) == false)
+            AssetBrowser-->filterTree.removeItem(%moduleItemId);
+      }
+   }
+  
    //special handling for selections
    if(AssetBrowser.newModuleId !$= "")
    {
@@ -484,6 +484,8 @@ function AssetBrowser::loadFilters( %this )
    
    %selectedItem = AssetBrowser-->filterTree.getSelectedItem();
    AssetBrowser-->filterTree.scrollVisibleByObjectId(%selectedItem);
+   
+   AssetBrowser-->filterTree.buildVisibleTree(); 
 }
 
 // create category and update current material if there is one
@@ -561,6 +563,26 @@ function AssetBrowser::updateSelection( %this, %asset, %moduleName )
    //AssetBrowser.selectedPreviewImagePath = %previewImagePath;
    
    %this.prevSelectedMaterialHL = %asset;
+}
+
+function AssetBrowser::collapseTree(%this)
+{
+   %modulesList = ModuleDatabase.findModules(true);
+      
+   for(%i=0; %i < getWordCount(%modulesList); %i++)
+   {
+      %moduleName = getWord(%modulesList, %i).ModuleId;
+      
+      %moduleGroup = getWord(%modulesList, %i).Group;
+      if((%moduleGroup $= "Core" || %moduleGroup $= "Tools") && !%this.coreModulesFilter)
+         continue;
+      
+      %moduleItemId = AssetBrowser-->filterTree.findItemByName(%moduleName);
+      
+      AssetBrowser-->filterTree.expandItem(%moduleItemId, false);
+   }
+   
+   AssetBrowser-->filterTree.expandItem(1, true);
 }
 
 //
@@ -709,6 +731,9 @@ function AssetBrowser::changeAsset(%this)
    %cmd = %this.fieldTargetObject @ "." @ %this.fieldTargetName @ "=\"" @ %this.selectedAsset @ "\";";
    echo("Changing asset via the " @ %cmd @ " command");
    eval(%cmd);
+   
+   //Flag us as dirty for editing purposes
+   EWorldEditor.setSceneAsDirty();
 }
 
 function AssetBrowser::reImportAsset(%this)
@@ -722,8 +747,34 @@ function AssetBrowser::reImportAsset(%this)
       AssetBrowser.isAssetReImport = true;
       AssetBrowser.reImportingAssetId = EditAssetPopup.assetId;
       
+      %reimportingPath = %assetDef.originalFilePath;
+      
+      //first, double-check we have an originating file. if we don't then we need to basically go out looking for it
+      if(!isFile(%assetDef.originalFilePath))
+      {
+         //if(%assetType $= "ImageAsset")
+         //   %filters = "";
+            
+         %dlg = new OpenFileDialog()
+         {
+            Filters = "(All Files (*.*)|*.*|";
+            DefaultFile = %currentFile;
+            ChangePath = false;
+            MustExist = true;
+            MultipleFiles = false;
+            forceRelativePath = false;
+         };
+            
+         if ( %dlg.Execute() )
+         {
+            %reimportingPath = %dlg.FileName;
+         }
+         
+         %dlg.delete();
+      }
+      
       AssetBrowser.onBeginDropFiles();
-      AssetBrowser.onDropFile(%assetDef.originalFilePath);
+      AssetBrowser.onDropFile(%reimportingPath);
       AssetBrowser.onEndDropFiles();
       
       %module = AssetDatabase.getAssetModule(EditAssetPopup.assetId);
@@ -745,7 +796,7 @@ function AssetPreviewButton::onRightClick(%this)
    EditAssetPopup.enableItem(7, true);
    
    //Is it an editable type?
-   if(%assetType $= "ImageAsset" || %assetType $= "GameObjectAsset" || %assetType $= "SoundAsset")
+   if(%assetType $= "ImageAsset" /*|| %assetType $= "GameObjectAsset"*/ || %assetType $= "CppAsset" || %assetType $= "SoundAsset")
    {
       EditAssetPopup.enableItem(0, false);
    }
@@ -758,7 +809,10 @@ function AssetPreviewButton::onRightClick(%this)
       EditAssetPopup.enableItem(7, false);
    }
    
-   EditAssetPopup.showPopup(Canvas);  
+   if(%assetType $= "LevelAsset")
+      EditLevelAssetPopup.showPopup(Canvas);  
+   else
+      EditAssetPopup.showPopup(Canvas);  
 }
 
 function AssetListPanel::onRightMouseDown(%this)
@@ -802,10 +856,6 @@ function AssetBrowserFilterTree::onSelect(%this, %itemId)
 	
 	// we have to empty out the list; so when we create new schedules, these dont linger
    MatEdScheduleArray.empty();
-   
-   // manage preview array
-   if(!isObject(AssetPreviewArray))
-      new ArrayObject(AssetPreviewArray);
       
    // we have to empty out the list; so when we create new guicontrols, these dont linger
    AssetPreviewArray.empty();
@@ -876,8 +926,6 @@ function AssetBrowserFilterTree::onSelect(%this, %itemId)
 	
 	for(%i=0; %i < %assetArray.count(); %i++)
 		AssetBrowser.buildPreviewArray( %assetArray.getValue(%i), %assetArray.getKey(%i) );
-   
-   AssetBrowser.loadImages( 0 );
 }
 
 function AssetBrowserFilterTree::onRightMouseDown(%this, %itemId)
@@ -909,9 +957,9 @@ function AssetBrowserFilterTree::onRightMouseDown(%this, %itemId)
             //Canvas.popDialog(AssetBrowser_newComponentAsset); 
 	         //AssetBrowser_newComponentAsset-->AssetBrowserModuleList.setText(AssetBrowser.selectedModule);
          }
-         else
+         else if(%this.getItemText(%itemId) $= "ScriptAsset")
          {
-            
+            EditAssetCategoryPopup.showPopup(Canvas);
          }
       }
    }
@@ -1131,45 +1179,35 @@ function EWorldEditor::onControlDropped( %this, %payload, %position )
    
    if(%assetType $= "ImageAsset")
    {
-      echo("DROPPED AN IMAGE ON THE EDITOR WINDOW!");  
+      echo("WorldEditor::onControlDropped - dropped an ImageAsset onto the editor window. Todo: Implement dropping image/material into scene");  
    }
    else if(%assetType $= "ShapeAsset")
    {
       echo("DROPPED A SHAPE ON THE EDITOR WINDOW!"); 
       
-      %newEntity = new Entity()
-      {
-         position = %pos;
-         
-         new MeshComponent()
-         {
-            MeshAsset = %module @ ":" @ %asset;
-         };
-         
-         //new CollisionComponent(){};
-      };
+      %staticShapeObjDef = AssetDatabase.acquireAsset("Core_GameObjects:StaticShapeObject");
       
-      MissionGroup.add(%newEntity);
+      %newEntity = %staticShapeObjDef.createObject();
+      
+      %newEntity.position = %pos;
+      %newEntity-->MeshComponent.MeshAsset = %module @ ":" @ %asset;
+      
+      getScene(0).add(%newEntity);
       
       EWorldEditor.clearSelection();
       EWorldEditor.selectObject(%newEntity);
    }
    else if(%assetType $= "MaterialAsset")
    {
-      echo("DROPPED A MATERIAL ON THE EDITOR WINDOW!");  
+      echo("WorldEditor::onControlDropped - dropped an MaterialAsset onto the editor window. Todo: Implement dropping image/material into scene"); 
    }
    else if(%assetType $= "GameObjectAsset")
    {
-      echo("DROPPED A GAME OBJECT ON THE EDITOR WINDOW!");  
+      echo("WorldEditor::onControlDropped - dropped an GameObjectAsset onto the editor window.");  
       
-      %GO = spawnGameObject(%asset, true);
+      %goAssetDef = AssetDatabase.acquireAsset(%module @ ":" @%asset);
       
-      %pos = EWCreatorWindow.getCreateObjectPosition(); //LocalClientConnection.camera.position; 
-      
-      %GO.position = %pos;
-      
-      EWorldEditor.clearSelection();
-      EWorldEditor.selectObject(%GO);
+      AssetBrowser.dragAndDropGameObjectAsset(%goAssetDef, EWorldEditor);
    }
    else if(%assetType $= "ComponentAsset")
    {
@@ -1185,7 +1223,7 @@ function EWorldEditor::onControlDropped( %this, %payload, %position )
       else
          eval("$tmpVar = new " @ %assetDef.componentClass @ "() {}; %newEntity.add($tmpVar);");
          
-      MissionGroup.add(%newEntity);
+      getScene(0).add(%newEntity);
       
       EWorldEditor.clearSelection();
       EWorldEditor.selectObject(%newEntity);
@@ -1198,72 +1236,10 @@ function EWorldEditor::onControlDropped( %this, %payload, %position )
          class = %asset;
       };
 
-      MissionGroup.add(%newEntity);
+      getScene(0).add(%newEntity);
       
       EWorldEditor.clearSelection();
       EWorldEditor.selectObject(%newEntity);
-   }
-   
-   EWorldEditor.isDirty = true;
-}
-
-function GuiInspectorTypeShapeAssetPtr::onControlDropped( %this, %payload, %position )
-{
-   Canvas.popDialog(EditorDragAndDropLayer);
-   
-   // Make sure this is a color swatch drag operation.
-   if( !%payload.parentGroup.isInNamespaceHierarchy( "AssetPreviewControlType_AssetDrop" ) )
-      return;
-
-   %assetType = %payload.dragSourceControl.parentGroup.assetType;
-   
-   if(%assetType $= "ShapeAsset")
-   {
-      echo("DROPPED A SHAPE ON A SHAPE ASSET COMPONENT FIELD!");  
-      
-      %module = %payload.dragSourceControl.parentGroup.moduleName;
-      %asset = %payload.dragSourceControl.parentGroup.assetName;
-      
-      %targetComponent = %this.ComponentOwner;
-      %targetComponent.MeshAsset = %module @ ":" @ %asset;
-      
-      //Inspector.refresh();
-   }
-   
-   EWorldEditor.isDirty= true;
-}
-
-function GuiInspectorTypeImageAssetPtr::onControlDropped( %this, %payload, %position )
-{
-   Canvas.popDialog(EditorDragAndDropLayer);
-   
-   // Make sure this is a color swatch drag operation.
-   if( !%payload.parentGroup.isInNamespaceHierarchy( "AssetPreviewControlType_AssetDrop" ) )
-      return;
-
-   %assetType = %payload.dragSourceControl.parentGroup.assetType;
-   
-   if(%assetType $= "ImageAsset")
-   {
-      echo("DROPPED A IMAGE ON AN IMAGE ASSET COMPONENT FIELD!");  
-   }
-   
-   EWorldEditor.isDirty = true;
-}
-
-function GuiInspectorTypeMaterialAssetPtr::onControlDropped( %this, %payload, %position )
-{
-   Canvas.popDialog(EditorDragAndDropLayer);
-   
-   // Make sure this is a color swatch drag operation.
-   if( !%payload.parentGroup.isInNamespaceHierarchy( "AssetPreviewControlType_AssetDrop" ) )
-      return;
-
-   %assetType = %payload.dragSourceControl.parentGroup.assetType;
-   
-   if(%assetType $= "MaterialAsset")
-   {
-      echo("DROPPED A MATERIAL ON A MATERIAL ASSET COMPONENT FIELD!");  
    }
    
    EWorldEditor.isDirty = true;

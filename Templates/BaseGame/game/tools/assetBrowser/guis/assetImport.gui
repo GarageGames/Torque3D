@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(AssetImportCtrl) {
    position = "0 0";
-   extent = "1440 900";
+   extent = "1024 768";
    minExtent = "8 2";
    horizSizing = "right";
    vertSizing = "bottom";
@@ -30,7 +30,7 @@
       anchorBottom = "0";
       anchorLeft = "1";
       anchorRight = "0";
-      position = "633 358";
+      position = "339 179";
       extent = "346 409";
       minExtent = "48 92";
       horizSizing = "center";
@@ -138,7 +138,7 @@
       anchorBottom = "0";
       anchorLeft = "1";
       anchorRight = "0";
-      position = "562 251";
+      position = "324 132";
       extent = "376 503";
       minExtent = "48 92";
       horizSizing = "center";
@@ -167,7 +167,7 @@
          minExtent = "8 2";
          horizSizing = "right";
          vertSizing = "bottom";
-         profile = "GuiTextProfile";
+         profile = "GuiDefaultProfile";
          visible = "1";
          active = "1";
          tooltipProfile = "GuiToolTipProfile";
@@ -296,8 +296,8 @@
       anchorBottom = "0";
       anchorLeft = "1";
       anchorRight = "0";
-      position = "536 205";
-      extent = "368 502";
+      position = "140 98";
+      extent = "733 502";
       minExtent = "48 92";
       horizSizing = "center";
       vertSizing = "center";
@@ -315,7 +315,7 @@
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
-         position = "224 470";
+         position = "589 470";
          extent = "64 22";
          minExtent = "8 2";
          horizSizing = "left";
@@ -335,7 +335,7 @@
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
-         position = "292 470";
+         position = "657 470";
          extent = "64 22";
          minExtent = "8 2";
          horizSizing = "left";
@@ -343,7 +343,7 @@
          profile = "ToolsGuiButtonProfile";
          visible = "1";
          active = "1";
-         command = "Canvas.popDialog();";
+         command = "ImportAssetWindow.close();";
          tooltipProfile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          isContainer = "0";
@@ -364,7 +364,7 @@
          minExtent = "8 2";
          horizSizing = "right";
          vertSizing = "bottom";
-         profile = "GuiTextProfile";
+         profile = "GuiDefaultProfile";
          visible = "1";
          active = "1";
          tooltipProfile = "GuiToolTipProfile";
@@ -387,7 +387,7 @@
          anchorLeft = "1";
          anchorRight = "0";
          position = "134 27";
-         extent = "204 22";
+         extent = "569 22";
          minExtent = "8 2";
          horizSizing = "width";
          vertSizing = "bottom";
@@ -410,7 +410,7 @@
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
-         position = "342 27";
+         position = "707 27";
          extent = "22 22";
          minExtent = "8 2";
          horizSizing = "left";
@@ -440,7 +440,7 @@
          minExtent = "8 2";
          horizSizing = "right";
          vertSizing = "bottom";
-         profile = "GuiTextProfile";
+         profile = "GuiDefaultProfile";
          visible = "1";
          active = "1";
          tooltipProfile = "GuiToolTipProfile";
@@ -455,6 +455,7 @@
          reverseTextList = "0";
          bitmapBounds = "16 16";
          hotTrackCallback = "0";
+         text = "TestConfig";
          maxLength = "1024";
          margin = "0 0 0 0";
          padding = "0 0 0 0";
@@ -463,7 +464,7 @@
          anchorLeft = "1";
          anchorRight = "0";
          position = "126 53";
-         extent = "175 22";
+         extent = "540 22";
          minExtent = "8 2";
          horizSizing = "width";
          vertSizing = "bottom";
@@ -486,7 +487,7 @@
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
-         position = "305 53";
+         position = "670 53";
          extent = "15 22";
          minExtent = "8 2";
          horizSizing = "left";
@@ -512,7 +513,7 @@
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
-         position = "325 53";
+         position = "690 53";
          extent = "15 22";
          minExtent = "8 2";
          horizSizing = "left";
@@ -538,7 +539,7 @@
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
-         position = "346 53";
+         position = "711 53";
          extent = "15 22";
          minExtent = "8 2";
          horizSizing = "left";
@@ -570,7 +571,7 @@
          anchorLeft = "1";
          anchorRight = "0";
          position = "9 82";
-         extent = "348 381";
+         extent = "713 381";
          minExtent = "8 2";
          horizSizing = "width";
          vertSizing = "height";
@@ -594,7 +595,7 @@
             changeChildSizeToFit = "0";
             changeChildPosition = "1";
             position = "1 1";
-            extent = "345 20";
+            extent = "710 20";
             minExtent = "16 16";
             horizSizing = "width";
             vertSizing = "bottom";

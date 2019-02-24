@@ -101,6 +101,8 @@ public:
    bool isBlend() { return mIsBlend; }
 
    S32 getBlendFrame() { return mBlendFrame; }
+
+   S32 getAnimationCount();
 };
 
 DefineConsoleType(TypeShapeAnimationAssetPtr, ShapeAnimationAsset)

@@ -237,7 +237,7 @@ function EditorNewLevel( %file )
 function EditorSaveMissionMenu()
 {
    if(EditorGui.saveAs)
-      EditorSaveMissionAs();
+      AssetBrowser.setupCreateNewAsset("LevelAsset", AssetBrowser.selectedModule, "EditorSaveMissionAs");
    else
       EditorSaveMission();
 }
@@ -299,123 +299,32 @@ function EditorSaveMission()
    return true;
 }
 
-function EditorSaveMissionAs( %missionName )
+function EditorSaveMissionAs( %levelAsset )
 {
    // If we didn't get passed a new mission name then
    // prompt the user for one.
-   if ( %missionName $= "" )
+   if ( %levelAsset $= "" )
+      return;
+      
+   %levelAssetDef = AssetDatabase.acquireAsset(%levelAsset);
+   %assetType = AssetDatabase.getAssetType(%levelAsset);
+      
+   if(%assetType !$= "LevelAsset")
    {
-      %dlg = new SaveFileDialog()
-      {
-         Filters        = $Pref::WorldEditor::FileSpec;
-         DefaultPath    = EditorSettings.value("LevelInformation/levelsDirectory");
-         ChangePath     = false;
-         OverwritePrompt   = true;
-      };
-
-      %ret = %dlg.Execute();
-      if(%ret)
-      {
-         // Immediately override/set the levelsDirectory
-         EditorSettings.setValue( "LevelInformation/levelsDirectory", collapseFilename(filePath( %dlg.FileName )) );
-         
-         %missionName = %dlg.FileName;
-      }
-      
-      %dlg.delete();
-      
-      if(! %ret)
-         return;
+      error("Somehow tried to save a non-level asset as a level? " @ %levelAsset);
+      return;
    }
+               
+   %missionName = %levelAssetDef.LevelFile;
                
    if( fileExt( %missionName ) !$= ".mis" )
       %missionName = %missionName @ ".mis";
-
-   EWorldEditor.isDirty = true;
-   %saveMissionFile = $Server::MissionFile;
-
-   $Server::MissionFile = %missionName;
-
-   %copyTerrainsFailed = false;
-
-   // Rename all the terrain files.  Save all previous names so we can
-   // reset them if saving fails.
-   %newMissionName = fileBase(%missionName);
-   %oldMissionName = fileBase(%saveMissionFile);
-   
-   initContainerTypeSearch( $TypeMasks::TerrainObjectType );
-   %savedTerrNames = new ScriptObject();
-   for( %i = 0;; %i ++ )
-   {
-      %terrainObject = containerSearchNext();
-      if( !%terrainObject )
-         break;
-
-      %savedTerrNames.array[ %i ] = %terrainObject.terrainFile;
       
-      %terrainFilePath = makeRelativePath( filePath( %terrainObject.terrainFile ), getMainDotCsDir() );
-      %terrainFileName = fileName( %terrainObject.terrainFile );
-               
-      // Workaround to have terrains created in an unsaved "New Level..." mission
-      // moved to the correct place.
-      
-      if( EditorGui.saveAs && %terrainFilePath $= "tools/art/terrains" )
-         %terrainFilePath = "art/terrains";
-      
-      // Try and follow the existing naming convention.
-      // If we can't, use systematic terrain file names.
-      if( strstr( %terrainFileName, %oldMissionName ) >= 0 )
-         %terrainFileName = strreplace( %terrainFileName, %oldMissionName, %newMissionName );
-      else
-         %terrainFileName = %newMissionName @ "_" @ %i @ ".ter";
-
-      %newTerrainFile = %terrainFilePath @ "/" @ %terrainFileName;
-
-      if (!isWriteableFileName(%newTerrainFile))
-      {
-         if (MessageBox("Error", "Terrain file \""@ %newTerrainFile @ "\" is read-only.  Continue?", "Ok", "Stop") == $MROk)
-            continue;
-         else
-         {
-            %copyTerrainsFailed = true;
-            break;
-         }
-      }
-      
-      if( !%terrainObject.save( %newTerrainFile ) )
-      {
-         error( "Failed to save '" @ %newTerrainFile @ "'" );
-         %copyTerrainsFailed = true;
-         break;
-      }
-      
-      %terrainObject.terrainFile = %newTerrainFile;
-   }
-
-   ETerrainEditor.isDirty = false;
-   
-   // Save the mission.
-   if(%copyTerrainsFailed || !EditorSaveMission())
-   {
-      // It failed, so restore the mission and terrain filenames.
-      
-      $Server::MissionFile = %saveMissionFile;
-
-      initContainerTypeSearch( $TypeMasks::TerrainObjectType );
-      for( %i = 0;; %i ++ )
-      {
-         %terrainObject = containerSearchNext();
-         if( !%terrainObject )
-            break;
-            
-         %terrainObject.terrainFile = %savedTerrNames.array[ %i ];
-      }
-   }
-   
-   %savedTerrNames.delete();
+   //Make sure we have a selected module so we can create our module
+   Canvas.pushDialog(AssetBrowser_selectModule);
 }
 
-function EditorOpenMission(%filename)
+function EditorOpenMission(%levelAsset)
 {
    if( EditorIsDirty())
    {
@@ -428,28 +337,31 @@ function EditorOpenMission(%filename)
       }
    }
 
-   if(%filename $= "")
+   if(%levelAsset $= "")
    {
-      %dlg = new OpenFileDialog()
+      AssetBrowser.showDialog("LevelAsset", "EditorOpenMission", "", "", "");
+      return;
+   }
+   else
+   {
+      //If we got the actual assetdef, just roll with it
+      if(isObject(%levelAsset))
       {
-         Filters        = $Pref::WorldEditor::FileSpec;
-         DefaultPath    = EditorSettings.value("LevelInformation/levelsDirectory");
-         ChangePath     = false;
-         MustExist      = true;
-      };
-            
-      %ret = %dlg.Execute();
-      if(%ret)
+         %assetDef = %levelAsset;
+      }
+      else
       {
-         // Immediately override/set the levelsDirectory
-         EditorSettings.setValue( "LevelInformation/levelsDirectory", collapseFilename(filePath( %dlg.FileName )) );
-         %filename = %dlg.FileName;
+         //parse it out if its
+         %assetDef = AssetDatabase.acquireAsset(%levelAsset);
       }
       
-      %dlg.delete();
+      %filename = %assetDef.levelFile;
       
-      if(! %ret)
+      if(%filename $= "")
+      {
+         error("Selected Level Asset doesn't have a valid levelFile path!");
          return;
+      }
    }
       
    // close the current editor, it will get cleaned up by MissionCleanup
@@ -480,6 +392,21 @@ function EditorOpenMission(%filename)
       Editor.open();
    
       popInstantGroup();
+   }
+}
+
+function EditorOpenSceneAppend(%levelAsset)
+{
+   //Load the asset's level file
+   exec(%levelAsset.levelFile);
+   
+   //We'll assume the scene name and assetname are the same for now
+   %sceneName = %levelAsset.AssetName;
+   %scene = nameToID(%sceneName);
+   if(isObject(%scene))
+   {
+      //Append it to our scene heirarchy
+      $scenesRootGroup.add(%scene);
    }
 }
 

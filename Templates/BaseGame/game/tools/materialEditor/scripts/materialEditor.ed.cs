@@ -137,6 +137,8 @@ function MaterialEditorGui::open(%this)
    
    if( MaterialEditorGui.currentMode $= "Mesh" )
       MaterialEditorGui.prepareActiveObject( true );
+   else if( MaterialEditorGui.currentMode $= "asset" )
+      MaterialEditorGui.prepareActiveMaterial( MaterialEditorGui.currentMaterial, true );
    else
       MaterialEditorGui.prepareActiveMaterial( "", true );
       
@@ -288,7 +290,9 @@ function MaterialEditorGui::setMode( %this )
    }
    else
    {
-      MaterialEditorGui.currentMode = "Material";
+      if(MaterialEditorGui.currentMode !$= "asset")
+         MaterialEditorGui.currentMode = "Material";
+         
       MatEdMaterialMode.setVisible(1);
       EWorldEditor.clearSelection();
    }

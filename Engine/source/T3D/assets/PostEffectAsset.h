@@ -46,7 +46,7 @@ class PostEffectAsset : public AssetBase
 {
    typedef AssetBase Parent;
 
-   StringTableEntry        mScriptFile;
+   StringTableEntry        mScriptFilePath;
    
 public:
    PostEffectAsset();
@@ -57,12 +57,10 @@ public:
    virtual void copyTo(SimObject* object);
 
    virtual void initializeAsset();
+   virtual void onAssetRefresh(void);
 
    /// Declare Console Object.
    DECLARE_CONOBJECT(PostEffectAsset);
-
-protected:
-   virtual void            onAssetRefresh(void) {}
 };
 
 DefineConsoleType(TypePostEffectAssetPtr, PostEffectAsset)

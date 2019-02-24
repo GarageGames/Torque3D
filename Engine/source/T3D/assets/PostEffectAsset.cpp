@@ -92,7 +92,7 @@ ConsoleSetType(TypePostEffectAssetPtr)
 
 PostEffectAsset::PostEffectAsset()
 {
-   mScriptFile = StringTable->EmptyString();
+   mScriptFilePath = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
@@ -112,7 +112,7 @@ void PostEffectAsset::initPersistFields()
    // Call parent.
    Parent::initPersistFields();
 
-   addField("scriptFile", TypeString, Offset(mScriptFile, PostEffectAsset), "Path to the script file.");
+   addField("scriptFilePath", TypeFilename, Offset(mScriptFilePath, PostEffectAsset), "Path to the script file.");
 }
 
 //------------------------------------------------------------------------------
@@ -125,5 +125,12 @@ void PostEffectAsset::copyTo(SimObject* object)
 
 void PostEffectAsset::initializeAsset()
 {
-   //mPostEffect = new PostEffect();
+   if (Platform::isFile(mScriptFilePath))
+      Con::executeFile(mScriptFilePath, false, false);
+}
+
+void PostEffectAsset::onAssetRefresh()
+{
+   if (Platform::isFile(mScriptFilePath))
+      Con::executeFile(mScriptFilePath, false, false);
 }

@@ -108,7 +108,7 @@ void ImageAsset::initPersistFields()
    // Call parent.
    Parent::initPersistFields();
 
-   addField("imageFile", TypeString, Offset(mImageFileName, ImageAsset), "Path to the image file.");
+   addField("imageFile", TypeFilename, Offset(mImageFileName, ImageAsset), "Path to the image file.");
    addField("useMips", TypeBool, Offset(mUseMips, ImageAsset), "Should the image use mips? (Currently unused).");
    addField("isHDRImage", TypeBool, Offset(mIsHDRImage, ImageAsset), "Is the image in an HDR format? (Currently unused)");
 }
