@@ -134,7 +134,7 @@ GuiCanvas::GuiCanvas(): GuiControl(),
                         mPlatformWindow(NULL),
                         mDisplayWindow(true),
                         mMenuBarCtrl(nullptr),
-                        mMenuBackground(nullptr)
+						mMenuBackground(nullptr)
 {
    setBounds(0, 0, 640, 480);
    mAwake = true;
@@ -1530,9 +1530,9 @@ void GuiCanvas::popDialogControl(GuiControl *gui)
 
    if (size() > 0)
    {
-      GuiControl *lastCtrl = static_cast<GuiControl *>(last());
-      if(lastCtrl->getFirstResponder() )
-		  lastCtrl->getFirstResponder()->setFirstResponder();
+      GuiControl *ctrl = static_cast<GuiControl *>(last());
+      if( ctrl->getFirstResponder() )
+         ctrl->getFirstResponder()->setFirstResponder();
    }
    else
    {
@@ -1547,8 +1547,8 @@ void GuiCanvas::popDialogControl(GuiControl *gui)
 
    if (size() > 0)
    {
-      GuiControl *lastCtrl = static_cast<GuiControl*>(last());
-	  lastCtrl->buildAcceleratorMap();
+      GuiControl *ctrl = static_cast<GuiControl*>(last());
+      ctrl->buildAcceleratorMap();
    }
    refreshMouseControl();
 }
@@ -1656,26 +1656,27 @@ void GuiCanvas::maintainSizing()
       Point2I newPos = screenRect.point;
 
       // if menubar is active displace content gui control
-      if (mMenuBarCtrl && (ctrl == getContentControl()))
-      {
-         /*const SimObject *menu = mMenuBarCtrl->findObjectByInternalName( StringTable->insert("menubar"), true);
+      if( mMenuBarCtrl && (ctrl == getContentControl()) )
+      {          
+          const SimObject *menu = mMenuBarCtrl->findObjectByInternalName( StringTable->insert("menubar"), true);
 
-         if( !menu )
-             continue;
+          if( !menu )
+              continue;
 
-         AssertFatal( dynamic_cast<const GuiControl*>(menu), "");*/
+          AssertFatal( dynamic_cast<const GuiControl*>(menu), "");
 
-         const U32 yOffset = static_cast<const GuiMenuBar*>(mMenuBarCtrl)->mMenubarHeight;
-         newPos.y += yOffset;
-         newExt.y -= yOffset;
+          const U32 yOffset = static_cast<const GuiControl*>(menu)->getExtent().y;
+          newPos.y += yOffset;
+          newExt.y -= yOffset;
       }
 
-      if (pos != newPos || ext != newExt)
+      if(pos != newPos || ext != newExt)
       {
          ctrl->resize(newPos, newExt);
          resetUpdateRegions();
       }
    }
+
 }
 
 void GuiCanvas::setupFences()
@@ -2139,7 +2140,7 @@ ConsoleDocFragment _pushDialog(
    "void pushDialog( GuiControl ctrl, int layer=0, bool center=false);"
 );
 
-DefineEngineMethod( GuiCanvas, pushDialog, void, (const char * ctrlName, S32 layer, bool center), ( 0, false), "(GuiControl ctrl, int layer=0, bool center=false)"
+DefineConsoleMethod( GuiCanvas, pushDialog, void, (const char * ctrlName, S32 layer, bool center), ( 0, false), "(GuiControl ctrl, int layer=0, bool center=false)"
            "@hide")
 {
    GuiControl *gui;
@@ -2176,7 +2177,7 @@ ConsoleDocFragment _popDialog2(
    "void popDialog();"
 );
 
-DefineEngineMethod( GuiCanvas, popDialog, void, (GuiControl * gui), (nullAsType<GuiControl*>()), "(GuiControl ctrl=NULL)"
+DefineConsoleMethod( GuiCanvas, popDialog, void, (GuiControl * gui), (nullAsType<GuiControl*>()), "(GuiControl ctrl=NULL)"
            "@hide")
 {
    if (gui)
@@ -2204,7 +2205,7 @@ ConsoleDocFragment _popLayer2(
    "void popLayer(S32 layer);"
 );
 
-DefineEngineMethod( GuiCanvas, popLayer, void, (S32 layer), (0), "(int layer)" 
+DefineConsoleMethod( GuiCanvas, popLayer, void, (S32 layer), (0), "(int layer)" 
            "@hide")
 {
 
@@ -2362,7 +2363,7 @@ ConsoleDocFragment _setCursorPos2(
    "bool setCursorPos( F32 posX, F32 posY);"
 );
 
-DefineEngineMethod( GuiCanvas, setCursorPos, void, (Point2I pos), , "(Point2I pos)"
+DefineConsoleMethod( GuiCanvas, setCursorPos, void, (Point2I pos), , "(Point2I pos)"
            "@hide")
 {
 
@@ -2647,7 +2648,7 @@ DefineEngineMethod( GuiCanvas, setWindowPosition, void, ( Point2I position ),,
    object->getPlatformWindow()->setPosition( position );
 }
 
-DefineEngineMethod( GuiCanvas, isFullscreen, bool, (), , "() - Is this canvas currently fullscreen?" )
+DefineConsoleMethod( GuiCanvas, isFullscreen, bool, (), , "() - Is this canvas currently fullscreen?" )
 {
    if (Platform::getWebDeployment())
       return false;
@@ -2658,14 +2659,14 @@ DefineEngineMethod( GuiCanvas, isFullscreen, bool, (), , "() - Is this canvas cu
    return object->getPlatformWindow()->getVideoMode().fullScreen;
 }
 
-DefineEngineMethod( GuiCanvas, minimizeWindow, void, (), , "() - minimize this canvas' window." )
+DefineConsoleMethod( GuiCanvas, minimizeWindow, void, (), , "() - minimize this canvas' window." )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if ( window )
       window->minimize();
 }
 
-DefineEngineMethod( GuiCanvas, isMinimized, bool, (), , "()" )
+DefineConsoleMethod( GuiCanvas, isMinimized, bool, (), , "()" )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if ( window )
@@ -2674,7 +2675,7 @@ DefineEngineMethod( GuiCanvas, isMinimized, bool, (), , "()" )
    return false;
 }
 
-DefineEngineMethod( GuiCanvas, isMaximized, bool, (), , "()" )
+DefineConsoleMethod( GuiCanvas, isMaximized, bool, (), , "()" )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if ( window )
@@ -2683,21 +2684,21 @@ DefineEngineMethod( GuiCanvas, isMaximized, bool, (), , "()" )
    return false;
 }
 
-DefineEngineMethod( GuiCanvas, maximizeWindow, void, (), , "() - maximize this canvas' window." )
+DefineConsoleMethod( GuiCanvas, maximizeWindow, void, (), , "() - maximize this canvas' window." )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if ( window )
       window->maximize();
 }
 
-DefineEngineMethod( GuiCanvas, restoreWindow, void, (), , "() - restore this canvas' window." )
+DefineConsoleMethod( GuiCanvas, restoreWindow, void, (), , "() - restore this canvas' window." )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if( window )
       window->restore();
 }
 
-DefineEngineMethod( GuiCanvas, setFocus, void, (), , "() - Claim OS input focus for this canvas' window.")
+DefineConsoleMethod( GuiCanvas, setFocus, void, (), , "() - Claim OS input focus for this canvas' window.")
 {
    PlatformWindow* window = object->getPlatformWindow();
    if( window )
@@ -2712,7 +2713,7 @@ DefineEngineMethod( GuiCanvas, setMenuBar, void, ( GuiControl* menu ),,
    return object->setMenuBar( menu );
 }
 
-DefineEngineMethod( GuiCanvas, setVideoMode, void, 
+DefineConsoleMethod( GuiCanvas, setVideoMode, void, 
                (U32 width, U32 height, bool fullscreen, U32 bitDepth, U32 refreshRate, U32 antialiasLevel), 
                ( false, 0, 0, 0),
                "(int width, int height, bool fullscreen, [int bitDepth], [int refreshRate], [int antialiasLevel] )\n"
@@ -2812,7 +2813,7 @@ DefineEngineMethod( GuiCanvas, setVideoMode, void,
    Con::setVariable( "$pref::Video::mode", vm.toString() );
 }
 
-DefineEngineMethod(GuiCanvas, showWindow, void, (),, "")
+ConsoleMethod( GuiCanvas, showWindow, void, 2, 2, "" )
 {
    if (!object->getPlatformWindow())
       return;
@@ -2822,7 +2823,7 @@ DefineEngineMethod(GuiCanvas, showWindow, void, (),, "")
    object->getPlatformWindow()->setDisplayWindow(true);
 }
 
-DefineEngineMethod(GuiCanvas, hideWindow, void, (),, "")
+ConsoleMethod( GuiCanvas, hideWindow, void, 2, 2, "" )
 {
    if (!object->getPlatformWindow())
       return;
@@ -2832,29 +2833,30 @@ DefineEngineMethod(GuiCanvas, hideWindow, void, (),, "")
    object->getPlatformWindow()->setDisplayWindow(false);
 }
 
-DefineEngineMethod(GuiCanvas, cursorClick, void, (S32 buttonId, bool isDown), , "")
+ConsoleMethod( GuiCanvas, cursorClick, void, 4, 4, "button, isDown" )
 {
+   const S32 buttonId = dAtoi(argv[2]);
+   const bool isDown = dAtob(argv[3]);
+
    object->cursorClick(buttonId, isDown);
 }
 
-DefineEngineMethod(GuiCanvas, cursorNudge, void, (F32 x, F32 y), , "")
+ConsoleMethod( GuiCanvas, cursorNudge, void, 4, 4, "x, y" )
 {
-   object->cursorNudge(x, y);
+   object->cursorNudge(dAtof(argv[2]), dAtof(argv[3]));
 }
-
 // This function allows resetting of the video-mode from script. It was motivated by
 // the need to temporarily disable vsync during datablock cache load to avoid a 
 // significant slowdown.
 bool AFX_forceVideoReset = false;
 
-
-DefineEngineMethod(GuiCanvas, resetVideoMode, void, (), , "")
+ConsoleMethod( GuiCanvas, resetVideoMode, void, 2,2, "()")
 {
    PlatformWindow* window = object->getPlatformWindow();
-   if (window)
+   if( window )
    {
-      GFXWindowTarget* gfx_target = window->getGFXTarget();
-      if (gfx_target)
+      GFXWindowTarget* gfx_target =  window->getGFXTarget();
+      if ( gfx_target )
       {
          AFX_forceVideoReset = true;
          gfx_target->resetMode();

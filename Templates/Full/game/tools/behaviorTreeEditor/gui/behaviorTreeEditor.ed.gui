@@ -1,0 +1,321 @@
+//-----------------------------------------------------------------------------
+// Copyright (c) 2014 Guy Allard
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
+//-----------------------------------------------------------------------------
+
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GuiControl(BTEditor) {
+   position = "0 0";
+   extent = "1024 768";
+   minExtent = "8 2";
+   horizSizing = "width";
+   vertSizing = "height";
+   profile = "ToolsGuiDefaultProfile";
+   visible = "1";
+   active = "1";
+   tooltipProfile = "GuiToolTipProfile";
+   hovertime = "1000";
+   isContainer = "1";
+   canSave = "1";
+   canSaveDynamicFields = "1";
+      lastContent = "1663";
+
+   new GuiControl() {
+      position = "0 0";
+      extent = "1024 32";
+      minExtent = "8 2";
+      horizSizing = "width";
+      vertSizing = "bottom";
+      profile = "ToolsGuiDefaultProfile";
+      visible = "1";
+      active = "1";
+      tooltipProfile = "GuiToolTipProfile";
+      hovertime = "1000";
+      isContainer = "1";
+      internalName = "top bar";
+      canSave = "1";
+      canSaveDynamicFields = "0";
+
+      new GuiContainer(BTToolBar) {
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "0 0";
+         extent = "16000 32";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "menubarProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+
+         new GuiControl() {
+            position = "5 0";
+            extent = "695 32";
+            minExtent = "8 2";
+            horizSizing = "width";
+            vertSizing = "bottom";
+            profile = "ToolsGuiDefaultProfile";
+            visible = "1";
+            active = "1";
+            tooltipProfile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "1";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+
+            new GuiPopUpMenuCtrl(BTEditorContentList) {
+               maxPopupHeight = "200";
+               sbUsesNAColor = "0";
+               reverseTextList = "0";
+               bitmapBounds = "16 16";
+               text = "BotBehavior";
+               maxLength = "1024";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "8 7";
+               extent = "145 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiPopUpMenuProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+         };
+      };
+   };
+   new GuiControl() {
+      position = "0 32";
+      extent = "1024 719";
+      minExtent = "8 2";
+      horizSizing = "width";
+      vertSizing = "height";
+      profile = "ToolsGuiDefaultProfile";
+      visible = "1";
+      active = "1";
+      tooltipProfile = "GuiToolTipProfile";
+      hovertime = "1000";
+      isContainer = "1";
+      internalName = "middle bar";
+      canSave = "1";
+      canSaveDynamicFields = "0";
+
+      new GuiFrameSetCtrl() {
+         columns = "0 514";
+         rows = "0";
+         borderWidth = "4";
+         borderColor = "48 32 48 32";
+         borderEnable = "alwaysOn";
+         borderMovable = "alwaysOn";
+         autoBalance = "0";
+         fudgeFactor = "0";
+         docking = "None";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "0 0";
+         extent = "1024 719";
+         minExtent = "8 2";
+         horizSizing = "width";
+         vertSizing = "height";
+         profile = "ToolsGuiFrameSetProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+
+         new GuiContainer() {
+            margin = "0 0 0 0";
+            padding = "0 0 0 0";
+            anchorTop = "1";
+            anchorBottom = "0";
+            anchorLeft = "1";
+            anchorRight = "0";
+            position = "0 0";
+            extent = "510 719";
+            minExtent = "8 2";
+            horizSizing = "width";
+            vertSizing = "height";
+            profile = "GuiDefaultProfile";
+            visible = "1";
+            active = "1";
+            tooltipProfile = "GuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "1";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+
+            new GuiTabBookCtrl(BTEditorTabBook) {
+               tabPosition = "Top";
+               tabMargin = "7";
+               minTabWidth = "48";
+               tabHeight = "20";
+               allowReorder = "1";
+               defaultPage = "0";
+               selectedPage = "0";
+               frontTabPadding = "0";
+               docking = "Client";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "0 0";
+               extent = "510 719";
+               minExtent = "8 2";
+               horizSizing = "width";
+               vertSizing = "height";
+               profile = "ToolsGuiTabBookProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "1";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+
+            };
+         };
+         new GuiScrollCtrl() {
+            willFirstRespond = "1";
+            hScrollBar = "alwaysOn";
+            vScrollBar = "alwaysOn";
+            lockHorizScroll = "0";
+            lockVertScroll = "0";
+            constantThumbHeight = "0";
+            childMargin = "0 0";
+            mouseWheelScrollSpeed = "-1";
+            margin = "0 0 0 0";
+            padding = "0 0 0 0";
+            anchorTop = "1";
+            anchorBottom = "0";
+            anchorLeft = "1";
+            anchorRight = "0";
+            position = "514 0";
+            extent = "510 719";
+            minExtent = "8 2";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            profile = "ToolsGuiScrollProfile";
+            visible = "1";
+            active = "1";
+            tooltipProfile = "GuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "1";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+
+            new GuiInspector(BehaviorTreeInspector) {
+               dividerMargin = "5";
+               showCustomFields = "1";
+               stackingType = "Vertical";
+               horizStacking = "Left to Right";
+               vertStacking = "Top to Bottom";
+               padding = "1";
+               dynamicSize = "1";
+               dynamicNonStackExtent = "0";
+               dynamicPos = "0";
+               changeChildSizeToFit = "1";
+               changeChildPosition = "1";
+               position = "1 1";
+               extent = "493 328";
+               minExtent = "16 16";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiInspectorProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "1";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+
+            };
+         };
+      };
+   };
+   new GuiControl() {
+      position = "0 751";
+      extent = "1024 17";
+      minExtent = "8 2";
+      horizSizing = "width";
+      vertSizing = "top";
+      profile = "menubarProfile";
+      visible = "1";
+      active = "1";
+      tooltipProfile = "GuiToolTipProfile";
+      hovertime = "1000";
+      isContainer = "1";
+      internalName = "bottom bar";
+      canSave = "1";
+      canSaveDynamicFields = "0";
+
+      new GuiTextCtrl(BTEditorStatusBar) {
+         text = "Status";
+         maxLength = "1024";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "5 0";
+         extent = "1019 17";
+         minExtent = "64 17";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "ToolsGuiTextProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+   };
+};
+//--- OBJECT WRITE END ---

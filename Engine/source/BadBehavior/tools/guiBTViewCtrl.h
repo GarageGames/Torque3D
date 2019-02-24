@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2014 Guy Allard
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,43 +20,26 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-// Load up all scripts.  This function is called when
-// a server is constructed.
-exec("./camera.cs");
-exec("./triggers.cs");
-exec("./VolumetricFog.cs");
-exec("./inventory.cs");
-exec("./shapeBase.cs");
-exec("./item.cs");
-exec("./health.cs");
-exec("./projectile.cs");
-exec("./radiusDamage.cs");
-exec("./teleporter.cs");
-exec("./physicsShape.cs");
+#ifndef _GUI_BTVIEWCTRL_H_
+#define _GUI_BTVIEWCTRL_H_
 
-exec('./BadBehavior/main.cs');
+#ifndef _GUI_TREEVIEWCTRL_H
+#include "gui/controls/guiTreeViewCtrl.h"
+#endif
 
-// Load our supporting weapon script, it contains methods used by all weapons.
-exec("./weapon.cs");
+namespace BadBehavior
+{
+   // subclassing GuiTreeViewCtrl so that we can tweak it for the behavior tree editor
+   class GuiBehaviorTreeViewCtrl : public GuiTreeViewCtrl
+   {
+      typedef GuiTreeViewCtrl Parent;
 
-// Load our weapon scripts
-// We only need weapon scripts for those weapons that work differently from the
-// class methods defined in weapon.cs
-exec("./proximityMine.cs");
+   public:
+      void onRenderCell(Point2I offset, Point2I cell, bool, bool);
 
-// Load our default player script
-exec("./player.cs");
+      DECLARE_CONOBJECT(GuiBehaviorTreeViewCtrl);
+   };
 
-// Load our player scripts
-exec("./aiPlayer.cs");
+} // namespace BadBehavior
 
-exec("./vehicle.cs");
-exec("./vehicleWheeled.cs");
-exec("./cheetah.cs");
-
-// Load turret support scripts
-exec("./turret.cs");
-
-// Load our gametypes
-exec("./gameCore.cs"); // This is the 'core' of the gametype functionality.
-exec("./gameDM.cs"); // Overrides GameCore with DeathMatch functionality.
+#endif

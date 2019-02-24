@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2014 Guy Allard
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,43 +20,36 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-// Load up all scripts.  This function is called when
-// a server is constructed.
-exec("./camera.cs");
-exec("./triggers.cs");
-exec("./VolumetricFog.cs");
-exec("./inventory.cs");
-exec("./shapeBase.cs");
-exec("./item.cs");
-exec("./health.cs");
-exec("./projectile.cs");
-exec("./radiusDamage.cs");
-exec("./teleporter.cs");
-exec("./physicsShape.cs");
+#include "Sequence.h"
 
-exec('./BadBehavior/main.cs');
+using namespace BadBehavior;
 
-// Load our supporting weapon script, it contains methods used by all weapons.
-exec("./weapon.cs");
+//------------------------------------------------------------------------------
+// Sequence node
+//------------------------------------------------------------------------------
+IMPLEMENT_CONOBJECT(Sequence);
 
-// Load our weapon scripts
-// We only need weapon scripts for those weapons that work differently from the
-// class methods defined in weapon.cs
-exec("./proximityMine.cs");
+Task *Sequence::createTask(SimObject &owner, BehaviorTreeRunner &runner)
+{
+   return new SequenceTask(*this, owner, runner);
+}
 
-// Load our default player script
-exec("./player.cs");
+//------------------------------------------------------------------------------
+// Sequence Task
+//------------------------------------------------------------------------------
+SequenceTask::SequenceTask(Node &node, SimObject &owner, BehaviorTreeRunner &runner) 
+   : Parent(node, owner, runner) 
+{
+}
 
-// Load our player scripts
-exec("./aiPlayer.cs");
+void SequenceTask::onChildComplete(Status s)
+{
+   mStatus = s;
 
-exec("./vehicle.cs");
-exec("./vehicleWheeled.cs");
-exec("./cheetah.cs");
+   // if child succeeded, move on to the next child
+   if(mStatus == SUCCESS)
+      ++mCurrentChild;
+   else
+      mIsComplete = true;
+}
 
-// Load turret support scripts
-exec("./turret.cs");
-
-// Load our gametypes
-exec("./gameCore.cs"); // This is the 'core' of the gametype functionality.
-exec("./gameDM.cs"); // Overrides GameCore with DeathMatch functionality.

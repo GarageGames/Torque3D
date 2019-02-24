@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2014 Guy Allard
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,43 +20,49 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-// Load up all scripts.  This function is called when
-// a server is constructed.
-exec("./camera.cs");
-exec("./triggers.cs");
-exec("./VolumetricFog.cs");
-exec("./inventory.cs");
-exec("./shapeBase.cs");
-exec("./item.cs");
-exec("./health.cs");
-exec("./projectile.cs");
-exec("./radiusDamage.cs");
-exec("./teleporter.cs");
-exec("./physicsShape.cs");
+#ifndef _BB_DECORATOR_H_
+#define _BB_DECORATOR_H_
 
-exec('./BadBehavior/main.cs');
+#ifndef _BB_CORE_H_
+#include "BadBehavior/core/Core.h"
+#endif
 
-// Load our supporting weapon script, it contains methods used by all weapons.
-exec("./weapon.cs");
+namespace BadBehavior
+{
+   //---------------------------------------------------------------------------
+   // Decorator node base class
+   //---------------------------------------------------------------------------
+   class DecoratorNode : public Node
+   {
+      typedef Node Parent;
 
-// Load our weapon scripts
-// We only need weapon scripts for those weapons that work differently from the
-// class methods defined in weapon.cs
-exec("./proximityMine.cs");
+   public:
+      // only allow 1 child node to be added
+      virtual void addObject(SimObject *obj);
+      virtual bool acceptsAsChild( SimObject *object ) const;
+   };
 
-// Load our default player script
-exec("./player.cs");
+   //---------------------------------------------------------------------------
+   // Decorator task base class
+   //---------------------------------------------------------------------------
+   class DecoratorTask : public Task
+   {
+      typedef Task Parent;
 
-// Load our player scripts
-exec("./aiPlayer.cs");
+   protected:
+      Task* mChild;
 
-exec("./vehicle.cs");
-exec("./vehicleWheeled.cs");
-exec("./cheetah.cs");
+      virtual Task* update();
+      virtual void onInitialize();
+      virtual void onTerminate();
 
-// Load turret support scripts
-exec("./turret.cs");
+   public:
+      DecoratorTask(Node &node, SimObject &owner, BehaviorTreeRunner &runner);
+      virtual ~DecoratorTask();
 
-// Load our gametypes
-exec("./gameCore.cs"); // This is the 'core' of the gametype functionality.
-exec("./gameDM.cs"); // Overrides GameCore with DeathMatch functionality.
+      virtual void onChildComplete(Status s);
+   };
+   
+} // namespace BadBehavior
+
+#endif
