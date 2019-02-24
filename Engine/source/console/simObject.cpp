@@ -2844,7 +2844,6 @@ DefineEngineMethod( SimObject, getFieldValue, const char*, ( const char* fieldNa
    // Parse out index if the field is given in the form of 'name[index]'.
    
    const char* arrayIndex = NULL;
-   const U32 nameLen = dStrlen( fieldName );
    if( fieldName[ nameLen - 1 ] == ']' )
    {
       const char* leftBracket = dStrchr( fieldName, '[' );
