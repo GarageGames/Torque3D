@@ -285,9 +285,9 @@ bool FileDialog::Execute()
    {
       // Single file selection, do it the easy way
       if(mForceRelativePath)
-         mData.mFile = Platform::makeRelativePathName(resultPath.c_str(), NULL);
+         mData.mFile = Con::getReturnBuffer(Platform::makeRelativePathName(resultPath.c_str(), NULL));
       else
-         mData.mFile = resultPath.c_str();
+         mData.mFile = Con::getReturnBuffer(resultPath.c_str());
    }
    else if (mData.mStyle & FileDialogData::FDS_MULTIPLEFILES)
    {
