@@ -32,8 +32,8 @@
 #ifndef COLLISION_COMPONENT_H
 #include "T3D/components/collision/collisionComponent.h"
 #endif
-#ifndef PHYSICS_COMPONENT_INTERFACE_H
-#include "T3D/components/physics/physicsComponentInterface.h"
+#ifndef PHYSICS_COMPONENT_H
+#include "T3D/components/physics/physicsComponent.h"
 #endif
 
 class PhysicsBody;
@@ -42,9 +42,9 @@ class PhysicsBody;
 /// 
 /// 
 //////////////////////////////////////////////////////////////////////////
-class RigidBodyComponent : public Component, public PhysicsComponentInterface
+class RigidBodyComponent : public PhysicsComponent
 {
-   typedef Component Parent;
+   typedef PhysicsComponent Parent;
 
    enum SimType
    {

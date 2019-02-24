@@ -23,8 +23,8 @@
 #ifndef PLAYER_CONTORLLER_COMPONENT_H
 #define PLAYER_CONTORLLER_COMPONENT_H
 
-#ifndef PHYSICSBEHAVIOR_H
-#include "T3D/components/physics/physicsBehavior.h"
+#ifndef PHYSICS_COMPONENT_H
+#include "T3D/components/physics/physicsComponent.h"
 #endif
 #ifndef __RESOURCE_H__
 #include "core/resource.h"
@@ -53,25 +53,20 @@
 #ifndef _T3D_PHYSICS_PHYSICSWORLD_H_
 #include "T3D/physics/physicsWorld.h"
 #endif
-#ifndef PHYSICS_COMPONENT_INTERFACE_H
-#include "T3D/components/physics/physicsComponentInterface.h"
-#endif
-#ifndef COLLISION_INTERFACES_H
-#include "T3D/components/collision/collisionInterfaces.h"
+#ifndef COLLISION_COMPONENT_H
+#include "T3D/components/collision/collisionComponent.h"
 #endif
 
 class SceneRenderState;
 class PhysicsWorld;
 class PhysicsPlayer;
 class SimplePhysicsBehaviorInstance;
-class CollisionInterface;
 
 //////////////////////////////////////////////////////////////////////////
 /// 
 /// 
 //////////////////////////////////////////////////////////////////////////
-class PlayerControllerComponent : public Component,
-   public PhysicsComponentInterface
+class PlayerControllerComponent : public PhysicsComponent
 {
    typedef Component Parent;
 
@@ -101,7 +96,7 @@ class PlayerControllerComponent : public Component,
    PhysicsPlayer *mPhysicsRep;
    PhysicsWorld  *mPhysicsWorld;
 
-   CollisionInterface* mOwnerCollisionInterface;
+   CollisionComponent* mOwnerCollisionComp;
 
    struct ContactInfo
    {
@@ -113,8 +108,9 @@ class PlayerControllerComponent : public Component,
       void clear()
       {
          contacted = jump = run = false;
-         contactObject = NULL;
-         contactNormal.set(1, 1, 1);
+         contactObject = nullptr;
+         contactNormal.set(0,0,0);
+         contactTime = 0;
       }
 
       ContactInfo() { clear(); }

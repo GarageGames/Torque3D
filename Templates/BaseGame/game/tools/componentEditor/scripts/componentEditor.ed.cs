@@ -154,13 +154,13 @@ function QuickEditComponentList::onHotTrackItem( %this, %itemID )
       SuperTooltipDlg.setTitle(%componentObj.friendlyName);
       SuperTooltipDlg.addParam("", %componentObj.description @ "\n");
       
-      /*%fieldCount = %componentObj.getComponentFieldCount();
+      %fieldCount = %componentObj.getComponentFieldCount();
       for (%i = 0; %i < %fieldCount; %i++)
       {
          %name = getField(%componentObj.getComponentField(%i), 0);
 
          SuperTooltipDlg.addParam(%name, %description @ "\n");
-      }*/
+      }
       %position = %this.getGlobalPosition();
       SuperTooltipDlg.processTooltip( %position,0,1 );
       %this.opened = true;    

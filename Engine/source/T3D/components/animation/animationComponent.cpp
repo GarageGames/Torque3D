@@ -74,7 +74,7 @@ AnimationComponent::AnimationComponent() : Component()
    mNetworked = true;
 
    mFriendlyName = "Animation(Component)";
-   mComponentType = "Render";
+   mComponentType = "Animation";
 
    mDescription = getDescriptionText("Allows a rendered mesh to be animated");
 

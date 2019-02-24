@@ -36,7 +36,7 @@
 
 #include "T3D/components/coreInterfaces.h"
 #include "T3D/components/render/renderComponentInterface.h"
-#include "T3D/components/collision/collisionInterfaces.h"
+#include "T3D/components/collision/collisionComponent.h"
 
 #include "gui/controls/guiTreeViewCtrl.h"
 #include "assets/assetManager.h"
@@ -1119,8 +1119,8 @@ bool Entity::buildPolyList(PolyListContext context, AbstractPolyList* polyList, 
 
 void Entity::buildConvex(const Box3F& box, Convex* convex)
 {
-   Vector<BuildConvexInterface*> updaters = getComponents<BuildConvexInterface>();
-   for (Vector<BuildConvexInterface*>::iterator it = updaters.begin(); it != updaters.end(); it++)
+   Vector<CollisionComponent*> colliders = getComponents<CollisionComponent>();
+   for (Vector<CollisionComponent*>::iterator it = colliders.begin(); it != colliders.end(); it++)
    {
       (*it)->buildConvex(box, convex);
    }
@@ -1394,10 +1394,7 @@ void Entity::clearComponents(bool deleteComponents)
          {
             comp->onComponentRemove(); //in case the behavior needs to do cleanup on the owner
 
-            //we only need to delete them on the server side. they'll be cleaned up on the client side
-            //via the ghosting system for us
-            if (isServerObject())
-               comp->deleteObject();
+            comp->deleteObject();
          }
       }
    }
@@ -1911,12 +1908,9 @@ DefineEngineMethod(Entity, getMoveVector, VectorF, (),,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
-   if (object->getControllingClient() != NULL)
-   {
-      //fetch our last move
-      if (object->lastMove.x != 0 || object->lastMove.y != 0 || object->lastMove.z != 0)
-         return VectorF(object->lastMove.x, object->lastMove.y, object->lastMove.z);
-   }
+   //fetch our last move
+   if (object->lastMove.x != 0 || object->lastMove.y != 0 || object->lastMove.z != 0)
+      return VectorF(object->lastMove.x, object->lastMove.y, object->lastMove.z);
 
    return VectorF::Zero;
 }
@@ -1925,12 +1919,9 @@ DefineEngineMethod(Entity, getMoveRotation, VectorF, (), ,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
-   if(object->getControllingClient() != NULL)
-   {
-      //fetch our last move
-      if (object->lastMove.pitch != 0 || object->lastMove.roll != 0 || object->lastMove.yaw != 0)
-         return VectorF(object->lastMove.pitch, object->lastMove.roll, object->lastMove.yaw);
-   }
+   //fetch our last move
+   if (object->lastMove.pitch != 0 || object->lastMove.roll != 0 || object->lastMove.yaw != 0)
+      return VectorF(object->lastMove.pitch, object->lastMove.roll, object->lastMove.yaw);
 
    return VectorF::Zero;
 }

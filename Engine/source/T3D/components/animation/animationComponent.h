@@ -101,7 +101,7 @@ public:
 
    TSShape* getShape();
 
-   void targetShapeChanged(RenderComponentInterface* instanceInterface);
+   virtual void targetShapeChanged(RenderComponentInterface* instanceInterface);
 
    virtual void processTick();
    virtual void advanceTime(F32 dt);

@@ -11,7 +11,7 @@
 #include "console/engineAPI.h"
 #include "sim/netConnection.h"
 #include "T3D/gameBase/gameConnection.h"
-#include "T3D/components/coreInterfaces.h"
+//#include "T3D/components/coreInterfaces.h"
 #include "math/mathUtils.h"
 #include "collision/concretePolyList.h"
 #include "collision/clippedPolyList.h"
@@ -94,21 +94,21 @@ void TriggerComponent::onComponentAdd()
 {
    Parent::onComponentAdd();
 
-   CollisionInterface *colInt = mOwner->getComponent<CollisionInterface>();
+   CollisionComponent *colComp = mOwner->getComponent<CollisionComponent>();
 
-   if(colInt)
+   if(colComp)
    {
-      colInt->onCollisionSignal.notify(this, &TriggerComponent::potentialEnterObject);
+      colComp->onCollisionSignal.notify(this, &TriggerComponent::potentialEnterObject);
    }
 }
 
 void TriggerComponent::onComponentRemove()
 {
-   CollisionInterface *colInt = mOwner->getComponent<CollisionInterface>();
+   CollisionComponent *colComp = mOwner->getComponent<CollisionComponent>();
 
-   if(colInt)
+   if(colComp)
    {
-      colInt->onCollisionSignal.remove(this, &TriggerComponent::potentialEnterObject);
+      colComp->onCollisionSignal.remove(this, &TriggerComponent::potentialEnterObject);
    }
 
    Parent::onComponentRemove();
@@ -119,11 +119,11 @@ void TriggerComponent::componentAddedToOwner(Component *comp)
    if (comp->getId() == getId())
       return;
 
-   CollisionInterface *colInt = mOwner->getComponent<CollisionInterface>();
+   CollisionComponent *colComp = mOwner->getComponent<CollisionComponent>();
 
-   if (colInt)
+   if (colComp)
    {
-      colInt->onCollisionSignal.notify(this, &TriggerComponent::potentialEnterObject);
+      colComp->onCollisionSignal.notify(this, &TriggerComponent::potentialEnterObject);
    }
 }
 
@@ -132,11 +132,11 @@ void TriggerComponent::componentRemovedFromOwner(Component *comp)
    if (comp->getId() == getId()) //?????????
       return;
 
-   CollisionInterface *colInt = mOwner->getComponent<CollisionInterface>();
+   CollisionComponent *colComp = mOwner->getComponent<CollisionComponent>();
 
-   if (colInt)
+   if (colComp)
    {
-      colInt->onCollisionSignal.remove(this, &TriggerComponent::potentialEnterObject);
+      colComp->onCollisionSignal.remove(this, &TriggerComponent::potentialEnterObject);
    }
 }
 
@@ -217,19 +217,19 @@ bool TriggerComponent::testObject(SceneObject* enter)
          return false;
 
       //check if the entity has a collision shape
-      CollisionInterface *cI = enterEntity->getComponent<CollisionInterface>();
-      if (cI)
+      CollisionComponent *colComp = enterEntity->getComponent<CollisionComponent>();
+      if (colComp)
       {
-         cI->buildPolyList(PLC_Collision, &mClippedList, mOwner->getWorldBox(), sphere);
+         colComp->buildPolyList(PLC_Collision, &mClippedList, mOwner->getWorldBox(), sphere);
 
          if (!mClippedList.isEmpty())
          {
             //well, it's clipped with, or inside, our bounds
             //now to test the clipped list against our own collision mesh
-            CollisionInterface *myCI = mOwner->getComponent<CollisionInterface>();
+            CollisionComponent *myColComp = mOwner->getComponent<CollisionComponent>();
 
             //wait, how would we NOT have this?
-            if (myCI)
+            if (myColComp)
             {
                //anywho, build our list and then we'll check intersections
                ClippedPolyList myList;
@@ -238,7 +238,7 @@ bool TriggerComponent::testObject(SceneObject* enter)
                myList.setTransform(&ownerTransform, mOwner->getScale());
                myList.setObject(mOwner);
 
-               myCI->buildPolyList(PLC_Collision, &myList, enterBox, sphere);
+               myColComp->buildPolyList(PLC_Collision, &myList, enterBox, sphere);
             }
          }
       }

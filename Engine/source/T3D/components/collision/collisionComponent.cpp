@@ -21,122 +21,32 @@
 //-----------------------------------------------------------------------------
 
 #include "T3D/components/collision/collisionComponent.h"
-#include "T3D/components/collision/collisionComponent_ScriptBinding.h"
-#include "T3D/components/physics/physicsBehavior.h"
-#include "console/consoleTypes.h"
-#include "core/util/safeDelete.h"
-#include "core/resourceManager.h"
-#include "console/consoleTypes.h"
-#include "console/consoleObject.h"
-#include "core/stream/bitStream.h"
-#include "scene/sceneRenderState.h"
-#include "gfx/gfxTransformSaver.h"
-#include "gfx/gfxDrawUtil.h"
+#include "scene/sceneObject.h"
+#include "T3D/entity.h"
 #include "console/engineAPI.h"
-#include "T3D/physics/physicsPlugin.h"
-#include "T3D/physics/physicsBody.h"
-#include "T3D/physics/physicsCollision.h"
-#include "T3D/gameBase/gameConnection.h"
-#include "collision/extrudedPolyList.h"
-#include "math/mathIO.h"
-#include "gfx/sim/debugDraw.h"  
-#include "collision/concretePolyList.h"
-
 #include "T3D/trigger.h"
+#include "materials/baseMatInstance.h"
+#include "collision/extrudedPolyList.h"
 #include "opcode/Opcode.h"
 #include "opcode/Ice/IceAABB.h"
 #include "opcode/Ice/IcePoint.h"
 #include "opcode/OPC_AABBTree.h"
 #include "opcode/OPC_AABBCollider.h"
+#include "collision/clippedPolyList.h"
 
-#include "math/mathUtils.h"
-#include "materials/baseMatInstance.h"
-#include "collision/vertexPolyList.h"
+static F32 sTractionDistance = 0.04f;
 
-extern bool gEditingMission;
+IMPLEMENT_CONOBJECT(CollisionComponent);
 
-static bool sRenderColliders = false;
-
-//Docs
-ConsoleDocClass(CollisionComponent,
-   "@brief The Box Collider component uses a box or rectangular convex shape for collisions.\n\n"
-
-   "Colliders are individualized components that are similarly based off the CollisionInterface core.\n"
-   "They are basically the entire functionality of how Torque handles collisions compacted into a single component.\n"
-   "A collider will both collide against and be collided with, other entities.\n"
-   "Individual colliders will offer different shapes. This box collider will generate a box/rectangle convex, \n"
-   "while the mesh collider will take the owner Entity's rendered shape and do polysoup collision on it, etc.\n\n"
-
-   "The general flow of operations for how collisions happen is thus:\n"
-   "  -When the component is added(or updated) prepCollision() is called.\n"
-   "    This will set up our initial convex shape for usage later.\n\n"
-
-   "  -When we update via processTick(), we first test if our entity owner is mobile.\n"
-   "    If our owner isn't mobile(as in, they have no components that provide it a velocity to move)\n"
-   "    then we skip doing our active collision checks. Collisions are checked by the things moving, as\n"
-   "    opposed to being reactionary. If we're moving, we call updateWorkingCollisionSet().\n"
-   "    updateWorkingCollisionSet() estimates our bounding space for our current ticket based on our position and velocity.\n"
-   "    If our bounding space has changed since the last tick, we proceed to call updateWorkingList() on our convex.\n"
-   "    This notifies any object in the bounding space that they may be collided with, so they will call buildConvex().\n"
-   "    buildConvex() will set up our ConvexList with our collision convex info.\n\n"
-
-   "  -When the component that is actually causing our movement, such as SimplePhysicsBehavior, updates, it will check collisions.\n"
-   "    It will call checkCollisions() on us. checkCollisions() will first build a bounding shape for our convex, and test\n"
-   "    if we can early out because we won't hit anything based on our starting point, velocity, and tick time.\n"
-   "    If we don't early out, we proceed to call updateCollisions(). This builds an ExtrudePolyList, which is then extruded\n"
-   "    based on our velocity. We then test our extruded polies on our working list of objects we build\n"
-   "    up earlier via updateWorkingCollisionSet. Any collisions that happen here will be added to our mCollisionList.\n"
-   "    Finally, we call handleCollisionList() on our collisionList, which then queues out the colliison notice\n"
-   "    to the object(s) we collided with so they can do callbacks and the like. We also report back on if we did collide\n"
-   "    to the physics component via our bool return in checkCollisions() so it can make the physics react accordingly.\n\n"
-
-   "One interesting point to note is the usage of mBlockColliding.\n"
-   "This is set so that it dictates the return on checkCollisions(). If set to false, it will ensure checkCollisions()\n"
-   "will return false, regardless if we actually collided. This is useful, because even if checkCollisions() returns false,\n"
-   "we still handle the collisions so the callbacks happen. This enables us to apply a collider to an object that doesn't block\n"
-   "objects, but does have callbacks, so it can act as a trigger, allowing for arbitrarily shaped triggers, as any collider can\n"
-   "act as a trigger volume(including MeshCollider).\n\n"
-
-   "@tsexample\n"
-   "new CollisionComponentInstance()\n"
-   "{\n"
-   "   template = CollisionComponentTemplate;\n"
-   "   colliderSize = \"1 1 2\";\n"
-   "   blockColldingObject = \"1\";\n"
-   "};\n"
-   "@endtsexample\n"
-
-   "@see SimplePhysicsBehavior\n"
-   "@ingroup Collision\n"
-   "@ingroup Components\n"
-   );
-//Docs
-
-/////////////////////////////////////////////////////////////////////////
-ImplementEnumType(CollisionMeshMeshType,
-   "Type of mesh data available in a shape.\n"
-   "@ingroup gameObjects")
-{ CollisionComponent::None, "None", "No mesh data." },
-{ CollisionComponent::Bounds, "Bounds", "Bounding box of the shape." },
-{ CollisionComponent::CollisionMesh, "Collision Mesh", "Specifically desingated \"collision\" meshes." },
-{ CollisionComponent::VisibleMesh, "Visible Mesh", "Rendered mesh polygons." },
-EndImplementEnumType;
-
-//
 CollisionComponent::CollisionComponent() : Component()
 {
-   mFriendlyName = "Collision(Component)";
+   mFriendlyName = "Collision Component";
 
-   mOwnerRenderInterface = NULL;
-   mOwnerPhysicsInterface = NULL;
+   mComponentType = "Collision";
+
+   mDescription = getDescriptionText("A stub component class that collision components should inherit from.");
 
    mBlockColliding = true;
-
-   mCollisionType = CollisionMesh;
-   mLOSType = CollisionMesh;
-   mDecalType = CollisionMesh;
-
-   colisionMeshPrefix = StringTable->insert("Collision");
 
    CollisionMoveMask = (TerrainObjectType | PlayerObjectType |
       StaticShapeObjectType | VehicleObjectType |
@@ -146,8 +56,6 @@ CollisionComponent::CollisionComponent() : Component()
    mPhysicsWorld = nullptr;
 
    mTimeoutList = nullptr;
-
-   mAnimated = false;
 }
 
 CollisionComponent::~CollisionComponent()
@@ -159,423 +67,807 @@ CollisionComponent::~CollisionComponent()
    }
 
    SAFE_DELETE_ARRAY(mDescription);
-}
 
-IMPLEMENT_CO_NETOBJECT_V1(CollisionComponent);
-
-void CollisionComponent::onComponentAdd()
-{
-   Parent::onComponentAdd();
-
-   RenderComponentInterface *renderInterface = mOwner->getComponent<RenderComponentInterface>();
-   if (renderInterface)
-   {
-      renderInterface->onShapeInstanceChanged.notify(this, &CollisionComponent::targetShapeChanged);
-      mOwnerRenderInterface = renderInterface;
-   }
-
-   //physicsInterface
-   PhysicsComponentInterface *physicsInterface = mOwner->getComponent<PhysicsComponentInterface>();
-   if (!physicsInterface)
-   {
-      mPhysicsRep = PHYSICSMGR->createBody();
-   }
-
-   prepCollision();
-}
-
-void CollisionComponent::onComponentRemove()
-{
    SAFE_DELETE(mPhysicsRep);
-
-   Parent::onComponentRemove();
 }
 
-void CollisionComponent::componentAddedToOwner(Component *comp)
+bool CollisionComponent::checkCollisions(const F32 travelTime, Point3F *velocity, Point3F start)
 {
-   if (comp->getId() == getId())
-      return;
-
-   //test if this is a shape component!
-   RenderComponentInterface *renderInterface = dynamic_cast<RenderComponentInterface*>(comp);
-   if (renderInterface)
-   {
-      renderInterface->onShapeInstanceChanged.notify(this, &CollisionComponent::targetShapeChanged);
-      mOwnerRenderInterface = renderInterface;
-      prepCollision();
-   }
-
-   PhysicsComponentInterface *physicsInterface = dynamic_cast<PhysicsComponentInterface*>(comp);
-   if (physicsInterface)
-   {
-      if (mPhysicsRep)
-         SAFE_DELETE(mPhysicsRep);
-
-      prepCollision();
-   }
+   return false;
 }
 
-void CollisionComponent::componentRemovedFromOwner(Component *comp)
+bool CollisionComponent::updateCollisions(F32 time, VectorF vector, VectorF velocity)
 {
-   if (comp->getId() == getId()) //?????????
-      return;
-
-   //test if this is a shape component!
-   RenderComponentInterface *renderInterface = dynamic_cast<RenderComponentInterface*>(comp);
-   if (renderInterface)
-   {
-      renderInterface->onShapeInstanceChanged.remove(this, &CollisionComponent::targetShapeChanged);
-      mOwnerRenderInterface = NULL;
-      prepCollision();
-   }
-
-   //physicsInterface
-   PhysicsComponentInterface *physicsInterface = dynamic_cast<PhysicsComponentInterface*>(comp);
-   if (physicsInterface)
-   {
-      mPhysicsRep = PHYSICSMGR->createBody();
-
-      prepCollision();
-   }
+   return false;
 }
 
-void CollisionComponent::checkDependencies()
+void CollisionComponent::updateWorkingCollisionSet(const U32 mask)
 {
 }
 
-void CollisionComponent::initPersistFields()
+void CollisionComponent::handleCollisionList( CollisionList &collisionList, VectorF velocity )
 {
-   Parent::initPersistFields();
+   Collision bestCol;
 
-   addGroup("Collision");
+   mCollisionList = collisionList;
 
-      addField("CollisionType", TypeCollisionMeshMeshType, Offset(mCollisionType, CollisionComponent),
-         "The type of mesh data to use for collision queries.");
-
-      addField("LineOfSightType", TypeCollisionMeshMeshType, Offset(mLOSType, CollisionComponent),
-         "The type of mesh data to use for collision queries.");
-
-      addField("DecalType", TypeCollisionMeshMeshType, Offset(mDecalType, CollisionComponent),
-         "The type of mesh data to use for collision queries.");
-
-      addField("CollisionMeshPrefix", TypeString, Offset(colisionMeshPrefix, CollisionComponent),
-         "The type of mesh data to use for collision queries.");
-
-      addField("BlockCollisions", TypeBool, Offset(mBlockColliding, CollisionComponent), "");
-
-   endGroup("Collision");
-}
-
-void CollisionComponent::inspectPostApply()
-{
-   // Apply any transformations set in the editor
-   Parent::inspectPostApply();
-
-   if (isServerObject())
+   for (U32 i=0; i < collisionList.getCount(); ++i)
    {
-      setMaskBits(ColliderMask);
-      prepCollision();
-   }
-}
+      Collision& colCheck = collisionList[i];
 
-U32 CollisionComponent::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
-{
-   U32 retMask = Parent::packUpdate(con, mask, stream);
-
-   if (stream->writeFlag(mask & (ColliderMask | InitialUpdateMask)))
-   {
-      stream->write((U32)mCollisionType);
-      stream->writeString(colisionMeshPrefix);
-   }
-
-   return retMask;
-}
-
-void CollisionComponent::unpackUpdate(NetConnection *con, BitStream *stream)
-{
-   Parent::unpackUpdate(con, stream);
-
-   if (stream->readFlag()) // UpdateMask
-   {
-      U32 collisionType = CollisionMesh;
-
-      stream->read(&collisionType);
-
-      // Handle it if we have changed CollisionType's
-      if ((MeshType)collisionType != mCollisionType)
+      if (colCheck.object)
       {
-         mCollisionType = (MeshType)collisionType;
+         if (colCheck.object->getTypeMask() & PlayerObjectType)
+         {
+            handleCollision( colCheck, velocity );
+         }
+         else if (colCheck.object->getTypeMask() & TriggerObjectType)
+         {
+            // We've hit it's bounding box, that's close enough for triggers
+            Trigger* pTrigger = static_cast<Trigger*>(colCheck.object);
 
-         prepCollision();
-      }
+            Component *comp = dynamic_cast<Component*>(this);
+            pTrigger->potentialEnterObject(comp->getOwner());
+         }
+         else if (colCheck.object->getTypeMask() & DynamicShapeObjectType)
+         {
+            Con::printf("HIT A GENERICALLY DYNAMIC OBJECT");
+            handleCollision(colCheck, velocity);
+         }
+         else if(colCheck.object->getTypeMask() & EntityObjectType)
+         {
+            Entity* ent = dynamic_cast<Entity*>(colCheck.object);
+            if (ent)
+            {
+               CollisionComponent *colObjectInterface = ent->getComponent<CollisionComponent>();
+               if (colObjectInterface)
+               {
+                  //convert us to our component
+                  Component *thisComp = dynamic_cast<Component*>(this);
+                  if (thisComp)
+                  {
+                     colObjectInterface->onCollisionSignal.trigger(thisComp->getOwner());
 
-      char readBuffer[1024];
+                     //TODO: properly do this
+                     Collision oppositeCol = colCheck;
+                     oppositeCol.object = thisComp->getOwner();
 
-      stream->readString(readBuffer);
-      colisionMeshPrefix = StringTable->insert(readBuffer);
-   }
-}
-
-void CollisionComponent::ownerTransformSet(MatrixF *mat)
-{
-   if (mPhysicsRep)
-      mPhysicsRep->setTransform(mOwner->getTransform());
-}
-
-void CollisionComponent::targetShapeChanged(RenderComponentInterface* instanceInterface)
-{
-   prepCollision();
-}
-
-void CollisionComponent::prepCollision()
-{
-   if (!mOwner)
-      return;
-
-   // Let the client know that the collision was updated
-   setMaskBits(ColliderMask);
-
-   mOwner->disableCollision();
-
-   if ((!PHYSICSMGR || mCollisionType == None) ||
-      (mOwnerRenderInterface == NULL && (mCollisionType == CollisionMesh || mCollisionType == VisibleMesh)))
-      return;
-
-   PhysicsCollision *colShape = NULL;
-
-   if (mCollisionType == Bounds)
-   {
-      MatrixF offset(true);
-
-      if (mOwnerRenderInterface && mOwnerRenderInterface->getShape())
-         offset.setPosition(mOwnerRenderInterface->getShape()->center);
-
-      colShape = PHYSICSMGR->createCollision();
-      colShape->addBox(mOwner->getObjBox().getExtents() * 0.5f * mOwner->getScale(), offset);
-   }
-   else if (mCollisionType == CollisionMesh || (mCollisionType == VisibleMesh /*&& !mOwner->getComponent<AnimatedMesh>()*/))
-   {
-      colShape = buildColShapes();
-   }
-
-   if (colShape)
-   {
-      mPhysicsWorld = PHYSICSMGR->getWorld(isServerObject() ? "server" : "client");
-
-      if (mPhysicsRep)
-      {
-         if (mBlockColliding)
-            mPhysicsRep->init(colShape, 0, 0, mOwner, mPhysicsWorld);
+                     colObjectInterface->handleCollision(oppositeCol, velocity);
+                  }
+               }
+            }
+         }
          else
-            mPhysicsRep->init(colShape, 0, PhysicsBody::BF_TRIGGER, mOwner, mPhysicsWorld);
+         {
+            handleCollision(colCheck, velocity);
+         }
+      }
+   }
+}
 
-         mPhysicsRep->setTransform(mOwner->getTransform());
+void CollisionComponent::handleCollision( Collision &col, VectorF velocity )
+{
+   if (col.object && (mContactInfo.contactObject == NULL ||
+      col.object->getId() != mContactInfo.contactObject->getId()))
+   {
+      queueCollision(col.object, velocity - col.object->getVelocity());
+
+      //do the callbacks to script for this collision
+      Component *comp = dynamic_cast<Component*>(this);
+      if (comp->isMethod("onCollision"))
+      {
+         S32 matId = col.material != NULL ? col.material->getMaterial()->getId() : 0;
+         Con::executef(comp, "onCollision", col.object, col.normal, col.point, matId, velocity);
+      }
+
+      if (comp->getOwner()->isMethod("onCollisionEvent"))
+      {
+         S32 matId = col.material != NULL ? col.material->getMaterial()->getId() : 0;
+         Con::executef(comp->getOwner(), "onCollisionEvent", col.object, col.normal, col.point, matId, velocity);
+      }
+   }
+}
+
+void CollisionComponent::handleCollisionNotifyList()
+{
+   //special handling for any collision components we should notify that a collision happened.
+   for (U32 i = 0; i < mCollisionNotifyList.size(); ++i)
+   {
+      //convert us to our component
+      Component *thisComp = dynamic_cast<Component*>(this);
+      if (thisComp)
+      {
+         mCollisionNotifyList[i]->onCollisionSignal.trigger(thisComp->getOwner());
       }
    }
 
-   mOwner->enableCollision();
-
-   onCollisionChanged.trigger(colShape);
+   mCollisionNotifyList.clear();
 }
 
-void CollisionComponent::processTick()
+Chunker<CollisionComponent::CollisionTimeout> sCollisionTimeoutChunker;
+CollisionComponent::CollisionTimeout* CollisionComponent::sFreeTimeoutList = 0;
+
+void CollisionComponent::queueCollision( SceneObject *obj, const VectorF &vec)
 {
-   if (!isActive())
-      return;
+   // Add object to list of collisions.
+   SimTime time = Sim::getCurrentTime();
+   S32 num = obj->getId();
 
-   //ProcessTick is where our collision testing begins!
-
-   //callback if we have a persisting contact
-   if (mContactInfo.contactObject)
+   CollisionTimeout** adr = &mTimeoutList;
+   CollisionTimeout* ptr = mTimeoutList;
+   while (ptr) 
    {
-      if (mContactInfo.contactTimer > 0)
+      if (ptr->objectNumber == num) 
       {
-         if (isMethod("updateContact"))
-            Con::executef(this, "updateContact");
+         if (ptr->expireTime < time) 
+         {
+            ptr->expireTime = time + CollisionTimeoutValue;
+            ptr->object = obj;
+            ptr->vector = vec;
+         }
+         return;
+      }
+      // Recover expired entries
+      if (ptr->expireTime < time) 
+      {
+         CollisionTimeout* cur = ptr;
+         *adr = ptr->next;
+         ptr = ptr->next;
+         cur->next = sFreeTimeoutList;
+         sFreeTimeoutList = cur;
+      }
+      else 
+      {
+         adr = &ptr->next;
+         ptr = ptr->next;
+      }
+   }
 
-         if (mOwner->isMethod("updateContact"))
-            Con::executef(mOwner, "updateContact");
+   // New entry for the object
+   if (sFreeTimeoutList != NULL)
+   {
+      ptr = sFreeTimeoutList;
+      sFreeTimeoutList = ptr->next;
+      ptr->next = NULL;
+   }
+   else
+   {
+      ptr = sCollisionTimeoutChunker.alloc();
+   }
+
+   ptr->object = obj;
+   ptr->objectNumber = obj->getId();
+   ptr->vector = vec;
+   ptr->expireTime = time + CollisionTimeoutValue;
+   ptr->next = mTimeoutList;
+
+   mTimeoutList = ptr;
+}
+
+bool CollisionComponent::checkEarlyOut(Point3F start, VectorF velocity, F32 time, Box3F objectBox, Point3F objectScale, 
+														Box3F collisionBox, U32 collisionMask, CollisionWorkingList &colWorkingList)
+{
+   Point3F end = start + velocity * time;
+   Point3F distance = end - start;
+
+   Box3F scaledBox = objectBox;
+   scaledBox.minExtents.convolve(objectScale);
+   scaledBox.maxExtents.convolve(objectScale);
+
+   if (mFabs(distance.x) < objectBox.len_x() &&
+      mFabs(distance.y) < objectBox.len_y() &&
+      mFabs(distance.z) < objectBox.len_z())
+   {
+      // We can potentially early out of this.  If there are no polys in the clipped polylist at our
+      //  end position, then we can bail, and just set start = end;
+      Box3F wBox = scaledBox;
+      wBox.minExtents += end;
+      wBox.maxExtents += end;
+
+      static EarlyOutPolyList eaPolyList;
+      eaPolyList.clear();
+      eaPolyList.mNormal.set(0.0f, 0.0f, 0.0f);
+      eaPolyList.mPlaneList.clear();
+      eaPolyList.mPlaneList.setSize(6);
+      eaPolyList.mPlaneList[0].set(wBox.minExtents,VectorF(-1.0f, 0.0f, 0.0f));
+      eaPolyList.mPlaneList[1].set(wBox.maxExtents,VectorF(0.0f, 1.0f, 0.0f));
+      eaPolyList.mPlaneList[2].set(wBox.maxExtents,VectorF(1.0f, 0.0f, 0.0f));
+      eaPolyList.mPlaneList[3].set(wBox.minExtents,VectorF(0.0f, -1.0f, 0.0f));
+      eaPolyList.mPlaneList[4].set(wBox.minExtents,VectorF(0.0f, 0.0f, -1.0f));
+      eaPolyList.mPlaneList[5].set(wBox.maxExtents,VectorF(0.0f, 0.0f, 1.0f));
+
+      // Build list from convex states here...
+      CollisionWorkingList& rList = colWorkingList;
+      CollisionWorkingList* pList = rList.wLink.mNext;
+      while (pList != &rList) 
+      {
+         Convex* pConvex = pList->mConvex;
+
+         if (pConvex->getObject()->getTypeMask() & collisionMask) 
+         {
+            Box3F convexBox = pConvex->getBoundingBox();
+
+            if (wBox.isOverlapped(convexBox))
+            {
+               // No need to separate out the physical zones here, we want those
+               //  to cause a fallthrough as well...
+               pConvex->getPolyList(&eaPolyList);
+            }
+         }
+         pList = pList->wLink.mNext;
       }
 
-      ++mContactInfo.contactTimer;
-   }
-   else if (mContactInfo.contactTimer != 0)
-      mContactInfo.clear();
-}
-
-void CollisionComponent::updatePhysics()
-{
-   
-}
-
-PhysicsCollision* CollisionComponent::getCollisionData()
-{
-   if ((!PHYSICSMGR || mCollisionType == None) || mOwnerRenderInterface == NULL)
-      return NULL;
-
-   PhysicsCollision *colShape = NULL;
-   if (mCollisionType == Bounds)
-   {
-      MatrixF offset(true);
-      offset.setPosition(mOwnerRenderInterface->getShape()->center);
-      colShape = PHYSICSMGR->createCollision();
-      colShape->addBox(mOwner->getObjBox().getExtents() * 0.5f * mOwner->getScale(), offset);
-   }
-   else if (mCollisionType == CollisionMesh || (mCollisionType == VisibleMesh/* && !mOwner->getComponent<AnimatedMesh>()*/))
-   {
-      colShape = buildColShapes();
-      //colShape = mOwnerShapeInstance->getShape()->buildColShape(mCollisionType == VisibleMesh, mOwner->getScale());
-   }
-   /*else if (mCollisionType == VisibleMesh && !mOwner->getComponent<AnimatedMesh>())
-   {
-   //We don't have support for visible mesh collisions with animated meshes currently in the physics abstraction layer
-   //so we don't generate anything if we're set to use a visible mesh but have an animated mesh component.
-   colShape = mOwnerShapeInstance->getShape()->buildColShape(mCollisionType == VisibleMesh, mOwner->getScale());
-   }*/
-   else if (mCollisionType == VisibleMesh/* && mOwner->getComponent<AnimatedMesh>()*/)
-   {
-      Con::printf("CollisionComponent::updatePhysics: Cannot use visible mesh collisions with an animated mesh!");
-   }
-
-   return colShape;
-}
-
-bool CollisionComponent::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
-{
-   if (!mCollisionType == None)
-   {
-      if (mPhysicsWorld)
+      if (eaPolyList.isEmpty())
       {
-         return mPhysicsWorld->castRay(start, end, info, Point3F::Zero);
+         return true;
       }
    }
 
    return false;
 }
 
-PhysicsCollision* CollisionComponent::buildColShapes()
+
+Collision* CollisionComponent::getCollision(S32 col) 
+{ 
+   if(col < mCollisionList.getCount() && col >= 0) 
+      return &mCollisionList[col];
+   else 
+      return NULL; 
+}
+
+Point3F CollisionComponent::getContactNormal() 
+{ 
+   return mContactInfo.contactNormal; 
+}
+
+bool CollisionComponent::hasContact()
 {
-   PROFILE_SCOPE(CollisionComponent_buildColShapes);
+   if (mContactInfo.contactObject)
+      return true;
+   else
+      return false;
+}
 
-   PhysicsCollision *colShape = NULL;
-   U32 surfaceKey = 0;
+S32 CollisionComponent::getCollisionCount()
+{
+   return mCollisionList.getCount();
+}
 
-   TSShape* shape = mOwnerRenderInterface->getShape();
+Point3F CollisionComponent::getCollisionNormal(S32 collisionIndex)
+{
+   if (collisionIndex < 0 || mCollisionList.getCount() < collisionIndex)
+      return Point3F::Zero;
 
-   if (mCollisionType == VisibleMesh)
+   return mCollisionList[collisionIndex].normal;
+}
+
+F32 CollisionComponent::getCollisionAngle(S32 collisionIndex, Point3F upVector)
+{
+   if (collisionIndex < 0 || mCollisionList.getCount() < collisionIndex)
+      return 0.0f;
+
+   return mRadToDeg(mAcos(mDot(mCollisionList[collisionIndex].normal, upVector)));
+}
+
+S32 CollisionComponent::getBestCollision(Point3F upVector)
+{
+   S32 bestCollision = -1;
+
+   F32 bestAngle = 360.f;
+   S32 count = mCollisionList.getCount();
+   for (U32 i = 0; i < count; ++i)
    {
-      // Here we build triangle collision meshes from the
-      // visible detail levels.
+      F32 angle = mRadToDeg(mAcos(mDot(mCollisionList[i].normal, upVector)));
 
-      // A negative subshape on the detail means we don't have geometry.
-      const TSShape::Detail &detail = shape->details[0];
-      if (detail.subShapeNum < 0)
-         return NULL;
-
-      // We don't try to optimize the triangles we're given
-      // and assume the art was created properly for collision.
-      ConcretePolyList polyList;
-      polyList.setTransform(&MatrixF::Identity, mOwner->getScale());
-
-      // Create the collision meshes.
-      S32 start = shape->subShapeFirstObject[detail.subShapeNum];
-      S32 end = start + shape->subShapeNumObjects[detail.subShapeNum];
-      for (S32 o = start; o < end; o++)
+      if (angle < bestAngle)
       {
-         const TSShape::Object &object = shape->objects[o];
-         if (detail.objectDetailNum >= object.numMeshes)
+         bestCollision = i;
+         bestAngle = angle;
+      }
+   }
+
+   return bestCollision;
+}
+
+F32 CollisionComponent::getBestCollisionAngle(VectorF upVector)
+{
+   S32 bestCol = getBestCollision(upVector);
+
+   if (bestCol == -1)
+      return 0;
+
+   return getCollisionAngle(bestCol, upVector);
+}
+
+//
+bool CollisionComponent::buildConvexOpcode(TSShapeInstance* sI, S32 dl, const Box3F &bounds, Convex *c, Convex *list)
+{
+   AssertFatal(dl >= 0 && dl < sI->getShape()->details.size(), "TSShapeInstance::buildConvexOpcode");
+
+   TSShape* shape = sI->getShape();
+
+   const MatrixF &objMat = mOwner->getObjToWorld();
+   const Point3F &objScale = mOwner->getScale();
+
+   // get subshape and object detail
+   const TSDetail * detail = &shape->details[dl];
+   S32 ss = detail->subShapeNum;
+   S32 od = detail->objectDetailNum;
+
+   // nothing emitted yet...
+   bool emitted = false;
+
+   S32 start = shape->subShapeFirstObject[ss];
+   S32 end = shape->subShapeNumObjects[ss] + start;
+   if (start<end)
+   {
+      MatrixF initialMat = objMat;
+      Point3F initialScale = objScale;
+
+      // set up for first object's node
+      MatrixF mat;
+      MatrixF scaleMat(true);
+      F32* p = scaleMat;
+      p[0] = initialScale.x;
+      p[5] = initialScale.y;
+      p[10] = initialScale.z;
+      const MatrixF * previousMat = &sI->mMeshObjects[start].getTransform();
+      mat.mul(initialMat, scaleMat);
+      mat.mul(*previousMat);
+
+      // Update our bounding box...
+      Box3F localBox = bounds;
+      MatrixF otherMat = mat;
+      otherMat.inverse();
+      otherMat.mul(localBox);
+
+      // run through objects and collide
+      for (S32 i = start; i<end; i++)
+      {
+         TSShapeInstance::MeshObjectInstance * meshInstance = &sI->mMeshObjects[i];
+
+         if (od >= meshInstance->object->numMeshes)
             continue;
 
-         // No mesh or no verts.... nothing to do.
-         TSMesh *mesh = shape->meshes[object.startMeshIndex + detail.objectDetailNum];
-         if (!mesh || mesh->mNumVerts == 0)
+         if (&meshInstance->getTransform() != previousMat)
+         {
+            // different node from before, set up for this node
+            previousMat = &meshInstance->getTransform();
+
+            if (previousMat != NULL)
+            {
+               mat.mul(initialMat, scaleMat);
+               mat.mul(*previousMat);
+
+               // Update our bounding box...
+               otherMat = mat;
+               otherMat.inverse();
+               localBox = bounds;
+               otherMat.mul(localBox);
+            }
+         }
+
+         // collide... note we pass the original mech transform
+         // here so that the convex data returned is in mesh space.
+         TSMesh * mesh = meshInstance->getMesh(od);
+         if (mesh && !meshInstance->forceHidden && meshInstance->visible > 0.01f && localBox.isOverlapped(mesh->getBounds()))
+            emitted |= buildMeshOpcode(mesh, *previousMat, localBox, c, list);
+         else
+            emitted |= false;
+      }
+   }
+
+   return emitted;
+}
+
+bool CollisionComponent::buildMeshOpcode(TSMesh *mesh, const MatrixF &meshToObjectMat,
+   const Box3F &nodeBox, Convex *convex, Convex *list)
+{
+   /*PROFILE_SCOPE(MeshCollider_buildConvexOpcode);
+
+   // This is small... there is no win for preallocating it.
+   Opcode::AABBCollider opCollider;
+   opCollider.SetPrimitiveTests(true);
+
+   // This isn't really needed within the AABBCollider as 
+   // we don't use temporal coherance... use a static to 
+   // remove the allocation overhead.
+   static Opcode::AABBCache opCache;
+
+   IceMaths::AABB opBox;
+   opBox.SetMinMax(Point(nodeBox.minExtents.x, nodeBox.minExtents.y, nodeBox.minExtents.z),
+      Point(nodeBox.maxExtents.x, nodeBox.maxExtents.y, nodeBox.maxExtents.z));
+   Opcode::CollisionAABB opCBox(opBox);
+
+   if (!opCollider.Collide(opCache, opCBox, *mesh->mOptTree))
+      return false;
+
+   U32 cnt = opCollider.GetNbTouchedPrimitives();
+   const udword *idx = opCollider.GetTouchedPrimitives();
+
+   Opcode::VertexPointers vp;
+   for (S32 i = 0; i < cnt; i++)
+   {
+      // First, check our active convexes for a potential match (and clean things
+      // up, too.)
+      const U32 curIdx = idx[i];
+
+      // See if the square already exists as part of the working set.
+      bool gotMatch = false;
+      CollisionWorkingList& wl = convex->getWorkingList();
+      for (CollisionWorkingList* itr = wl.wLink.mNext; itr != &wl; itr = itr->wLink.mNext)
+      {
+         if (itr->mConvex->getType() != TSPolysoupConvexType)
             continue;
 
-         // Gather the mesh triangles.
-         polyList.clear();
-         mesh->buildPolyList(0, &polyList, surfaceKey, NULL);
+         const MeshColliderPolysoupConvex *chunkc = static_cast<MeshColliderPolysoupConvex*>(itr->mConvex);
 
-         // Create the collision shape if we haven't already.
-         if (!colShape)
-            colShape = PHYSICSMGR->createCollision();
+         if (chunkc->getObject() != mOwner)
+            continue;
 
-         // Get the object space mesh transform.
-         MatrixF localXfm;
-         shape->getNodeWorldTransform(object.nodeIndex, &localXfm);
+         if (chunkc->mesh != mesh)
+            continue;
 
-         colShape->addTriangleMesh(polyList.mVertexList.address(),
-            polyList.mVertexList.size(),
-            polyList.mIndexList.address(),
-            polyList.mIndexList.size() / 3,
-            localXfm);
+         if (chunkc->idx != curIdx)
+            continue;
+
+         // A match! Don't need to add it.
+         gotMatch = true;
+         break;
       }
 
-      // Return what we built... if anything.
-      return colShape;
+      if (gotMatch)
+         continue;
+
+      // Get the triangle...
+      mesh->mOptTree->GetMeshInterface()->GetTriangle(vp, idx[i]);
+
+      Point3F a(vp.Vertex[0]->x, vp.Vertex[0]->y, vp.Vertex[0]->z);
+      Point3F b(vp.Vertex[1]->x, vp.Vertex[1]->y, vp.Vertex[1]->z);
+      Point3F c(vp.Vertex[2]->x, vp.Vertex[2]->y, vp.Vertex[2]->z);
+
+      // Transform the result into object space!
+      meshToObjectMat.mulP(a);
+      meshToObjectMat.mulP(b);
+      meshToObjectMat.mulP(c);
+
+      //If we're not doing debug rendering on the client, then set up our convex list as normal
+      PlaneF p(c, b, a);
+      Point3F peak = ((a + b + c) / 3.0f) - (p * 0.15f);
+
+      // Set up the convex...
+      MeshColliderPolysoupConvex *cp = new MeshColliderPolysoupConvex();
+
+      list->registerObject(cp);
+      convex->addToWorkingList(cp);
+
+      cp->mesh = mesh;
+      cp->idx = curIdx;
+      cp->mObject = mOwner;
+
+      cp->normal = p;
+      cp->verts[0] = a;
+      cp->verts[1] = b;
+      cp->verts[2] = c;
+      cp->verts[3] = peak;
+
+      // Update the bounding box.
+      Box3F &bounds = cp->box;
+      bounds.minExtents.set(F32_MAX, F32_MAX, F32_MAX);
+      bounds.maxExtents.set(-F32_MAX, -F32_MAX, -F32_MAX);
+
+      bounds.minExtents.setMin(a);
+      bounds.minExtents.setMin(b);
+      bounds.minExtents.setMin(c);
+      bounds.minExtents.setMin(peak);
+
+      bounds.maxExtents.setMax(a);
+      bounds.maxExtents.setMax(b);
+      bounds.maxExtents.setMax(c);
+      bounds.maxExtents.setMax(peak);
    }
-   else if (mCollisionType == CollisionMesh)
+
+   return true;*/
+   return false;
+}
+
+bool CollisionComponent::castRayOpcode(S32 dl, const Point3F & startPos, const Point3F & endPos, RayInfo *info)
+{
+   // if dl==-1, nothing to do
+   //if (dl == -1 || !getShapeInstance())
+      return false;
+
+   /*TSShape *shape = getShapeInstance()->getShape();
+
+   AssertFatal(dl >= 0 && dl < shape->details.size(), "TSShapeInstance::castRayOpcode");
+
+   info->t = 100.f;
+
+   // get subshape and object detail
+   const TSDetail * detail = &shape->details[dl];
+   S32 ss = detail->subShapeNum;
+   if (ss < 0)
+      return false;
+
+   S32 od = detail->objectDetailNum;
+
+   // nothing emitted yet...
+   bool emitted = false;
+
+   const MatrixF* saveMat = NULL;
+   S32 start = shape->subShapeFirstObject[ss];
+   S32 end = shape->subShapeNumObjects[ss] + start;
+   if (start<end)
    {
+      MatrixF mat;
+      const MatrixF * previousMat = &getShapeInstance()->mMeshObjects[start].getTransform();
+      mat = *previousMat;
+      mat.inverse();
+      Point3F localStart, localEnd;
+      mat.mulP(startPos, &localStart);
+      mat.mulP(endPos, &localEnd);
 
-      // Scan out the collision hulls...
-      //
-      // TODO: We need to support LOS collision for physics.
-      //
-      for (U32 i = 0; i < shape->details.size(); i++)
+      // run through objects and collide
+      for (S32 i = start; i<end; i++)
       {
-         const TSShape::Detail &detail = shape->details[i];
-         const String &name = shape->names[detail.nameIndex];
+         TSShapeInstance::MeshObjectInstance * meshInstance = &getShapeInstance()->mMeshObjects[i];
 
-         // Is this a valid collision detail.
-         if (!dStrStartsWith(name, colisionMeshPrefix) || detail.subShapeNum < 0)
+         if (od >= meshInstance->object->numMeshes)
             continue;
 
-         // Now go thru the meshes for this detail.
-         S32 start = shape->subShapeFirstObject[detail.subShapeNum];
-         S32 end = start + shape->subShapeNumObjects[detail.subShapeNum];
-         if (start >= end)
-            continue;
-
-         for (S32 o = start; o < end; o++)
+         if (&meshInstance->getTransform() != previousMat)
          {
-            const TSShape::Object &object = shape->objects[o];
+            // different node from before, set up for this node
+            previousMat = &meshInstance->getTransform();
 
-            if (object.numMeshes <= detail.objectDetailNum)
-               continue;
+            if (previousMat != NULL)
+            {
+               mat = *previousMat;
+               mat.inverse();
+               mat.mulP(startPos, &localStart);
+               mat.mulP(endPos, &localEnd);
+            }
+         }
 
-            // No mesh, a flat bounds, or no verts.... nothing to do.
-            TSMesh *mesh = shape->meshes[object.startMeshIndex + detail.objectDetailNum];
-            if (!mesh || mesh->getBounds().isEmpty() || mesh->mNumVerts == 0)
-               continue;
-
-            // We need the default mesh transform.
-            MatrixF localXfm;
-            shape->getNodeWorldTransform(object.nodeIndex, &localXfm);
-
-            // We have some sort of collision shape... so allocate it.
-            if (!colShape)
-               colShape = PHYSICSMGR->createCollision();
-
-            // Any other mesh name we assume as a generic convex hull.
-            //
-            // Collect the verts using the vertex polylist which will 
-            // filter out duplicates.  This is importaint as the convex
-            // generators can sometimes fail with duplicate verts.
-            //
-            VertexPolyList polyList;
-            MatrixF meshMat(localXfm);
-
-            Point3F t = meshMat.getPosition();
-            t.convolve(mOwner->getScale());
-            meshMat.setPosition(t);
-
-            polyList.setTransform(&MatrixF::Identity, mOwner->getScale());
-            mesh->buildPolyList(0, &polyList, surfaceKey, NULL);
-            colShape->addConvex(polyList.getVertexList().address(),
-               polyList.getVertexList().size(),
-               meshMat);
-         } // objects
-      } // details
+         // collide...
+         TSMesh * mesh = meshInstance->getMesh(od);
+         if (mesh && !meshInstance->forceHidden && meshInstance->visible > 0.01f)
+         {
+            if (castRayMeshOpcode(mesh, localStart, localEnd, info, getShapeInstance()->mMaterialList))
+            {
+               saveMat = previousMat;
+               emitted = true;
+            }
+         }
+      }
    }
 
-   return colShape;
+   if (emitted)
+   {
+      saveMat->mulV(info->normal);
+      info->point = endPos - startPos;
+      info->point *= info->t;
+      info->point += startPos;
+   }
+
+   return emitted;*/
+}
+
+static Point3F	texGenAxis[18] =
+{
+   Point3F(0,0,1), Point3F(1,0,0), Point3F(0,-1,0),
+   Point3F(0,0,-1), Point3F(1,0,0), Point3F(0,1,0),
+   Point3F(1,0,0), Point3F(0,1,0), Point3F(0,0,1),
+   Point3F(-1,0,0), Point3F(0,1,0), Point3F(0,0,-1),
+   Point3F(0,1,0), Point3F(1,0,0), Point3F(0,0,1),
+   Point3F(0,-1,0), Point3F(-1,0,0), Point3F(0,0,-1)
+};
+
+bool CollisionComponent::castRayMeshOpcode(TSMesh *mesh, const Point3F &s, const Point3F &e, RayInfo *info, TSMaterialList *materials)
+{
+   Opcode::RayCollider ray;
+   Opcode::CollisionFaces cfs;
+
+   IceMaths::Point dir(e.x - s.x, e.y - s.y, e.z - s.z);
+   const F32 rayLen = dir.Magnitude();
+   IceMaths::Ray vec(Point(s.x, s.y, s.z), dir.Normalize());
+
+   ray.SetDestination(&cfs);
+   ray.SetFirstContact(false);
+   ray.SetClosestHit(true);
+   ray.SetPrimitiveTests(true);
+   ray.SetCulling(true);
+   ray.SetMaxDist(rayLen);
+
+   AssertFatal(ray.ValidateSettings() == NULL, "invalid ray settings");
+
+   // Do collision.
+   bool safety = ray.Collide(vec, *mesh->mOptTree);
+   AssertFatal(safety, "CollisionComponent::castRayOpcode - no good ray collide!");
+
+   // If no hit, just skip out.
+   if (cfs.GetNbFaces() == 0)
+      return false;
+
+   // Got a hit!
+   AssertFatal(cfs.GetNbFaces() == 1, "bad");
+   const Opcode::CollisionFace &face = cfs.GetFaces()[0];
+
+   // If the cast was successful let's check if the t value is less than what we had
+   // and toggle the collision boolean
+   // Stupid t... i prefer coffee
+   const F32 t = face.mDistance / rayLen;
+
+   if (t < 0.0f || t > 1.0f)
+      return false;
+
+   if (t <= info->t)
+   {
+      info->t = t;
+
+      // Calculate the normal.
+      Opcode::VertexPointers vp;
+      mesh->mOptTree->GetMeshInterface()->GetTriangle(vp, face.mFaceID);
+
+      if (materials && vp.MatIdx >= 0 && vp.MatIdx < materials->size())
+         info->material = materials->getMaterialInst(vp.MatIdx);
+
+      // Get the two edges.
+      IceMaths::Point baseVert = *vp.Vertex[0];
+      IceMaths::Point a = *vp.Vertex[1] - baseVert;
+      IceMaths::Point b = *vp.Vertex[2] - baseVert;
+
+      IceMaths::Point n;
+      n.Cross(a, b);
+      n.Normalize();
+
+      info->normal.set(n.x, n.y, n.z);
+
+      // generate UV coordinate across mesh based on 
+      // matching normals, this isn't done by default and is 
+      // primarily of interest in matching a collision point to 
+      // either a GUI control coordinate or finding a hit pixel in texture space
+      if (info->generateTexCoord)
+      {
+         baseVert = *vp.Vertex[0];
+         a = *vp.Vertex[1];
+         b = *vp.Vertex[2];
+
+         Point3F facePoint = (1.0f - face.mU - face.mV) * Point3F(baseVert.x, baseVert.y, baseVert.z)
+            + face.mU * Point3F(a.x, a.y, a.z) + face.mV * Point3F(b.x, b.y, b.z);
+
+         U32 faces[1024];
+         U32 numFaces = 0;
+         for (U32 i = 0; i < mesh->mOptTree->GetMeshInterface()->GetNbTriangles(); i++)
+         {
+            if (i == face.mFaceID)
+            {
+               faces[numFaces++] = i;
+            }
+            else
+            {
+               IceMaths::Point n2;
+
+               mesh->mOptTree->GetMeshInterface()->GetTriangle(vp, i);
+
+               baseVert = *vp.Vertex[0];
+               a = *vp.Vertex[1] - baseVert;
+               b = *vp.Vertex[2] - baseVert;
+               n2.Cross(a, b);
+               n2.Normalize();
+
+               F32 eps = .01f;
+               if (mFabs(n.x - n2.x) < eps && mFabs(n.y - n2.y) < eps && mFabs(n.z - n2.z) < eps)
+               {
+                  faces[numFaces++] = i;
+               }
+            }
+
+            if (numFaces == 1024)
+            {
+               // too many faces in this collision mesh for UV generation
+               return true;
+            }
+
+         }
+
+         Point3F min(F32_MAX, F32_MAX, F32_MAX);
+         Point3F max(-F32_MAX, -F32_MAX, -F32_MAX);
+
+         for (U32 i = 0; i < numFaces; i++)
+         {
+            mesh->mOptTree->GetMeshInterface()->GetTriangle(vp, faces[i]);
+
+            for (U32 j = 0; j < 3; j++)
+            {
+               a = *vp.Vertex[j];
+
+               if (a.x < min.x)
+                  min.x = a.x;
+               if (a.y < min.y)
+                  min.y = a.y;
+               if (a.z < min.z)
+                  min.z = a.z;
+
+               if (a.x > max.x)
+                  max.x = a.x;
+               if (a.y > max.y)
+                  max.y = a.y;
+               if (a.z > max.z)
+                  max.z = a.z;
+
+            }
+
+         }
+
+         // slerp
+         Point3F s = ((max - min) - (facePoint - min)) / (max - min);
+
+         // compute axis
+         S32		bestAxis = 0;
+         F32      best = 0.f;
+
+         for (U32 i = 0; i < 6; i++)
+         {
+            F32 dot = mDot(info->normal, texGenAxis[i * 3]);
+            if (dot > best)
+            {
+               best = dot;
+               bestAxis = i;
+            }
+         }
+
+         Point3F xv = texGenAxis[bestAxis * 3 + 1];
+         Point3F yv = texGenAxis[bestAxis * 3 + 2];
+
+         S32 sv, tv;
+
+         if (xv.x)
+            sv = 0;
+         else if (xv.y)
+            sv = 1;
+         else
+            sv = 2;
+
+         if (yv.x)
+            tv = 0;
+         else if (yv.y)
+            tv = 1;
+         else
+            tv = 2;
+
+         // handle coord translation
+         if (bestAxis == 2 || bestAxis == 3)
+         {
+            S32 x = sv;
+            sv = tv;
+            tv = x;
+
+            if (yv.z < 0)
+               s[sv] = 1.f - s[sv];
+         }
+
+         if (bestAxis < 2)
+         {
+            if (yv.y < 0)
+               s[sv] = 1.f - s[sv];
+         }
+
+         if (bestAxis > 3)
+         {
+            s[sv] = 1.f - s[sv];
+            if (yv.z > 0)
+               s[tv] = 1.f - s[tv];
+
+         }
+
+         // done!
+         info->texCoord.set(s[sv], s[tv]);
+
+      }
+
+      return true;
+   }
+
+   return false;
 }

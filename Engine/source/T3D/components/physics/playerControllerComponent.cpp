@@ -37,7 +37,6 @@
 #include "collision/collision.h"
 #include "T3D/physics/physicsPlayer.h"
 #include "T3D/physics/physicsPlugin.h"
-#include "T3D/components/collision/collisionInterfaces.h"
 #include "T3D/trigger.h"
 #include "T3D/components/collision/collisionTrigger.h"
 
@@ -58,13 +57,8 @@ IMPLEMENT_CALLBACK(PlayerControllerComponent, updateMove, void, (PlayerControlle
 //////////////////////////////////////////////////////////////////////////
 // Constructor/Destructor
 //////////////////////////////////////////////////////////////////////////
-PlayerControllerComponent::PlayerControllerComponent() : Component()
+PlayerControllerComponent::PlayerControllerComponent() : PhysicsComponent()
 {
-   addComponentField("isStatic", "If enabled, object will not simulate physics", "bool", "0", "");
-   addComponentField("gravity", "The direction of gravity affecting this object, as a vector", "vector", "0 0 -9", "");
-   addComponentField("drag", "The drag coefficient that constantly affects the object", "float", "0.7", "");
-   addComponentField("mass", "The mass of the object", "float", "1", "");
-
    mBuoyancy = 0.f;
    mFriction = 0.3f;
    mElasticity = 0.4f;
@@ -122,7 +116,7 @@ PlayerControllerComponent::PlayerControllerComponent() : Component()
    mPhysicsRep = nullptr;
    mPhysicsWorld = nullptr;
 
-   mOwnerCollisionInterface = nullptr;
+   mOwnerCollisionComp = nullptr;
    mIntegrationCount = 0;
 }
 
@@ -160,6 +154,13 @@ void PlayerControllerComponent::onComponentAdd()
 {
    Parent::onComponentAdd();
 
+   CollisionComponent *collisionComp = mOwner->getComponent<CollisionComponent>();
+   if (collisionComp)
+   {
+      collisionComp->onCollisionChanged.notify(this, &PlayerControllerComponent::updatePhysics);
+      mOwnerCollisionComp = collisionComp;
+   }
+
    updatePhysics();
 }
 
@@ -168,12 +169,11 @@ void PlayerControllerComponent::componentAddedToOwner(Component *comp)
    if (comp->getId() == getId())
       return;
 
-   //test if this is a shape component!
-   CollisionInterface *collisionInterface = dynamic_cast<CollisionInterface*>(comp);
-   if (collisionInterface)
+   CollisionComponent *collisionComp = dynamic_cast<CollisionComponent*>(comp);
+   if (collisionComp)
    {
-      collisionInterface->onCollisionChanged.notify(this, &PlayerControllerComponent::updatePhysics);
-      mOwnerCollisionInterface = collisionInterface;
+      collisionComp->onCollisionChanged.notify(this, &PlayerControllerComponent::updatePhysics);
+      mOwnerCollisionComp = collisionComp;
       updatePhysics();
    }
 }
@@ -183,12 +183,11 @@ void PlayerControllerComponent::componentRemovedFromOwner(Component *comp)
    if (comp->getId() == getId()) //?????????
       return;
 
-   //test if this is a shape component!
-   CollisionInterface *collisionInterface = dynamic_cast<CollisionInterface*>(comp);
-   if (collisionInterface)
+   CollisionComponent *collisionComp = dynamic_cast<CollisionComponent*>(comp);
+   if (collisionComp)
    {
-      collisionInterface->onCollisionChanged.remove(this, &PlayerControllerComponent::updatePhysics);
-      mOwnerCollisionInterface = NULL;
+      collisionComp->onCollisionChanged.notify(this, &PlayerControllerComponent::updatePhysics);
+      mOwnerCollisionComp = nullptr;
       updatePhysics();
    }
 }
@@ -219,7 +218,7 @@ void PlayerControllerComponent::initPersistFields()
    Parent::initPersistFields();
 
    addField("inputVelocity", TypePoint3F, Offset(mInputVelocity, PlayerControllerComponent), "");
-   addField("useDirectMoveInput", TypePoint3F, Offset(mUseDirectMoveInput, PlayerControllerComponent), "");
+   addField("useDirectMoveInput", TypeBool, Offset(mUseDirectMoveInput, PlayerControllerComponent), "");
 }
 
 U32 PlayerControllerComponent::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
@@ -579,10 +578,10 @@ void PlayerControllerComponent::updatePos(const F32 travelTime)
       haveCollisions = true;
 
       //TODO: clean this up so the phys component doesn't have to tell the col interface to do this
-      CollisionInterface* colInterface = mOwner->getComponent<CollisionInterface>();
-      if (colInterface)
+      CollisionComponent* colComp = mOwner->getComponent<CollisionComponent>();
+      if (colComp)
       {
-         colInterface->handleCollisionList(collisionList, mVelocity);
+         colComp->handleCollisionList(collisionList, mVelocity);
       }
    }
 
@@ -629,6 +628,8 @@ void PlayerControllerComponent::updatePos(const F32 travelTime)
          }
       }
    }
+
+   updateContainer();
    
    MatrixF newMat;
    newMat.setPosition(newPos);
@@ -701,6 +702,9 @@ void PlayerControllerComponent::findContact(bool *run, bool *jump, VectorF *cont
 
    if (mContactInfo.contacted)
       mContactInfo.contactNormal = *contactNormal;
+
+   mContactInfo.run = *run;
+   mContactInfo.jump = *jump;
 }
 
 void PlayerControllerComponent::applyImpulse(const Point3F &pos, const VectorF &vec)

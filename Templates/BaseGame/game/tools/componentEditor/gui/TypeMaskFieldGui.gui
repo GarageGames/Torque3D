@@ -1,0 +1,107 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GuiControl(TypeMaskFieldGui) {
+   position = "0 0";
+   extent = "1024 768";
+   minExtent = "8 2";
+   horizSizing = "right";
+   vertSizing = "bottom";
+   profile = "ToolsGuiDefaultNonModalProfile";
+   visible = "1";
+   active = "1";
+   tooltipProfile = "GuiToolTipProfile";
+   hovertime = "1000";
+   isContainer = "1";
+   canSave = "1";
+   canSaveDynamicFields = "1";
+
+   new GuiWindowCtrl(TypeMaskFieldWindow) {
+      text = "Select Type Masks";
+      resizeWidth = "0";
+      resizeHeight = "1";
+      canMove = "1";
+      canClose = "1";
+      canMinimize = "0";
+      canMaximize = "0";
+      canCollapse = "0";
+      closeCommand = "Canvas.popDialog(TypeMaskFieldGui);";
+      edgeSnap = "1";
+      docking = "None";
+      margin = "4 4 4 4";
+      padding = "0 0 0 0";
+      anchorTop = "0";
+      anchorBottom = "0";
+      anchorLeft = "0";
+      anchorRight = "0";
+      position = "430 176";
+      extent = "161 250";
+      minExtent = "161 86";
+      horizSizing = "windowRelative";
+      vertSizing = "windowRelative";
+      profile = "ToolsGuiWindowProfile";
+      visible = "1";
+      active = "1";
+      tooltipProfile = "GuiToolTipProfile";
+      hovertime = "1000";
+      isContainer = "1";
+      canSave = "1";
+      canSaveDynamicFields = "0";
+
+      new GuiScrollCtrl() {
+         willFirstRespond = "1";
+         hScrollBar = "alwaysOff";
+         vScrollBar = "dynamic";
+         lockHorizScroll = "0";
+         lockVertScroll = "0";
+         constantThumbHeight = "0";
+         childMargin = "2 0";
+         mouseWheelScrollSpeed = "-1";
+         docking = "Client";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "0";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "1 9";
+         extent = "159 238";
+         minExtent = "8 2";
+         horizSizing = "width";
+         vertSizing = "height";
+         profile = "ToolsGuiScrollProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+
+         new GuiStackControl() {
+            stackingType = "Vertical";
+            horizStacking = "Left to Right";
+            vertStacking = "Top to Bottom";
+            padding = "-2";
+            dynamicSize = "1";
+            dynamicNonStackExtent = "0";
+            dynamicPos = "0";
+            changeChildSizeToFit = "1";
+            changeChildPosition = "1";
+            position = "3 1";
+            extent = "153 18";
+            minExtent = "16 16";
+            horizSizing = "width";
+            vertSizing = "bottom";
+            profile = "ToolsGuiDefaultProfile";
+            visible = "1";
+            active = "1";
+            tooltipProfile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "1";
+            internalName = "TypeMaskList";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+         };
+      };
+   };
+};
+//--- OBJECT WRITE END ---

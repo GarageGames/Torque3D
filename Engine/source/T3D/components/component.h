@@ -20,6 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#pragma once
+
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
@@ -44,6 +46,7 @@ class Namespace;
 
 struct ComponentField
 {
+   StringTableEntry mFieldLabel;
    StringTableEntry mFieldName;
    StringTableEntry mFieldDescription;
 
@@ -145,7 +148,7 @@ public:
    /// @param   type         The Type of field that this is, example 'Text' or 'Bool'
    /// @param   defaultValue The Default value of this field
    /// @param   userData     An extra optional field that can be used for user data
-   void addComponentField(const char *fieldName, const char *desc, const char *type, const char *defaultValue = NULL, const char *userData = NULL, bool hidden = false);
+   void addComponentField(const char *fieldName, const char *desc, const char *type, const char *defaultValue = NULL, const char *userData = NULL, bool hidden = false, const char* customLabel = "");
 
    /// Returns the number of ComponentField's on this template
    inline S32 getComponentFieldCount() { return mFields.size(); };

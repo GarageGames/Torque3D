@@ -39,7 +39,7 @@ bool RigidBodyComponent::smNoSmoothing = false;
 //////////////////////////////////////////////////////////////////////////
 // Constructor/Destructor
 //////////////////////////////////////////////////////////////////////////
-RigidBodyComponent::RigidBodyComponent() : Component()   
+RigidBodyComponent::RigidBodyComponent() : PhysicsComponent()
 {
    mMass = 20;
    mDynamicFriction = 1;
@@ -353,11 +353,11 @@ void RigidBodyComponent::findContact()
 
    mPhysicsRep->findContact(&contactObject, contactNormal, &overlapObjects);
 
-   if (!overlapObjects.empty())
+   /*if (!overlapObjects.empty())
    {
       //fire our signal that the physics sim said collisions happened
       onPhysicsCollision.trigger(*contactNormal, overlapObjects);
-   }
+   }*/
 }
 
 void RigidBodyComponent::_onPhysicsReset(PhysicsResetEvent reset)
