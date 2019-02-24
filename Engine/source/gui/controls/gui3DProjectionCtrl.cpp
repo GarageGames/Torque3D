@@ -43,9 +43,9 @@
   
 #include "console/console.h"  
 #include "console/consoleTypes.h"  
-#include "scene/SceneObject.h"  
+#include "scene/sceneObject.h"  
 #include "T3D/player.h"  
-#include "gui/controls/Gui3DProjectionCtrl.h"  
+#include "gui/controls/gui3DProjectionCtrl.h"  
   
 IMPLEMENT_CONOBJECT(Gui3DProjectionCtrl);  
   
