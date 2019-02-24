@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "core/shaders/gl/hlslCompat.glsl"
+#include "../../../../core/rendering/shaders/gl/hlslCompat.glsl"
 #include "shadergen:/autogenConditioners.h"
 
 in vec2 uv0;

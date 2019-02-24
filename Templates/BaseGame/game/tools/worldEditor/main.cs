@@ -133,6 +133,15 @@ function initializeWorldEditor()
    EVisibility.addOption( "Frustum Lock", "$Scene::lockCull", "" );
    EVisibility.addOption( "Disable Zone Culling", "$Scene::disableZoneCulling", "" );
    EVisibility.addOption( "Disable Terrain Occlusion", "$Scene::disableTerrainOcclusion", "" );
+
+   EVisibility.addOption( "Colorblindness: Protanopia", "$CBV_Protanopia", "toggleColorBlindnessViz" );
+   EVisibility.addOption( "Colorblindness: Protanomaly", "$CBV_Protanomaly", "toggleColorBlindnessViz" );
+   EVisibility.addOption( "Colorblindness: Deuteranopia", "$CBV_Deuteranopia", "toggleColorBlindnessViz" );
+   EVisibility.addOption( "Colorblindness: Deuteranomaly", "$CBV_Deuteranomaly", "toggleColorBlindnessViz" );
+   EVisibility.addOption( "Colorblindness: Tritanopia", "$CBV_Tritanopia", "toggleColorBlindnessViz" );
+   EVisibility.addOption( "Colorblindness: Tritanomaly", "$CBV_Tritanomaly", "toggleColorBlindnessViz" );
+   EVisibility.addOption( "Colorblindness: Achromatopsia", "$CBV_Achromatopsia", "toggleColorBlindnessViz" );
+   EVisibility.addOption( "Colorblindness: Achromatomaly", "$CBV_Achromatomaly", "toggleColorBlindnessViz" );
 }
 
 function destroyWorldEditor()

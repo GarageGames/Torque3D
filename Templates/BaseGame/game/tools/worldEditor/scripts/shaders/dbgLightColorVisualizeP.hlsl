@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "core/shaders/shaderModelAutoGen.hlsl"
-#include "core/shaders/postfx/postFx.hlsl"
+#include "../../../../core/rendering/shaders/shaderModelAutoGen.hlsl"
+#include "../../../../core/rendering/shaders/postFX/postFx.hlsl"
 
 TORQUE_UNIFORM_SAMPLER2D(lightDeferredTex,0);
 
