@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -54,6 +54,7 @@ main(int argc, char **argv)
     name = NULL;
     index = -1;
     if (argc > 1) {
+        size_t l;
         name = argv[1];
         if ((strcmp(name, "--help") == 0) || (strcmp(name, "-h") == 0)) {
             SDL_Log("USAGE: %s [device]\n"
@@ -63,9 +64,9 @@ main(int argc, char **argv)
             return 0;
         }
 
-        i = strlen(name);
-        if ((i < 3) && isdigit(name[0]) && ((i == 1) || isdigit(name[1]))) {
-            index = atoi(name);
+        l = SDL_strlen(name);
+        if ((l < 3) && SDL_isdigit(name[0]) && ((l == 1) || SDL_isdigit(name[1]))) {
+            index = SDL_atoi(name);
             name = NULL;
         }
     }

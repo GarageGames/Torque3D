@@ -36,15 +36,15 @@ GEN_HEADERS = @GEN_HEADERS@
 GEN_OBJECTS = @GEN_OBJECTS@
 VERSION_OBJECTS = @VERSION_OBJECTS@
 
-SDLMAIN_TARGET = libSDL2main.a
+SDLMAIN_TARGET = libSDL2main.la
 SDLMAIN_OBJECTS = @SDLMAIN_OBJECTS@
 
-SDLTEST_TARGET = libSDL2_test.a
+SDLTEST_TARGET = libSDL2_test.la
 SDLTEST_OBJECTS = @SDLTEST_OBJECTS@
 
 WAYLAND_SCANNER = @WAYLAND_SCANNER@
 
-SRC_DIST = *.txt acinclude Android.mk autogen.sh android-project build-scripts cmake cmake_uninstall.cmake.in configure configure.in debian docs include Makefile.* sdl2-config.cmake.in sdl2-config.in sdl2.m4 sdl2.pc.in SDL2.spec.in src test VisualC.html VisualC VisualC-WinRT Xcode Xcode-iOS
+SRC_DIST = *.txt acinclude Android.mk autogen.sh android-project build-scripts cmake cmake_uninstall.cmake.in configure configure.in debian docs include Makefile.* sdl2-config.cmake.in sdl2-config.in sdl2.m4 sdl2.pc.in SDL2.spec.in SDL2Config.cmake src test VisualC.html VisualC VisualC-WinRT Xcode Xcode-iOS
 GEN_DIST = SDL2.spec
 
 ifneq ($V,1)
@@ -112,6 +112,7 @@ HDRS = \
 	SDL_types.h \
 	SDL_version.h \
 	SDL_video.h \
+	SDL_vulkan.h \
 	begin_code.h \
 	close_code.h
 
@@ -121,14 +122,12 @@ LT_AGE      = @LT_AGE@
 LT_CURRENT  = @LT_CURRENT@
 LT_RELEASE  = @LT_RELEASE@
 LT_REVISION = @LT_REVISION@
-LT_LDFLAGS  = -no-undefined -rpath $(DESTDIR)$(libdir) -release $(LT_RELEASE) -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+LT_LDFLAGS  = -no-undefined -rpath $(libdir) -release $(LT_RELEASE) -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 all: $(srcdir)/configure Makefile $(objects) $(objects)/$(TARGET) $(objects)/$(SDLMAIN_TARGET) $(objects)/$(SDLTEST_TARGET)
 
 $(srcdir)/configure: $(srcdir)/configure.in
-	@echo "Warning, configure.in is out of date"
-	#(cd $(srcdir) && sh autogen.sh && sh configure)
-	@sleep 3
+	@echo "Warning, configure is out of date, please re-run autogen.sh"
 
 Makefile: $(srcdir)/Makefile.in
 	$(SHELL) config.status $@
@@ -147,12 +146,10 @@ $(objects)/$(TARGET): $(GEN_HEADERS) $(GEN_OBJECTS) $(OBJECTS) $(VERSION_OBJECTS
 	$(RUN_CMD_LTLINK)$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $(OBJECTS) $(GEN_OBJECTS) $(VERSION_OBJECTS) $(LDFLAGS) $(EXTRA_LDFLAGS) $(LT_LDFLAGS)
 
 $(objects)/$(SDLMAIN_TARGET): $(SDLMAIN_OBJECTS)
-	$(RUN_CMD_AR)$(AR) cru $@ $(SDLMAIN_OBJECTS)
-	$(RUN_CMD_RANLIB)$(RANLIB) $@
+	$(RUN_CMD_LTLINK)$(LIBTOOL) --tag=CC --mode=link $(CC) -static -o $@ $(SDLMAIN_OBJECTS) -rpath $(libdir)
 
 $(objects)/$(SDLTEST_TARGET): $(SDLTEST_OBJECTS)
-	$(RUN_CMD_AR)$(AR) cru $@ $(SDLTEST_OBJECTS)
-	$(RUN_CMD_RANLIB)$(RANLIB) $@
+	$(RUN_CMD_LTLINK)$(LIBTOOL) --tag=CC --mode=link $(CC) -static -o $@ $(SDLTEST_OBJECTS) -rpath $(libdir)
 
 install: all install-bin install-hdrs install-lib install-data
 install-bin:
@@ -173,10 +170,8 @@ install-hdrs: update-revision
 install-lib: $(objects) $(objects)/$(TARGET) $(objects)/$(SDLMAIN_TARGET) $(objects)/$(SDLTEST_TARGET)
 	$(SHELL) $(auxdir)/mkinstalldirs $(DESTDIR)$(libdir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(objects)/$(TARGET) $(DESTDIR)$(libdir)/$(TARGET)
-	$(INSTALL) -m 644 $(objects)/$(SDLMAIN_TARGET) $(DESTDIR)$(libdir)/$(SDLMAIN_TARGET)
-	$(RANLIB) $(DESTDIR)$(libdir)/$(SDLMAIN_TARGET)
-	$(INSTALL) -m 644 $(objects)/$(SDLTEST_TARGET) $(DESTDIR)$(libdir)/$(SDLTEST_TARGET)
-	$(RANLIB) $(DESTDIR)$(libdir)/$(SDLTEST_TARGET)
+	$(LIBTOOL) --mode=install $(INSTALL) $(objects)/$(SDLMAIN_TARGET) $(DESTDIR)$(libdir)/$(SDLMAIN_TARGET)
+	$(LIBTOOL) --mode=install $(INSTALL) $(objects)/$(SDLTEST_TARGET) $(DESTDIR)$(libdir)/$(SDLTEST_TARGET)
 install-data:
 	$(SHELL) $(auxdir)/mkinstalldirs $(DESTDIR)$(datadir)/aclocal
 	$(INSTALL) -m 644 $(srcdir)/sdl2.m4 $(DESTDIR)$(datadir)/aclocal/sdl2.m4

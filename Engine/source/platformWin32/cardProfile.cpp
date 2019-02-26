@@ -74,7 +74,7 @@ void initDisplayDeviceInfo()
    Con::setVariable( "$PCI_DEV", dev );
 }
 
-DefineConsoleFunction( initDisplayDeviceInfo, void, (), , "()"
+DefineEngineFunction( initDisplayDeviceInfo, void, (), , "()"
 				"@brief Initializes variables that track device and vendor information/IDs\n\n"
 				"@ingroup Rendering")
 {

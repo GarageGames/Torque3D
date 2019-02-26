@@ -18,10 +18,10 @@
 # module will automatically add the -framework Cocoa on your behalf.
 #
 #
-# Additional Note: If you see an empty SDL2_LIBRARY_TEMP in your configuration
+# Additional Note: If you see an empty SDL2_CORE_LIBRARY in your configuration
 # and no SDL2_LIBRARY, it means CMake did not find your SDL2 library
 # (SDL2.dll, libsdl2.so, SDL2.framework, etc).
-# Set SDL2_LIBRARY_TEMP to point to your SDL2 library, and configure again.
+# Set SDL2_CORE_LIBRARY to point to your SDL2 library, and configure again.
 # Similarly, if you see an empty SDL2MAIN_LIBRARY, you should set this value
 # as appropriate. These values are used to generate the final SDL2_LIBRARY
 # variable, but when these values are unset, SDL2_LIBRARY does not get created.
@@ -87,7 +87,7 @@ FIND_PATH(SDL2_INCLUDE_DIR SDL.h
 )
 #MESSAGE("SDL2_INCLUDE_DIR is ${SDL2_INCLUDE_DIR}")
 
-FIND_LIBRARY(SDL2_LIBRARY_TEMP
+FIND_LIBRARY(SDL2_CORE_LIBRARY
   NAMES SDL2
   HINTS
   $ENV{SDL2DIR}
@@ -98,8 +98,7 @@ FIND_LIBRARY(SDL2_LIBRARY_TEMP
   /opt/csw
   /opt
 )
-
-#MESSAGE("SDL2_LIBRARY_TEMP is ${SDL2_LIBRARY_TEMP}")
+#MESSAGE("SDL2_CORE_LIBRARY is ${SDL2_CORE_LIBRARY}")
 
 IF(NOT SDL2_BUILDING_LIBRARY)
   IF(NOT ${SDL2_INCLUDE_DIR} MATCHES ".framework")
@@ -137,7 +136,9 @@ IF(MINGW)
 ENDIF(MINGW)
 
 SET(SDL2_FOUND "NO")
-IF(SDL2_LIBRARY_TEMP)
+IF(SDL2_CORE_LIBRARY)
+  SET(SDL2_LIBRARY_TEMP ${SDL2_CORE_LIBRARY})
+
   # For SDL2main
   IF(NOT SDL2_BUILDING_LIBRARY)
     IF(SDL2MAIN_LIBRARY)
@@ -172,15 +173,12 @@ IF(SDL2_LIBRARY_TEMP)
   ENDIF(WIN32)
 
   # Set the final string here so the GUI reflects the final state.
-  SET(SDL2_LIBRARY ${SDL2_LIBRARY_TEMP} CACHE STRING "Where the SDL2 Library can be found")
-  # Set the temp variable to INTERNAL so it is not seen in the CMake GUI
-  SET(SDL2_LIBRARY_TEMP "${SDL2_LIBRARY_TEMP}" CACHE INTERNAL "")
+  SET(SDL2_LIBRARY ${SDL2_LIBRARY_TEMP})
 
   SET(SDL2_FOUND "YES")
-ENDIF(SDL2_LIBRARY_TEMP)
+ENDIF(SDL2_CORE_LIBRARY)
 
 INCLUDE(FindPackageHandleStandardArgs)
-
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(SDL2
                                   REQUIRED_VARS SDL2_LIBRARY SDL2_INCLUDE_DIR)
 

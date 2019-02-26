@@ -482,12 +482,12 @@ const char* Settings::findNextValue()
 }
 
 // make sure to replace the strings
-DefineConsoleMethod(Settings, findFirstValue, const char*, ( const char* pattern, bool deepSearch, bool includeDefaults ), ("", false, false), "settingObj.findFirstValue();")
+DefineEngineMethod(Settings, findFirstValue, const char*, ( const char* pattern, bool deepSearch, bool includeDefaults ), ("", false, false), "settingObj.findFirstValue();")
 {
    return object->findFirstValue( pattern, deepSearch, includeDefaults );
 }
 
-DefineConsoleMethod(Settings, findNextValue, const char*, (), , "settingObj.findNextValue();")
+DefineEngineMethod(Settings, findNextValue, const char*, (), , "settingObj.findNextValue();")
 {
 	return object->findNextValue();
 }
@@ -644,7 +644,7 @@ void SettingSaveNode::buildDocument(SimXMLDocument *document, bool skipWrite)
       document->popElement();
 }
 
-DefineConsoleMethod(Settings, setValue, void, (const char * settingName, const char * value), (""), "settingObj.setValue(settingName, value);")
+DefineEngineMethod(Settings, setValue, void, (const char * settingName, const char * value), (""), "settingObj.setValue(settingName, value);")
 {
    StringTableEntry fieldName = StringTable->insert( settingName );
    
@@ -654,13 +654,13 @@ DefineConsoleMethod(Settings, setValue, void, (const char * settingName, const c
       object->setValue( fieldName );
 }
 
-DefineConsoleMethod(Settings, setDefaultValue, void, (const char * settingName, const char * value), , "settingObj.setDefaultValue(settingName, value);")
+DefineEngineMethod(Settings, setDefaultValue, void, (const char * settingName, const char * value), , "settingObj.setDefaultValue(settingName, value);")
 {
    StringTableEntry fieldName = StringTable->insert( settingName );
    object->setDefaultValue( fieldName, value );
 }
 
-DefineConsoleMethod(Settings, value, const char*, (const char * settingName, const char * defaultValue), (""), "settingObj.value(settingName, defaultValue);")
+DefineEngineMethod(Settings, value, const char*, (const char * settingName, const char * defaultValue), (""), "settingObj.value(settingName, defaultValue);")
 {
    StringTableEntry fieldName = StringTable->insert( settingName );
    
@@ -672,7 +672,7 @@ DefineConsoleMethod(Settings, value, const char*, (const char * settingName, con
    return "";
 }
 
-DefineConsoleMethod(Settings, remove, void, (const char * settingName, bool includeDefaults), (false), "settingObj.remove(settingName, includeDefaults = false);")
+DefineEngineMethod(Settings, remove, void, (const char * settingName, bool includeDefaults), (false), "settingObj.remove(settingName, includeDefaults = false);")
 {
    // there's a problem with some fields not being removed properly, but works if you run it twice,
    // a temporary solution for now is simply to call the remove twice
@@ -681,33 +681,32 @@ DefineConsoleMethod(Settings, remove, void, (const char * settingName, bool incl
 	object->remove( settingName, includeDefaults );
 }
 
-ConsoleMethod(Settings, write, bool, 2, 2, "%success = settingObj.write();")
+DefineEngineMethod(Settings, write, bool, (),, "%success = settingObj.write();")
 {
-   TORQUE_UNUSED(argc); TORQUE_UNUSED(argv);
    return object->write();
 }
 
-DefineConsoleMethod(Settings, read, bool, (), , "%success = settingObj.read();")
+DefineEngineMethod(Settings, read, bool, (), , "%success = settingObj.read();")
 {
    return object->read();
 }
 
-DefineConsoleMethod(Settings, beginGroup, void, (const char * groupName, bool includeDefaults), (false), "settingObj.beginGroup(groupName, fromStart = false);")
+DefineEngineMethod(Settings, beginGroup, void, (const char * groupName, bool includeDefaults), (false), "settingObj.beginGroup(groupName, fromStart = false);")
 {
 	object->beginGroup( groupName, includeDefaults );
 }
 
-DefineConsoleMethod(Settings, endGroup, void, (), , "settingObj.endGroup();")
+DefineEngineMethod(Settings, endGroup, void, (), , "settingObj.endGroup();")
 {
    object->endGroup();
 }
 
-DefineConsoleMethod(Settings, clearGroups, void, (), , "settingObj.clearGroups();")
+DefineEngineMethod(Settings, clearGroups, void, (), , "settingObj.clearGroups();")
 {
    object->clearGroups();
 }
 
-DefineConsoleMethod(Settings, getCurrentGroups, const char*, (), , "settingObj.getCurrentGroups();")
+DefineEngineMethod(Settings, getCurrentGroups, const char*, (), , "settingObj.getCurrentGroups();")
 {
    return object->getCurrentGroups();
 }

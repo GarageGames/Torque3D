@@ -1,0 +1,19 @@
+<ModuleDefinition
+	ModuleId="CoreModule"
+	VersionId="1"
+	Description="Module that implements the core engine-level setup for the game."
+	ScriptFile="Core.cs"
+	CreateFunction="onCreate"
+	DestroyFunction="onDestroy"
+	Group="Core">
+	<DeclaredAssets
+           canSave="true"
+           canSaveDynamicFields="true"
+           Extension="asset.taml"
+           Recurse="true" />
+	<AutoloadAssets
+	   canSave="true"
+	   canSaveDynamicFields="true"
+	   AssetType="ComponentAsset"
+	   Recurse="true" />
+</ModuleDefinition>

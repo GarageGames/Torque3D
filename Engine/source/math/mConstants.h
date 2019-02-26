@@ -44,7 +44,7 @@
 
 #define M_CONST_E_F    2.7182818284590452353602874f
 
-#define POINT_EPSILON (1e-4) ///< Epsilon for point types.
+#define POINT_EPSILON (0.0001f) ///< Epsilon for point types.
 
 
 /// Result of an overlap test.

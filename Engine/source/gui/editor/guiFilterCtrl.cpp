@@ -60,7 +60,7 @@ void GuiFilterCtrl::initPersistFields()
    Parent::initPersistFields();
 }
 
-DefineConsoleMethod( GuiFilterCtrl, getValue, const char*, (), , "Return a tuple containing all the values in the filter."
+DefineEngineMethod( GuiFilterCtrl, getValue, const char*, (), , "Return a tuple containing all the values in the filter."
 			  "@internal")
 {
    static char buffer[512];
@@ -70,14 +70,14 @@ DefineConsoleMethod( GuiFilterCtrl, getValue, const char*, (), , "Return a tuple
    for (U32 i=0; i < filter->size(); i++)
    {
       char value[32];
-      dSprintf(value, 31, "%1.5f ", *(filter->begin()+i) );
-      dStrcat(buffer, value);
+      dSprintf(value, 32, "%1.5f ", *(filter->begin()+i) );
+      dStrcat(buffer, value, 32);
    }
 
    return buffer;
 }
 
-ConsoleMethod( GuiFilterCtrl, setValue, void, 3, 20, "(f1, f2, ...)"
+DefineEngineStringlyVariadicMethod( GuiFilterCtrl, setValue, void, 3, 20, "(f1, f2, ...)"
               "Reset the filter to use the specified points, spread equidistantly across the domain."
 			  "@internal")
 {
@@ -89,7 +89,7 @@ ConsoleMethod( GuiFilterCtrl, setValue, void, 3, 20, "(f1, f2, ...)"
 	object->set(filter);
 }
 
-DefineConsoleMethod( GuiFilterCtrl, identity, void, (), , "Reset the filtering."
+DefineEngineMethod( GuiFilterCtrl, identity, void, (), , "Reset the filtering."
 			  "@internal")
 {
    object->identity();
@@ -177,9 +177,9 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
    Point2I pos = offset;
    Point2I ext = getExtent();
 
-   RectI r(pos, ext);
-   GFX->getDrawUtil()->drawRectFill(r, ColorI(255,255,255));
-   GFX->getDrawUtil()->drawRect(r, ColorI(0,0,0));
+   RectI bgRect(pos, ext);
+   GFX->getDrawUtil()->drawRectFill(bgRect, ColorI(255,255,255));
+   GFX->getDrawUtil()->drawRect(bgRect, ColorI(0,0,0));
 
    // shrink by 2 pixels
    pos.x += 2;
@@ -218,13 +218,13 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
    // draw the knots
    for (U32 k=0; k < mFilter.size(); k++)
    {
-      RectI r;
-      r.point.x = (S32)(((F32)ext.x/(F32)(mFilter.size()-1)*(F32)k));
-      r.point.y = (S32)(ext.y - ((F32)ext.y * mFilter[k]));
-      r.point += pos + Point2I(-2,-2);
-      r.extent = Point2I(5,5);
+      RectI knotRect;
+	  knotRect.point.x = (S32)(((F32)ext.x/(F32)(mFilter.size()-1)*(F32)k));
+	  knotRect.point.y = (S32)(ext.y - ((F32)ext.y * mFilter[k]));
+	  knotRect.point += pos + Point2I(-2,-2);
+	  knotRect.extent = Point2I(5,5);
 
-      GFX->getDrawUtil()->drawRectFill(r, ColorI(255,0,0));
+      GFX->getDrawUtil()->drawRectFill(knotRect, ColorI(255,0,0));
    }
 
    renderChildControls(offset, updateRect);
@@ -239,7 +239,7 @@ void Filter::set(S32 argc, const char *argv[])
    if (argc == 1)
    {  // in the form of one string "1.0 1.0 1.0"
       char list[1024];
-      dStrcpy(list, *argv);    // strtok modifies the string so we need to copy it
+      dStrcpy(list, *argv, 1024);    // strtok modifies the string so we need to copy it
       char *value = dStrtok(list, " ");
       while (value)
       {

@@ -144,7 +144,7 @@ INT CreateMiniDump( LPEXCEPTION_POINTERS ExceptionInfo)
 
    //copy over the pdb file
    char pdbName[1024];
-   dStrcpy(pdbName, exeName);	
+   dStrcpy(pdbName, exeName, 1024);	
    dStrncat(pdbName, ".pdb", 4);
    dSprintf(fromFile, 2048, "%s/%s", Platform::getCurrentDirectory(), pdbName );
    dSprintf(fileName, 2048, "%s/%s", crashPath, pdbName );

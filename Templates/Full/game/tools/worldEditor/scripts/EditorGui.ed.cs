@@ -1302,6 +1302,7 @@ function VisibilityDropdownToggle()
    {
       EVisibility.setVisible(true);
       visibilityToggleBtn.setStateOn(1);
+      EVisibility.setExtent("200 540");
    }
 }
 
@@ -1569,169 +1570,112 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
    %haveObjectEntries = false;
    %haveLockAndHideEntries = true;
    
-   // Handle multi-selection.
+   //Set up the generic pop-up pre-emptively if we haven't already
+   %popup = new PopupMenu()
+   {
+      superClass = "MenuBuilder";
+      isPopup = "1";
+      object = -1;
+      bookmark = -1;
+   };
+   
    if( %this.getSelectedItemsCount() > 1 )
    {
-      %popup = ETMultiSelectionContextPopup;
-      if( !isObject( %popup ) )
-         %popup = new PopupMenu( ETMultiSelectionContextPopup )
-         {
-            superClass = "MenuBuilder";
-            isPopup = "1";
-
-            item[ 0 ] = "Delete" TAB "" TAB "EditorMenuEditDelete();";
-            item[ 1 ] = "Group" TAB "" TAB "EWorldEditor.addSimGroup( true );";
-         };
+      %popup.item[ 0 ] = "Delete" TAB "" TAB "EditorMenuEditDelete();";
+      %popup.item[ 1 ] = "Group" TAB "" TAB "EWorldEditor.addSimGroup( true );";
    }
-
-   // Open context menu if this is a CameraBookmark
-   else if( %obj.isMemberOfClass( "CameraBookmark" ) )
-   {
-      %popup = ETCameraBookmarkContextPopup;
-      if( !isObject( %popup ) )
-         %popup = new PopupMenu( ETCameraBookmarkContextPopup )
-         {
-            superClass = "MenuBuilder";
-            isPopup = "1";
-
-            item[ 0 ] = "Go To Bookmark" TAB "" TAB "EditorGui.jumpToBookmark( %this.bookmark.getInternalName() );";
-
-            bookmark = -1;
-         };
-
-      ETCameraBookmarkContextPopup.bookmark = %obj;
-   }
-   
-   // Open context menu if this is set CameraBookmarks group.
-   else if( %obj.name $= "CameraBookmarks" )
-   {
-      %popup = ETCameraBookmarksGroupContextPopup;
-      if( !isObject( %popup ) )
-         %popup = new PopupMenu( ETCameraBookmarksGroupContextPopup )
-         {
-            superClass = "MenuBuilder";
-            isPopup = "1";
-
-            item[ 0 ] = "Add Camera Bookmark" TAB "" TAB "EditorGui.addCameraBookmarkByGui();";
-         };
-   }
-
-   // Open context menu if this is a SimGroup
-   else if( !%obj.isMemberOfClass( "SceneObject" ) )
-   {
-      %popup = ETSimGroupContextPopup;
-      if( !isObject( %popup ) )
-         %popup = new PopupMenu( ETSimGroupContextPopup )
-         {
-            superClass = "MenuBuilder";
-            isPopup = "1";
-
-            item[ 0 ] = "Rename" TAB "" TAB "EditorTree.showItemRenameCtrl( EditorTree.findItemByObjectId( %this.object ) );";
-            item[ 1 ] = "Delete" TAB "" TAB "EWorldEditor.deleteMissionObject( %this.object );";
-            item[ 2 ] = "Inspect" TAB "" TAB "inspectObject( %this.object );";
-            item[ 3 ] = "-";
-            item[ 4 ] = "Toggle Lock Children" TAB "" TAB "EWorldEditor.toggleLockChildren( %this.object );";
-            item[ 5 ] = "Toggle Hide Children" TAB "" TAB "EWorldEditor.toggleHideChildren( %this.object );";
-            item[ 6 ] = "-";
-            item[ 7 ] = "Group" TAB "" TAB "EWorldEditor.addSimGroup( true );";
-            item[ 8 ] = "-";
-            item[ 9 ] = "Add New Objects Here" TAB "" TAB "EWCreatorWindow.setNewObjectGroup( %this.object );";
-            item[ 10 ] = "Add Children to Selection" TAB "" TAB "EWorldEditor.selectAllObjectsInSet( %this.object, false );";
-            item[ 11 ] = "Remove Children from Selection" TAB "" TAB "EWorldEditor.selectAllObjectsInSet( %this.object, true );";
-
-            object = -1;
-         };
-
-      %popup.object = %obj;
-      
-      %hasChildren = %obj.getCount() > 0;
-      %popup.enableItem( 10, %hasChildren );
-      %popup.enableItem( 11, %hasChildren );
-      
-      %haveObjectEntries = true;
-      %haveLockAndHideEntries = false;
-   }
-   
-   // Open generic context menu.
    else
    {
-      %popup = ETContextPopup;      
-      if( !isObject( %popup ) )
-         %popup = new PopupMenu( ETContextPopup )
-         {
-            superClass = "MenuBuilder";
-            isPopup = "1";
-
-            item[ 0 ] = "Rename" TAB "" TAB "EditorTree.showItemRenameCtrl( EditorTree.findItemByObjectId( %this.object ) );";
-            item[ 1 ] = "Delete" TAB "" TAB "EWorldEditor.deleteMissionObject( %this.object );";
-            item[ 2 ] = "Inspect" TAB "" TAB "inspectObject( %this.object );";
-            item[ 3 ] = "-";
-            item[ 4 ] = "Locked" TAB "" TAB "%this.object.setLocked( !%this.object.locked ); EWorldEditor.syncGui();";
-            item[ 5 ] = "Hidden" TAB "" TAB "EWorldEditor.hideObject( %this.object, !%this.object.hidden ); EWorldEditor.syncGui();";
-            item[ 6 ] = "-";
-            item[ 7 ] = "Group" TAB "" TAB "EWorldEditor.addSimGroup( true );";
-
-            object = -1;
-         };
+      if( %obj.isMemberOfClass( "CameraBookmark" ) )
+      {
+         %popup.bookmark = %obj;
          
-      if(%obj.isMemberOfClass("Entity"))
-      {
-         %popup = ETEntityContextPopup;      
-         if( !isObject( %popup ) )
-            %popup = new PopupMenu( ETEntityContextPopup : ETSimGroupContextPopup )
-            {
-               superClass = "MenuBuilder";
-               isPopup = "1";
-
-               item[ 12 ] = "-";
-               item[ 13 ] = "Convert to Game Object" TAB "" TAB "EWorldEditor.createGameObject( %this.object );";
-            };
+         %popup.item[ 0 ] = "Go To Bookmark" TAB "" TAB "EditorGui.jumpToBookmark( " @ %popup.bookmark.getInternalName() @ " );";
       }
-     
-      // Specialized version for ConvexShapes. 
-      else if( %obj.isMemberOfClass( "ConvexShape" ) )
+      else if( %obj.name $= "CameraBookmarks" )
       {
-         %popup = ETConvexShapeContextPopup;      
-         if( !isObject( %popup ) )
-            %popup = new PopupMenu( ETConvexShapeContextPopup : ETContextPopup )
-            {
-               superClass = "MenuBuilder";
-               isPopup = "1";
-
-               item[ 8 ] = "-";
-               item[ 9 ] = "Convert to Zone" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"Zone\" );";
-               item[ 10 ] = "Convert to Portal" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"Portal\" );";
-               item[ 11 ] = "Convert to Occluder" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"OcclusionVolume\" );";
-               item[ 12 ] = "Convert to Sound Space" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"SFXSpace\" );";
-            };
+         %popup.item[ 0 ] = "Add Camera Bookmark" TAB "" TAB "EditorGui.addCameraBookmarkByGui();";
       }
-      
-      // Specialized version for polyhedral objects.
-      else if( %obj.isMemberOfClass( "Zone" ) ||
+      else 
+      {
+         %popup.object = %obj;
+         %haveObjectEntries = true;
+         
+         %popup.item[ 0 ] = "Rename" TAB "" TAB "EditorTree.showItemRenameCtrl( EditorTree.findItemByObjectId(" @ %popup.object @ ") );";
+         %popup.item[ 1 ] = "Delete" TAB "" TAB "EWorldEditor.deleteMissionObject(" @ %popup.object @ ");";
+         %popup.item[ 2 ] = "Inspect" TAB "" TAB "inspectObject(" @ %popup.object @ ");";
+         %popup.item[ 3 ] = "-";
+         %popup.item[ 4 ] = "Locked" TAB "" TAB "%this.object.setLocked( !" @ %popup.object @ ".locked ); EWorldEditor.syncGui();";
+         %popup.item[ 5 ] = "Hidden" TAB "" TAB "EWorldEditor.hideObject( " @ %popup.object @ ", !" @ %popup.object @ ".hidden ); EWorldEditor.syncGui();";
+         %popup.item[ 6 ] = "-";
+         %popup.item[ 7 ] = "Group" TAB "" TAB "EWorldEditor.addSimGroup( true );";
+   
+         if( %obj.isMemberOfClass( "ConvexShape" ) )
+         {
+            %popup.item[ 8 ] = "-";
+            %popup.item[ 9 ] = "Convert to Zone" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"Zone\" );";
+            %popup.item[ 10 ] = "Convert to Portal" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"Portal\" );";
+            %popup.item[ 11 ] = "Convert to Occluder" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"OcclusionVolume\" );";
+            %popup.item[ 12 ] = "Convert to Sound Space" TAB "" TAB "EWorldEditor.convertSelectionToPolyhedralObjects( \"SFXSpace\" );";
+         }
+         else if( %obj.isMemberOfClass( "Zone" ) ||
                %obj.isMemberOfClass( "Portal" ) ||
                %obj.isMemberOfClass( "OcclusionVolume" ) ||
                %obj.isMemberOfClass( "SFXSpace" ) )
-      {
-         %popup = ETPolyObjectContextPopup;      
-         if( !isObject( %popup ) )
-            %popup = new PopupMenu( ETPolyObjectContextPopup : ETContextPopup )
+         {
+            %popup.item[ 8 ] = "-";
+            %popup.item[ 9 ] = "Convert to ConvexShape" TAB "" TAB "EWorldEditor.convertSelectionToConvexShape();";
+         }
+         else if(%obj.getClassName() $= "SimGroup" || 
+               %obj.isMemberOfClass( "Path" ) ||
+               %obj.isMemberOfClass("Entity") )
+         {
+            //If it's not any special-handle classes above, then it'll be group-based stuff here
+            %popup.item[ 4 ] = "Toggle Lock Children" TAB "" TAB "EWorldEditor.toggleLockChildren( " @ %popup.object @ " );";
+            %popup.item[ 5 ] = "Toggle Hide Children" TAB "" TAB "EWorldEditor.toggleHideChildren( " @ %popup.object @ " );";
+            
+            %popup.item[ 8 ] = "-";
+            %popup.item[ 9 ] = "Add New Objects Here" TAB "" TAB "EWCreatorWindow.setNewObjectGroup( " @ %popup.object @ " );";
+            %popup.item[ 10 ] = "Add Children to Selection" TAB "" TAB "EWorldEditor.selectAllObjectsInSet( " @ %popup.object @ ", false );";
+            %popup.item[ 11 ] = "Remove Children from Selection" TAB "" TAB "EWorldEditor.selectAllObjectsInSet( " @ %popup.object @ ", true );";
+            
+            %hasChildren = %obj.getCount() > 0;
+            %popup.enableItem( 10, %hasChildren );
+            %popup.enableItem( 11, %hasChildren );
+            
+            %haveObjectEntries = true;
+            %haveLockAndHideEntries = false;
+            
+            //Special case for Entities, which is special-case AND does group stuff with chld objects
+            if(%obj.isMemberOfClass("Entity"))
             {
-               superClass = "MenuBuilder";
-               isPopup = "1";
-
-               item[ 8 ] = "-";
-               item[ 9 ] = "Convert to ConvexShape" TAB "" TAB "EWorldEditor.convertSelectionToConvexShape();";
-            };
+               %popup.item[ 12 ] = "-";
+               %popup.item[ 13 ] = "Convert to Game Object" TAB "" TAB "EWorldEditor.createGameObject( " @ %popup.object @ " );";
+               %popup.item[ 14 ] = "Duplicate Game Object" TAB "" TAB "EWorldEditor.duplicateGameObject( " @ %popup.object @ " );";
+               %popup.item[ 15 ] = "Show in Asset Browser" TAB "" TAB "EWorldEditor.showGameObjectInAssetBrowser( " @ %popup.object @ " );";
+               
+               if(!isObject(AssetDatabase.acquireAsset(%obj.gameObjectAsset)))
+               {
+                  %popup.enableItem(13, true);
+                  %popup.enableItem(14, false);
+                  %popup.enableItem(15, false);
+               }
+               else
+               {
+                  %popup.enableItem(13, false);
+                  %popup.enableItem(14, true);
+                  %popup.enableItem(15, true);
+               }
+            }
+         }  
       }
-
-      %popup.object = %obj;
-      %haveObjectEntries = true;
    }
 
    if( %haveObjectEntries )
    {         
       %popup.enableItem( 0, %obj.isNameChangeAllowed() && %obj.getName() !$= "MissionGroup" );
       %popup.enableItem( 1, %obj.getName() !$= "MissionGroup" );
+      
       if( %haveLockAndHideEntries )
       {
          %popup.checkItem( 4, %obj.locked );
@@ -1740,6 +1684,7 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
       %popup.enableItem( 7, %this.isItemSelected( %itemId ) );
    }
    
+   %popup.reloadItems();
    %popup.showPopup( Canvas );
 }
 
@@ -2017,7 +1962,7 @@ function EWorldEditor::syncGui( %this )
    %this.syncToolPalette();
    
    EditorTree.update();
-   Editor.getUndoManager().updateUndoMenu( EditorGui.menuBar-->EditMenu );
+   Editor.getUndoManager().updateUndoMenu( EditorGui.findMenu("Edit") );
    EditorGuiStatusBar.setSelectionObjectsByCount( %this.getSelectionSize() );
    
    EWTreeWindow-->LockSelection.setStateOn( %this.getSelectionLockCount() > 0 );
@@ -2251,155 +2196,6 @@ function EWorldEditor::deleteMissionObject( %this, %object )
    MEDeleteUndoAction::submit( %object );
    EWorldEditor.isDirty = true;
    EditorTree.buildVisibleTree( true );
-}
-
-function EWorldEditor::createGameObject( %this, %entity )
-{
-   if(!isObject(GameObjectBuilder))
-   {
-      new GuiControl(GameObjectBuilder, EditorGuiGroup) {
-         profile = "ToolsGuiDefaultProfile";
-         horizSizing = "right";
-         vertSizing = "bottom";
-         position = "0 0";
-         extent = "800 600";
-         minExtent = "8 8";
-         visible = "1";
-         setFirstResponder = "0";
-         modal = "1";
-         helpTag = "0";
-      
-         new GuiWindowCtrl(GameObjectBuilderTargetWindow) {
-            profile = "ToolsGuiWindowProfile";
-            horizSizing = "center";
-            vertSizing = "center";
-            position = "384 205";
-            extent = "256 102";
-            minExtent = "256 8";
-            visible = "1";
-            setFirstResponder = "0";
-            modal = "1";
-            helpTag = "0";
-            resizeWidth = "1";
-            resizeHeight = "1";
-            canMove = "1";
-            canClose = "0";
-            canMinimize = "0";
-            canMaximize = "0";
-            minSize = "50 50";
-            text = "Create Object";
-      
-            new GuiTextCtrl() {
-               profile = "GuiCenterTextProfile";
-               horizSizing = "right";
-               vertSizing = "bottom";
-               position = "9 26";
-               extent = "84 16";
-               minExtent = "8 8";
-               visible = "1";
-               setFirstResponder = "0";
-               modal = "1";
-               helpTag = "0";
-               text = "Object Name:";
-            };
-            new GuiTextEditCtrl(GameObjectBuilderObjectName) {
-                class = ObjectBuilderGuiTextEditCtrl;
-               profile = "ToolsGuiTextEditProfile";
-               horizSizing = "width";
-               vertSizing = "bottom";
-               position = "78 26";
-               extent = "172 18";
-               minExtent = "8 8";
-               visible = "1";
-               setFirstResponder = "0";
-               modal = "1";
-               helpTag = "0";
-               historySize = "0";
-            };
-            new GuiButtonCtrl(GameObjectBuilderOKButton) {
-               profile = "ToolsGuiButtonProfile";
-               horizSizing = "width";
-               vertSizing = "bottom";
-               position = "7 250";
-               extent = "156 24";
-               minExtent = "8 8";
-               visible = "1";
-               setFirstResponder = "0";
-               modal = "1";
-               command = "EWorldEditor.buildGameObject();";
-               helpTag = "0";
-               text = "Create New";
-               Accelerator = "return";
-            };
-            new GuiButtonCtrl(GameObjectBuilderCancelButton) {
-               profile = "ToolsGuiButtonProfile";
-               horizSizing = "left";
-               vertSizing = "bottom";
-               position = "170 250";
-               extent = "80 24";
-               minExtent = "8 8";
-               visible = "1";
-               setFirstResponder = "0";
-               modal = "1";
-               command = "Canvas.popDialog(GameObjectBuilder);";
-               helpTag = "0";
-               text = "Cancel";
-               Accelerator = "escape";
-            };
-         };
-      };
-      
-      GameObjectBuilderTargetWindow.extent = getWord(GameObjectBuilderTargetWindow.extent, 0) SPC 88;
-      GameObjectBuilderOKButton.position = getWord(GameObjectBuilderOKButton.position, 0) SPC 57;
-      GameObjectBuilderCancelButton.position = getWord(GameObjectBuilderCancelButton.position, 0) SPC 57;
-   }
-
-   GameObjectBuilderObjectName.text = "";
-   GameObjectBuilder.selectedEntity = %entity;
-
-   Canvas.pushDialog(GameObjectBuilder);
-}
-
-function EWorldEditor::buildGameObject(%this)
-{
-	if(GameObjectBuilderObjectName.getText() $= "")
-	{
-		error("Attempted to make a new Game Object with no name!");
-		Canvas.popDialog(GameObjectBuilder);
-		return;
-	}
-
-	%path = EditorSettings.value( "WorldEditor/newGameObjectDir" );
-	%className = GameObjectBuilderObjectName.getText();
-	GameObjectBuilder.selectedEntity.class = %className;
-	Inspector.inspect(GameObjectBuilder.selectedEntity);
-	
-	%file = new FileObject();
-	
-	if(%file.openForWrite(%path @ "\\" @ %className @ ".cs"))
-	{
-		%file.writeline("function " @ %className @ "::onAdd(%this)\n{\n\n}\n");
-		%file.writeline("function " @ %className @ "::onRemove(%this)\n{\n\n}\n");
-		
-		//todo, pre-write any event functions of interest
-		
-		%file.close();
-	}
-	
-	//set up the paths
-	%tamlPath = %path @ "/" @ %className @ ".taml";
-	%scriptPath = %path @ "/" @ %className @ ".cs";
-	saveGameObject(%className, %tamlPath, %scriptPath);
-	
-	//reload it
-	execGameObjects();
-	
-	//now, add the script file and a ref to the taml into our SGO manifest so we can readily spawn it later.
-	TamlWrite(GameObjectBuilder.selectedEntity, %tamlpath);
-
-   GameObjectBuilder.selectedEntity = "";
-	
-	Canvas.popDialog(GameObjectBuilder);
 }
 
 function EWorldEditor::selectAllObjectsInSet( %this, %set, %deselect )

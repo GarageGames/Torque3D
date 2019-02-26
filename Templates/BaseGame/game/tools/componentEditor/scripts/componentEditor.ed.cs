@@ -154,13 +154,13 @@ function QuickEditComponentList::onHotTrackItem( %this, %itemID )
       SuperTooltipDlg.setTitle(%componentObj.friendlyName);
       SuperTooltipDlg.addParam("", %componentObj.description @ "\n");
       
-      %fieldCount = %componentObj.getComponentFieldCount();
+      /*%fieldCount = %componentObj.getComponentFieldCount();
       for (%i = 0; %i < %fieldCount; %i++)
       {
          %name = getField(%componentObj.getComponentField(%i), 0);
 
          SuperTooltipDlg.addParam(%name, %description @ "\n");
-      }
+      }*/
       %position = %this.getGlobalPosition();
       SuperTooltipDlg.processTooltip( %position,0,1 );
       %this.opened = true;    
@@ -219,7 +219,7 @@ function AddComponentQuickEditButton::onClick(%this)
    %instance.owner = Inspector.getInspectObject(0);
    %instance.owner.add(%instance);
    
-   Inspector.schedule( 50, "refresh" );
+   schedule( 50, 0, "refreshInspector", Inspector.getInspectObject(0) );
    EWorldEditor.isDirty = true;
 }
 
@@ -227,7 +227,97 @@ function addComponent(%obj, %instance)
 {
    echo("Adding the component!");
    %obj.addComponent(%instance);
-   Inspector.schedule( 50, "refresh" );
+   //Inspector.schedule( 50, "refresh" );
+   schedule( 50, 0, "refreshInspector", Inspector.getInspectObject(0) );
    EWorldEditor.isDirty = true;
 }
 
+function refreshInspector(%entity)
+{
+   inspector.removeInspect(%entity);
+   inspector.addInspect(%entity);
+}
+
+function GuiInspectorComponentGroup::onConstructComponentField(%this, %component, %fieldName)
+{
+   //echo("Tried to make a component field for component:" @ %component @ " for the " @ %fieldName @ " field.");
+   
+   %fieldType = %component.getComponentFieldType(%fieldName);
+   %makeCommand = %this @ ".build" @ %fieldType @ "Field("@ %component @ "," @ %fieldName @ ");";
+   eval(%makeCommand);
+}
+
+function GuiInspectorComponentGroup::onRightMouseUp(%this, %point)
+{
+   if( !isObject( InspectComponentPopup ) )
+      new PopupMenu( InspectComponentPopup )
+      {
+         superClass = "MenuBuilder";
+         isPopup = true;
+
+         item[ 0 ] = "View in Asset Browser" TAB "" TAB "AssetBrowser.editAsset();";
+         item[ 1 ] = "Delete Component" TAB "" TAB "schedule(10, 0, ComponentEditorRemoveComponent, InspectComponentPopup.componentOwner, InspectComponentPopup.component);";
+         item[ 2 ] = "Edit Script" TAB "" TAB "AssetBrowser.editAsset();";
+         item[ 3 ] = "";
+      };
+      
+   %comp = %this.getComponent();
+   InspectComponentPopup.componentOwner = %comp.owner;
+   InspectComponentPopup.component = %comp;
+      
+   //Find out our asset!
+   %componentName = %this.caption;
+   
+   %assetQuery = new AssetQuery();
+   if(!AssetDatabase.findAssetType(%assetQuery, "ComponentAsset"))
+      return; //if we didn't find ANY, just exit
+      
+   EditAssetPopup.assetId = "";
+   
+   // Find all the types.
+   %count = %assetQuery.getCount();
+
+   %categories = "";
+   for (%i = 0; %i < %count; %i++)
+   {
+      %assetId = %assetQuery.getAsset(%i);
+      
+      %componentAsset = AssetDatabase.acquireAsset(%assetId);
+      %friendlyName = %componentAsset.friendlyName;
+      
+      if(%friendlyName !$= "" && %friendlyName $= %componentName)
+      {
+         EditAssetPopup.assetId = %assetId;
+         break;
+      }
+      
+      %compName = %componentAsset.componentName;
+
+      if(%compName !$= "" && %compName $= %componentName)
+      {
+         EditAssetPopup.assetId = %assetId;
+         break;
+      }
+   }
+   
+   if(EditAssetPopup.assetId $= "")
+   {
+      //didn't find it
+      InspectComponentPopup.enableItem(0, false);
+      InspectComponentPopup.enableItem(2, false);
+   }
+   else
+   {
+      InspectComponentPopup.enableItem(0, true);
+      InspectComponentPopup.enableItem(2, true);
+   }
+   
+   InspectComponentPopup.showPopup(Canvas);
+}
+
+function ComponentEditorRemoveComponent(%entity, %component)
+{
+   %entity.removeComponent(%component, true);
+   inspector.removeInspect(%entity);
+   inspector.addInspect(%entity);
+}

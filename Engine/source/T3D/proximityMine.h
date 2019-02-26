@@ -72,8 +72,7 @@ class ProximityMine: public Item
 protected:
    enum MaskBits {
       DeployedMask   = Parent::NextFreeMask,
-      ExplosionMask  = Parent::NextFreeMask << 1,
-      NextFreeMask   = Parent::NextFreeMask << 2
+      ExplosionMask  = Parent::NextFreeMask << 1
    };
 
    enum State

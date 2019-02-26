@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -59,11 +59,25 @@ RPI_Available(void)
 static void
 RPI_Destroy(SDL_VideoDevice * device)
 {
-    /*    SDL_VideoData *phdata = (SDL_VideoData *) device->driverdata; */
+    SDL_free(device->driverdata);
+    SDL_free(device);
+}
 
-    if (device->driverdata != NULL) {
-        device->driverdata = NULL;
-    }
+static int 
+RPI_GetRefreshRate()
+{
+    TV_DISPLAY_STATE_T tvstate;
+    if (vc_tv_get_display_state( &tvstate ) == 0) {
+        //The width/height parameters are in the same position in the union
+        //for HDMI and SDTV
+        HDMI_PROPERTY_PARAM_T property;
+        property.property = HDMI_PROPERTY_PIXEL_CLOCK_TYPE;
+        vc_tv_hdmi_get_property(&property);
+        return property.param1 == HDMI_PIXEL_CLOCK_TYPE_NTSC ? 
+            tvstate.display.hdmi.frame_rate * (1000.0f/1001.0f) : 
+            tvstate.display.hdmi.frame_rate;
+    } 
+    return 60;  /* Failed to get display state, default to 60 */
 }
 
 static SDL_VideoDevice *
@@ -100,8 +114,8 @@ RPI_Create()
     device->VideoQuit = RPI_VideoQuit;
     device->GetDisplayModes = RPI_GetDisplayModes;
     device->SetDisplayMode = RPI_SetDisplayMode;
-    device->CreateWindow = RPI_CreateWindow;
-    device->CreateWindowFrom = RPI_CreateWindowFrom;
+    device->CreateSDLWindow = RPI_CreateWindow;
+    device->CreateSDLWindowFrom = RPI_CreateWindowFrom;
     device->SetWindowTitle = RPI_SetWindowTitle;
     device->SetWindowIcon = RPI_SetWindowIcon;
     device->SetWindowPosition = RPI_SetWindowPosition;
@@ -114,7 +128,9 @@ RPI_Create()
     device->RestoreWindow = RPI_RestoreWindow;
     device->SetWindowGrab = RPI_SetWindowGrab;
     device->DestroyWindow = RPI_DestroyWindow;
+#if 0
     device->GetWindowWMInfo = RPI_GetWindowWMInfo;
+#endif
     device->GL_LoadLibrary = RPI_GLES_LoadLibrary;
     device->GL_GetProcAddress = RPI_GLES_GetProcAddress;
     device->GL_UnloadLibrary = RPI_GLES_UnloadLibrary;
@@ -124,6 +140,7 @@ RPI_Create()
     device->GL_GetSwapInterval = RPI_GLES_GetSwapInterval;
     device->GL_SwapWindow = RPI_GLES_SwapWindow;
     device->GL_DeleteContext = RPI_GLES_DeleteContext;
+    device->GL_DefaultProfileConfig = RPI_GLES_DefaultProfileConfig;
 
     device->PumpEvents = RPI_PumpEvents;
 
@@ -159,8 +176,7 @@ RPI_VideoInit(_THIS)
 
     current_mode.w = w;
     current_mode.h = h;
-    /* FIXME: Is there a way to tell the actual refresh rate? */
-    current_mode.refresh_rate = 60;
+    current_mode.refresh_rate = RPI_GetRefreshRate();
     /* 32 bpp for default */
     current_mode.format = SDL_PIXELFORMAT_ABGR8888;
 
@@ -183,7 +199,9 @@ RPI_VideoInit(_THIS)
     SDL_AddVideoDisplay(&display);
 
 #ifdef SDL_INPUT_LINUXEV    
-    SDL_EVDEV_Init();
+    if (SDL_EVDEV_Init() < 0) {
+        return -1;
+    }
 #endif    
     
     RPI_InitMouse(_this);
@@ -210,6 +228,16 @@ int
 RPI_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode)
 {
     return 0;
+}
+
+static void
+RPI_vsync_callback(DISPMANX_UPDATE_HANDLE_T u, void *data)
+{
+   SDL_WindowData *wdata = ((SDL_WindowData *) data);
+
+   SDL_LockMutex(wdata->vsync_cond_mutex);
+   SDL_CondSignal(wdata->vsync_cond);
+   SDL_UnlockMutex(wdata->vsync_cond_mutex);
 }
 
 int
@@ -287,9 +315,18 @@ RPI_CreateWindow(_THIS, SDL_Window * window)
         return SDL_SetError("Could not create GLES window surface");
     }
 
+    /* Start generating vsync callbacks if necesary */
+    wdata->double_buffer = SDL_FALSE;
+    if (SDL_GetHintBoolean(SDL_HINT_VIDEO_DOUBLE_BUFFER, SDL_FALSE)) {
+        wdata->vsync_cond = SDL_CreateCond();
+        wdata->vsync_cond_mutex = SDL_CreateMutex();
+        wdata->double_buffer = SDL_TRUE;
+        vc_dispmanx_vsync_callback(displaydata->dispman_display, RPI_vsync_callback, (void*)wdata);
+    }
+
     /* Setup driver data for this window */
     window->driverdata = wdata;
-    
+
     /* One window, it always has focus */
     SDL_SetMouseFocus(window);
     SDL_SetKeyboardFocus(window);
@@ -302,7 +339,22 @@ void
 RPI_DestroyWindow(_THIS, SDL_Window * window)
 {
     SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
+    SDL_VideoDisplay *display = SDL_GetDisplayForWindow(window);
+    SDL_DisplayData *displaydata = (SDL_DisplayData *) display->driverdata;
+
     if(data) {
+	if (data->double_buffer) {
+	    /* Wait for vsync, and then stop vsync callbacks and destroy related stuff, if needed */
+	    SDL_LockMutex(data->vsync_cond_mutex);
+	    SDL_CondWait(data->vsync_cond, data->vsync_cond_mutex);
+	    SDL_UnlockMutex(data->vsync_cond_mutex);
+
+	    vc_dispmanx_vsync_callback(displaydata->dispman_display, NULL, NULL);
+
+	    SDL_DestroyCond(data->vsync_cond);
+	    SDL_DestroyMutex(data->vsync_cond_mutex);
+	}
+
 #if SDL_VIDEO_OPENGL_EGL
         if (data->egl_surface != EGL_NO_SURFACE) {
             SDL_EGL_DestroySurface(_this, data->egl_surface);
@@ -368,13 +420,14 @@ RPI_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed)
 /*****************************************************************************/
 /* SDL Window Manager function                                               */
 /*****************************************************************************/
+#if 0
 SDL_bool
 RPI_GetWindowWMInfo(_THIS, SDL_Window * window, struct SDL_SysWMinfo *info)
 {
     if (info->version.major <= SDL_MAJOR_VERSION) {
         return SDL_TRUE;
     } else {
-        SDL_SetError("application not compiled with SDL %d.%d\n",
+        SDL_SetError("application not compiled with SDL %d.%d",
                      SDL_MAJOR_VERSION, SDL_MINOR_VERSION);
         return SDL_FALSE;
     }
@@ -382,6 +435,7 @@ RPI_GetWindowWMInfo(_THIS, SDL_Window * window, struct SDL_SysWMinfo *info)
     /* Failed to get window manager information */
     return SDL_FALSE;
 }
+#endif
 
 #endif /* SDL_VIDEO_DRIVER_RPI */
 

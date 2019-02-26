@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _STATICSHAPE_H_
 #define _STATICSHAPE_H_
 
@@ -38,12 +43,16 @@ struct StaticShapeData: public ShapeBaseData {
    bool  noIndividualDamage;
    S32   dynamicTypeField;
    bool  isShielded;
+   F32   energyPerDamagePoint;	// Re-added for AFX
 
    //
    DECLARE_CONOBJECT(StaticShapeData);
    static void initPersistFields();
    virtual void packData(BitStream* stream);
    virtual void unpackData(BitStream* stream);
+public:
+   StaticShapeData(const StaticShapeData&, bool = false);
+   virtual bool   allowSubstitutions() const { return true; }
 };
 
 

@@ -66,13 +66,13 @@ DbgFileView::DbgFileView()
    mSize.set(1, 0);
 }
 
-DefineConsoleMethod(DbgFileView, setCurrentLine, void, (S32 line, bool selected), , "(int line, bool selected)"
+DefineEngineMethod(DbgFileView, setCurrentLine, void, (S32 line, bool selected), , "(int line, bool selected)"
               "Set the current highlighted line.")
 {
    object->setCurrentLine(line, selected);
 }
 
-DefineConsoleMethod(DbgFileView, getCurrentLine, const char *, (), , "()"
+DefineEngineMethod(DbgFileView, getCurrentLine, const char *, (), , "()"
               "Get the currently executing file and line, if any.\n\n"
               "@returns A string containing the file, a tab, and then the line number."
               " Use getField() with this.")
@@ -84,38 +84,38 @@ DefineConsoleMethod(DbgFileView, getCurrentLine, const char *, (), , "()"
 	return ret;
 }
 
-DefineConsoleMethod(DbgFileView, open, bool, (const char * filename), , "(string filename)"
+DefineEngineMethod(DbgFileView, open, bool, (const char * filename), , "(string filename)"
               "Open a file for viewing.\n\n"
               "@note This loads the file from the local system.")
 {
    return object->openFile(filename);
 }
 
-DefineConsoleMethod(DbgFileView, clearBreakPositions, void, (), , "()"
+DefineEngineMethod(DbgFileView, clearBreakPositions, void, (), , "()"
               "Clear all break points in the current file.")
 {
    object->clearBreakPositions();
 }
 
-DefineConsoleMethod(DbgFileView, setBreakPosition, void, (U32 line), , "(int line)"
+DefineEngineMethod(DbgFileView, setBreakPosition, void, (U32 line), , "(int line)"
               "Set a breakpoint at the specified line.")
 {
    object->setBreakPosition(line);
 }
 
-DefineConsoleMethod(DbgFileView, setBreak, void, (U32 line), , "(int line)"
+DefineEngineMethod(DbgFileView, setBreak, void, (U32 line), , "(int line)"
               "Set a breakpoint at the specified line.")
 {
    object->setBreakPointStatus(line, true);
 }
 
-DefineConsoleMethod(DbgFileView, removeBreak, void, (U32 line), , "(int line)"
+DefineEngineMethod(DbgFileView, removeBreak, void, (U32 line), , "(int line)"
               "Remove a breakpoint from the specified line.")
 {
    object->setBreakPointStatus(line, false);
 }
 
-DefineConsoleMethod(DbgFileView, findString, bool, (const char * findThis), , "(string findThis)"
+DefineEngineMethod(DbgFileView, findString, bool, (const char * findThis), , "(string findThis)"
               "Find the specified string in the currently viewed file and "
               "scroll it into view.")
 {
@@ -431,7 +431,7 @@ bool DbgFileView::findMouseOverVariable()
    {
       S32 stringPosition = pt.x - gFileXOffset;
       char tempBuf[256], *varNamePtr = &tempBuf[1];
-      dStrcpy(tempBuf, mFileView[cell.y].text);
+      dStrcpy(tempBuf, mFileView[cell.y].text, 256);
 
       //find the current mouse over char
       S32 charNum = findMouseOverChar(mFileView[cell.y].text, stringPosition);
@@ -526,7 +526,7 @@ void DbgFileView::onPreRender()
 {
 	setUpdate();
    char oldVar[256];
-   dStrcpy(oldVar, mMouseOverVariable);
+   dStrcpy(oldVar, mMouseOverVariable, 256);
    bool found = findMouseOverVariable();
    if (found && mPCCurrentLine >= 0)
    {
@@ -685,7 +685,7 @@ void DbgFileView::onRenderCell(Point2I offset, Point2I cell, bool selected, bool
       {
          S32 startPos, endPos;
          char tempBuf[256];
-         dStrcpy(tempBuf, mFileView[cell.y].text);
+         dStrcpy(tempBuf, mFileView[cell.y].text, 256);
 
          //get the end coord
          tempBuf[mBlockEnd] = '\0';

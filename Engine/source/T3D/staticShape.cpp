@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #include "platform/platform.h"
 #include "core/dnet.h"
 #include "core/stream/bitStream.h"
@@ -95,6 +99,14 @@ StaticShapeData::StaticShapeData()
    shadowEnable = true;
 
    noIndividualDamage = false;
+}
+
+StaticShapeData::StaticShapeData(const StaticShapeData& other, bool temp_clone) : ShapeBaseData(other, temp_clone)
+{
+   noIndividualDamage = other.noIndividualDamage;
+   dynamicTypeField = other.dynamicTypeField;
+   isShielded = other.isShielded; // -- uninitialized, unused
+   energyPerDamagePoint = other.energyPerDamagePoint; // -- uninitialized, unused
 }
 
 void StaticShapeData::initPersistFields()
@@ -302,7 +314,7 @@ void StaticShape::unpackUpdate(NetConnection *connection, BitStream *bstream)
 // This appears to be legacy T2 stuff
 // Marked internal, as this is flagged to be deleted
 // [8/1/2010 mperry]
-DefineConsoleMethod( StaticShape, setPoweredState, void, (bool isPowered), , "(bool isPowered)"
+DefineEngineMethod( StaticShape, setPoweredState, void, (bool isPowered), , "(bool isPowered)"
            "@internal")
 {
    if(!object->isServerObject())
@@ -310,7 +322,7 @@ DefineConsoleMethod( StaticShape, setPoweredState, void, (bool isPowered), , "(b
    object->setPowered(isPowered);
 }
 
-DefineConsoleMethod( StaticShape, getPoweredState, bool, (), , "@internal")
+DefineEngineMethod( StaticShape, getPoweredState, bool, (), , "@internal")
 {
    if(!object->isServerObject())
       return(false);

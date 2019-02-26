@@ -37,13 +37,15 @@ typedef const _##N* const_##N;
                                                                               \
     if(((_x) ? (_x)->Capacity : 0) < _cap)                                    \
     {                                                                         \
+        ptrdiff_t data_offset = (_x) ? (char*)((_x)->Data) - (char*)(_x) :    \
+                                sizeof(*(_x));                                \
         size_t old_size = ((_x) ? (_x)->Size : 0);                            \
         void *temp;                                                           \
                                                                               \
-        temp = al_calloc(16, sizeof(*(_x)) + sizeof((_x)->Data[0])*_cap);     \
+        temp = al_calloc(16, data_offset + sizeof((_x)->Data[0])*_cap);       \
         assert(temp != NULL);                                                 \
         if((_x))                                                              \
-            memcpy(((ALubyte*)temp)+sizeof(*(_x)), (_x)->Data,                \
+            memcpy(((char*)temp)+data_offset, (_x)->Data,                     \
                    sizeof((_x)->Data[0])*old_size);                           \
                                                                               \
         al_free((_x));                                                        \
@@ -78,30 +80,12 @@ typedef const _##N* const_##N;
         _f(_iter);                                                            \
 } while(0)
 
-#define VECTOR_FOR_EACH_PARAMS(_t, _x, _f, ...)  do {                         \
-    _t *_iter = VECTOR_BEGIN((_x));                                           \
-    _t *_end = VECTOR_END((_x));                                              \
-    for(;_iter != _end;++_iter)                                               \
-        _f(__VA_ARGS__, _iter);                                               \
-} while(0)
-
 #define VECTOR_FIND_IF(_i, _t, _x, _f)  do {                                  \
     _t *_iter = VECTOR_BEGIN((_x));                                           \
     _t *_end = VECTOR_END((_x));                                              \
     for(;_iter != _end;++_iter)                                               \
     {                                                                         \
         if(_f(_iter))                                                         \
-            break;                                                            \
-    }                                                                         \
-    (_i) = _iter;                                                             \
-} while(0)
-
-#define VECTOR_FIND_IF_PARMS(_i, _t, _x, _f, ...)  do {                       \
-    _t *_iter = VECTOR_BEGIN((_x));                                           \
-    _t *_end = VECTOR_END((_x));                                              \
-    for(;_iter != _end;++_iter)                                               \
-    {                                                                         \
-        if(_f(__VA_ARGS__, _iter))                                            \
             break;                                                            \
     }                                                                         \
     (_i) = _iter;                                                             \

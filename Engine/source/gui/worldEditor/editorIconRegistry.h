@@ -30,6 +30,8 @@
 #include "core/util/tDictionary.h"
 #endif 
 
+#include "console/engineAPI.h"
+
 class SimObject;
 class AbstractClassRep;
 
@@ -40,6 +42,7 @@ class AbstractClassRep;
 class EditorIconRegistry
 {
 public:
+   DECLARE_STATIC_CLASS(EditorIconRegistry);
 
    EditorIconRegistry();
    ~EditorIconRegistry();

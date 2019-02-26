@@ -97,7 +97,7 @@ static Socket* addPolledSocket(NetSocket& fd, S32 state,
    sock->fd = fd;
    sock->state = state;
    if (remoteAddr)
-      dStrcpy(sock->remoteAddr, remoteAddr);
+      dStrcpy(sock->remoteAddr, remoteAddr, 256);
    if (port != -1)
       sock->remotePort = port;
    gPolledSockets.push_back(sock);
@@ -242,7 +242,7 @@ NetSocket Net::openConnectTo(const char *addressString)
    if(!dStrnicmp(addressString, "ip:", 3))
       addressString += 3;  // eat off the ip:
    char remoteAddr[256];
-   dStrcpy(remoteAddr, addressString);
+   dStrcpy(remoteAddr, addressString, 256);
       
    char *portString = dStrchr(remoteAddr, ':');
 
@@ -814,7 +814,7 @@ bool Net::stringToAddress(const char *addressString, NetAddress *address)
       if(strlen(addressString) > 255)
          return false;
          
-      dStrcpy(remoteAddr, addressString);
+      dStrcpy(remoteAddr, addressString, 256);
          
       char *portString = dStrchr(remoteAddr, ':');
       if(portString)

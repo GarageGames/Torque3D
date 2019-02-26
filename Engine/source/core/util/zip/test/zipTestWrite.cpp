@@ -95,7 +95,7 @@ private:
       {
          // Find a unique filename
          U32 count = 1;
-         dStrcpy(fileBuf, filename);
+         dStrcpy(fileBuf, filename, bufSize);
          
          while(zip->findFileInfo(fileBuf))
          {
@@ -109,7 +109,7 @@ private:
          }
       }
       else if(fileBuf && bufSize > 0)
-         dStrcpy(fileBuf, filename);
+         dStrcpy(fileBuf, filename, bufSize);
 
       // Try and write to the file
       Stream * stream = zip->openFile(fileBuf ? fileBuf : filename, ZipArchive::Write);

@@ -34,13 +34,14 @@
 #include <stdarg.h>
 #include <fcntl.h>
 
+#include "console/engineAPI.h"
+
 StdConsole *stdConsole = NULL;
 
-ConsoleFunction(enableWinConsole, void, 2, 2, "enableWinConsole(bool);")
+DefineEngineFunction(enableWinConsole, void, (bool _enable),, "enableWinConsole(bool);")
 {
-   argc;
    if (stdConsole)
-      stdConsole->enable(dAtob(argv[1]));
+      stdConsole->enable(_enable);
 }
 
 void StdConsole::create()

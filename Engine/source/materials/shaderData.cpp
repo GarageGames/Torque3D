@@ -363,17 +363,17 @@ bool ShaderData::_checkDefinition(GFXShader *shader)
       {              
          if( !shader->findShaderConstHandle( String::ToString("$rtParams%d", pos)) )
          {
-            String error = String::ToString("ShaderData(%s) sampler[%d] used but rtParams%d not used in shader compilation. Possible error", shader->getPixelShaderFile().c_str(), pos, pos);
-            Con::errorf( error );
+            String errStr = String::ToString("ShaderData(%s) sampler[%d] used but rtParams%d not used in shader compilation. Possible error", shader->getPixelShaderFile().c_str(), pos, pos);
+            Con::errorf(errStr);
             error = true;
          }
       }     
 
       if(!find)
       {
-         String error = String::ToString("ShaderData(%s) sampler %s not defined", shader->getPixelShaderFile().c_str(), samplers[i].c_str());
-         Con::errorf(error );
-         GFXAssertFatal(0, error );
+         String errStr = String::ToString("ShaderData(%s) sampler %s not defined", shader->getPixelShaderFile().c_str(), samplers[i].c_str());
+         Con::errorf(errStr);
+         GFXAssertFatal(0, errStr);
          error = true;
       }
    }  

@@ -1302,15 +1302,16 @@ bool CameraGoalPlayer::setPlayerObject(Player *obj)
 	return true;
 }
 
-ConsoleMethod( CameraGoalPlayer, setPlayerObject, bool, 3, 3, "(Player object)") {   
-	Player *gb;
-	if(!Sim::findObject(argv[2], gb))
+DefineEngineMethod( CameraGoalPlayer, setPlayerObject, bool, (Player* playerObj), (nullAsType<Player*>()), "(Player object)")
+{
+
+	if(playerObj == nullptr)
 	{
-		Con::errorf("CameraGoalPlayer::setPlayerObject - failed to find object '%s'", argv[2]);
+		Con::errorf("CameraGoalPlayer::setPlayerObject - failed to find object");
 		return false;
 	}
 
-	return object->setPlayerObject(gb);
+	return object->setPlayerObject(playerObj);
 }
 
 //----------------------------------------------------------------------
@@ -1337,11 +1338,11 @@ void CameraGoalPlayer::clearForcedYaw()
 	setMaskBits(ModeMask);
 }
 
-ConsoleMethod( CameraGoalPlayer, setForcedYaw, void, 4, 4, "(yaw radians, ms)")
+DefineEngineMethod( CameraGoalPlayer, setForcedYaw, void, (F32 yaw, S32 ms), (0,0), "(yaw radians, ms)")
 {
-	if(dStrlen(argv[2]) > 0)
+	if(yaw != 0)
 	{
-		object->setForcedYaw(dAtof(argv[2]), dAtoi(argv[3]));
+		object->setForcedYaw(yaw, ms);
 	}
 	else
 	{
@@ -1373,11 +1374,11 @@ void CameraGoalPlayer::clearForcedPitch()
 	setMaskBits(ModeMask);
 }
 
-ConsoleMethod( CameraGoalPlayer, setForcedPitch, void, 4, 4, "(pitch radians, ms)")
+DefineEngineMethod( CameraGoalPlayer, setForcedPitch, void, (F32 pitch, S32 ms), (0,0), "(pitch radians, ms)")
 {
-	if(dStrlen(argv[2]) > 0)
+	if(pitch != 0)
 	{
-		object->setForcedPitch(dAtof(argv[2]), dAtoi(argv[3]));
+		object->setForcedPitch(pitch, ms);
 	}
 	else
 	{
@@ -1410,15 +1411,15 @@ void CameraGoalPlayer::clearForcedRadius(S32 ms)
 	setMaskBits(ModeMask);
 }
 
-ConsoleMethod( CameraGoalPlayer, setForcedRadius, void, 4, 4, "(radius, ms)")
+DefineEngineMethod( CameraGoalPlayer, setForcedRadius, void, (F32 radius, S32 ms), (0,0), "(radius, ms)")
 {
-	if(dStrlen(argv[2]) > 0)
+	if(radius != 0)
 	{
-		object->setForcedRadius(dAtof(argv[2]), dAtoi(argv[3]));
+		object->setForcedRadius(radius, ms);
 	}
 	else
 	{
-		object->clearForcedRadius(dAtoi(argv[3]));
+		object->clearForcedRadius(ms);
 	}
 }
 
@@ -1430,7 +1431,7 @@ void CameraGoalPlayer::setAutoYaw(bool on)
 	setMaskBits(ModeMask);
 }
 
-ConsoleMethod( CameraGoalPlayer, setAutoYaw, void, 3, 3, "(bool)")
+DefineEngineMethod( CameraGoalPlayer, setAutoYaw, void, (bool autoYaw), (false), "(bool)")
 {
-	object->setAutoYaw(dAtob(argv[2]));
+	object->setAutoYaw(autoYaw);
 }

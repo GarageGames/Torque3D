@@ -131,7 +131,7 @@ void GFXGLPrimitiveBuffer::finish()
 GLvoid* GFXGLPrimitiveBuffer::getBuffer()
 {
 	// NULL specifies no offset into the hardware buffer
-   return (GLvoid*)mBufferOffset;
+   return (GLvoid*)(uintptr_t)mBufferOffset;
 }
 
 void GFXGLPrimitiveBuffer::zombify()

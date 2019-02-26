@@ -56,7 +56,7 @@ bool dFileDelete(const char * name)
 #ifdef UNICODE
    convertUTF8toUTF16N( name, buf, buf.size );
 #else
-   dStrcpy( buf, name );
+   dStrcpy( buf, name, buf.size );
 #endif
 
    backslash( buf );
@@ -88,8 +88,8 @@ bool dFileRename(const char *oldName, const char *newName)
    convertUTF8toUTF16N( oldName, oldf, oldf.size );
    convertUTF8toUTF16N( newName, newf, newf.size );
 #else
-   dStrcpy(oldf, oldName);
-   dStrcpy(newf, newName);
+   dStrcpy(oldf, oldName, oldf.size);
+   dStrcpy(newf, newName, newf.size);
 #endif
    backslash(oldf);
    backslash(newf);
@@ -106,7 +106,7 @@ bool dFileTouch(const char * name)
 #ifdef UNICODE
    convertUTF8toUTF16N( name, buf, buf.size );
 #else
-   dStrcpy( buf, name );
+   dStrcpy( buf, name, buf.size );
 #endif
 
    backslash( buf );
@@ -133,8 +133,8 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
    convertUTF8toUTF16N( fromName, from, from.size );
    convertUTF8toUTF16N( toName, to, to.size );
 #else
-   dStrcpy( from, fromName );
-   dStrcpy( to, toName );
+   dStrcpy( from, fromName, from.size );
+   dStrcpy( to, toName, to.size );
 #endif
 
    backslash( from );
@@ -168,7 +168,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
          char* toDir = tempBuf;
          Platform::makeFullPathName(fromDir + dStrlen(fromName) + (dStricmp(fromDir, fromName) ? 1 : 0), tempBuf, tempBuf.size, toName);
          if(*(toDir + dStrlen(toDir) - 1) != '/')
-            dStrcat(toDir, "/");
+            dStrcat(toDir, "/", tempBuf.size);
          forwardslash(toDir);
 
          if (!Platform::createPath(toDir))
@@ -191,8 +191,8 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
 
          char* toFile = tempBuf;
          Platform::makeFullPathName(fileInfo[i].pFullPath + dStrlen(fromName) + (dStricmp(fileInfo[i].pFullPath, fromName) ? 1 : 0), tempBuf, tempBuf.size, toName);
-         dStrcat(toFile, "/");
-         dStrcat(toFile, fileInfo[i].pFileName);
+         dStrcat(toFile, "/", tempBuf.size);
+         dStrcat(toFile, fileInfo[i].pFileName, tempBuf.size);
 
          backslash(fromFile);
          backslash(toFile);
@@ -269,7 +269,7 @@ File::FileStatus File::open(const char *filename, const AccessMode openMode)
 #ifdef UNICODE
    convertUTF8toUTF16N( filename, fname, fname.size );
 #else
-   dStrcpy(fname, filename);
+   dStrcpy(fname, filename, fname.size);
 #endif
    backslash( fname );
 
@@ -678,7 +678,7 @@ bool Platform::getFileTimes(const char *filePath, FileTime *createTime, FileTime
 #ifdef UNICODE
    convertUTF8toUTF16N( filePath, fp, fp.size );
 #else
-   dStrcpy( fp, filePath );
+   dStrcpy( fp, filePath, fp.size );
 #endif
 
    backslash( fp );
@@ -833,7 +833,7 @@ bool Platform::setCurrentDirectory(StringTableEntry newDir)
 #ifdef UNICODE
    convertUTF8toUTF16N( newDir, buf, buf.size - 1 );
 #else
-   dStrcpy( buf, newDir );
+   dStrcpy( buf, newDir, buf.size );
 #endif
 
    backslash( buf );
@@ -948,7 +948,7 @@ bool Platform::isFile(const char *pFilePath)
 #ifdef UNICODE
    convertUTF8toUTF16N( pFilePath, buf, buf.size );
 #else
-   dStrcpy( buf, pFilePath );
+   dStrcpy( buf, pFilePath, buf.size );
 #endif
    backslash( buf );
 
@@ -987,7 +987,7 @@ S32 Platform::getFileSize(const char *pFilePath)
 #ifdef UNICODE
    convertUTF8toUTF16N( pFilePath, buf, buf.size );
 #else
-   dStrcpy( buf, pFilePath );
+   dStrcpy( buf, pFilePath, buf.size );
 #endif
    backslash( buf );
 
@@ -1024,7 +1024,7 @@ bool Platform::isDirectory(const char *pDirPath)
 #ifdef UNICODE
    convertUTF8toUTF16N( pDirPath, buf, buf.size );
 #else
-   dStrcpy( buf, pDirPath );
+   dStrcpy( buf, pDirPath, buf.size );
 #endif
    backslash( buf );
 
@@ -1071,8 +1071,8 @@ bool Platform::isSubDirectory(const char *pParent, const char *pDir)
    convertUTF8toUTF16N( fileName, file, file.size );
    convertUTF8toUTF16N( pDir, dir, dir.size );
 #else
-   dStrcpy( file, fileName );
-   dStrcpy( dir, pDir );
+   dStrcpy( file, fileName, file.size );
+   dStrcpy( dir, pDir, dir.size );
 #endif
 
    backslash( file );
@@ -1256,7 +1256,7 @@ bool Platform::hasSubDirectory(const char *pPath)
    // Compose our search string - Format : ([path]/[subpath]/*)
    char trail = pPath[ dStrlen(pPath) - 1 ];
    if( trail == '/' )
-      dStrcpy( searchBuf, pPath );
+      dStrcpy( searchBuf, pPath, 1024 );
    else
       dSprintf(searchBuf, 1024, "%s/*", pPath );
 

@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _PARTICLE_H_
 #define _PARTICLE_H_
 
@@ -44,7 +49,9 @@ class ParticleData : public SimDataBlock
   public:
    enum PDConst
    {
-      PDC_NUM_KEYS = 4,
+      // This increase the keyframes from 4 to 8. Especially useful for premult-alpha blended particles
+      // for which 4 keyframes is often not enough.
+      PDC_NUM_KEYS = 8,
    };
 
    F32   dragCoefficient;
@@ -97,6 +104,23 @@ class ParticleData : public SimDataBlock
    static void  initPersistFields();
 
    bool reload(char errorBuffer[256]);
+  public:
+   /*C*/  ParticleData(const ParticleData&, bool = false);
+   virtual void onPerformSubstitutions();
+   virtual bool allowSubstitutions() const { return true; }
+  protected:
+   F32   spinBias;
+   bool  randomizeSpinDir;
+   StringTableEntry  textureExtName;
+  public:
+   GFXTexHandle      textureExtHandle;
+   bool   constrain_pos;
+   F32    start_angle;
+   F32    angle_variance;
+   F32    sizeBias; 
+  public:
+   bool loadParameters();  
+   bool reload(String &errorStr);
 };
 
 //*****************************************************************************
@@ -123,6 +147,10 @@ struct Particle
 
    F32              spinSpeed;
    Particle *       next;
+   Point3F  pos_local;
+   F32      t_last;
+   Point3F  radial_v;   // radial vector for concentric effects
+   // note -- for non-oriented particles, we use orientDir.x to store the billboard start angle.
 };
 
 

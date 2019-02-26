@@ -334,7 +334,7 @@ public:
         // Sanity!
         AssertFatal( fieldNameLength < sizeof(fieldNameBuffer), "TamlCustomField: Field name is too long." );
 
-        dStrcpy( fieldNameBuffer, mFieldName );
+        dStrcpy( fieldNameBuffer, mFieldName, 1024 );
         fieldNameBuffer[fieldNameLength-1] = 0;
         StringTableEntry fieldName = StringTable->insert( fieldNameBuffer );
 

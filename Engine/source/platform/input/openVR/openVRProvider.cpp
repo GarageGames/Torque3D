@@ -18,11 +18,6 @@
 #include "gfx/D3D11/gfxD3D11EnumTranslate.h"
 #include "gfx/gfxStringEnumTranslate.h"
 
-
-#include "gfx/D3D9/gfxD3D9Device.h"
-#include "gfx/D3D9/gfxD3D9TextureObject.h"
-#include "gfx/D3D9/gfxD3D9EnumTranslate.h"
-
 #include "materials/matTextureTarget.h"
 
 #ifdef TORQUE_OPENGL
@@ -435,7 +430,7 @@ bool OpenVRRenderState::setupRenderTargets(GFXDevice::GFXDeviceRenderStyles mode
    }
 
    GFXTexHandle stereoTexture;
-   stereoTexture.set(newRTSize.x, newRTSize.y, GFXFormatR8G8B8A8, &VRTextureProfile, "OpenVR Stereo RT Color");
+   stereoTexture.set(newRTSize.x, newRTSize.y, GFXFormatR8G8B8A8_SRGB, &VRTextureProfile, "OpenVR Stereo RT Color");
    mStereoRenderTexture = stereoTexture;
 
    GFXTexHandle stereoDepthTexture;
@@ -446,7 +441,7 @@ bool OpenVRRenderState::setupRenderTargets(GFXDevice::GFXDeviceRenderStyles mode
    mStereoRT->attachTexture(GFXTextureTarget::Color0, stereoTexture);
    mStereoRT->attachTexture(GFXTextureTarget::DepthStencil, stereoDepthTexture);
 
-   mOutputEyeTextures.init(newRTSize.x, newRTSize.y, GFXFormatR8G8B8A8, &VRTextureProfile, "OpenVR Stereo RT Color OUTPUT");
+   mOutputEyeTextures.init(newRTSize.x, newRTSize.y, GFXFormatR8G8B8A8_SRGB, &VRTextureProfile, "OpenVR Stereo RT Color OUTPUT");
 
    return true;
 }
@@ -498,7 +493,7 @@ OpenVRProvider::OpenVRProvider() :
    mDrawCanvas(NULL),
    mGameConnection(NULL)
 {
-   dStrcpy(mName, "openvr");
+   dStrcpy(mName, "openvr", 30);
    mDeviceType = INPUTMGR->getNextDeviceType();
    buildInputCodeTable();
    GFXDevice::getDeviceEventSignal().notify(this, &OpenVRProvider::_handleDeviceEvent);
@@ -975,11 +970,6 @@ void OpenVRProvider::onEyeRendered(U32 index)
          bounds = OpenVRUtil::TorqueRectToBounds(mHMDRenderState.mEyeViewport[1], mHMDRenderState.mStereoRenderTexture.getWidthHeight());
          err = vr::VRCompositor()->Submit((vr::EVREye)(vr::Eye_Right), &eyeTexture, &bounds);
       }
-   }
-   else if (GFX->getAdapterType() == Direct3D9)
-   {
-      //vr::Texture_t eyeTexture = { (void*)static_cast<GFXD3D9TextureObject*>(mHMDRenderState.mStereoRenderTextures[index].getPointer())->get2DTex(), vr::API_DirectX, vr::ColorSpace_Gamma };
-      //err = vr::VRCompositor()->Submit((vr::EVREye)(vr::Eye_Left + index), &eyeTexture);
    }
 #ifdef TORQUE_OPENGL
    else if (GFX->getAdapterType() == OpenGL)
@@ -1496,7 +1486,7 @@ bool OpenVRProvider::getRenderModelTexture(S32 idx, GFXTextureObject **outTex, b
             bmp->writeBitmap("PNG", fs);
             fs.close();
 
-            tex.set(bmp, &GFXDefaultStaticDiffuseProfile, true, "OpenVR Texture");
+            tex.set(bmp, &GFXStaticTextureSRGBProfile, true, "OpenVR Texture");
             //tex.set(loadedTexture.vrTexture->unWidth, loadedTexture.vrTexture->unHeight, 1, (void*)pixels, GFXFormatR8G8B8A8, &GFXDefaultStaticDiffuseProfile, "OpenVR Texture", 1);
 
 

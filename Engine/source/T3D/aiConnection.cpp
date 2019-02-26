@@ -130,7 +130,7 @@ static inline F32 moveClamp(F32 v)
 
 //-----------------------------------------------------------------------------
 /// Construct and connect an AI connection object
-ConsoleFunction(aiConnect, S32 , 2, 20, "(...)"
+DefineEngineStringlyVariadicFunction(aiConnect, S32 , 2, 20, "(...)"
    "@brief Creates a new AIConnection, and passes arguments to its onConnect script callback.\n\n"
    "@returns The newly created AIConnection\n"
    "@see GameConnection for parameter information\n"
@@ -160,7 +160,7 @@ ConsoleFunction(aiConnect, S32 , 2, 20, "(...)"
 
 
 //-----------------------------------------------------------------------------
-DefineConsoleMethod(AIConnection, setMove, void, (const char * field, F32 value), ,"(string field, float value)"
+DefineEngineMethod(AIConnection, setMove, void, (const char * field, F32 value), ,"(string field, float value)"
               "Set a field on the current move.\n\n"
               "@param   field One of {'x','y','z','yaw','pitch','roll'}\n"
               "@param   value Value to set field to.")
@@ -190,7 +190,7 @@ DefineConsoleMethod(AIConnection, setMove, void, (const char * field, F32 value)
    object->setMove(&move);
 }
 
-DefineConsoleMethod(AIConnection,getMove,F32, (const char * field), ,"(string field)"
+DefineEngineMethod(AIConnection,getMove,F32, (const char * field), ,"(string field)"
               "Get the given field of a move.\n\n"
               "@param field One of {'x','y','z','yaw','pitch','roll'}\n"
               "@returns The requested field on the current move.")
@@ -212,7 +212,7 @@ DefineConsoleMethod(AIConnection,getMove,F32, (const char * field), ,"(string fi
 }
 
 
-DefineConsoleMethod(AIConnection,setFreeLook,void,(bool isFreeLook), ,"(bool isFreeLook)"
+DefineEngineMethod(AIConnection,setFreeLook,void,(bool isFreeLook), ,"(bool isFreeLook)"
               "Enable/disable freelook on the current move.")
 {
    Move move = object->getMove();
@@ -220,7 +220,7 @@ DefineConsoleMethod(AIConnection,setFreeLook,void,(bool isFreeLook), ,"(bool isF
    object->setMove(&move);
 }
 
-DefineConsoleMethod(AIConnection, getFreeLook, bool, (), ,"getFreeLook()"
+DefineEngineMethod(AIConnection, getFreeLook, bool, (), ,"getFreeLook()"
               "Is freelook on for the current move?")
 {
    return object->getMove().freeLook;
@@ -229,7 +229,7 @@ DefineConsoleMethod(AIConnection, getFreeLook, bool, (), ,"getFreeLook()"
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod(AIConnection,setTrigger,void, (S32 idx, bool set), ,"(int trigger, bool set)"
+DefineEngineMethod(AIConnection,setTrigger,void, (S32 idx, bool set), ,"(int trigger, bool set)"
               "Set a trigger.")
 {
    if (idx >= 0 && idx < MaxTriggerKeys)  
@@ -240,7 +240,7 @@ DefineConsoleMethod(AIConnection,setTrigger,void, (S32 idx, bool set), ,"(int tr
    }
 }
 
-DefineConsoleMethod(AIConnection,getTrigger,bool, (S32 idx), ,"(int trigger)"
+DefineEngineMethod(AIConnection,getTrigger,bool, (S32 idx), ,"(int trigger)"
               "Is the given trigger set?")
 {
    if (idx >= 0 && idx < MaxTriggerKeys)
@@ -251,7 +251,7 @@ DefineConsoleMethod(AIConnection,getTrigger,bool, (S32 idx), ,"(int trigger)"
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod(AIConnection,getAddress,const char*,(), ,"")
+DefineEngineMethod(AIConnection,getAddress,const char*,(), ,"")
 {
    // Override the netConnection method to return to indicate
    // this is an ai connection.

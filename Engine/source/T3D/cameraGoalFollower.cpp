@@ -525,20 +525,18 @@ bool CameraGoalFollower::setGoalObject(ShapeBase *obj, S32 ms)
 	return true;
 }
 
-ConsoleMethod( CameraGoalFollower, setGoalObject, bool, 3, 4, "(ShapeBase object)") {   
-	ShapeBase *gb;
-	if(!Sim::findObject(argv[2], gb))
+DefineEngineMethod( CameraGoalFollower, setGoalObject, bool, (ShapeBase* goalObj, S32 ms),
+                                 (nullAsType<ShapeBase*>(), 2000), "(ShapeBase object, S32 trackTime)")
+{
+	if(goalObj == nullptr)
 		return false;
 
-	if(argc == 4)
-		object->setGoalObject(gb, dAtoi(argv[3]));
-	else
-		object->setGoalObject(gb);
+   object->setGoalObject(goalObj, ms);
 
 	return true;
 }
 
-ConsoleMethod( CameraGoalFollower, getGoalObject, S32, 2, 2, "")
+DefineEngineMethod( CameraGoalFollower, getGoalObject, S32, (), , "")
 {
    if(!object->getGoalObject())
       return 0;
@@ -573,13 +571,13 @@ bool CameraGoalFollower::setPlayerObject(Player *obj)
 	return true;
 }
 
-ConsoleMethod( CameraGoalFollower, setPlayerObject, bool, 3, 3, "(Player object)") {   
-	Player *gb;
-	if(!Sim::findObject(argv[2], gb))
+DefineEngineMethod( CameraGoalFollower, setPlayerObject, bool, (Player* playerObj), (nullAsType<Player*>()), "(Player object)")
+{
+	if(playerObj==nullptr)
 	{
-		Con::errorf("CameraGoalFollower::setPlayerObject - failed to find object '%s'", argv[2]);
+		Con::errorf("CameraGoalFollower::setPlayerObject - failed to find object");
 		return false;
 	}
 
-	return object->setPlayerObject(gb);
+	return object->setPlayerObject(playerObj);
 }

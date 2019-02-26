@@ -31,6 +31,28 @@
 class GuiInspector;
 class GuiInspectorField;
 
+struct VariableField
+{
+   StringTableEntry mFieldName;
+   StringTableEntry mFieldLabel;
+   StringTableEntry mFieldDescription;
+
+   StringTableEntry mFieldTypeName;
+   S32 mFieldType;
+
+   SimObject* mOwnerObject;
+
+   StringTableEntry mDefaultValue;
+   String mDataValues;
+
+   String mGroup;
+
+   StringTableEntry mSetCallbackName;
+
+   bool mHidden;
+   bool mEnabled;
+};
+
 class GuiInspectorVariableGroup : public GuiInspectorGroup
 {
 public:
@@ -49,7 +71,14 @@ public:
 
    virtual bool inspectGroup();
 
+   void clearFields();
+   void addField(VariableField* field);
+
+   void addInspectorField(GuiInspectorField* field);
+   GuiInspectorField* createInspectorField();
+
 protected:
+   Vector<VariableField*> mFields;
 };
 
 #endif // _GUI_INSPECTOR_VARIABLEGROUP_H_

@@ -885,7 +885,7 @@ void logDumpTraverse(MemDumpLog *sizes, TreeNode *header, U32 depth)
 }
 
 #ifdef TORQUE_DEBUG
-DefineConsoleFunction( validateMemory, void, ( ),,
+DefineEngineFunction( validateMemory, void, ( ),,
    "@brief Used to validate memory space for the game.\n\n"
    "@ingroup Debugging" )
 {
@@ -893,7 +893,7 @@ DefineConsoleFunction( validateMemory, void, ( ),,
 }
 #endif
 
-DefineConsoleFunction( freeMemoryDump, void, ( ),,
+DefineEngineFunction( freeMemoryDump, void, ( ),,
    "@brief Dumps some useful statistics regarding free memory.\n\n"
    "Dumps an analysis of \'free chunks\' of memory. "
    "Does not print how much memory is free.\n\n"
@@ -1130,7 +1130,7 @@ static void logFree(const AllocatedHeader* hdr)
 
 void enableLogging(const char* fileName)
 {
-   dStrcpy(gLogFilename, fileName);
+   dStrcpy(gLogFilename, fileName, 256);
    if (!gEnableLogging)
    {
       gEnableLogging = true;

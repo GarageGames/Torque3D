@@ -254,6 +254,8 @@ GFXTextureObject *GFXTextureManager::_lookupTexture( const char *hashName, const
    //compare just the profile flags and not the entire profile, names could be different but otherwise identical flags
    if (ret && (ret->mProfile->compareFlags(*profile)))
       return ret;
+   else if (ret)
+      Con::warnf("GFXTextureManager::_lookupTexture: Cached texture %s has a different profile flag", hashName);
 
    return NULL;
 }

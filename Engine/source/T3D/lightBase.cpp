@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "T3D/lightBase.h"
 
@@ -73,6 +78,7 @@ LightBase::LightBase()
    mLight = LightManager::createLightInfo();
 
    mFlareState.clear();
+   mLocalRenderViz = false;
 }
 
 LightBase::~LightBase()
@@ -206,7 +212,7 @@ void LightBase::prepRenderImage( SceneRenderState *state )
 
    // If the light is selected or light visualization
    // is enabled then register the callback.
-   if ( smRenderViz || isSelectedInEditor )
+   if ( mLocalRenderViz || smRenderViz || isSelectedInEditor )
    {
       ObjectRenderInst *ri = state->getRenderPass()->allocInst<ObjectRenderInst>();
       ri->renderDelegate.bind( this, &LightBase::_onRenderViz );
@@ -434,7 +440,7 @@ static ConsoleDocFragment _lbplayAnimation2(
    "void playAnimation(LightAnimData anim);"
 );
 
-DefineConsoleMethod( LightBase, playAnimation, void, (const char * anim), (""), "( [LightAnimData anim] )\t"
+DefineEngineMethod( LightBase, playAnimation, void, (const char * anim), (""), "( [LightAnimData anim] )\t"
    "Plays a light animation on the light.  If no LightAnimData is passed the "
    "existing one is played."
    "@hide")
@@ -478,7 +484,7 @@ void LightBase::playAnimation( LightAnimData *animData )
     }
 }
 
-DefineConsoleMethod( LightBase, pauseAnimation, void, (), , "Stops the light animation." )
+DefineEngineMethod( LightBase, pauseAnimation, void, (), , "Stops the light animation." )
 {
     object->pauseAnimation();
 }

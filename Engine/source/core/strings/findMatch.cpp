@@ -71,8 +71,9 @@ void FindMatch::setExpression( const char *_expression )
 {
    delete [] expression;
 
-   expression = new char[dStrlen(_expression) + 1];
-   dStrcpy(expression, _expression);
+   dsize_t expressionLen = dStrlen(_expression) + 1;
+   expression = new char[expressionLen];
+   dStrcpy(expression, _expression, expressionLen);
    dStrupr(expression);
 }
 
@@ -82,7 +83,7 @@ bool FindMatch::findMatch( const char *str, bool caseSensitive )
       return false;
 
    char nstr[512];
-   dStrcpy( nstr,str );
+   dStrcpy( nstr,str,512 );
    dStrupr(nstr);
    if ( isMatch( expression, nstr, caseSensitive ) )
    {
@@ -143,7 +144,7 @@ bool FindMatch::isMatchMultipleExprs( const char *exps, const char *str, bool ca
    S32 len = dStrlen(exps);
 
    char *e = new char[len+1];
-   dStrcpy(e,exps);
+   dStrcpy(e,exps,len+1);
 
    // [tom, 12/18/2006] This no longer supports space separated expressions as
    // they don't work when the paths have spaces in.

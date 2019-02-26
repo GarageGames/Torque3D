@@ -585,7 +585,7 @@ bool Platform::FS::InstallFileSystems()
    {
       // add trailing '/' if it isn't there
       if (buffer[dStrlen(buffer) - 1] != '/')
-         dStrcat(buffer, "/");
+         dStrcat(buffer, "/", PATH_MAX);
          
       Platform::FS::SetCwd(buffer);
    }

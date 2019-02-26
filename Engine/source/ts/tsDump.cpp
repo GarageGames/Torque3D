@@ -197,10 +197,10 @@ void TSShapeInstance::dump(Stream & stream)
    dumpLine("\r\n   Sequences:\r\n");
    for (i = 0; i < mShape->sequences.size(); i++)
    {
-      const char *name = "(none)";
+      const char *seqName = "(none)";
       if (mShape->sequences[i].nameIndex != -1)
-         name = mShape->getName(mShape->sequences[i].nameIndex);
-      dumpLine(avar("      %3d: %s%s%s\r\n", i, name,
+		  seqName = mShape->getName(mShape->sequences[i].nameIndex);
+      dumpLine(avar("      %3d: %s%s%s\r\n", i, seqName,
          mShape->sequences[i].isCyclic() ? " (cyclic)" : "",
          mShape->sequences[i].isBlend() ? " (blend)" : ""));
    }
@@ -212,9 +212,9 @@ void TSShapeInstance::dump(Stream & stream)
       for (i=0; i<(S32)ml->size(); i++)
       {
          U32 flags = ml->getFlags(i);
-         const String& name = ml->getMaterialName(i);
+         const String& matName = ml->getMaterialName(i);
          dumpLine(avar(
-            "   material #%i: '%s'%s.", i, name.c_str(),
+            "   material #%i: '%s'%s.", i, matName.c_str(),
             flags & (TSMaterialList::S_Wrap|TSMaterialList::T_Wrap) ? "" : " not tiled")
          );
          if (flags & TSMaterialList::Translucent)

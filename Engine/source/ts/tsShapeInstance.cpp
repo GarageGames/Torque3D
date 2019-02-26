@@ -307,16 +307,19 @@ void TSShapeInstance::reSkin( String newBaseName, String oldBaseName )
    {
       // Try changing base
       const String &pName = materialNames[i];
-      if ( pName.compare( oldBaseName, oldBaseNameLength, String::NoCase ) == 0 )
-      {
-         String newName( pName );
-         newName.replace( 0, oldBaseNameLength, newBaseName );
-         pMatList->renameMaterial( i, newName );
-      }
+	  String newName( String::ToLower(pName) );
+	  newName.replace( String::ToLower(oldBaseName), String::ToLower(newBaseName) );
+	  pMatList->renameMaterial( i, newName );
    }
 
    // Initialize the material instances
    initMaterialList();
+}
+
+void TSShapeInstance::resetMaterialList()
+{
+	TSMaterialList* oMatlist = mShape->materialList;
+	setMaterialList(oMatlist);
 }
 
 //-------------------------------------------------------------------------------------
@@ -662,7 +665,7 @@ S32 TSShapeInstance::setDetailFromDistance( const SceneRenderState *state, F32 s
 
    // We're inlining SceneRenderState::projectRadius here to 
    // skip the unnessasary divide by zero protection.
-   F32 pixelRadius = ( mShape->radius / scaledDistance ) * state->getWorldToScreenScale().y * pixelScale;
+   F32 pixelRadius = ( mShape->mRadius / scaledDistance ) * state->getWorldToScreenScale().y * pixelScale;
    F32 pixelSize = pixelRadius * smDetailAdjust;
 
    if ( pixelSize < smSmallestVisiblePixelSize ) {
@@ -811,7 +814,7 @@ void TSShapeInstance::MeshObjectInstance::render(  S32 objectDetail,
    // skin is dirty and needs to be updated.  This should result
    // in the skin only updating once per frame in most cases.
    const U32 currTime = Sim::getCurrentTime();
-   bool isSkinDirty = currTime != mLastTime;
+   bool isSkinDirty = (currTime != mLastTime) || (objectDetail != mLastObjectDetail);
 
    // Update active transform list for bones for GPU skinning
    if ( mesh->getMeshType() == TSMesh::SkinMeshType )
@@ -832,7 +835,7 @@ void TSShapeInstance::MeshObjectInstance::render(  S32 objectDetail,
 
    // Update the last render time.
    mLastTime = currTime;
-
+   mLastObjectDetail = objectDetail;
    GFX->popWorldMatrix();
 }
 
@@ -863,9 +866,9 @@ bool TSShapeInstance::MeshObjectInstance::bufferNeedsUpdate( S32 objectDetail )
    return mesh && mesh->getMeshType() == TSMesh::SkinMeshType && currTime != mLastTime;
 }
 
-TSShapeInstance::MeshObjectInstance::MeshObjectInstance() 
-   : meshList(0), object(0), frame(0), matFrame(0),
-     visible(1.0f), forceHidden(false), mLastTime( 0 )
+TSShapeInstance::MeshObjectInstance::MeshObjectInstance()
+	: meshList(0), object(0), frame(0), matFrame(0),
+	visible(1.0f), forceHidden(false), mLastTime(0), mLastObjectDetail(0)
 {
 }
 

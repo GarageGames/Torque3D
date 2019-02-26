@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,12 +26,15 @@
 /* needed for SDL_IPHONE_MAX_GFORCE macro */
 #include "SDL_config_iphoneos.h"
 
+#include "SDL_assert.h"
 #include "SDL_events.h"
 #include "SDL_joystick.h"
 #include "SDL_hints.h"
 #include "SDL_stdinc.h"
 #include "../SDL_sysjoystick.h"
 #include "../SDL_joystick_c.h"
+#include "../steam/SDL_steamcontroller.h"
+
 
 #if !SDL_EVENTS_DISABLED
 #include "../../events/SDL_events_c.h"
@@ -57,6 +60,7 @@ static SDL_JoystickDeviceItem *deviceList = NULL;
 
 static int numjoysticks = 0;
 static SDL_JoystickID instancecounter = 0;
+int SDL_AppleTVRemoteOpenedAsJoystick = 0;
 
 static SDL_JoystickDeviceItem *
 GetDeviceForIndex(int device_index)
@@ -113,6 +117,7 @@ SDL_SYS_AddMFIJoystickDevice(SDL_JoystickDeviceItem *device, GCController *contr
 #if TARGET_OS_TV
     else if (controller.microGamepad) {
         device->guid.data[10] = 3;
+        device->remote = SDL_TRUE;
     }
 #endif /* TARGET_OS_TV */
 
@@ -147,6 +152,15 @@ SDL_SYS_AddJoystickDevice(GCController *controller, SDL_bool accelerometer)
 {
     SDL_JoystickDeviceItem *device = deviceList;
 
+#if TARGET_OS_TV
+    if (!SDL_GetHintBoolean(SDL_HINT_TV_REMOTE_AS_JOYSTICK, SDL_TRUE)) {
+        /* Ignore devices that aren't actually controllers (e.g. remotes), they'll be handled as keyboard input */
+        if (controller && !controller.extendedGamepad && !controller.gamepad && controller.microGamepad) {
+            return;
+        }
+    }
+#endif
+
     while (device != NULL) {
         if (device->controller == controller) {
             return;
@@ -154,12 +168,10 @@ SDL_SYS_AddJoystickDevice(GCController *controller, SDL_bool accelerometer)
         device = device->next;
     }
 
-    device = (SDL_JoystickDeviceItem *) SDL_malloc(sizeof(SDL_JoystickDeviceItem));
+    device = (SDL_JoystickDeviceItem *) SDL_calloc(1, sizeof(SDL_JoystickDeviceItem));
     if (device == NULL) {
         return;
     }
-
-    SDL_zerop(device);
 
     device->accelerometer = accelerometer;
     device->instance_id = instancecounter++;
@@ -242,7 +254,7 @@ SDL_SYS_RemoveJoystickDevice(SDL_JoystickDeviceItem *device)
 
     --numjoysticks;
 
-	SDL_PrivateJoystickRemoved(device->instance_id);
+    SDL_PrivateJoystickRemoved(device->instance_id);
 
     SDL_free(device->name);
     SDL_free(device);
@@ -251,7 +263,7 @@ SDL_SYS_RemoveJoystickDevice(SDL_JoystickDeviceItem *device)
 }
 
 #if TARGET_OS_TV
-static void
+static void SDLCALL
 SDL_AppleTVRemoteRotationHintChanged(void *udata, const char *name, const char *oldValue, const char *newValue)
 {
     BOOL allowRotation = newValue != NULL && *newValue != '0';
@@ -266,6 +278,50 @@ SDL_AppleTVRemoteRotationHintChanged(void *udata, const char *name, const char *
 }
 #endif /* TARGET_OS_TV */
 
+static SDL_bool SteamControllerConnectedCallback(const char *name, SDL_JoystickGUID guid, int *device_instance)
+{
+    SDL_JoystickDeviceItem *device = (SDL_JoystickDeviceItem *)SDL_calloc(1, sizeof(SDL_JoystickDeviceItem));
+    if (device == NULL) {
+        return SDL_FALSE;
+    }
+
+    *device_instance = device->instance_id = instancecounter++;
+    device->name = SDL_strdup(name);
+    device->guid = guid;
+    SDL_GetSteamControllerInputs(&device->nbuttons,
+                                 &device->naxes,
+                                 &device->nhats);
+    device->m_bSteamController = SDL_TRUE;
+
+    if (deviceList == NULL) {
+        deviceList = device;
+    } else {
+        SDL_JoystickDeviceItem *lastdevice = deviceList;
+        while (lastdevice->next != NULL) {
+            lastdevice = lastdevice->next;
+        }
+        lastdevice->next = device;
+    }
+
+    ++numjoysticks;
+
+    SDL_PrivateJoystickAdded(numjoysticks - 1);
+
+    return SDL_TRUE;
+}
+
+static void SteamControllerDisconnectedCallback(int device_instance)
+{
+    SDL_JoystickDeviceItem *item;
+
+    for (item = deviceList; item; item = item->next) {
+        if (item->instance_id == device_instance) {
+            SDL_SYS_RemoveJoystickDevice(item);
+            break;
+        }
+    }
+}
+
 /* Function to scan the system for joysticks.
  * Joystick 0 should be the system default joystick.
  * It should return 0, or -1 on an unrecoverable fatal error.
@@ -275,6 +331,9 @@ SDL_SYS_JoystickInit(void)
 {
     @autoreleasepool {
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+
+        SDL_InitSteamControllers(SteamControllerConnectedCallback,
+                                 SteamControllerDisconnectedCallback);
 
 #if !TARGET_OS_TV
         if (SDL_GetHintBoolean(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, SDL_TRUE)) {
@@ -326,13 +385,16 @@ SDL_SYS_JoystickInit(void)
     return numjoysticks;
 }
 
-int SDL_SYS_NumJoysticks()
+int
+SDL_SYS_NumJoysticks(void)
 {
     return numjoysticks;
 }
 
-void SDL_SYS_JoystickDetect()
+void
+SDL_SYS_JoystickDetect(void)
 {
+    SDL_UpdateSteamControllers();
 }
 
 /* Function to get the device-dependent name of a joystick */
@@ -394,6 +456,9 @@ SDL_SYS_JoystickOpen(SDL_Joystick * joystick, int device_index)
             };
 #endif /* SDL_JOYSTICK_MFI */
         }
+    }
+    if (device->remote) {
+        ++SDL_AppleTVRemoteOpenedAsJoystick;
     }
 
     return 0;
@@ -514,7 +579,7 @@ SDL_SYS_MFIJoystickUpdate(SDL_Joystick * joystick)
                  * initializes its values to 0. We only want to make sure the
                  * player index is up to date if the user actually moves an axis. */
                 if ((i != 2 && i != 5) || axes[i] != -32768) {
-                    updateplayerindex |= (joystick->axes[i] != axes[i]);
+                    updateplayerindex |= (joystick->axes[i].value != axes[i]);
                 }
                 SDL_PrivateJoystickAxis(joystick, i, axes[i]);
             }
@@ -551,12 +616,9 @@ SDL_SYS_MFIJoystickUpdate(SDL_Joystick * joystick)
             };
 
             for (i = 0; i < SDL_arraysize(axes); i++) {
-                updateplayerindex |= (joystick->axes[i] != axes[i]);
+                updateplayerindex |= (joystick->axes[i].value != axes[i]);
                 SDL_PrivateJoystickAxis(joystick, i, axes[i]);
             }
-
-            /* Apparently the dpad values are not accurate enough to be useful. */
-            /* hatstate = SDL_SYS_MFIJoystickHatStateForDPad(gamepad.dpad); */
 
             Uint8 buttons[] = {
                 gamepad.buttonA.isPressed,
@@ -567,8 +629,6 @@ SDL_SYS_MFIJoystickUpdate(SDL_Joystick * joystick)
                 updateplayerindex |= (joystick->buttons[i] != buttons[i]);
                 SDL_PrivateJoystickButton(joystick, i, buttons[i]);
             }
-
-            /* TODO: Figure out what to do with reportsAbsoluteDpadValues */
         }
 #endif /* TARGET_OS_TV */
 
@@ -626,6 +686,11 @@ SDL_SYS_JoystickUpdate(SDL_Joystick * joystick)
     if (device == NULL) {
         return;
     }
+    
+    if (device->m_bSteamController) {
+        SDL_UpdateSteamController(joystick);
+        return;
+    }
 
     if (device->accelerometer) {
         SDL_SYS_AccelerometerUpdate(joystick);
@@ -658,6 +723,9 @@ SDL_SYS_JoystickClose(SDL_Joystick * joystick)
             controller.playerIndex = -1;
 #endif
         }
+    }
+    if (device->remote) {
+        --SDL_AppleTVRemoteOpenedAsJoystick;
     }
 }
 
@@ -693,6 +761,8 @@ SDL_SYS_JoystickQuit(void)
         motionManager = nil;
 #endif /* !TARGET_OS_TV */
     }
+
+    SDL_QuitSteamControllers();
 
     numjoysticks = 0;
 }

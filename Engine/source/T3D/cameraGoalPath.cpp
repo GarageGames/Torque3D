@@ -258,15 +258,15 @@ bool CameraGoalPath::setPlayerPathObject(SimPath::Path *obj)
 	return true;
 }
 
-ConsoleMethod( CameraGoalPath, setPlayerPathObject, bool, 3, 3, "(Path object)") {   
-	SimPath::Path *p;
-	if(!Sim::findObject(argv[2], p))
+DefineEngineMethod( CameraGoalPath, setPlayerPathObject, bool, (SimPath::Path* pathObj), (nullAsType<SimPath::Path*>()), "(Path object)")
+{   
+	if(pathObj == nullptr)
 	{
-		Con::errorf("CameraGoalPath::setPlayerPathObject - failed to find object '%s'", argv[2]);
+		Con::errorf("CameraGoalPath::setPlayerPathObject - failed to find object");
 		return false;
 	}
 
-	return object->setPlayerPathObject(p);
+	return object->setPlayerPathObject(pathObj);
 }
 
 //===============================================================================
@@ -281,15 +281,15 @@ bool CameraGoalPath::setCameraPathObject(SimPath::Path *obj)
 	return true;
 }
 
-ConsoleMethod( CameraGoalPath, setCameraPathObject, bool, 3, 3, "(Path object)") {   
-	SimPath::Path *p;
-	if(!Sim::findObject(argv[2], p))
+DefineEngineMethod( CameraGoalPath, setCameraPathObject, bool, (SimPath::Path* pathObj), (nullAsType<SimPath::Path*>()), "(Path object)")
+{
+	if(pathObj == nullptr)
 	{
-		Con::errorf("CameraGoalPath::setCameraPathObject - failed to find object '%s'", argv[2]);
+		Con::errorf("CameraGoalPath::setCameraPathObject - failed to find object");
 		return false;
 	}
 
-	return object->setCameraPathObject(p);
+	return object->setCameraPathObject(pathObj);
 }
 
 //===============================================================================
@@ -317,15 +317,15 @@ bool CameraGoalPath::setPlayerObject(Player *obj)
 	return true;
 }
 
-ConsoleMethod( CameraGoalPath, setPlayerObject, bool, 3, 3, "(Player object)") {   
-	Player *gb;
-	if(!Sim::findObject(argv[2], gb))
+DefineEngineMethod( CameraGoalPath, setPlayerObject, bool, (Player* playerObj), (nullAsType<Player*>()), "(Player object)")
+{
+	if(playerObj == nullptr)
 	{
-		Con::errorf("CameraGoalPath::setPlayerObject - failed to find object '%s'", argv[2]);
+		Con::errorf("CameraGoalPath::setPlayerObject - failed to find object");
 		return false;
 	}
 
-	return object->setPlayerObject(gb);
+	return object->setPlayerObject(playerObj);
 }
 
 //===============================================================================
@@ -336,7 +336,7 @@ void CameraGoalPath::setLookAtPlayer(bool on)
 	setMaskBits(ModeMask);
 }
 
-ConsoleMethod( CameraGoalPath, setLookAtPlayer, void, 3, 3, "(bool)")
+DefineEngineMethod( CameraGoalPath, setLookAtPlayer, void, (bool lookAt), (false), "(bool)")
 {
-	object->setLookAtPlayer(dAtob(argv[2]));
+	object->setLookAtPlayer(lookAt);
 }

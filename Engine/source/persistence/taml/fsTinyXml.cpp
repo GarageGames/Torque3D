@@ -33,7 +33,7 @@ bool fsTiXmlDocument::LoadFile( const char * pFilename, TiXmlEncoding encoding )
 
 #ifdef TORQUE_OS_ANDROID
    if (strlen(pFilename) > strlen(filenameBuffer)) {
-      strcpy(filenameBuffer, pFilename);
+      dStrcpy(filenameBuffer, pFilename, 1024);
    }
 #endif
 
@@ -199,16 +199,16 @@ void fsTiXmlAttribute::Print( FileStream& stream, int depth, TIXML_STRING* str )
 {
    TIXML_STRING n, v;
 
-   TiXmlString value = TiXmlString(Value());
+   TiXmlString val = TiXmlString(Value());
 
    EncodeString( NameTStr(), &n );
-   EncodeString( value, &v );
+   EncodeString( val, &v );
 
    for ( int i=0; i< depth; i++ ) {
       stream.writeText( "    " );
    }
 
-   if (value.find ('\"') == TIXML_STRING::npos) {
+   if (val.find ('\"') == TIXML_STRING::npos) {
       const char* pValue = v.c_str();
       char buffer[4096];
       const S32 length = dSprintf(buffer, sizeof(buffer), "%s=\"%s\"", n.c_str(), pValue);

@@ -20,11 +20,19 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _OBJECTTYPES_H_
 #define _OBJECTTYPES_H_
 
 #include "platform/types.h"
 
+// Uncomment the AFX_CAP_AFXMODEL_TYPE define below to enable a type flag
+// for afxModel objects.
+//#define AFX_CAP_AFXMODEL_TYPE
 /// Types used for SceneObject type masks (SceneObject::mTypeMask)
 ///
 /// @note If a new object type is added, don't forget to add it to
@@ -149,6 +157,11 @@ enum SceneObjectTypes
 
    EntityObjectType = BIT(23),
    /// @}
+   InteriorLikeObjectType =  BIT(24),
+   TerrainLikeObjectType = BIT(25),
+#if defined(AFX_CAP_AFXMODEL_TYPE) 
+   afxModelObjectType = BIT(26)
+#endif 
 };
 
 enum SceneObjectTypeMasks : U32

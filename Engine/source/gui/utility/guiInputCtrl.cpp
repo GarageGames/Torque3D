@@ -58,9 +58,25 @@ ConsoleDocClass( GuiInputCtrl,
 
 //------------------------------------------------------------------------------
 
+GuiInputCtrl::GuiInputCtrl()
+   : mSendAxisEvents(false),
+   mSendBreakEvents(false),
+   mSendModifierEvents(false)
+{
+}
+
+//------------------------------------------------------------------------------
+
 void GuiInputCtrl::initPersistFields()
 {
-   
+   addGroup("GuiInputCtrl");
+   addField("sendAxisEvents", TypeBool, Offset(mSendAxisEvents, GuiInputCtrl),
+      "If true, onAxisEvent callbacks will be sent for SI_AXIS Move events (Default false).");
+   addField("sendBreakEvents", TypeBool, Offset(mSendBreakEvents, GuiInputCtrl),
+      "If true, break events for all devices will generate callbacks (Default false).");
+   addField("sendModifierEvents", TypeBool, Offset(mSendModifierEvents, GuiInputCtrl),
+      "If true, Make events will be sent for modifier keys (Default false).");
+   endGroup("GuiInputCtrl");
 
    Parent::initPersistFields();
 }
@@ -110,6 +126,8 @@ static bool isModifierKey( U16 keyCode )
       case KEY_RALT:
       case KEY_LSHIFT:
       case KEY_RSHIFT:
+      case KEY_MAC_LOPT:
+      case KEY_MAC_ROPT:
          return( true );
    }
 
@@ -117,33 +135,49 @@ static bool isModifierKey( U16 keyCode )
 }
 
 IMPLEMENT_CALLBACK( GuiInputCtrl, onInputEvent, void, (const char* device, const char* action, bool state ),
-														  ( device, action, state),
-	"@brief Callback that occurs when an input is triggered on this control\n\n"
-	"@param device The device type triggering the input, such as keyboard, mouse, etc\n"
-	"@param action The actual event occuring, such as a key or button\n"
-	"@param state True if the action is being pressed, false if it is being release\n\n"
-);
+   ( device, action, state),
+   "@brief Callback that occurs when an input is triggered on this control\n\n"
+   "@param device The device type triggering the input, such as keyboard, mouse, etc\n"
+   "@param action The actual event occuring, such as a key or button\n"
+   "@param state True if the action is being pressed, false if it is being release\n\n");
+
+IMPLEMENT_CALLBACK(GuiInputCtrl, onAxisEvent, void, (const char* device, const char* action, F32 axisValue),
+   (device, action, axisValue),
+   "@brief Callback that occurs when an axis event is triggered on this control\n\n"
+   "@param device The device type triggering the input, such as mouse, joystick, gamepad, etc\n"
+   "@param action The ActionMap code for the axis\n"
+   "@param axisValue The current value of the axis\n\n");
 
 //------------------------------------------------------------------------------
 bool GuiInputCtrl::onInputEvent( const InputEventInfo &event )
 {
-   // TODO - add POV support...
+   char deviceString[32];
    if ( event.action == SI_MAKE )
    {
       if ( event.objType == SI_BUTTON
         || event.objType == SI_POV
-        || ( ( event.objType == SI_KEY ) && !isModifierKey( event.objInst ) ) )
+        || event.objType == SI_KEY )
       {
-         char deviceString[32];
          if ( !ActionMap::getDeviceName( event.deviceType, event.deviceInst, deviceString ) )
-            return( false );
+            return false;
 
-         const char* actionString = ActionMap::buildActionString( &event );
+         if ((event.objType == SI_KEY) && isModifierKey(event.objInst))
+         {
+            if (!mSendModifierEvents)
+               return false;
 
-		 //Con::executef( this, "onInputEvent", deviceString, actionString, "1" );
-		 onInputEvent_callback(deviceString, actionString, 1);
+            char keyString[32];
+            if (!ActionMap::getKeyString(event.objInst, keyString))
+               return false;
 
-         return( true );
+            onInputEvent_callback(deviceString, keyString, 1);
+         }
+         else
+         {
+            const char* actionString = ActionMap::buildActionString(&event);
+            onInputEvent_callback(deviceString, actionString, 1);
+         }
+         return true;
       }
    }
    else if ( event.action == SI_BREAK )
@@ -152,14 +186,36 @@ bool GuiInputCtrl::onInputEvent( const InputEventInfo &event )
       {
          char keyString[32];
          if ( !ActionMap::getKeyString( event.objInst, keyString ) )
-            return( false );
+            return false;
 
-         //Con::executef( this, "onInputEvent", "keyboard", keyString, "0" );
-		 onInputEvent_callback("keyboard", keyString, 0);
+         onInputEvent_callback("keyboard", keyString, 0);
+         return true;
+      }
+      else if (mSendBreakEvents)
+      {
+         if (!ActionMap::getDeviceName(event.deviceType, event.deviceInst, deviceString))
+            return false;
 
-         return( true );
+         const char* actionString = ActionMap::buildActionString(&event);
+
+         onInputEvent_callback(deviceString, actionString, 0);
+         return true;
       }
    }
+   else if (mSendAxisEvents && ((event.objType == SI_AXIS) || (event.objType == SI_INT) || (event.objType == SI_FLOAT)))
+   {
+      F32 fValue = event.fValue;
+      if (event.objType == SI_INT)
+         fValue = (F32)event.iValue;
 
-   return( false );
+      if (!ActionMap::getDeviceName(event.deviceType, event.deviceInst, deviceString))
+         return false;
+
+      const char* actionString = ActionMap::buildActionString(&event);
+
+      onAxisEvent_callback(deviceString, actionString, fValue);
+      return (event.deviceType != MouseDeviceType);   // Don't consume mouse move events
+   }
+
+   return false;
 }

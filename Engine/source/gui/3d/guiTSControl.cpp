@@ -432,8 +432,6 @@ void GuiTSCtrl::_internalRender(RectI guiViewport, RectI renderViewport, Frustum
    if (mRenderStyle == RenderStyleStereoSideBySide && debugDraw->willDraw())
    {
       // For SBS we need to render over each viewport
-      Frustum frustum;
-
       GFX->setViewport(mLastCameraQuery.stereoViewports[0]);
       MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[0]);
       GFX->setFrustum(frustum);
@@ -543,7 +541,6 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       GFX->setStereoTargets(mLastCameraQuery.stereoTargets);
 
       MatrixF myTransforms[2];
-      Frustum frustum;
 
       if (smUseLatestDisplayTransform)
       {

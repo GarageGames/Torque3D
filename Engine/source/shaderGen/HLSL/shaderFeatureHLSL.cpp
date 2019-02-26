@@ -35,6 +35,8 @@
 #include "lighting/advanced/advancedLightBinManager.h"
 #include "ts/tsShape.h"
 
+#include "shaderGen/shaderGen.h"
+
 LangElement * ShaderFeatureHLSL::setupTexSpaceMat( Vector<ShaderComponent*> &, // componentList
                                                    Var **texSpaceMat )
 {
@@ -821,7 +823,7 @@ Var* ShaderFeatureHLSL::addOutDetailTexCoord(   Vector<ShaderComponent*> &compon
 //****************************************************************************
 
 DiffuseMapFeatHLSL::DiffuseMapFeatHLSL()
-: mTorqueDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/torque.hlsl"))
+: mTorqueDep(ShaderGen::smCommonShaderPath + String("/torque.hlsl"))
 {
 	addDependency(&mTorqueDep);
 }
@@ -1107,7 +1109,6 @@ void DiffuseFeatureHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       targ = ShaderFeature::RenderTarget1;
 
       col = (Var*)LangElement::find("col1");
-      MultiLine * meta = new MultiLine;
       if (!col)
       {
          // create color var
@@ -1115,7 +1116,7 @@ void DiffuseFeatureHLSL::processPix(   Vector<ShaderComponent*> &componentList,
          col->setType("fragout");
          col->setName(getOutputTargetVarName(targ));
          col->setStructName("OUT");
-         meta->addStatement(new GenOp("   @ = float4(1.0);\r\n", col));
+         meta->addStatement(new GenOp("   @ = float4(1.0,1.0,1.0,1.0);\r\n", col));
       }
    }
 
@@ -1156,7 +1157,7 @@ void DiffuseVertColorFeatureHLSL::processVert(  Vector< ShaderComponent* >& comp
 
       ShaderConnector* connectComp = dynamic_cast< ShaderConnector* >( componentList[ C_CONNECTOR ] );
       AssertFatal( connectComp, "DiffuseVertColorFeatureGLSL::processVert - C_CONNECTOR is not a ShaderConnector" );
-      Var* outColor = connectComp->getElement( RT_COLOR );
+      outColor = connectComp->getElement( RT_COLOR );
       outColor->setName( "vertColor" );
       outColor->setStructName( "OUT" );
       outColor->setType( "float4" );
@@ -1485,7 +1486,7 @@ void VertLitHLSL::processVert(   Vector<ShaderComponent*> &componentList,
 
       // Grab the connector color
       ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-      Var *outColor = connectComp->getElement( RT_COLOR );
+      outColor = connectComp->getElement( RT_COLOR );
       outColor->setName( "vertColor" );
       outColor->setStructName( "OUT" );
       outColor->setType( "float4" );
@@ -2021,7 +2022,7 @@ void ReflectCubeFeatHLSL::setTexData(  Material::StageData &stageDat,
 //****************************************************************************
 
 RTLightingFeatHLSL::RTLightingFeatHLSL()
-   : mDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/lighting.hlsl" ))
+   : mDep(ShaderGen::smCommonShaderPath + String("/lighting.hlsl" ))
 {
    addDependency( &mDep );
 }
@@ -2234,7 +2235,7 @@ ShaderFeature::Resources RTLightingFeatHLSL::getResources( const MaterialFeature
 //****************************************************************************
 
 FogFeatHLSL::FogFeatHLSL()
-   : mFogDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/torque.hlsl" ))
+   : mFogDep(ShaderGen::smCommonShaderPath + String("/torque.hlsl" ))
 {
    addDependency( &mFogDep );
 }
@@ -2364,7 +2365,7 @@ ShaderFeature::Resources FogFeatHLSL::getResources( const MaterialFeatureData &f
 //****************************************************************************
 
 VisibilityFeatHLSL::VisibilityFeatHLSL()
-   : mTorqueDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/torque.hlsl" ))
+   : mTorqueDep(ShaderGen::smCommonShaderPath + String("/torque.hlsl" ))
 {
    addDependency( &mTorqueDep );
 }
@@ -2531,7 +2532,7 @@ void RenderTargetZeroHLSL::processPix( Vector<ShaderComponent*> &componentList, 
 //****************************************************************************
 
 HDROutHLSL::HDROutHLSL()
-   : mTorqueDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/torque.hlsl" ))
+   : mTorqueDep(ShaderGen::smCommonShaderPath + String("/torque.hlsl" ))
 {
    addDependency( &mTorqueDep );
 }
@@ -2552,7 +2553,7 @@ void HDROutHLSL::processPix(  Vector<ShaderComponent*> &componentList,
 #include "T3D/fx/groundCover.h"
 
 FoliageFeatureHLSL::FoliageFeatureHLSL()
-: mDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/foliage.hlsl" ))
+: mDep(ShaderGen::smCommonShaderPath + String("/foliage.hlsl" ))
 {
    addDependency( &mDep );
 }
@@ -2698,7 +2699,7 @@ void ParticleNormalFeatureHLSL::processVert(Vector<ShaderComponent*> &componentL
 //****************************************************************************
 
 ImposterVertFeatureHLSL::ImposterVertFeatureHLSL()
-   :  mDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/imposter.hlsl" ))
+   :  mDep(ShaderGen::smCommonShaderPath + String("/imposter.hlsl" ))
 {
    addDependency( &mDep );
 }

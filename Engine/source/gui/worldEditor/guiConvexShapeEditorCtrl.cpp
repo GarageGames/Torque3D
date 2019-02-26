@@ -46,6 +46,10 @@
 #include "core/volume.h"
 #include "gui/worldEditor/worldEditor.h"
 #include "T3D/prefab.h"
+#include "T3D/trigger.h"
+#include "T3D/zone.h"
+#include "T3D/portal.h"
+#include "math/mPolyhedron.impl.h"
 
 IMPLEMENT_CONOBJECT( GuiConvexEditorCtrl );
 
@@ -161,6 +165,35 @@ void GuiConvexEditorCtrl::setVisible( bool val )
             mGizmoProfile->flags = mSavedGizmoFlags;
             mSavedGizmoFlags = -1;
          }
+
+         SimGroup* misGroup;
+         if (Sim::findObject("MissionGroup", misGroup))
+         {
+            //Make our proxy objects "real" again
+            for (U32 i = 0; i < mProxyObjects.size(); ++i)
+            {
+               if (!mProxyObjects[i].shapeProxy || !mProxyObjects[i].targetObject)
+                  continue;
+
+               AbstractClassRep* classRep = AbstractClassRep::findClassRep(mProxyObjects[i].targetObjectClass);
+               if (!classRep)
+               {
+                  Con::errorf("WorldEditor::createPolyhedralObject - No such class: %s", mProxyObjects[i].targetObjectClass.c_str());
+                  continue;
+               }
+
+               SceneObject* polyObj = createPolyhedralObject(mProxyObjects[i].targetObjectClass.c_str(), mProxyObjects[i].shapeProxy);
+
+               misGroup->addObject(polyObj);
+
+               //Now, remove the convex proxy
+               mProxyObjects[i].shapeProxy->deleteObject();
+               mProxyObjects[i].targetObject->deleteObject();
+               mProxyObjects.erase(i);
+               --i;
+            }
+
+         }
       }
       else
       {
@@ -188,6 +221,60 @@ void GuiConvexEditorCtrl::setVisible( bool val )
 			}
          updateGizmoPos();
          mSavedGizmoFlags = mGizmoProfile->flags;
+
+         SimGroup* misGroup;
+         if (Sim::findObject("MissionGroup", misGroup))
+         {
+            for (U32 c = 0; c < misGroup->size(); ++c)
+            {
+               bool isTrigger = (misGroup->at(c)->getClassName() == StringTable->insert("Trigger"));
+               bool isZone = (misGroup->at(c)->getClassName() == StringTable->insert("Zone"));
+               bool isPortal = (misGroup->at(c)->getClassName() == StringTable->insert("Portal"));
+               bool isOccluder = (misGroup->at(c)->getClassName() == StringTable->insert("OcclusionVolume"));
+
+               if (isZone || isPortal || isOccluder)
+               {
+                  SceneObject* sceneObj = static_cast<SceneObject*>(misGroup->at(c));
+                  if (!sceneObj)
+                  {
+                     Con::errorf("WorldEditor::createConvexShapeFrom - Invalid object");
+                     continue;
+                  }
+
+                  ConvexShape* proxyShape = createConvexShapeFrom(sceneObj);
+
+                  //Set the texture to a representatory one so we know what's what
+                  if (isTrigger)
+                     proxyShape->mMaterialName = "TriggerProxyMaterial";
+                  else if (isPortal)
+                     proxyShape->mMaterialName = "PortalProxyMaterial";
+                  else if (isZone)
+                     proxyShape->mMaterialName = "ZoneProxyMaterial";
+                  else if (isOccluder)
+                     proxyShape->mMaterialName = "OccluderProxyMaterial";
+
+                  proxyShape->_updateMaterial();
+
+                  sceneObj->setHidden(true);
+
+                  //set up the proxy object
+                  ConvexShapeProxy newProxy;
+                  newProxy.shapeProxy = proxyShape;
+                  newProxy.targetObject = sceneObj;
+
+                  if (isTrigger)
+                     newProxy.targetObjectClass = "Trigger";
+                  else if (isPortal)
+                     newProxy.targetObjectClass = "Portal";
+                  else if (isZone)
+                     newProxy.targetObjectClass = "Zone";
+                  else
+                     newProxy.targetObjectClass = "OcclusionVolume";
+
+                  mProxyObjects.push_back(newProxy);
+               }
+            }
+         }
       }
    }
 
@@ -437,6 +524,8 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
          newShape->mSurfaces.merge( mConvexSEL->mSurfaces );
          
          setupShape( newShape );
+
+         newShape->setField("material", mConvexSEL->getMaterialName());
 
          submitUndo( CreateShape, newShape );
 
@@ -2033,7 +2122,8 @@ ConvexShape* ConvexEditorCreateTool::extrudeShapeFromFace( ConvexShape *inShape,
       surf.mulL( worldToShape );      
    }
 
-	newShape->setField( "material", Parent::mEditor->mMaterialName );
+	//newShape->setField( "material", Parent::mEditor->mMaterialName );
+   newShape->setField("material", inShape->getMaterialName());
 
    newShape->registerObject();
    mEditor->updateShape( newShape );
@@ -2179,43 +2269,248 @@ void GuiConvexEditorCtrl::splitSelectedFace()
    updateGizmoPos();
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, hollowSelection, void, (), , "" )
+SceneObject* GuiConvexEditorCtrl::createPolyhedralObject(const char* className, SceneObject* geometryProvider)
+{
+   if (!geometryProvider)
+   {
+      Con::errorf("WorldEditor::createPolyhedralObject - Invalid geometry provider!");
+      return NULL;
+   }
+
+   if (!className || !className[0])
+   {
+      Con::errorf("WorldEditor::createPolyhedralObject - Invalid class name");
+      return NULL;
+   }
+
+   AbstractClassRep* classRep = AbstractClassRep::findClassRep(className);
+   if (!classRep)
+   {
+      Con::errorf("WorldEditor::createPolyhedralObject - No such class: %s", className);
+      return NULL;
+   }
+
+   // We don't want the extracted poly list to be affected by the object's
+   // current transform and scale so temporarily reset them.
+
+   MatrixF savedTransform = geometryProvider->getTransform();
+   Point3F savedScale = geometryProvider->getScale();
+
+   geometryProvider->setTransform(MatrixF::Identity);
+   geometryProvider->setScale(Point3F(1.f, 1.f, 1.f));
+
+   // Extract the geometry.  Use the object-space bounding volumes
+   // as we have moved the object to the origin for the moment.
+
+   OptimizedPolyList polyList;
+   if (!geometryProvider->buildPolyList(PLC_Export, &polyList, geometryProvider->getObjBox(), geometryProvider->getObjBox().getBoundingSphere()))
+   {
+      Con::errorf("WorldEditor::createPolyhedralObject - Failed to extract geometry!");
+      return NULL;
+   }
+
+   // Restore the object's original transform.
+
+   geometryProvider->setTransform(savedTransform);
+   geometryProvider->setScale(savedScale);
+
+   // Create the object.
+
+   SceneObject* object = dynamic_cast< SceneObject* >(classRep->create());
+   if (!Object)
+   {
+      Con::errorf("WorldEditor::createPolyhedralObject - Could not create SceneObject with class '%s'", className);
+      return NULL;
+   }
+
+   // Convert the polylist to a polyhedron.
+
+   Polyhedron polyhedron = polyList.toPolyhedron();
+
+   // Add the vertex data.
+
+   const U32 numPoints = polyhedron.getNumPoints();
+   const Point3F* points = polyhedron.getPoints();
+
+   for (U32 i = 0; i < numPoints; ++i)
+   {
+      static StringTableEntry sPoint = StringTable->insert("point");
+      object->setDataField(sPoint, NULL, EngineMarshallData(points[i]));
+   }
+
+   // Add the plane data.
+
+   const U32 numPlanes = polyhedron.getNumPlanes();
+   const PlaneF* planes = polyhedron.getPlanes();
+
+   for (U32 i = 0; i < numPlanes; ++i)
+   {
+      static StringTableEntry sPlane = StringTable->insert("plane");
+      const PlaneF& plane = planes[i];
+
+      char buffer[1024];
+      dSprintf(buffer, sizeof(buffer), "%g %g %g %g", plane.x, plane.y, plane.z, plane.d);
+
+      object->setDataField(sPlane, NULL, buffer);
+   }
+
+   // Add the edge data.
+
+   const U32 numEdges = polyhedron.getNumEdges();
+   const Polyhedron::Edge* edges = polyhedron.getEdges();
+
+   for (U32 i = 0; i < numEdges; ++i)
+   {
+      static StringTableEntry sEdge = StringTable->insert("edge");
+      const Polyhedron::Edge& edge = edges[i];
+
+      char buffer[1024];
+      dSprintf(buffer, sizeof(buffer), "%i %i %i %i ",
+         edge.face[0], edge.face[1],
+         edge.vertex[0], edge.vertex[1]
+      );
+
+      object->setDataField(sEdge, NULL, buffer);
+   }
+
+   // Set the transform.
+
+   object->setTransform(savedTransform);
+   object->setScale(savedScale);
+
+   // Register and return the object.
+
+   if (!object->registerObject())
+   {
+      Con::errorf("WorldEditor::createPolyhedralObject - Failed to register object!");
+      delete object;
+      return NULL;
+   }
+
+   return object;
+}
+
+ConvexShape* GuiConvexEditorCtrl::createConvexShapeFrom(SceneObject* polyObject)
+{
+   if (!polyObject)
+   {
+      Con::errorf("WorldEditor::createConvexShapeFrom - Invalid object");
+      return NULL;
+   }
+
+   IScenePolyhedralObject* iPoly = dynamic_cast< IScenePolyhedralObject* >(polyObject);
+   if (!iPoly)
+   {
+      Con::errorf("WorldEditor::createConvexShapeFrom - Not a polyhedral object!");
+      return NULL;
+   }
+
+   // Get polyhedron.
+
+   AnyPolyhedron polyhedron = iPoly->ToAnyPolyhedron();
+   const U32 numPlanes = polyhedron.getNumPlanes();
+   if (!numPlanes)
+   {
+      Con::errorf("WorldEditor::createConvexShapeFrom - Object returned no valid polyhedron");
+      return NULL;
+   }
+
+   // Create a ConvexShape.
+
+   ConvexShape* shape = new ConvexShape();
+
+   // Add all planes.
+
+   for (U32 i = 0; i < numPlanes; ++i)
+   {
+      const PlaneF& plane = polyhedron.getPlanes()[i];
+
+      // Polyhedron planes are facing inwards so we need to
+      // invert the normal here.
+
+      Point3F normal = plane.getNormal();
+      normal.neg();
+
+      // Turn the orientation of the plane into a quaternion.
+      // The normal is our up vector (that's what's expected
+      // by ConvexShape for the surface orientation).
+
+      MatrixF orientation(true);
+      MathUtils::getMatrixFromUpVector(normal, &orientation);
+      const QuatF quat(orientation);
+
+      // Get the plane position.
+
+      const Point3F position = plane.getPosition();
+
+      // Turn everything into a "surface" property for the ConvexShape.
+
+      char buffer[1024];
+      dSprintf(buffer, sizeof(buffer), "%g %g %g %g %g %g %g",
+         quat.x, quat.y, quat.z, quat.w,
+         position.x, position.y, position.z
+      );
+
+      // Add the surface.
+
+      static StringTableEntry sSurface = StringTable->insert("surface");
+      shape->setDataField(sSurface, NULL, buffer);
+   }
+
+   // Copy the transform.
+
+   shape->setTransform(polyObject->getTransform());
+   shape->setScale(polyObject->getScale());
+
+   // Register the shape.
+
+   if (!shape->registerObject())
+   {
+      Con::errorf("WorldEditor::createConvexShapeFrom - Could not register ConvexShape!");
+      delete shape;
+      return NULL;
+   }
+
+   return shape;
+}
+
+DefineEngineMethod( GuiConvexEditorCtrl, hollowSelection, void, (), , "" )
 {
    object->hollowSelection();
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, recenterSelection, void, (), , "" )
+DefineEngineMethod( GuiConvexEditorCtrl, recenterSelection, void, (), , "" )
 {
    object->recenterSelection();
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, hasSelection, S32, (), , "" )
+DefineEngineMethod( GuiConvexEditorCtrl, hasSelection, S32, (), , "" )
 {
    return object->hasSelection();
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, handleDelete, void, (), , "" )
+DefineEngineMethod( GuiConvexEditorCtrl, handleDelete, void, (), , "" )
 {
    object->handleDelete();
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, handleDeselect, void, (), , "" )
+DefineEngineMethod( GuiConvexEditorCtrl, handleDeselect, void, (), , "" )
 {
    object->handleDeselect();
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, dropSelectionAtScreenCenter, void, (), , "" )
+DefineEngineMethod( GuiConvexEditorCtrl, dropSelectionAtScreenCenter, void, (), , "" )
 {
    object->dropSelectionAtScreenCenter();
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, selectConvex, void, (ConvexShape *convex), , "( ConvexShape )" )
+DefineEngineMethod( GuiConvexEditorCtrl, selectConvex, void, (ConvexShape *convex), , "( ConvexShape )" )
 {
 if (convex)
       object->setSelection( convex, -1 );
 }
 
-DefineConsoleMethod( GuiConvexEditorCtrl, splitSelectedFace, void, (), , "" )
+DefineEngineMethod( GuiConvexEditorCtrl, splitSelectedFace, void, (), , "" )
 {
    object->splitSelectedFace();
 }

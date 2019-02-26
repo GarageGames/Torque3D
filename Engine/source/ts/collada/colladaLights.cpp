@@ -139,7 +139,7 @@ static void processNodeLights(AppNode* appNode, const MatrixF& offset, SimGroup*
 }
 
 // Load lights from a collada file and add to the scene.
-DefineConsoleFunction( loadColladaLights, bool, (const char * filename, const char * parentGroup, const char * baseObject), ("", ""), 
+DefineEngineFunction( loadColladaLights, bool, (const char * filename, const char * parentGroup, const char * baseObject), ("", ""),
    "(string filename, SimGroup parentGroup=MissionGroup, SimObject baseObject=-1)"
    "Load all light instances from a COLLADA (.dae) file and add to the scene.\n"
    "@param filename COLLADA filename to load lights from\n"

@@ -134,7 +134,6 @@ protected:
    ID3D11DeviceContext1* mD3DDeviceContext1;
    ID3DUserDefinedAnnotation* mUserAnnotation;
 
-   GFXShader* mCurrentShader;
    GFXShaderRef mGenericShader[GS_COUNT];
    GFXShaderConstBufferRef mGenericShaderBuffer[GS_COUNT];
    GFXShaderConstHandle *mModelViewProjSC[GS_COUNT];

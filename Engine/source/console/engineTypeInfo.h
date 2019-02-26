@@ -231,6 +231,9 @@ class EnginePropertyTable
 
          /// Combination of EnginePropertyFlags.
          U32 mFlags;
+
+         /// Type-id of the property
+         U32 mType;
          
          /// Return the name of the property.
          const char* getName() const { return mName; }
@@ -255,6 +258,9 @@ class EnginePropertyTable
          
          ///
          bool hideInInspectors() const { return ( mFlags & EnginePropertyHideInInspectors ); }
+
+         /// Return the type-id of the property.
+         U32 getType() const { return mType; }
       };
       
    protected:

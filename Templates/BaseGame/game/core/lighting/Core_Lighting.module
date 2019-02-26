@@ -1,0 +1,9 @@
+<ModuleDefinition
+	ModuleId="Core_Lighting"
+	VersionId="1"
+	Description="Module that implements the core engine-level setup for the game."
+	ScriptFile="Core_Lighting.cs"
+	CreateFunction="onCreate"
+	DestroyFunction="onDestroy"
+	Group="Core">
+</ModuleDefinition>

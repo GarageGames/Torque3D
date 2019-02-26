@@ -1142,7 +1142,7 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
       const F32 typeMaxElevation = mMaxElevation[type];
       const F32 typeMinElevation = mMinElevation[type];
       const bool typeIsShape = mShapeInstances[ type ] != NULL;
-      const Box3F typeShapeBounds = typeIsShape ? mShapeInstances[ type ]->getShape()->bounds : Box3F();
+      const Box3F typeShapeBounds = typeIsShape ? mShapeInstances[ type ]->getShape()->mBounds : Box3F();
       const F32 typeWindScale = mWindScale[type];
       StringTableEntry typeLayer = mLayer[type];
       const bool typeInvertLayer = mInvertLayer[type];
@@ -1184,9 +1184,9 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
             terrainBlock = dynamic_cast< TerrainBlock* >( terrainBlocks.first() );
          else
          {
-            for ( U32 i = 0; i < terrainBlocks.size(); i++ )
+            for ( U32 blockIDx = 0; blockIDx < terrainBlocks.size(); blockIDx++ )
             {
-               TerrainBlock *terrain = dynamic_cast< TerrainBlock* >( terrainBlocks[ i ] );
+               TerrainBlock *terrain = dynamic_cast< TerrainBlock* >( terrainBlocks[ blockIDx ] );
                if( !terrain )
                   continue;
 

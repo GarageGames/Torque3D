@@ -32,7 +32,11 @@
 #ifndef _SIMBASE_H_
 #include "console/simBase.h"
 #endif
+#ifndef _ITICKABLE_H_  
+#include "core/iTickable.h"  
+#endif  
 
+class ContextAction;
 struct InputEventInfo;
 
 struct EventDescriptor
@@ -48,6 +52,7 @@ struct EventDescriptor
 class ActionMap : public SimObject
 {
    typedef SimObject Parent;
+   friend class ContextAction;
 
   protected:
    bool onAdd();
@@ -62,7 +67,9 @@ class ActionMap : public SimObject
          HasDeadZone = BIT(2),   ///< Dead zone is present.
          Inverted    = BIT(3),   ///< Input is inverted.
          NonLinear   = BIT(4),   ///< Input should be re-fit to a non-linear scale
-         BindCmd     = BIT(5)    ///< Bind a console command to this.
+         BindCmd     = BIT(5),    ///< Bind a console command to this.
+         Held        = BIT(6),
+         DoubleTap   = BIT(7)
       };
 
       U32 flags;           ///< @see Node::Flags
@@ -75,6 +82,7 @@ class ActionMap : public SimObject
 
       char *makeConsoleCommand;         ///< Console command to execute when we make this command.
       char *breakConsoleCommand;        ///< Console command to execute when we break this command.
+      ContextAction* contextEvent;      ///< Event that kicks off via context-keybind actions such as holding or double-tapping
    };
 
    /// Used to represent a devices.
@@ -143,6 +151,7 @@ class ActionMap : public SimObject
    bool processBind(const U32 argc, const char** argv, SimObject* object = NULL);
    bool processBindCmd(const char *device, const char *action, const char *makeCmd, const char *breakCmd);
    bool processUnbind(const char *device, const char *action, SimObject* object = NULL);
+   bool processHoldBind(const char *device, const char *action, const char *holdFunc, const char *tapFunc, const U32 holdTime, const bool holdOnly, const bool returnHoldTime = false);
 
    /// @name Console Interface Functions
    /// @{
@@ -185,4 +194,28 @@ class ActionMap : public SimObject
    DECLARE_CONOBJECT(ActionMap);
 };
 
+class ContextAction : public ITickable
+{
+   ActionMap::Node* mButton;                   ///< our button we're holding  
+   F32 mMinHoldTime;                   ///< minimum time to qualify as 'held'. If we hold less than this,   
+                                       ///< it's a 'press', otherwise it's a 'held'  
+public:
+   F32 mStartTime;                      ///< Our timestamp when we first pressed.  
+   F32 mEventValue;                    ///< Event value from our key event.  
+   StringTableEntry mConsoleFunctionHeld; ///< Console function to call with new values if we held over  
+                                         ///< a certain time.  
+
+   bool mHoldOnly;                     ///< does this only care if we're holding?     
+                                       ///< true means that it only fires a function while holding  
+                                       ///< false time-contexts it  
+   bool mBreakEvent;                    ///< Button is no longer being pressed!  
+   bool mDidHold;                       ///< did we, at some point in the process, hold the button?  
+   bool mActive;                        ///< do we be tickin?  
+   bool mReturnHoldTime;                ///< Do we return back our time held?  
+
+   ContextAction(StringTableEntry func, F32 minHoldTime, ActionMap::Node* button, bool holdOnly);
+   virtual void processTick();
+   virtual void interpolateTick(F32 delta) {}   
+   virtual void advanceTime(F32 timeDelta) {}
+};
 #endif // _ACTIONMAP_H_

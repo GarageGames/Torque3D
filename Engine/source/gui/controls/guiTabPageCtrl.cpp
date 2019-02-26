@@ -50,7 +50,7 @@ GuiTabPageCtrl::GuiTabPageCtrl(void)
 {
    setExtent(Point2I(100, 200));
    mFitBook = false;
-   dStrcpy(mText,(UTF8*)"TabPage");
+   dStrcpy(mText,(UTF8*)"TabPage", MAX_STRING_LENGTH);
    mActive = true;
    mIsContainer = true;
 }

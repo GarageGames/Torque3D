@@ -267,7 +267,7 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
    sgData.init( state );
 
    // There are cases where shadow rendering is disabled.
-   const bool disableShadows = state->isReflectPass() || ShadowMapPass::smDisableShadows;
+   const bool disableShadows = /*state->isReflectPass() || */ShadowMapPass::smDisableShadows;
 
    // Pick the right material for rendering the sunlight... we only
    // cast shadows when its enabled and we're not in a reflection.
@@ -299,6 +299,8 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
       // Set geometry
       GFX->setVertexBuffer( mFarFrustumQuadVerts );
       GFX->setPrimitiveBuffer( NULL );
+
+      vectorMatInfo->matInstance->mSpecialLight = true;
 
       // Render the material passes
       while( vectorMatInfo->matInstance->setupPass( state, sgData ) )
@@ -336,6 +338,8 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
       GFX->setPrimitiveBuffer( curEntry.primBuffer );
 
       lsp->getOcclusionQuery()->begin();
+
+      curLightMat->matInstance->mSpecialLight = false;
 
       // Render the material passes
       while( curLightMat->matInstance->setupPass( state, sgData ) )
@@ -497,6 +501,17 @@ void AdvancedLightBinManager::_setupPerFrameParameters( const SceneRenderState *
                                           farPlane, 
                                           vsFarPlane);
    }
+
+   MatrixSet &matrixSet = getRenderPass()->getMatrixSet();
+   //matrixSet.restoreSceneViewProjection();
+
+   const MatrixF &worldToCameraXfm = matrixSet.getWorldToCamera();
+
+   MatrixF inverseViewMatrix = worldToCameraXfm;
+   //inverseViewMatrix.fullInverse();
+   //inverseViewMatrix.transpose();
+
+   //MatrixF inverseViewMatrix = MatrixF::Identity;
 }
 
 void AdvancedLightBinManager::setupSGData( SceneData &data, const SceneRenderState* state, LightInfo *light )
@@ -747,6 +762,10 @@ bool LightMatInstance::setupPass( SceneRenderState *state, const SceneData &sgDa
          mProcessedMaterial->getNumPasses() == 0 )
       return false;
 
+   U32 reflectStatus = Base;
+   if (state->isReflectPass())
+      reflectStatus = Reflecting;
+
    // Fetch the lightmap params
    const LightMapParams *lmParams = sgData.lights[0]->getExtended<LightMapParams>();
    
@@ -795,14 +814,21 @@ bool LightMatInstance::setupPass( SceneRenderState *state, const SceneData &sgDa
    {
       // If this is not an internal pass, and this light is represented in lightmaps
       // than only effect non-lightmapped geometry for this pass
-      if(lmParams->representedInLightmap)
-         GFX->setStateBlock(mLitState[StaticLightNonLMGeometry]);
+      if (lmParams->representedInLightmap)
+      {
+         GFX->setStateBlock(mLitState[StaticLightNonLMGeometry][reflectStatus]);
+      }
       else // This is a normal, dynamic light.
-         GFX->setStateBlock(mLitState[DynamicLight]);
-      
+      {
+         if (mSpecialLight)
+            GFX->setStateBlock(mLitState[SunLight][reflectStatus]);
+         else
+            GFX->setStateBlock(mLitState[DynamicLight][reflectStatus]);
+      }
+
    }
    else // Internal pass, this is the add-specular/multiply-darken-color pass
-      GFX->setStateBlock(mLitState[StaticLightLMGeometry]);
+      GFX->setStateBlock(mLitState[StaticLightLMGeometry][reflectStatus]);
 
    return bRetVal;
 }
@@ -832,17 +858,32 @@ bool LightMatInstance::init( const FeatureSet &features, const GFXVertexFormat *
 
    //DynamicLight State: This will effect lightmapped and non-lightmapped geometry
    // in the same way.
+
    litState.separateAlphaBlendDefined = true;
    litState.separateAlphaBlendEnable = false;
    litState.stencilMask = RenderDeferredMgr::OpaqueDynamicLitMask | RenderDeferredMgr::OpaqueStaticLitMask;
-   mLitState[DynamicLight] = GFX->createStateBlock(litState);
+   litState.setCullMode(GFXCullCW);
+   mLitState[DynamicLight][Base] = GFX->createStateBlock(litState);
+   litState.setCullMode(GFXCullCCW);
+   mLitState[DynamicLight][Reflecting] = GFX->createStateBlock(litState);
+
+   litState.separateAlphaBlendDefined = true;
+   litState.separateAlphaBlendEnable = false;
+   litState.stencilMask = RenderDeferredMgr::OpaqueDynamicLitMask | RenderDeferredMgr::OpaqueStaticLitMask;
+   litState.setCullMode(GFXCullCCW);
+   mLitState[SunLight][Base] = GFX->createStateBlock(litState);
+   litState.setCullMode(GFXCullCCW);
+   mLitState[SunLight][Reflecting] = GFX->createStateBlock(litState);
 
    // StaticLightNonLMGeometry State: This will treat non-lightmapped geometry
    // in the usual way, but will not effect lightmapped geometry.
    litState.separateAlphaBlendDefined = true;
    litState.separateAlphaBlendEnable = false;
    litState.stencilMask = RenderDeferredMgr::OpaqueDynamicLitMask;
-   mLitState[StaticLightNonLMGeometry] = GFX->createStateBlock(litState);
+   litState.setCullMode(GFXCullCW);
+   mLitState[StaticLightNonLMGeometry][Base] = GFX->createStateBlock(litState);
+   litState.setCullMode(GFXCullCCW);
+   mLitState[StaticLightNonLMGeometry][Reflecting] = GFX->createStateBlock(litState);
 
    // StaticLightLMGeometry State: This will add specular information (alpha) but
    // multiply-darken color information. 
@@ -854,7 +895,10 @@ bool LightMatInstance::init( const FeatureSet &features, const GFXVertexFormat *
    litState.separateAlphaBlendSrc = GFXBlendOne;
    litState.separateAlphaBlendDest = GFXBlendOne;
    litState.separateAlphaBlendOp = GFXBlendOpAdd;
-   mLitState[StaticLightLMGeometry] = GFX->createStateBlock(litState);
+   litState.setCullMode(GFXCullCW);
+   mLitState[StaticLightLMGeometry][Base] = GFX->createStateBlock(litState);
+   litState.setCullMode(GFXCullCCW);
+   mLitState[StaticLightLMGeometry][Reflecting] = GFX->createStateBlock(litState);
 
    return true;
 }

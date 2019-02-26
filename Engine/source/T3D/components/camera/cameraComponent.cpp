@@ -79,6 +79,7 @@ CameraComponent::CameraComponent() : Component()
    mTargetNode = "";
 
    mUseParentTransform = true;
+   mNetworked = true;
 
    mFriendlyName = "Camera(Component)";
 }
@@ -202,7 +203,7 @@ void CameraComponent::setCameraFov(F32 fov)
 void CameraComponent::onCameraScopeQuery(NetConnection *cr, CameraScopeQuery * query)
 {
    // update the camera query
-   query->camera = this;
+   query->camera = mOwner;//this;
 
    if(GameConnection * con = dynamic_cast<GameConnection*>(cr))
    {
@@ -236,8 +237,6 @@ bool CameraComponent::getCameraTransform(F32* pos,MatrixF* mat)
 {
    // Returns camera to world space transform
    // Handles first person / third person camera position
-   bool isServer = isServerObject();
-
    if (mTargetNodeIdx == -1)
    {
       if (mUseParentTransform)
@@ -357,7 +356,8 @@ U32 CameraComponent::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
          mTargetNodeIdx = nodeIndex;
       }
 
-      stream->writeInt(mTargetNodeIdx, 32);
+      if(stream->writeFlag(mTargetNodeIdx > -1))
+         stream->writeInt(mTargetNodeIdx, 32);
       //send offsets here
 
       stream->writeCompressedPoint(mPosOffset);
@@ -382,7 +382,10 @@ void CameraComponent::unpackUpdate(NetConnection *con, BitStream *stream)
 
    if(stream->readFlag())
    {
-      mTargetNodeIdx = stream->readInt(32);
+      if (stream->readFlag())
+         mTargetNodeIdx = stream->readInt(32);
+      else
+         mTargetNodeIdx = -1;
 
       stream->readCompressedPoint(&mPosOffset);
 
@@ -474,7 +477,6 @@ void CameraComponent::setRotation(RotationF newRot)
 Frustum CameraComponent::getFrustum()
 {
    Frustum visFrustum;
-   F32 left, right, top, bottom;
    F32 aspectRatio = mClientScreen.x / mClientScreen.y;
 
    visFrustum.set(false, mDegToRad(mCameraFov), aspectRatio, 0.1f, 1000, mOwner->getTransform());

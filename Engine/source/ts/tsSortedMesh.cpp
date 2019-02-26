@@ -86,10 +86,10 @@ S32 TSSortedMesh::getNumPolys()
       Cluster & cluster = clusters[cIdx];
       for (S32 i=cluster.startPrimitive; i<cluster.endPrimitive; i++)
       {
-         if (primitives[i].matIndex & TSDrawPrimitive::Triangles)
-            count += primitives[i].numElements / 3;
+         if (mPrimitives[i].matIndex & TSDrawPrimitive::Triangles)
+            count += mPrimitives[i].numElements / 3;
          else
-            count += primitives[i].numElements - 2;
+            count += mPrimitives[i].numElements - 2;
       }
       cIdx = cluster.frontCluster; // always use frontCluster...we assume about the same no matter what
    }

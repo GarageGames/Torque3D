@@ -55,7 +55,7 @@
  #include "console/console.h"
  #include "core/strings/stringFunctions.h"
  #include "util/tempAlloc.h"
- #include "cinterface/cinterface.h"
+ #include "cinterface/c_controlInterface.h"
  #include "core/volume.h"
 
  #if defined(__FreeBSD__)
@@ -211,7 +211,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
        dStrncpy(pathEl, currChar, pathElLen);
        pathEl[pathElLen] = '\0';
        dStrncpy(testPath, tempBuf, MaxPath);
-       dStrcat(testPath, pathEl);
+       dStrcat(testPath, pathEl, MaxPath);
        if (stat(testPath, &filestat) != -1)
        {
           dStrncpy(tempBuf, testPath, MaxPath);
@@ -226,7 +226,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
              if (dStricmp(pathEl, ent->d_name) == 0)
              {
                 foundMatch = true;
-                dStrcat(tempBuf, ent->d_name);
+                dStrcat(tempBuf, ent->d_name, MaxPath);
                 break;
              }
           }
@@ -238,7 +238,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
        }
        if (*termChar == '/')
        {
-          dStrcat(tempBuf, "/");
+          dStrcat(tempBuf, "/", MaxPath);
           termChar++;
           currChar = termChar;
        }
@@ -935,7 +935,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
 
     TempAlloc< UTF8 > buf( dStrlen( newDir ) + 2 );
 
-    dStrcpy( buf, newDir );
+    dStrcpy( buf, newDir, buf.size );
 
     ForwardSlash( buf );
     return chdir( buf ) == 0;
@@ -1267,7 +1267,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
  	    {
  	      char child[1024];
  	      if ( (basePath[dStrlen(basePath) - 1]) == '/')
- 		dStrcpy (child, d->d_name);
+ 		dStrcpy (child, d->d_name, 1024);
  	      else
  		dSprintf(child, 1024, "/%s", d->d_name);
  	      if (currentDepth < recurseDepth || recurseDepth == -1)

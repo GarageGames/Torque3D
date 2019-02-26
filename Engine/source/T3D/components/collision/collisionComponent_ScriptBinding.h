@@ -24,21 +24,21 @@
 #include "T3D/components/collision/collisionComponent.h"
 #include "materials/baseMatInstance.h"
 
-DefineConsoleMethod(CollisionComponent, getNumberOfContacts, S32, (), ,
+DefineEngineMethod(CollisionComponent, getNumberOfContacts, S32, (), ,
    "Gets the number of contacts this collider has hit.\n"
    "@return The number of static fields defined on the object.")
 {
    return object->getCollisionList()->getCount();
 }
 
-DefineConsoleMethod(CollisionComponent, getBestContact, S32, (), ,
+DefineEngineMethod(CollisionComponent, getBestContact, S32, (), ,
    "Gets the number of contacts this collider has hit.\n"
    "@return The number of static fields defined on the object.")
 {
    return 0;
 }
 
-DefineConsoleMethod(CollisionComponent, getContactNormal, Point3F, (), ,
+DefineEngineMethod(CollisionComponent, getContactNormal, Point3F, (), ,
    "Gets the number of contacts this collider has hit.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -53,7 +53,7 @@ DefineConsoleMethod(CollisionComponent, getContactNormal, Point3F, (), ,
    return Point3F::Zero;
 }
 
-DefineConsoleMethod(CollisionComponent, getContactMaterial, S32, (), ,
+DefineEngineMethod(CollisionComponent, getContactMaterial, S32, (), ,
    "Gets the number of contacts this collider has hit.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -69,7 +69,7 @@ DefineConsoleMethod(CollisionComponent, getContactMaterial, S32, (), ,
    return 0;
 }
 
-DefineConsoleMethod(CollisionComponent, getContactObject, S32, (), ,
+DefineEngineMethod(CollisionComponent, getContactObject, S32, (), ,
    "Gets the number of contacts this collider has hit.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -81,7 +81,7 @@ DefineConsoleMethod(CollisionComponent, getContactObject, S32, (), ,
    return 0;
 }
 
-DefineConsoleMethod(CollisionComponent, getContactPoint, Point3F, (), ,
+DefineEngineMethod(CollisionComponent, getContactPoint, Point3F, (), ,
    "Gets the number of contacts this collider has hit.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -96,7 +96,7 @@ DefineConsoleMethod(CollisionComponent, getContactPoint, Point3F, (), ,
    return Point3F::Zero;
 }
 
-DefineConsoleMethod(CollisionComponent, getContactTime, S32, (), ,
+DefineEngineMethod(CollisionComponent, getContactTime, S32, (), ,
    "Gets the number of contacts this collider has hit.\n"
    "@return The number of static fields defined on the object.")
 {

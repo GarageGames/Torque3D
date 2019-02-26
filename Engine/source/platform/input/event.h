@@ -249,6 +249,14 @@ enum InputObjectInstancesEnum
    SI_DPOV2          = 0x215,
    SI_LPOV2          = 0x216,
    SI_RPOV2          = 0x217,
+   SI_POVMASK        = 0x218,
+   SI_POVMASK2       = 0x219,
+
+   /// Trackball event codes.
+   SI_XBALL          = 0x21A,
+   SI_YBALL          = 0x21B,
+   SI_XBALL2         = 0x21C,
+   SI_YBALL2         = 0x21D,
 
    XI_CONNECT        = 0x300,
    XI_THUMBLX        = 0x301,
@@ -262,7 +270,7 @@ enum InputObjectInstancesEnum
    XI_DPAD_DOWN      = 0x308,
    XI_DPAD_LEFT      = 0x309,
    XI_DPAD_RIGHT     = 0x310,*/
-   
+
    XI_START          = 0x311,
    XI_BACK           = 0x312,
    XI_LEFT_THUMB     = 0x313,
@@ -273,7 +281,8 @@ enum InputObjectInstancesEnum
    XI_A              = 0x317,
    XI_B              = 0x318,
    XI_X              = 0x319,
-   XI_Y              = 0x320,
+   XI_Y              = 0x31A,
+   XI_GUIDE          = 0x31B,
 
    INPUT_DEVICE_PLUGIN_CODES_START = 0x400,
 };

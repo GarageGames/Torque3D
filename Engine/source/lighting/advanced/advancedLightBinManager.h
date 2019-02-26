@@ -60,19 +60,23 @@ protected:
    enum
    {
       DynamicLight = 0,
+      SunLight,
       StaticLightNonLMGeometry,
       StaticLightLMGeometry,
-      NUM_LIT_STATES
+      NUM_LIT_STATES,
+      Base = 0,
+      Reflecting = 1
    };
-   GFXStateBlockRef mLitState[NUM_LIT_STATES];
+   GFXStateBlockRef mLitState[NUM_LIT_STATES][2];
 
 public:
    LightMatInstance(Material &mat) : Parent(mat), mLightMapParamsSC(NULL), mInternalPass(false) {}
 
    virtual bool init( const FeatureSet &features, const GFXVertexFormat *vertexFormat );
    virtual bool setupPass( SceneRenderState *state, const SceneData &sgData );
-};
 
+   bool mSpecialLight;
+};
 
 class AdvancedLightBinManager : public RenderTexTargetBinManager
 {

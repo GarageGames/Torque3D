@@ -647,7 +647,7 @@ void SFXSystem::deleteWhenStopped( SFXSource* source )
    // If the source isn't already on the play-once source list,
    // put it there now.
    
-   Vector< SFXSource* >::iterator iter = find( mPlayOnceSources.begin(), mPlayOnceSources.end(), source );
+   Vector< SFXSource* >::iterator iter = T3D::find( mPlayOnceSources.begin(), mPlayOnceSources.end(), source );
    if( iter == mPlayOnceSources.end() )
       mPlayOnceSources.push_back( source );
 }
@@ -674,9 +674,9 @@ void SFXSystem::_onRemoveSource( SFXSource* source )
 {
    // Check if it was a play once source.
    
-   Vector< SFXSource* >::iterator iter = find( mPlayOnceSources.begin(), mPlayOnceSources.end(), source );
-   if ( iter != mPlayOnceSources.end() )
-      mPlayOnceSources.erase_fast( iter );
+   Vector< SFXSource* >::iterator sourceIter = T3D::find( mPlayOnceSources.begin(), mPlayOnceSources.end(), source );
+   if (sourceIter != mPlayOnceSources.end() )
+      mPlayOnceSources.erase_fast(sourceIter);
 
    // Update the stats.
    
@@ -684,9 +684,9 @@ void SFXSystem::_onRemoveSource( SFXSource* source )
    
    if( dynamic_cast< SFXSound* >( source ) )
    {
-      SFXSoundVector::iterator iter = find( mSounds.begin(), mSounds.end(), static_cast< SFXSound* >( source ) );
-      if( iter != mSounds.end() )
-         mSounds.erase_fast( iter );
+      SFXSoundVector::iterator vectorIter = T3D::find( mSounds.begin(), mSounds.end(), static_cast< SFXSound* >( source ) );
+      if(vectorIter != mSounds.end() )
+         mSounds.erase_fast(vectorIter);
          
       mStatNumSounds = mSounds.size();
    }
@@ -1442,7 +1442,7 @@ static ConsoleDocFragment _sfxCreateSource4(
    NULL,
    "SFXSound sfxCreateSource( SFXDescription description, string filename, float x, float y, float z );" );
 
-DefineConsoleFunction( sfxCreateSource, S32, ( const char * sfxType, const char * arg0, const char * arg1, const char * arg2, const char * arg3 ), ("", "", "", ""),
+DefineEngineFunction( sfxCreateSource, S32, ( const char * sfxType, const char * arg0, const char * arg1, const char * arg2, const char * arg3 ), ("", "", "", ""),
                      "( SFXTrack track | ( SFXDescription description, string filename ) [, float x, float y, float z ] ) "
                      "Creates a new paused sound source using a profile or a description "
                      "and filename.  The return value is the source which must be "
@@ -1547,7 +1547,7 @@ static ConsoleDocFragment _sfxPlay3(
    NULL,
    "void sfxPlay( SFXTrack track, float x, float y, float z );" );
    
-DefineConsoleFunction( sfxPlay, S32, ( const char * trackName, const char * pointOrX, const char * y, const char * z ), ( "", "", ""),
+DefineEngineFunction( sfxPlay, S32, ( const char * trackName, const char * pointOrX, const char * y, const char * z ), ( "", "", ""),
    "Start playing the given source or create a new source for the given track and play it.\n"
    "@hide" )
 {
@@ -1657,7 +1657,7 @@ static ConsoleDocFragment _sPlayOnce4(
    "SFXSource sfxPlayOnce( SFXDescription description, string filename, float x, float y, float z, float fadeInTime=-1 );"
 );
 
-DefineConsoleFunction( sfxPlayOnce, S32, ( const char * sfxType, const char * arg0, const char * arg1, const char * arg2, const char * arg3, const char* arg4 ), ("", "", "", "", "-1.0f"),
+DefineEngineFunction( sfxPlayOnce, S32, ( const char * sfxType, const char * arg0, const char * arg1, const char * arg2, const char * arg3, const char* arg4 ), ("", "", "", "", "-1.0f"),
    "SFXSource sfxPlayOnce( ( SFXTrack track | SFXDescription description, string filename ) [, float x, float y, float z, float fadeInTime=-1 ] ) "
    "Create a new play-once source for the given profile or description+filename and start playback of the source.\n"
    "@hide" )

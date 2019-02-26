@@ -26,10 +26,8 @@
 #include "renderInstance/renderPassManager.h"
 #include "math/util/matrixSet.h"
 
-#ifdef TORQUE_EXPERIMENTAL_EC
 #include "T3D/components/render/renderComponentInterface.h"
 #include "T3D/components/component.h"
-#endif
 
 //-----------------------------------------------------------------------------
 
@@ -107,19 +105,6 @@ void SceneRenderState::renderObjects( SceneObject** objects, U32 numObjects )
       SceneObject* object = objects[ i ];
       object->prepRenderImage( this );
    }
-
-#ifdef TORQUE_EXPERIMENTAL_EC
-   U32 interfaceCount = RenderComponentInterface::all.size();
-   for (U32 i = 0; i < RenderComponentInterface::all.size(); i++)
-   {
-      Component* comp = dynamic_cast<Component*>(RenderComponentInterface::all[i]);
-
-      if (comp->isClientObject() && comp->isActive())
-      {
-         RenderComponentInterface::all[i]->prepRenderImage(this);
-      }
-   }
-#endif
 
    PROFILE_END();
 

@@ -53,7 +53,7 @@ void Px3Player::_releaseController()
    {
       mController->getActor()->userData = NULL;
       mWorld->getStaticChangedSignal().remove( this, &Px3Player::_onStaticChanged );
-      mController->release();
+      SafeReleasePhysx(mController);
    }
 }
 
@@ -136,8 +136,6 @@ Point3F Px3Player::move( const VectorF &disp, CollisionList &outCol )
       return newPos;
    }
 
-   mWorld->releaseWriteLock();
-
    mCollisionList = &outCol;
 
    physx::PxVec3 dispNx( disp.x, disp.y, disp.z );
@@ -151,8 +149,8 @@ Point3F Px3Player::move( const VectorF &disp, CollisionList &outCol )
    physx::PxFilterData data;
    data.word0=groups;
    filter.mFilterData = &data;
-   filter.mFilterFlags = physx::PxSceneQueryFilterFlags(physx::PxControllerFlag::eCOLLISION_DOWN|physx::PxControllerFlag::eCOLLISION_SIDES|physx::PxControllerFlag::eCOLLISION_UP);
-
+   filter.mFilterFlags = physx::PxQueryFlags(physx::PxQueryFlag::eDYNAMIC | physx::PxQueryFlag::eSTATIC);
+   
    mController->move( dispNx,0.0001f,0, filter );
 
    Point3F newPos = px3Cast<Point3F>( mController->getPosition() );
@@ -272,7 +270,6 @@ void Px3Player::enableCollision()
 {
    AssertFatal( mController, "Px3Player::enableCollision - The controller is null!" );
 
-   mWorld->releaseWriteLock();
    px3GetFirstShape(mController->getActor())->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE,true);
 }
 
@@ -280,7 +277,6 @@ void Px3Player::disableCollision()
 {
    AssertFatal( mController, "Px3Player::disableCollision - The controller is null!" );
 
-   mWorld->releaseWriteLock();
 	px3GetFirstShape(mController->getActor())->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE,false); 
 }
 
@@ -292,8 +288,6 @@ PhysicsWorld* Px3Player::getWorld()
 void Px3Player::setTransform( const MatrixF &transform )
 {
    AssertFatal( mController, "Px3Player::setTransform - The controller is null!" );
-
-   mWorld->releaseWriteLock();
 
    Point3F newPos = transform.getPosition();
    newPos.z += mOriginOffset;
@@ -355,7 +349,6 @@ void Px3Player::setSpacials(const Point3F &nPos, const Point3F &nSize)
    F32 height = nSize.z - (radius * 2.0f);
    height -= mSkinWidth * 2.0f;
 
-   mWorld->releaseWriteLock();
    mController->resize(height);
    px3GetFirstShape(mController->getActor())->getCapsuleGeometry(mGeometry);
 }
