@@ -5,15 +5,4 @@
 	ScriptFile="Core.cs"
 	CreateFunction="onCreate"
 	DestroyFunction="onDestroy"
-	Group="Core">
-	<DeclaredAssets
-           canSave="true"
-           canSaveDynamicFields="true"
-           Extension="asset.taml"
-           Recurse="true" />
-	<AutoloadAssets
-	   canSave="true"
-	   canSaveDynamicFields="true"
-	   AssetType="ComponentAsset"
-	   Recurse="true" />
-</ModuleDefinition>
+	Group="Core"/>
