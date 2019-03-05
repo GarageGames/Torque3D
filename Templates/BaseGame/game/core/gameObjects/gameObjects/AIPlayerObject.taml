@@ -1,0 +1,12 @@
+<AIPlayerObject
+    scale="1 1 1"
+    class="AIPlayerObject"
+    canSave="true"
+    canSaveDynamicFields="true"
+    position="0 0 0"
+    rotation="0 -0 -0"
+    LocalPosition="0 0 0"
+    LocalRotation="1 0 0 0"
+    lifetimeMS="0"
+    gameObject="Core_GameObjects:AIPlayerObject">
+</AIPlayerObject>

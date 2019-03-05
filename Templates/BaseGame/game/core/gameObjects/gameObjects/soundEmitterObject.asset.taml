@@ -1,0 +1,7 @@
+<GameObjectAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="soundEmitterObject"
+    gameObjectName="soundEmitterObject"
+    TAMLFilePath="core/gameObjects/gameObjects/soundEmitterObject.taml"
+    description="A basic sound emitter example." />
