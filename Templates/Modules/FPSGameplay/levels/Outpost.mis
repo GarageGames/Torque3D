@@ -1,5 +1,5 @@
 //--- OBJECT WRITE BEGIN ---
-new SimGroup(MissionGroup) {
+new Scene(OutpostLevel) {
    canSave = "1";
    canSaveDynamicFields = "1";
       enabled = "1";
