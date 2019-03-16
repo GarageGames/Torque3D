@@ -317,9 +317,14 @@ function EditorGui::shutdown( %this )
 /// will take over the default world editor window.
 function EditorGui::addToEditorsMenu( %this, %displayName, %accel, %newPlugin )
 {
+   //We need to cache the editors list. So first see if we have our list we cache the entries into
+   if(!isObject(EditorsMenuList))
+   {
+      new ArrayObject(EditorsMenuList);   
+   }
+   
    %windowMenu = %this.findMenu( "Editors" );   
    %count = %windowMenu.getItemCount();      
-   
    
    %alreadyExists = false;
    for ( %i = 0; %i < %count; %i++ )
@@ -336,7 +341,10 @@ function EditorGui::addToEditorsMenu( %this, %displayName, %accel, %newPlugin )
       %accel = "";
          
    if(!%alreadyExists)
+   {
+      EditorsMenuList.add(%displayName TAB %accel TAB %newPlugin);
       %windowMenu.addItem( %count, %displayName TAB %accel TAB %newPlugin );
+   }
       
    return %accel;
 }
