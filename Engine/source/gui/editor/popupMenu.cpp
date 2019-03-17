@@ -282,156 +282,159 @@ void PopupMenu::showPopup(GuiCanvas *owner, S32 x /* = -1 */, S32 y /* = -1 */)
    if (owner == NULL)
       return;
 
-   GuiControl* editorGui;
-   Sim::findObject("EditorGui", editorGui);
+   GuiPopupMenuBackgroundCtrl* backgroundCtrl;
+   Sim::findObject("PopUpMenuControl", backgroundCtrl);
 
-   if (editorGui)
+   GuiControlProfile* profile;
+   Sim::findObject("GuiMenubarProfile", profile);
+
+   if (!profile)
+      return;
+
+   if (mTextList == nullptr)
    {
-      GuiPopupMenuBackgroundCtrl* backgroundCtrl;
-      Sim::findObject("PopUpMenuControl", backgroundCtrl);
+      mTextList = new GuiPopupMenuTextListCtrl();
+      mTextList->registerObject();
+      mTextList->setControlProfile(profile);
 
-      GuiControlProfile* profile;
-      Sim::findObject("GuiMenubarProfile", profile);
-
-      if (!profile)
-         return;
-
-      if (mTextList == nullptr)
-      {
-         mTextList = new GuiPopupMenuTextListCtrl();
-         mTextList->registerObject();
-         mTextList->setControlProfile(profile);
-
-         mTextList->mPopup = this;
-         mTextList->mMenuBar = getMenuBarCtrl();
-      }
-
-      if (!backgroundCtrl)
-      {
-         backgroundCtrl = new GuiPopupMenuBackgroundCtrl();
-
-         backgroundCtrl->registerObject("PopUpMenuControl");
-      }
-
-      if (!backgroundCtrl || !mTextList)
-         return;
-
-      if (!mIsSubmenu)
-      {
-         //if we're a 'parent' menu, then tell the background to clear out all existing other popups
-
-         backgroundCtrl->clearPopups();
-      }
-
-      //find out if we're doing a first-time add
-      S32 popupIndex = backgroundCtrl->findPopupMenu(this);
-
-      if (popupIndex == -1)
-      {
-         backgroundCtrl->addObject(mTextList);
-         backgroundCtrl->mPopups.push_back(this);
-      }
-
-      mTextList->mBackground = backgroundCtrl;
-
-      owner->pushDialogControl(backgroundCtrl, 10);
-
-      //Set the background control's menubar, if any, and if it's not already set
-      if(backgroundCtrl->mMenuBarCtrl == nullptr)
-         backgroundCtrl->mMenuBarCtrl = getMenuBarCtrl();
-
-      backgroundCtrl->setExtent(editorGui->getExtent());
-
-      mTextList->clear();
-
-      S32 textWidth = 0, width = 0;
-      S32 acceleratorWidth = 0;
-      GFont *font = profile->mFont;
-
-      Point2I maxBitmapSize = Point2I(0, 0);
-
-      S32 numBitmaps = profile->mBitmapArrayRects.size();
-      if (numBitmaps)
-      {
-         RectI *bitmapBounds = profile->mBitmapArrayRects.address();
-         for (S32 i = 0; i < numBitmaps; i++)
-         {
-            if (bitmapBounds[i].extent.x > maxBitmapSize.x)
-               maxBitmapSize.x = bitmapBounds[i].extent.x;
-            if (bitmapBounds[i].extent.y > maxBitmapSize.y)
-               maxBitmapSize.y = bitmapBounds[i].extent.y;
-         }
-      }
-
-      for (U32 i = 0; i < mMenuItems.size(); i++)
-      {
-         if (!mMenuItems[i].mVisible)
-            continue;
-
-         S32 iTextWidth = font->getStrWidth(mMenuItems[i].mText.c_str());
-         S32 iAcceleratorWidth = mMenuItems[i].mAccelerator ? font->getStrWidth(mMenuItems[i].mAccelerator) : 0;
-
-         if (iTextWidth > textWidth)
-            textWidth = iTextWidth;
-         if (iAcceleratorWidth > acceleratorWidth)
-            acceleratorWidth = iAcceleratorWidth;
-      }
-
-      width = textWidth + acceleratorWidth + maxBitmapSize.x * 2 + 2 + 4;
-
-      mTextList->setCellSize(Point2I(width, font->getHeight() + 2));
-      mTextList->clearColumnOffsets();
-      mTextList->addColumnOffset(-1); // add an empty column in for the bitmap index.
-      mTextList->addColumnOffset(maxBitmapSize.x + 1);
-      mTextList->addColumnOffset(maxBitmapSize.x + 1 + textWidth + 4);
-
-      U32 entryCount = 0;
-
-      for (U32 i = 0; i < mMenuItems.size(); i++)
-      {
-         if (!mMenuItems[i].mVisible)
-            continue;
-
-         char buf[512];
-
-         //  If this menu item is a submenu, then set the isSubmenu to 2 to indicate
-         // an arrow should be drawn.  Otherwise set the isSubmenu normally.
-         char isSubmenu = 1;
-         if (mMenuItems[i].mIsSubmenu)
-            isSubmenu = 2;
-
-         char bitmapIndex = 1;
-         if (mMenuItems[i].mBitmapIndex >= 0 && (mMenuItems[i].mBitmapIndex * 3 <= profile->mBitmapArrayRects.size()))
-            bitmapIndex = mMenuItems[i].mBitmapIndex + 2;
-
-         dSprintf(buf, sizeof(buf), "%c%c\t%s\t%s", bitmapIndex, isSubmenu, mMenuItems[i].mText.c_str(), mMenuItems[i].mAccelerator ? mMenuItems[i].mAccelerator : "");
-         mTextList->addEntry(entryCount, buf);
-
-         if (!mMenuItems[i].mEnabled)
-            mTextList->setEntryActive(entryCount, false);
-
-         entryCount++;
-      }
-
-      Point2I pos = Point2I::Zero;
-
-      if (x == -1 && y == -1)
-         pos = owner->getCursorPos();
-      else
-         pos = Point2I(x, y);
-
-      mTextList->setPosition(pos);
-
-      //nudge in if we'd overshoot the screen
-      S32 widthDiff = (mTextList->getPosition().x + mTextList->getExtent().x) - backgroundCtrl->getWidth();
-      if (widthDiff > 0)
-      {
-         Point2I popupPos = mTextList->getPosition();
-         mTextList->setPosition(popupPos.x - widthDiff, popupPos.y);
-      }
-
-      mTextList->setHidden(false);
+      mTextList->mPopup = this;
+      mTextList->mMenuBar = getMenuBarCtrl();
    }
+
+   if (!backgroundCtrl)
+   {
+      backgroundCtrl = new GuiPopupMenuBackgroundCtrl();
+
+      backgroundCtrl->registerObject("PopUpMenuControl");
+   }
+
+   if (!backgroundCtrl || !mTextList)
+      return;
+
+   if (!mIsSubmenu)
+   {
+      //if we're a 'parent' menu, then tell the background to clear out all existing other popups
+
+      backgroundCtrl->clearPopups();
+   }
+
+   //find out if we're doing a first-time add
+   S32 popupIndex = backgroundCtrl->findPopupMenu(this);
+
+   if (popupIndex == -1)
+   {
+      backgroundCtrl->addObject(mTextList);
+      backgroundCtrl->mPopups.push_back(this);
+   }
+
+   mTextList->mBackground = backgroundCtrl;
+
+   owner->pushDialogControl(backgroundCtrl, 10);
+
+   //Set the background control's menubar, if any, and if it's not already set
+   if(backgroundCtrl->mMenuBarCtrl == nullptr)
+      backgroundCtrl->mMenuBarCtrl = getMenuBarCtrl();
+
+   backgroundCtrl->setExtent(owner->getExtent());
+
+   mTextList->clear();
+
+   S32 textWidth = 0, width = 0;
+   S32 acceleratorWidth = 0;
+   GFont *font = profile->mFont;
+
+   Point2I maxBitmapSize = Point2I(0, 0);
+
+   S32 numBitmaps = profile->mBitmapArrayRects.size();
+   if (numBitmaps)
+   {
+      RectI *bitmapBounds = profile->mBitmapArrayRects.address();
+      for (S32 i = 0; i < numBitmaps; i++)
+      {
+         if (bitmapBounds[i].extent.x > maxBitmapSize.x)
+            maxBitmapSize.x = bitmapBounds[i].extent.x;
+         if (bitmapBounds[i].extent.y > maxBitmapSize.y)
+            maxBitmapSize.y = bitmapBounds[i].extent.y;
+      }
+   }
+
+   for (U32 i = 0; i < mMenuItems.size(); i++)
+   {
+      if (!mMenuItems[i].mVisible)
+         continue;
+
+      S32 iTextWidth = font->getStrWidth(mMenuItems[i].mText.c_str());
+      S32 iAcceleratorWidth = mMenuItems[i].mAccelerator ? font->getStrWidth(mMenuItems[i].mAccelerator) : 0;
+
+      if (iTextWidth > textWidth)
+         textWidth = iTextWidth;
+      if (iAcceleratorWidth > acceleratorWidth)
+         acceleratorWidth = iAcceleratorWidth;
+   }
+
+   width = textWidth + acceleratorWidth + maxBitmapSize.x * 2 + 2 + 4;
+
+   mTextList->setCellSize(Point2I(width, font->getHeight() + 2));
+   mTextList->clearColumnOffsets();
+   mTextList->addColumnOffset(-1); // add an empty column in for the bitmap index.
+   mTextList->addColumnOffset(maxBitmapSize.x + 1);
+   mTextList->addColumnOffset(maxBitmapSize.x + 1 + textWidth + 4);
+
+   U32 entryCount = 0;
+
+   for (U32 i = 0; i < mMenuItems.size(); i++)
+   {
+      if (!mMenuItems[i].mVisible)
+         continue;
+
+      char buf[512];
+
+      //  If this menu item is a submenu, then set the isSubmenu to 2 to indicate
+      // an arrow should be drawn.  Otherwise set the isSubmenu normally.
+      char isSubmenu = 1;
+      if (mMenuItems[i].mIsSubmenu)
+         isSubmenu = 2;
+
+      char bitmapIndex = 1;
+      if (mMenuItems[i].mBitmapIndex >= 0 && (mMenuItems[i].mBitmapIndex * 3 <= profile->mBitmapArrayRects.size()))
+         bitmapIndex = mMenuItems[i].mBitmapIndex + 2;
+
+      dSprintf(buf, sizeof(buf), "%c%c\t%s\t%s", bitmapIndex, isSubmenu, mMenuItems[i].mText.c_str(), mMenuItems[i].mAccelerator ? mMenuItems[i].mAccelerator : "");
+      mTextList->addEntry(entryCount, buf);
+
+      if (!mMenuItems[i].mEnabled)
+         mTextList->setEntryActive(entryCount, false);
+
+      entryCount++;
+   }
+
+   Point2I pos = Point2I::Zero;
+
+   if (x == -1 && y == -1)
+      pos = owner->getCursorPos();
+   else
+      pos = Point2I(x, y);
+
+   mTextList->setPosition(pos);
+
+   //nudge in if we'd overshoot the screen
+   S32 widthDiff = (mTextList->getPosition().x + mTextList->getExtent().x) - backgroundCtrl->getWidth();
+   if (widthDiff > 0)
+   {
+      Point2I popupPos = mTextList->getPosition();
+      mTextList->setPosition(popupPos.x - widthDiff, popupPos.y);
+   }
+
+   //If we'd overshoot the screen vertically, just mirror the axis so we're above the mouse
+   S32 heightDiff = (mTextList->getPosition().y + mTextList->getExtent().y) - backgroundCtrl->getHeight();
+   if (heightDiff > 0)
+   {
+      Point2I popupPos = mTextList->getPosition();
+      mTextList->setPosition(popupPos.x, popupPos.y - mTextList->getExtent().y);
+   }
+
+
+   mTextList->setHidden(false);
 }
 
 void PopupMenu::hidePopup()
