@@ -38,6 +38,7 @@
 #include "scene/sceneRenderState.h"
 #include "renderInstance/renderBinManager.h"
 
+#include "T3D/Scene.h"
 
 IMPLEMENT_CONOBJECT(EditTSCtrl);
 ConsoleDocClass( EditTSCtrl,
@@ -795,15 +796,15 @@ void EditTSCtrl::_renderScene( ObjectRenderInst*, SceneRenderState *state, BaseM
    GFXTransformSaver saver;
 
    // render through console callbacks
-   SimSet * missionGroup = static_cast<SimSet*>(Sim::findObject("MissionGroup"));
-   if(missionGroup)
+   Scene* scene = Scene::getRootScene();
+   if(scene)
    {
       mConsoleRendering = true;
 
       // [ rene, 27-Jan-10 ] This calls onEditorRender on the server objects instead
       //    of on the client objects which seems a bit questionable to me.
  
-      for(SimSetIterator itr(missionGroup); *itr; ++itr)
+      for(SimSetIterator itr(scene); *itr; ++itr)
       {
          SceneObject* object = dynamic_cast< SceneObject* >( *itr );
          if( object && object->isRenderEnabled() && !object->isHidden() )

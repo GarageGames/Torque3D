@@ -18,7 +18,7 @@ function Core_ClientServer::create( %this )
    exec( "./scripts/client/client.cs" );
    exec( "./scripts/server/server.cs" );
 
-   $Game::MissionGroup = "MissionGroup";
+   $Game::MainScene = getScene(0);
 
    initServer();
    

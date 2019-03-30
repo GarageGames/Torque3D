@@ -947,10 +947,10 @@ function ObjectBuilderGui::buildPlayerDropPoint(%this)
    %this.addField("spawnClass",     "TypeString",    "Spawn Class", "Player");
    %this.addField("spawnDatablock", "TypeDataBlock", "Spawn Data", "PlayerData DefaultPlayerData");
 
-   if( EWCreatorWindow.objectGroup.getID() == MissionGroup.getID() )
+   if( EWCreatorWindow.objectGroup.getID() == getScene(0).getID() )
    {
       if( !isObject("PlayerDropPoints") )
-         MissionGroup.add( new SimGroup("PlayerDropPoints") );
+         getScene(0).add( new SimGroup("PlayerDropPoints") );
       %this.objectGroup = "PlayerDropPoints";
    }
 
@@ -967,10 +967,10 @@ function ObjectBuilderGui::buildObserverDropPoint(%this)
    %this.addField("spawnClass",     "TypeString",    "Spawn Class", "Camera");
    %this.addField("spawnDatablock", "TypeDataBlock", "Spawn Data", "CameraData Observer");
 
-   if( EWCreatorWindow.objectGroup.getID() == MissionGroup.getID() )
+   if( EWCreatorWindow.objectGroup.getID() == getScene(0).getID() )
    {
       if( !isObject("ObserverDropPoints") )
-         MissionGroup.add( new SimGroup("ObserverDropPoints") );
+         getScene(0).add( new SimGroup("ObserverDropPoints") );
       %this.objectGroup = "ObserverDropPoints";
    }
 

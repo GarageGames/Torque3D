@@ -43,6 +43,8 @@
 #include "T3D/gameBase/gameConnection.h"
 #include "T3D/prefab.h"
 
+#include "T3D/Scene.h"
+
 IMPLEMENT_CONOBJECT(GuiRiverEditorCtrl);
 
 ConsoleDocClass( GuiRiverEditorCtrl,
@@ -444,12 +446,12 @@ void GuiRiverEditorCtrl::_process3DMouseDown( const Gui3DMouseEvent& event )
          return;
       }                
 
-      // Add to MissionGroup                              
-      SimGroup *missionGroup;
-      if ( !Sim::findObject( "MissionGroup", missionGroup ) )               
-         Con::errorf( "GuiRiverEditorCtrl - could not find MissionGroup to add new River" );
+      // Add to Scene                              
+      Scene* scene = Scene::getRootScene();
+      if ( !scene )               
+         Con::errorf( "GuiRiverEditorCtrl - could not find root Scene to add new River" );
       else
-         missionGroup->addObject( newRiver );
+         scene->addObject( newRiver );
 
       Point3F pos( endPnt );
       pos.z += mDefaultDepth * 0.5f;

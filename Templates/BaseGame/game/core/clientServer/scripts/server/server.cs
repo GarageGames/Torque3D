@@ -243,7 +243,7 @@ function onServerDestroyed()
 {
    physicsStopSimulation("server");
    
-   if (!isObject( MissionGroup ))
+   if (!isObject( getScene(0) ))
       return;
 
    echo("*** ENDING MISSION");
@@ -262,7 +262,7 @@ function onServerDestroyed()
    }
    
    // Delete everything
-   MissionGroup.delete();
+   getScene(0).delete();
    MissionCleanup.delete();
    
    clearServerPaths();

@@ -114,7 +114,7 @@ function MissionAreaEditorPlugin::createNewMissionArea(%this)
    %newMissionArea = new MissionArea();
    %newMissionArea.area = "-256 -256 512 512";
 
-   MissionGroup.add(%newMissionArea);
+   getScene(0).add(%newMissionArea);
 
    EditorGui.setEditor(MissionAreaEditorPlugin);
 

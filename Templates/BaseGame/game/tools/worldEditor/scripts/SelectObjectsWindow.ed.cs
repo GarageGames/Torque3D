@@ -40,7 +40,7 @@ function ESelectObjectsWindow::toggleVisibility( %this )
 /// to start searching for objects.
 function ESelectObjectsWindow::getRootGroup( %this )
 {
-   return MissionGroup;
+   return getScene(0);
 }
 
 //---------------------------------------------------------------------------------------------

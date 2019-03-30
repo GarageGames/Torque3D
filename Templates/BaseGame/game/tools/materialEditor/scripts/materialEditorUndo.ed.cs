@@ -187,7 +187,7 @@ function ActionUpdateActiveMaterialAnimationFlags::undo(%this)
 function ActionUpdateActiveMaterialName::redo(%this)
 {
    %this.material.setName(%this.newName);
-   MaterialEditorGui.updateMaterialReferences( MissionGroup, %this.oldName, %this.newName );
+   MaterialEditorGui.updateMaterialReferences( getScene(0), %this.oldName, %this.newName );
 
    if( MaterialEditorPreviewWindow.isVisible() && MaterialEditorGui.currentMaterial == %this.material )
    {
@@ -199,7 +199,7 @@ function ActionUpdateActiveMaterialName::redo(%this)
 function ActionUpdateActiveMaterialName::undo(%this)
 {
    %this.material.setName(%this.oldName);
-   MaterialEditorGui.updateMaterialReferences( MissionGroup, %this.newName, %this.oldName );
+   MaterialEditorGui.updateMaterialReferences( getScene(0), %this.newName, %this.oldName );
 
    if( MaterialEditorPreviewWindow.isVisible() && MaterialEditorGui.currentMaterial == %this.material )
    {

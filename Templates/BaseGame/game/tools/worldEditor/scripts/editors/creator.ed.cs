@@ -179,7 +179,7 @@ function EWCreatorWindow::createStatic( %this, %file )
       return;
 
    if( !isObject(%this.objectGroup) )
-      %this.setNewObjectGroup( MissionGroup );
+      %this.setNewObjectGroup( getScene(0) );
 
    %objId = new TSStatic()
    {
@@ -197,7 +197,7 @@ function EWCreatorWindow::createPrefab( %this, %file )
       return;
 
    if( !isObject(%this.objectGroup) )
-      %this.setNewObjectGroup( MissionGroup );
+      %this.setNewObjectGroup( getScene(0) );
 
    %objId = new Prefab()
    {
@@ -215,7 +215,7 @@ function EWCreatorWindow::createObject( %this, %cmd )
       return;
 
    if( !isObject(%this.objectGroup) )
-      %this.setNewObjectGroup( MissionGroup );
+      %this.setNewObjectGroup( getScene(0) );
 
    pushInstantGroup();
    %objId = eval(%cmd);

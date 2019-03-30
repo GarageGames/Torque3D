@@ -34,6 +34,8 @@
 #include "T3D/physics/physicsShape.h"
 #include "core/util/path.h"
 
+#include "T3D/Scene.h"
+
 // We use this locally ( within this file ) to prevent infinite recursion
 // while loading prefab files that contain other prefabs.
 static Vector<String> sPrefabFileStack;
@@ -269,11 +271,11 @@ void Prefab::setFile( String file )
 
 SimGroup* Prefab::explode()
 {
-   SimGroup *missionGroup;
+   Scene* scene = Scene::getRootScene();
 
-   if ( !Sim::findObject( "MissionGroup", missionGroup ) )
+   if ( !scene)
    {
-      Con::errorf( "Prefab::explode, MissionGroup was not found." );
+      Con::errorf( "Prefab::explode, Scene was not found." );
       return NULL;
    }
 
@@ -295,7 +297,7 @@ SimGroup* Prefab::explode()
       smChildToPrefabMap.erase( child->getId() );
    }
    
-   missionGroup->addObject(group);
+   scene->addObject(group);
    mChildGroup = NULL;
    mChildMap.clear();
 
@@ -468,10 +470,10 @@ Prefab* Prefab::getPrefabByChild( SimObject *child )
 
 bool Prefab::isValidChild( SimObject *simobj, bool logWarnings )
 {
-   if ( simobj->getName() && dStricmp(simobj->getName(),"MissionGroup") == 0 )
+   if ( simobj->getName() && simobj == Scene::getRootScene() )
    {
       if ( logWarnings )
-         Con::warnf( "MissionGroup is not valid within a Prefab." );
+         Con::warnf( "root Scene is not valid within a Prefab." );
       return false;
    }
 
