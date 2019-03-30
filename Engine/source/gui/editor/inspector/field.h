@@ -84,6 +84,10 @@ class GuiInspectorField : public GuiControl
       ///
       bool mHighlighted;
 
+      //These are so we can special-case our height for additional room on certain field-types
+      bool mUseHeightOverride;
+      U32 mHeightOverride;
+
       //An override that lets us bypass inspector-dependent logic for setting/getting variables/fields
       bool mSpecialEditField;
       //An override to make sure this field is associated to an object that isn't expressly
