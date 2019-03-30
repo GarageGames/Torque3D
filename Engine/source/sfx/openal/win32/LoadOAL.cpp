@@ -439,7 +439,118 @@ ALboolean LoadOAL10Library(char *szOALFullPathName, LPOPENALFNTABLE lpOALFnTable
 		OutputDebugStringA("Failed to retrieve 'alcGetEnumValue' function address\n");
 		return AL_FALSE;
 	}
+   lpOALFnTable->alGenEffects = (LPALGENEFFECTS)GetProcAddress(g_hOpenALDLL, "alGenEffects");
+   if (lpOALFnTable->alGenEffects == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alGenEffects' function address\n");
+   }
+   lpOALFnTable->alEffecti = (LPALEFFECTI)GetProcAddress(g_hOpenALDLL, "alEffecti");
+   if (lpOALFnTable->alEffecti == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alEffecti' function address\n");
+   }
+   lpOALFnTable->alEffectiv = (LPALEFFECTIV)GetProcAddress(g_hOpenALDLL, "alEffectiv");
+   if (lpOALFnTable->alEffectiv == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alEffectiv' function address\n");
+   }
+   lpOALFnTable->alEffectf = (LPALEFFECTF)GetProcAddress(g_hOpenALDLL, "alEffectf");
+   if (lpOALFnTable->alEffectf == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alEffectf' function address\n");
+   }
+   lpOALFnTable->alEffectfv = (LPALEFFECTFV)GetProcAddress(g_hOpenALDLL, "alEffectfv");
+   if (lpOALFnTable->alEffectfv == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alEffectfv' function address\n");
+   }
+   lpOALFnTable->alGetEffecti = (LPALGETEFFECTI)GetProcAddress(g_hOpenALDLL, "alGetEffecti");
+   if (lpOALFnTable->alGetEffecti == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alGetEffecti' function address\n");
+   }
+   lpOALFnTable->alGetEffectiv = (LPALGETEFFECTIV)GetProcAddress(g_hOpenALDLL, "alGetEffectiv");
+   if (lpOALFnTable->alGetEffectiv == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alGetEffectiv' function address\n");
+   }
+   lpOALFnTable->alGetEffectf = (LPALGETEFFECTF)GetProcAddress(g_hOpenALDLL, "alGetEffectf");
+   if (lpOALFnTable->alGetEffectf == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alGetEffectf' function address\n");
+   }
+   lpOALFnTable->alGetEffectfv = (LPALGETEFFECTFV)GetProcAddress(g_hOpenALDLL, "alGetEffectfv");
+   if (lpOALFnTable->alGetEffectfv == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alGetEffectfv' function address\n");
+   }
 
+   lpOALFnTable->alDeleteEffects = (LPALDELETEEFFECTS)GetProcAddress(g_hOpenALDLL, "alDeleteEffects");
+   if (lpOALFnTable->alDeleteEffects == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alDeleteEffects' function address\n");
+   }
+   lpOALFnTable->alIsEffect = (LPALISEFFECT)GetProcAddress(g_hOpenALDLL, "alIsEffect");
+   if (lpOALFnTable->alIsEffect == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alIsEffect' function address\n");
+   }
+   lpOALFnTable->alAuxiliaryEffectSlotf = (LPALAUXILIARYEFFECTSLOTF)GetProcAddress(g_hOpenALDLL, "alAuxiliaryEffectSlotf");
+   if (lpOALFnTable->alAuxiliaryEffectSlotf == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alAuxiliaryEffectSlotf' function address\n");
+   }
+   lpOALFnTable->alAuxiliaryEffectSlotfv = (LPALAUXILIARYEFFECTSLOTFV)GetProcAddress(g_hOpenALDLL, "alAuxiliaryEffectSlotfv");
+   if (lpOALFnTable->alAuxiliaryEffectSlotfv == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alAuxiliaryEffectSlotfv' function address\n");
+   }
+   lpOALFnTable->alAuxiliaryEffectSloti = (LPALAUXILIARYEFFECTSLOTI)GetProcAddress(g_hOpenALDLL, "alAuxiliaryEffectSloti");
+   if (lpOALFnTable->alAuxiliaryEffectSloti == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alAuxiliaryEffectSloti' function address\n");
+   }
+   lpOALFnTable->alAuxiliaryEffectSlotiv = (LPALAUXILIARYEFFECTSLOTIV)GetProcAddress(g_hOpenALDLL, "alAuxiliaryEffectSlotiv");
+   if (lpOALFnTable->alAuxiliaryEffectSlotiv == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alAuxiliaryEffectSlotiv' function address\n");
+   }
+   lpOALFnTable->alIsAuxiliaryEffectSlot = (LPALISAUXILIARYEFFECTSLOT)GetProcAddress(g_hOpenALDLL, "alIsAuxiliaryEffectSlot");
+   if (lpOALFnTable->alIsAuxiliaryEffectSlot == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alIsAuxiliaryEffectSlot' function address\n");
+   }
+   lpOALFnTable->alGenAuxiliaryEffectSlots = (LPALGENAUXILIARYEFFECTSLOTS)GetProcAddress(g_hOpenALDLL, "alGenAuxiliaryEffectSlots");
+   if (lpOALFnTable->alGenAuxiliaryEffectSlots == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alGenAuxiliaryEffectSlots' function address\n");
+   }
+   lpOALFnTable->alDeleteAuxiliaryEffectSlots = (LPALDELETEAUXILIARYEFFECTSLOTS)GetProcAddress(g_hOpenALDLL, "alDeleteAuxiliaryEffectSlots");
+   if (lpOALFnTable->alDeleteAuxiliaryEffectSlots == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alDeleteAuxiliaryEffectSlots' function address\n");
+   }
+   lpOALFnTable->alGetAuxiliaryEffectSlotf = (LPALGETAUXILIARYEFFECTSLOTF)GetProcAddress(g_hOpenALDLL, "alGetAuxiliaryEffectSlotf");
+   if (lpOALFnTable->alGetAuxiliaryEffectSlotf == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alGetAuxiliaryEffectSlotf' function address\n");
+   }
+   lpOALFnTable->alGetAuxiliaryEffectSlotfv = (LPALGETAUXILIARYEFFECTSLOTFV)GetProcAddress(g_hOpenALDLL, "alGetAuxiliaryEffectSlotfv");
+   if (lpOALFnTable->alGetAuxiliaryEffectSlotfv == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alGetAuxiliaryEffectSlotfv' function address\n");
+   }
+   lpOALFnTable->alGetAuxiliaryEffectSloti = (LPALGETAUXILIARYEFFECTSLOTI)GetProcAddress(g_hOpenALDLL, "alGetAuxiliaryEffectSloti");
+   if (lpOALFnTable->alGetAuxiliaryEffectSloti == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alGetAuxiliaryEffectSloti' function address\n");
+   }
+   lpOALFnTable->alGetAuxiliaryEffectSlotiv = (LPALGETAUXILIARYEFFECTSLOTIV)GetProcAddress(g_hOpenALDLL, "alGetAuxiliaryEffectSlotiv");
+   if (lpOALFnTable->alGetAuxiliaryEffectSlotiv == NULL)
+   {
+      OutputDebugStringA("Failed to retrieve 'alGetAuxiliaryEffectSlotiv' function address\n");
+   }
+   lpOALFnTable->alSource3i = (LPALSOURCE3I)GetProcAddress(g_hOpenALDLL, "alSource3i");
 	return AL_TRUE;
 }
 

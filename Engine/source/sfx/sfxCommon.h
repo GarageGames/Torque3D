@@ -153,6 +153,7 @@ enum SFXDistanceModel
 {
    SFXDistanceModelLinear,             ///< Volume decreases linearly from min to max where it reaches zero.
    SFXDistanceModelLogarithmic,        ///< Volume halves every min distance steps starting from min distance; attenuation stops at max distance.
+   SFXDistanceModelExponent,           /// exponential falloff for distance attenuation.
 };
 
 DefineEnumType( SFXDistanceModel );
@@ -186,6 +187,14 @@ inline F32 SFXDistanceAttenuation( SFXDistanceModel model, F32 minDistance, F32 
          distance = getMin( distance, maxDistance );
          
          gain = minDistance / ( minDistance + rolloffFactor * ( distance - minDistance ) );
+         break;
+
+         ///create exponential distance model    
+      case SFXDistanceModelExponent:
+         distance = getMax(distance, minDistance);
+         distance = getMin(distance, maxDistance);
+
+         gain = pow((distance / minDistance), (-rolloffFactor));
          break;
          
    }
@@ -313,97 +322,97 @@ class SFXFormat
 /// Reverb environment properties.
 ///
 /// @note A given device may not implement all properties.
+///restructure our reverbproperties to match openal
+
 class SFXReverbProperties
 {
-   public:
-   
-      typedef void Parent;
-         
-      F32   mEnvSize;
-      F32   mEnvDiffusion;
-      S32   mRoom;
-      S32   mRoomHF;
-      S32   mRoomLF;
-      F32   mDecayTime;
-      F32   mDecayHFRatio;
-      F32   mDecayLFRatio;
-      S32   mReflections;
-      F32   mReflectionsDelay;
-      F32   mReflectionsPan[ 3 ];
-      S32   mReverb;
-      F32   mReverbDelay;
-      F32   mReverbPan[ 3 ];
-      F32   mEchoTime;
-      F32   mEchoDepth;
-      F32   mModulationTime;
-      F32   mModulationDepth;
-      F32   mAirAbsorptionHF;
-      F32   mHFReference;
-      F32   mLFReference;
-      F32   mRoomRolloffFactor;
-      F32   mDiffusion;
-      F32   mDensity;
-      S32   mFlags;
-      
-      SFXReverbProperties()
-         : mEnvSize( 7.5f ),
-           mEnvDiffusion( 1.0f ),
-           mRoom( -1000 ),
-           mRoomHF( -100 ),
-           mRoomLF( 0 ),
-           mDecayTime( 1.49f ),
-           mDecayHFRatio( 0.83f ),
-           mDecayLFRatio( 1.0f ),
-           mReflections( -2602 ),
-           mReflectionsDelay( 0.007f ),
-           mReverb( 200 ),
-           mReverbDelay( 0.011f ),
-           mEchoTime( 0.25f ),
-           mEchoDepth( 0.0f ),
-           mModulationTime( 0.25f ),
-           mModulationDepth( 0.0f ),
-           mAirAbsorptionHF( -5.0f ),
-           mHFReference( 5000.0f ),
-           mLFReference( 250.0f ),
-           mRoomRolloffFactor( 0.0f ),
-           mDiffusion( 100.0f ),
-           mDensity( 100.0f ),
-           mFlags( 0 )
-      {
-         mReflectionsPan[ 0 ] = 0.0f;
-         mReflectionsPan[ 1 ] = 0.0f;
-         mReflectionsPan[ 2 ] = 0.0f;
-         
-         mReverbPan[ 0 ] = 0.0f;
-         mReverbPan[ 1 ] = 0.0f;
-         mReverbPan[ 2 ] = 0.0f;
-      }
-      
-      void validate()
-      {
-         mEnvSize                = mClampF( mEnvSize,                1.0f,     100.0f );
-         mEnvDiffusion           = mClampF( mEnvDiffusion,           0.0f,     1.0f );
-         mRoom                   = mClamp( mRoom,                    -10000,  0 );
-         mRoomHF                 = mClamp( mRoomHF,                  -10000,  0 );
-         mRoomLF                 = mClamp( mRoomLF,                  -10000,  0 );
-         mDecayTime              = mClampF( mDecayTime,              0.1f,     20.0f );
-         mDecayHFRatio           = mClampF( mDecayHFRatio,           0.1f,     2.0f );
-         mDecayLFRatio           = mClampF( mDecayLFRatio,           0.1f,     2.0f );
-         mReflections            = mClamp( mReflections,             -10000,  1000 );
-         mReflectionsDelay       = mClampF( mReflectionsDelay,       0.0f,     0.3f );
-         mReverb                 = mClamp( mReverb,                  -10000,  2000 );
-         mReverbDelay            = mClampF( mReverbDelay,            0.0f,     0.1f );
-         mEchoTime               = mClampF( mEchoTime,               0.075f,   0.25f );
-         mEchoDepth              = mClampF( mEchoDepth,              0.0f,     1.0f );
-         mModulationTime         = mClampF( mModulationTime,         0.04f,    4.0f );
-         mModulationDepth        = mClampF( mModulationDepth,        0.0f,     1.0f );
-         mAirAbsorptionHF        = mClampF( mAirAbsorptionHF,        -100.0f,    0.0f );
-         mHFReference            = mClampF( mHFReference,            1000.0f,  20000.0f );
-         mLFReference            = mClampF( mLFReference,            20.0f,    1000.0f );
-         mRoomRolloffFactor      = mClampF( mRoomRolloffFactor,      0.0f,     10.0f );
-         mDiffusion              = mClampF( mDiffusion,              0.0f,     100.0f );
-         mDensity                = mClampF( mDensity,                0.0f,     100.0f );
-      }
+public:
+
+   struct Parent;
+
+   float flDensity;
+   float flDiffusion;
+   float flGain;
+   float flGainHF;
+   float flGainLF;
+   float flDecayTime;
+   float flDecayHFRatio;
+   float flDecayLFRatio;
+   float flReflectionsGain;
+   float flReflectionsDelay;
+   float flReflectionsPan[3];
+   float flLateReverbGain;
+   float flLateReverbDelay;
+   float flLateReverbPan[3];
+   float flEchoTime;
+   float flEchoDepth;
+   float flModulationTime;
+   float flModulationDepth;
+   float flAirAbsorptionGainHF;
+   float flHFReference;
+   float flLFReference;
+   float flRoomRolloffFactor;
+   int   iDecayHFLimit;
+
+   ///set our defaults to be the same as no reverb otherwise our reverb
+   ///effects menu sounds
+   SFXReverbProperties()
+   {
+      flDensity = 0.0f;
+      flDiffusion = 0.0f;
+      flGain = 0.0f;
+      flGainHF = 0.0f;
+      flGainLF = 0.0000f;
+      flDecayTime = 0.0f;
+      flDecayHFRatio = 0.0f;
+      flDecayLFRatio = 0.0f;
+      flReflectionsGain = 0.0f;
+      flReflectionsDelay = 0.0f;
+      flReflectionsPan[3] = 0.0f;
+      flLateReverbGain = 0.0f;
+      flLateReverbDelay = 0.0f;
+      flLateReverbPan[3] = 0.0f;
+      flEchoTime = 0.0f;
+      flEchoDepth = 0.0f;
+      flModulationTime = 0.0f;
+      flModulationDepth = 0.0f;
+      flAirAbsorptionGainHF = 0.0f;
+      flHFReference = 0.0f;
+      flLFReference = 0.0f;
+      flRoomRolloffFactor = 0.0f;
+      iDecayHFLimit = 0;
+   }
+
+   void validate()
+   {
+      flDensity = mClampF(flDensity, 0.0f, 1.0f);
+      flDiffusion = mClampF(flDiffusion, 0.0f, 1.0f);
+      flGain = mClampF(flGain, 0.0f, 1.0f);
+      flGainHF = mClampF(flGainHF, 0.0f, 1.0f);
+      flGainLF = mClampF(flGainLF, 0.0f, 1.0f);
+      flDecayTime = mClampF(flDecayTime, 0.1f, 20.0f);
+      flDecayHFRatio = mClampF(flDecayHFRatio, 0.1f, 2.0f);
+      flDecayLFRatio = mClampF(flDecayLFRatio, 0.1f, 2.0f);
+      flReflectionsGain = mClampF(flReflectionsGain, 0.0f, 3.16f);
+      flReflectionsDelay = mClampF(flReflectionsDelay, 0.0f, 0.3f);
+      flReflectionsPan[0] = mClampF(flReflectionsPan[0], -1.0f, 1.0f);
+      flReflectionsPan[1] = mClampF(flReflectionsPan[1], -1.0f, 1.0f);
+      flReflectionsPan[2] = mClampF(flReflectionsPan[2], -1.0f, 1.0f);
+      flLateReverbGain = mClampF(flLateReverbGain, 0.0f, 10.0f);
+      flLateReverbDelay = mClampF(flLateReverbDelay, 0.0f, 0.1f);
+      flLateReverbPan[0] = mClampF(flLateReverbPan[0], -1.0f, 1.0f);
+      flLateReverbPan[1] = mClampF(flLateReverbPan[1], -1.0f, 1.0f);
+      flLateReverbPan[2] = mClampF(flLateReverbPan[2], -1.0f, 1.0f);
+      flEchoTime = mClampF(flEchoTime, 0.075f, 0.25f);
+      flEchoDepth = mClampF(flEchoDepth, 0.0f, 1.0f);
+      flModulationTime = mClampF(flModulationTime, 0.04f, 4.0f);
+      flModulationDepth = mClampF(flModulationDepth, 0.0f, 1.0f);
+      flAirAbsorptionGainHF = mClampF(flAirAbsorptionGainHF, 0.892f, 1.0f);
+      flHFReference = mClampF(flHFReference, 1000.0f, 20000.0f);
+      flLFReference = mClampF(flLFReference, 20.0f, 1000.0f);
+      flRoomRolloffFactor = mClampF(flRoomRolloffFactor, 0.0f, 10.0f);
+      iDecayHFLimit = mClampF(iDecayHFLimit, 0, 1);
+   }
 };
 
 
@@ -415,73 +424,99 @@ class SFXReverbProperties
 /// Sound reverb properties.
 ///
 /// @note A given SFX device may not implement all properties.
+///not in use by openal yet if u are going to use ambient reverb zones its 
+///probably best to not have reverb on the sound effect itself.
 class SFXSoundReverbProperties
 {
-   public:
-   
-      typedef void Parent;
-   
-      S32   mDirect;
-      S32   mDirectHF;
-      S32   mRoom;
-      S32   mRoomHF;
-      S32   mObstruction;
-      F32   mObstructionLFRatio;
-      S32   mOcclusion;
-      F32   mOcclusionLFRatio;
-      F32   mOcclusionRoomRatio;
-      F32   mOcclusionDirectRatio;
-      S32   mExclusion;
-      F32   mExclusionLFRatio;
-      S32   mOutsideVolumeHF;
-      F32   mDopplerFactor;
-      F32   mRolloffFactor;
-      F32   mRoomRolloffFactor;
-      F32   mAirAbsorptionFactor;
-      S32   mFlags;
-      
-      SFXSoundReverbProperties()
-         : mDirect( 0 ),
-           mDirectHF( 0 ),
-           mRoom( 0 ),
-           mRoomHF( 0 ),
-           mObstruction( 0 ),
-           mObstructionLFRatio( 0.0f ),
-           mOcclusion( 0 ),
-           mOcclusionLFRatio( 0.25f ),
-           mOcclusionRoomRatio( 1.5f ),
-           mOcclusionDirectRatio( 1.0f ),
-           mExclusion( 0 ),
-           mExclusionLFRatio( 1.0f ),
-           mOutsideVolumeHF( 0 ),
-           mDopplerFactor( 0.0f ),
-           mRolloffFactor( 0.0f ),
-           mRoomRolloffFactor( 0.0f ),
-           mAirAbsorptionFactor( 1.0f ),
-           mFlags( 0 )
-      {
-      }
-      
-      void validate()
-      {
-         mDirect              = mClamp( mDirect,                -10000,  1000 );
-         mDirectHF            = mClamp( mDirectHF,              -10000,  0 );
-         mRoom                = mClamp( mRoom,                  -10000,  1000 );
-         mRoomHF              = mClamp( mRoomHF,                -10000,  0 );
-         mObstruction         = mClamp( mObstruction,           -10000,  0 );
-         mObstructionLFRatio  = mClampF( mObstructionLFRatio,   0.0f,     1.0f );
-         mOcclusion           = mClamp( mOcclusion,             -10000,  0 );
-         mOcclusionLFRatio    = mClampF( mOcclusionLFRatio,     0.0f,     1.0f );
-         mOcclusionRoomRatio  = mClampF( mOcclusionRoomRatio,   0.0f,     10.0f );
-         mOcclusionDirectRatio= mClampF( mOcclusionDirectRatio, 0.0f,     10.0f );
-         mExclusion           = mClamp( mExclusion,             -10000,  0 );
-         mExclusionLFRatio    = mClampF( mExclusionLFRatio,     0.0f,     1.0f );
-         mOutsideVolumeHF     = mClamp( mOutsideVolumeHF,       -10000,  0 );
-         mDopplerFactor       = mClampF( mDopplerFactor,        0.0f,     10.0f );
-         mRolloffFactor       = mClampF( mRolloffFactor,        0.0f,     10.0f );
-         mRoomRolloffFactor   = mClampF( mRoomRolloffFactor,    0.0f,     10.0f );
-         mAirAbsorptionFactor = mClampF( mAirAbsorptionFactor,  0.0f,     10.0f );
-      }
+public:
+
+   typedef void Parent;
+
+   float flDensity;
+   float flDiffusion;
+   float flGain;
+   float flGainHF;
+   float flGainLF;
+   float flDecayTime;
+   float flDecayHFRatio;
+   float flDecayLFRatio;
+   float flReflectionsGain;
+   float flReflectionsDelay;
+   float flReflectionsPan[3];
+   float flLateReverbGain;
+   float flLateReverbDelay;
+   float flLateReverbPan[3];
+   float flEchoTime;
+   float flEchoDepth;
+   float flModulationTime;
+   float flModulationDepth;
+   float flAirAbsorptionGainHF;
+   float flHFReference;
+   float flLFReference;
+   float flRoomRolloffFactor;
+   int   iDecayHFLimit;
+
+
+   ///Set our defaults to have no reverb
+   ///if you are going to use zone reverbs its
+   ///probably best not to use per-voice reverb
+   SFXSoundReverbProperties()
+   {
+      flDensity = 0.0f;
+      flDiffusion = 0.0f;
+      flGain = 0.0f;
+      flGainHF = 0.0f;
+      flGainLF = 0.0000f;
+      flDecayTime = 0.0f;
+      flDecayHFRatio = 0.0f;
+      flDecayLFRatio = 0.0f;
+      flReflectionsGain = 0.0f;
+      flReflectionsDelay = 0.0f;
+      flReflectionsPan[3] = 0.0f;
+      flLateReverbGain = 0.0f;
+      flLateReverbDelay = 0.0f;
+      flLateReverbPan[3] = 0.0f;
+      flEchoTime = 0.0f;
+      flEchoDepth = 0.0f;
+      flModulationTime = 0.0f;
+      flModulationDepth = 0.0f;
+      flAirAbsorptionGainHF = 0.0f;
+      flHFReference = 0.0f;
+      flLFReference = 0.0f;
+      flRoomRolloffFactor = 0.0f;
+      iDecayHFLimit = 0;
+   }
+
+   void validate()
+   {
+      flDensity = mClampF(flDensity, 0.0f, 1.0f);
+      flDiffusion = mClampF(flDiffusion, 0.0f, 1.0f);
+      flGain = mClampF(flGain, 0.0f, 1.0f);
+      flGainHF = mClampF(flGainHF, 0.0f, 1.0f);
+      flGainLF = mClampF(flGainLF, 0.0f, 1.0f);
+      flDecayTime = mClampF(flDecayTime, 0.1f, 20.0f);
+      flDecayHFRatio = mClampF(flDecayHFRatio, 0.1f, 2.0f);
+      flDecayLFRatio = mClampF(flDecayLFRatio, 0.1f, 2.0f);
+      flReflectionsGain = mClampF(flReflectionsGain, 0.0f, 3.16f);
+      flReflectionsDelay = mClampF(flReflectionsDelay, 0.0f, 0.3f);
+      flReflectionsPan[0] = mClampF(flReflectionsPan[0], -1.0f, 1.0f);
+      flReflectionsPan[1] = mClampF(flReflectionsPan[1], -1.0f, 1.0f);
+      flReflectionsPan[2] = mClampF(flReflectionsPan[2], -1.0f, 1.0f);
+      flLateReverbGain = mClampF(flLateReverbGain, 0.0f, 10.0f);
+      flLateReverbDelay = mClampF(flLateReverbDelay, 0.0f, 0.1f);
+      flLateReverbPan[0] = mClampF(flLateReverbPan[0], -1.0f, 1.0f);
+      flLateReverbPan[1] = mClampF(flLateReverbPan[1], -1.0f, 1.0f);
+      flLateReverbPan[2] = mClampF(flLateReverbPan[2], -1.0f, 1.0f);
+      flEchoTime = mClampF(flEchoTime, 0.075f, 0.25f);
+      flEchoDepth = mClampF(flEchoDepth, 0.0f, 1.0f);
+      flModulationTime = mClampF(flModulationTime, 0.04f, 4.0f);
+      flModulationDepth = mClampF(flModulationDepth, 0.0f, 1.0f);
+      flAirAbsorptionGainHF = mClampF(flAirAbsorptionGainHF, 0.892f, 1.0f);
+      flHFReference = mClampF(flHFReference, 1000.0f, 20000.0f);
+      flLFReference = mClampF(flLFReference, 20.0f, 1000.0f);
+      flRoomRolloffFactor = mClampF(flRoomRolloffFactor, 0.0f, 10.0f);
+      iDecayHFLimit = mClampF(iDecayHFLimit, 0, 1);
+   }
 };
 
 
