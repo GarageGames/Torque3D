@@ -631,7 +631,7 @@ void GuiSplitContainer::setSplitPoint(Point2I splitPoint)
 }
 
 DefineEngineMethod(GuiSplitContainer, setSplitPoint, void, (Point2I splitPoint), ,
-   "Set the positin of the split handler.")
+   "Set the position of the split handle.")
 {
    object->setSplitPoint(splitPoint);
 }
