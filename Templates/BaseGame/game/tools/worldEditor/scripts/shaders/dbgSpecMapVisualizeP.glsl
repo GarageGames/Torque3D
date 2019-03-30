@@ -19,7 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-#include "core/shaders/gl/hlslCompat.glsl"
+#include "../../../../core/rendering/shaders/gl/hlslCompat.glsl"
 
 in vec2 uv0;
 uniform sampler2D matinfoTex;

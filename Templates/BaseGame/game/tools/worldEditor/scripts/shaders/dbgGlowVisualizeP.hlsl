@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "core/shaders/postfx/postFx.hlsl"
+#include "../../../../core/rendering/shaders/postFX/postFx.hlsl"
 
 TORQUE_UNIFORM_SAMPLER2D(glowBuffer, 0);
 

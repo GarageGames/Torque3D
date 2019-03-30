@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "core/shaders/shaderModel.hlsl"
+#include "../../../../core/rendering/shaders/shaderModel.hlsl"
 
 struct MaterialDecoratorConnectV
 {
