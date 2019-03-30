@@ -1241,6 +1241,9 @@ void GuiTextEditCtrl::onLoseFirstResponder()
     root->disableKeyboardTranslation();
    }
 
+   updateHistory(&mTextBuffer, true);
+   mHistoryDirty = false;
+
    //execute the validate command
    if( mValidateCommand.isNotEmpty() )
       evaluate( mValidateCommand );
