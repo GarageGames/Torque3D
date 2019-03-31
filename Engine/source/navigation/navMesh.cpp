@@ -107,8 +107,7 @@ DefineEngineFunction(NavMeshUpdateAll, void, (S32 objid, bool remove), (0, false
    SceneObject *obj;
    if(!Sim::findObject(objid, obj))
       return;
-   if(remove)
-      obj->disableCollision();
+   obj->mPathfindingIgnore = remove;
    SimSet *set = NavMesh::getServerSet();
    for(U32 i = 0; i < set->size(); i++)
    {
@@ -119,8 +118,6 @@ DefineEngineFunction(NavMeshUpdateAll, void, (S32 objid, bool remove), (0, false
          m->buildTiles(obj->getWorldBox());
       }
    }
-   if(remove)
-      obj->enableCollision();
 }
 
 DefineEngineFunction(NavMeshUpdateAroundObject, void, (S32 objid, bool remove), (0, false),
@@ -129,8 +126,7 @@ DefineEngineFunction(NavMeshUpdateAroundObject, void, (S32 objid, bool remove), 
    SceneObject *obj;
    if (!Sim::findObject(objid, obj))
       return;
-   if (remove)
-      obj->disableCollision();
+   obj->mPathfindingIgnore = remove;
    SimSet *set = NavMesh::getServerSet();
    for (U32 i = 0; i < set->size(); i++)
    {
@@ -141,8 +137,6 @@ DefineEngineFunction(NavMeshUpdateAroundObject, void, (S32 objid, bool remove), 
          m->buildTiles(obj->getWorldBox());
       }
    }
-   if (remove)
-      obj->enableCollision();
 }
 
 
