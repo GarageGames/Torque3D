@@ -33,6 +33,7 @@
 #include "gfx/gfxDrawUtil.h"
 #include "gfx/primBuilder.h"
 #include "console/engineAPI.h"
+#include "gui/editor/guiPopupMenuCtrl.h"
 
 // menu bar:
 // basic idea - fixed height control bar at the top of a window, placed and sized in gui editor
@@ -1113,6 +1114,13 @@ GuiMenuBar::GuiMenuBar()
 
 void GuiMenuBar::onRemove()
 {
+   GuiPopupMenuBackgroundCtrl* backgroundCtrl;
+   if (Sim::findObject("PopUpMenuControl", backgroundCtrl))
+   {
+      if (backgroundCtrl->mMenuBarCtrl == this)
+         backgroundCtrl->mMenuBarCtrl = nullptr;
+   }
+
    Parent::onRemove();
 }
 
@@ -1472,11 +1480,11 @@ PopupMenu* GuiMenuBar::getMenu(U32 index)
    return mMenuList[index].popupMenu;
 }
 
-PopupMenu* GuiMenuBar::findMenu(StringTableEntry barTitle)
+PopupMenu* GuiMenuBar::findMenu(String barTitle)
 {
    for (U32 i = 0; i < mMenuList.size(); i++)
    {
-      if (mMenuList[i].text == barTitle)
+      if (String::ToLower(mMenuList[i].text) == String::ToLower(barTitle))
          return mMenuList[i].popupMenu;
    }
 
@@ -1521,8 +1529,7 @@ DefineEngineMethod(GuiMenuBar, insert, void, (SimObject* pObject, S32 pos), (nul
 
 DefineEngineMethod(GuiMenuBar, findMenu, S32, (const char* barTitle), (""), "(barTitle)")
 {
-   StringTableEntry barTitleStr = StringTable->insert(barTitle);
-   PopupMenu* menu = object->findMenu(barTitleStr);
+   PopupMenu* menu = object->findMenu(barTitle);
 
    if (menu)
       return menu->getId();

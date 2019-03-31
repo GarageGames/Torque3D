@@ -113,7 +113,7 @@ function EditorGui::buildMenus(%this)
    %this.menuBar = new GuiMenuBar(WorldEditorMenubar)
    {
       dynamicItemInsertPos = 3;
-      extent = "1024 20";
+      extent = Canvas.extent.x SPC "20";
       minExtent = "320 20";
       horizSizing = "width";
       profile = "GuiMenuBarProfile";
@@ -251,6 +251,41 @@ function EditorGui::buildMenus(%this)
          //item[5] = "-";
    };
    %this.menuBar.insert(%editorsMenu);
+   
+   //if we're just refreshing the menus, we probably have a list of editors we want added to the Editors menu there, so check and if so, add them now
+   if(isObject(EditorsMenuList))
+   {
+      %editorsListCount = EditorsMenuList.count();
+      
+      for(%e = 0; %e < %editorsListCount; %e++)
+      {
+         %menuEntry = EditorsMenuList.getKey(%e);
+         %editorsMenu.addItem(%e, %menuEntry);
+      }
+   }
+   
+   if(isObject(PhysicsEditorPlugin))
+   {
+      %physicsToolsMenu = new PopupMenu()
+      {
+         superClass = "MenuBuilder";
+         //class = "PhysXToolsMenu";
+
+         barTitle = "Physics";
+                                    
+         item[0] = "Start Simulation" TAB "Ctrl-Alt P" TAB "physicsStartSimulation( \"client\" );physicsStartSimulation( \"server\" );";         
+         //item[1] = "Stop Simulation" TAB "" TAB "physicsSetTimeScale( 0 );";
+         item[1] = "-";
+         item[2] = "Speed 25%" TAB "" TAB "physicsSetTimeScale( 0.25 );";
+         item[3] = "Speed 50%" TAB "" TAB "physicsSetTimeScale( 0.5 );";
+         item[4] = "Speed 100%" TAB "" TAB "physicsSetTimeScale( 1.0 );";
+         item[5] = "-";
+         item[6] = "Reload NXBs" TAB "" TAB "";
+      };
+      
+      // Add our menu.
+      %this.menuBar.insert( %physicsToolsMenu, EditorGui.menuBar.dynamicItemInsertPos );
+   }
       
    // Lighting Menu
    %lightingMenu = new PopupMenu()
@@ -386,6 +421,11 @@ function EditorGui::buildMenus(%this)
 }
 
 //////////////////////////////////////////////////////////////////////////
+
+function WorldEditorMenubar::onResize(%this)
+{
+   %this.extent.x = Canvas.extent.x;
+}
 
 function EditorGui::attachMenus(%this)
 {
