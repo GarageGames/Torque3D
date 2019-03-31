@@ -33,7 +33,6 @@ extern InputModifiers convertModifierBits(const U32 in);
 // Constructor/Destructor
 //-----------------------------------------------------------------------------
 WindowInputGenerator::WindowInputGenerator( PlatformWindow *window ) :
-                                             mNotifyPosition(true),
                                              mWindow(window),
                                              mInputController(NULL),
                                              mLastCursorPos(0,0),
@@ -135,6 +134,7 @@ void WindowInputGenerator::handleMouseMove( WindowId did, U32 modifier, S32 x, S
    //  Because of this we always have to generate and send off for processing
    //  relative events, even if the mouse is not locked.  
    //  I'm considering removing this in the Canvas refactor, thoughts? [7/6/2007 justind]
+   // Now sends the absolute position event whenever an absolute position is received from the OS. [2/13/2019 mar] 
 
    // Generate a base Movement along and Axis event
    InputEventInfo event;
@@ -192,33 +192,23 @@ void WindowInputGenerator::handleMouseMove( WindowId did, U32 modifier, S32 x, S
 
       }
 
-      // When the window gains focus, we send a cursor position event 
-      if( mNotifyPosition )
-      {
-         mNotifyPosition = false;
+      // We use SI_MAKE to signify that the position is being set, not relatively moved.
+      event.action = SI_MAKE;
 
-         // We use SI_MAKE to signify that the position is being set, not relatively moved.
-         event.action     = SI_MAKE;
+      // X Axis
+      event.objInst = SI_XAXIS;
+      event.fValue = (F32)x;
+      generateInputEvent(event);
 
-         // X Axis
-         event.objInst    = SI_XAXIS;
-         event.fValue     = (F32)x;
-         generateInputEvent(event);
-
-         // Y Axis
-         event.objInst = SI_YAXIS;
-         event.fValue     = (F32)y;
-         generateInputEvent(event);      
-      }
+      // Y Axis
+      event.objInst = SI_YAXIS;
+      event.fValue = (F32)y;
+      generateInputEvent(event);
 
       mLastCursorPos = Point2I(x,y);
-
    }
    else
-   {   
       mLastCursorPos += Point2I(x,y);      
-      mNotifyPosition = true;
-   }
 }
 
 void WindowInputGenerator::handleMouseButton( WindowId did, U32 modifiers, U32 action, U16 button )
@@ -388,8 +378,6 @@ void WindowInputGenerator::handleAppEvent( WindowId did, S32 event )
    }
    else if(event == GainFocus)
    {
-      // Set an update flag to notify the consumer of the absolute mouse position next move
-      mNotifyPosition = true;
       mFocused = true;
    }
 
