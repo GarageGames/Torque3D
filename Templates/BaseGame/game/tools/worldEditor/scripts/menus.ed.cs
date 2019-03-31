@@ -233,8 +233,32 @@ function EditorGui::buildMenus(%this)
       Item[15] = "Manage Bookmarks..." TAB "Ctrl-Shift B" TAB "EditorGui.toggleCameraBookmarkWindow();";
       item[16] = "Jump to Bookmark" TAB %this.cameraBookmarksMenu;
    };
+
    %this.menuBar.insert(%cameraMenu);
-      
+   
+    // Snap Menu  
+    %snapToMenu = new PopupMenu()    
+    {    
+        superClass = "MenuBuilder";    
+        class = "EditorSnapToMenu";    
+
+        barTitle = "SnapTo";  
+
+        // The onSelectItem() callback for this menu re-purposes the command field    
+        // as the MenuBuilder version is not used.    
+        item[0] = "Snap 2nd Object To 1st X" TAB "" TAB "X";    
+        item[1] = "Snap 2nd Object To 1st X+" TAB "" TAB "X+";    
+        item[2] = "Snap 2nd Object To 1st X-" TAB "" TAB "X-";    
+        item[3] = "Snap 2nd Object To 1st Y" TAB "" TAB "Y";    
+        item[4] = "Snap 2nd Object to 1st Y+" TAB "" TAB "Y+";    
+        item[5] = "Snap 2nd Object to 1st Y-" TAB "" TAB "Y-";    
+        item[6] = "Snap 2nd Object To 1st Z" TAB "" TAB "Z";    
+        item[7] = "Snap 2nd Object to 1st Z+" TAB "" TAB "Z+";    
+        item[8] = "Snap 2nd Object to 1st Z-" TAB "" TAB "Z-";    
+
+    };    
+   %this.menuBar.insert(%snapToMenu);  
+
    // Editors Menu
    %editorsMenu = new PopupMenu()
    {
