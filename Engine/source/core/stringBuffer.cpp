@@ -48,12 +48,12 @@
          void dumpAllStrings();
    };
 
-   DefineConsoleFunction( sbmDumpStats, void, (), , "()")
+   DefineEngineFunction( sbmDumpStats, void, (), , "()")
    {
       StringBufferManager::getManager().dumpStats();
    }
 
-   DefineConsoleFunction( sbmDumpStrings, void, (), , "()")
+   DefineEngineFunction( sbmDumpStrings, void, (), , "()")
    {
       StringBufferManager::getManager().dumpAllStrings();
    }

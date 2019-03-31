@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -53,12 +53,12 @@ static const struct { int x; int y; } button_positions[] = {
 
 /* This is indexed by SDL_GameControllerAxis. */
 static const struct { int x; int y; double angle; } axis_positions[] = {
-    {75,  154, 0.0},  /* LEFTX */
-    {75,  154, 90.0},  /* LEFTY */
-    {305, 230, 0.0},  /* RIGHTX */
-    {305, 230, 90.0},  /* RIGHTY */
-    {91, 0, 90.0},     /* TRIGGERLEFT */
-    {375, 0, 90.0},    /* TRIGGERRIGHT */
+    {74,  153, 270.0},  /* LEFTX */
+    {74,  153, 0.0},  /* LEFTY */
+    {306, 231, 270.0},  /* RIGHTX */
+    {306, 231, 0.0},  /* RIGHTY */
+    {91, -20, 0.0},     /* TRIGGERLEFT */
+    {375, -20, 0.0},    /* TRIGGERRIGHT */
 };
 
 SDL_Renderer *screen = NULL;
@@ -80,10 +80,6 @@ LoadTexture(SDL_Renderer *renderer, const char *file, SDL_bool transparent)
         if (transparent) {
             if (temp->format->BytesPerPixel == 1) {
                 SDL_SetColorKey(temp, SDL_TRUE, *(Uint8 *)temp->pixels);
-            } else {
-                SDL_assert(!temp->format->palette);
-                SDL_assert(temp->format->BitsPerPixel == 24);
-                SDL_SetColorKey(temp, SDL_TRUE, (*(Uint32 *)temp->pixels) & 0x00FFFFFF);
             }
         }
 
@@ -112,6 +108,13 @@ loop(void *arg)
 
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
+        case SDL_CONTROLLERAXISMOTION:
+            SDL_Log("Controller axis %s changed to %d\n", SDL_GameControllerGetStringForAxis((SDL_GameControllerAxis)event.caxis.axis), event.caxis.value);
+            break;
+        case SDL_CONTROLLERBUTTONDOWN:
+        case SDL_CONTROLLERBUTTONUP:
+            SDL_Log("Controller button %s %s\n", SDL_GameControllerGetStringForButton((SDL_GameControllerButton)event.cbutton.button), event.cbutton.state ? "pressed" : "released");
+            break;
         case SDL_KEYDOWN:
             if (event.key.keysym.sym != SDLK_ESCAPE) {
                 break;
@@ -259,6 +262,19 @@ main(int argc, char *argv[])
     
     SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
 
+    /* Print information about the mappings */
+    if (!argv[1]) {
+        SDL_Log("Supported mappings:\n");
+        for (i = 0; i < SDL_GameControllerNumMappings(); ++i) {
+            char *mapping = SDL_GameControllerMappingForIndex(i);
+            if (mapping) {
+                SDL_Log("\t%s\n", mapping);
+                SDL_free(mapping);
+            }
+        }
+        SDL_Log("\n");
+    }
+
     /* Print information about the controller */
     for (i = 0; i < SDL_NumJoysticks(); ++i) {
         const char *name;
@@ -276,7 +292,9 @@ main(int argc, char *argv[])
             name = SDL_JoystickNameForIndex(i);
             description = "Joystick";
         }
-        SDL_Log("%s %d: %s (guid %s)\n", description, i, name ? name : "Unknown", guid);
+        SDL_Log("%s %d: %s (guid %s, VID 0x%.4x, PID 0x%.4x)\n",
+            description, i, name ? name : "Unknown", guid,
+            SDL_JoystickGetDeviceVendor(i), SDL_JoystickGetDeviceProduct(i));
     }
     SDL_Log("There are %d game controller(s) attached (%d joystick(s))\n", nController, SDL_NumJoysticks());
 
@@ -348,3 +366,5 @@ main(int argc, char *argv[])
 }
 
 #endif
+
+/* vi: set ts=4 sw=4 expandtab: */

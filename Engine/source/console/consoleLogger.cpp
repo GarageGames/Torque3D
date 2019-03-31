@@ -225,7 +225,7 @@ void ConsoleLogger::log( const char *consoleLine )
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( ConsoleLogger, attach, bool, (), , "() Attaches the logger to the console and begins writing to file"
+DefineEngineMethod( ConsoleLogger, attach, bool, (), , "() Attaches the logger to the console and begins writing to file"
            "@tsexample\n"
            "// Create the logger\n"
            "// Will automatically start writing to testLogging.txt with normal priority\n"
@@ -247,7 +247,7 @@ DefineConsoleMethod( ConsoleLogger, attach, bool, (), , "() Attaches the logger 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( ConsoleLogger, detach, bool, (), , "() Detaches the logger from the console and stops writing to file"
+DefineEngineMethod( ConsoleLogger, detach, bool, (), , "() Detaches the logger from the console and stops writing to file"
            "@tsexample\n"
            "// Create the logger\n"
            "// Will automatically start writing to testLogging.txt with normal priority\n"

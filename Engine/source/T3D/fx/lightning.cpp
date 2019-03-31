@@ -303,7 +303,7 @@ bool LightningData::preload(bool server, String &errorStr)
       {
          if (strikeTextureNames[i][0])
          {
-            strikeTextures[i] = GFXTexHandle(strikeTextureNames[i], &GFXDefaultStaticDiffuseProfile, avar("%s() - strikeTextures[%d] (line %d)", __FUNCTION__, i, __LINE__));
+            strikeTextures[i] = GFXTexHandle(strikeTextureNames[i], &GFXStaticTextureProfile, avar("%s() - strikeTextures[%d] (line %d)", __FUNCTION__, i, __LINE__));
             mNumStrikeTextures++;
          }
       }

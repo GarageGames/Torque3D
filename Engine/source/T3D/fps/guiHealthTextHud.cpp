@@ -41,10 +41,10 @@ class GuiHealthTextHud : public GuiControl
    bool mShowEnergy;  
    bool mShowTrueHealth;  
   
-   ColorF mFillColor;  
-   ColorF mFrameColor;  
-   ColorF mTextColor;  
-   ColorF mWarnColor;  
+   LinearColorF mFillColor;  
+   LinearColorF mFrameColor;  
+   LinearColorF mTextColor;  
+   LinearColorF mWarnColor;  
   
    F32 mWarnLevel;  
    F32 mPulseThreshold;  
@@ -167,7 +167,7 @@ void GuiHealthTextHud::onRender(Point2I offset, const RectI &updateRect)
   
    // If enabled draw background first  
    if (mShowFill)  
-      drawUtil->drawRectFill(updateRect, mFillColor);  
+      drawUtil->drawRectFill(updateRect, mFillColor.toColorI());
   
    // Prepare text and center it  
    S32 val = (S32)mValue;    
@@ -176,7 +176,7 @@ void GuiHealthTextHud::onRender(Point2I offset, const RectI &updateRect)
    offset.x += (getBounds().extent.x - mProfile->mFont->getStrWidth((const UTF8 *)buf)) / 2;    
    offset.y += (getBounds().extent.y - mProfile->mFont->getHeight()) / 2;    
   
-   ColorF tColor = mTextColor;   
+   LinearColorF tColor = mTextColor;   
   
    // If warning level is exceeded switch to warning color  
    if(mValue < mWarnLevel)   
@@ -192,11 +192,11 @@ void GuiHealthTextHud::onRender(Point2I offset, const RectI &updateRect)
       }  
    }  
   
-   drawUtil->setBitmapModulation(tColor);    
+   drawUtil->setBitmapModulation(tColor.toColorI());
    drawUtil->drawText(mProfile->mFont, offset, buf);    
    drawUtil->clearBitmapModulation();    
   
    // If enabled draw the border last  
    if (mShowFrame)  
-      drawUtil->drawRect(updateRect, mFrameColor);  
+      drawUtil->drawRect(updateRect, mFrameColor.toColorI());
 }  

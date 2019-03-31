@@ -123,7 +123,7 @@ void DepthSortList::setExtents(Poly & poly, PolyExtents & polyExtents)
    polyExtents.zMin = polyExtents.zMax = p.z;
    for (S32 i=poly.vertexStart+1; i<poly.vertexStart+poly.vertexCount; i++)
    {
-      Point3F p = mVertexList[mIndexList[i]].point;
+      p = mVertexList[mIndexList[i]].point;
 
       // x
       if (p.x < polyExtents.xMin)

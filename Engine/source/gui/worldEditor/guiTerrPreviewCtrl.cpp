@@ -88,35 +88,35 @@ void GuiTerrPreviewCtrl::initPersistFields()
 }
 
 
-DefineConsoleMethod( GuiTerrPreviewCtrl, reset, void, (), , "Reset the view of the terrain.")
+DefineEngineMethod( GuiTerrPreviewCtrl, reset, void, (), , "Reset the view of the terrain.")
 {
    object->reset();
 }
 
-DefineConsoleMethod( GuiTerrPreviewCtrl, setRoot, void, (), , "Add the origin to the root and reset the origin.")
+DefineEngineMethod( GuiTerrPreviewCtrl, setRoot, void, (), , "Add the origin to the root and reset the origin.")
 {
    object->setRoot();
 }
 
-DefineConsoleMethod( GuiTerrPreviewCtrl, getRoot, Point2F, (), , "Return a Point2F representing the position of the root.")
+DefineEngineMethod( GuiTerrPreviewCtrl, getRoot, Point2F, (), , "Return a Point2F representing the position of the root.")
 {
    return object->getRoot();
 
 }
 
-DefineConsoleMethod( GuiTerrPreviewCtrl, setOrigin, void, (Point2F pos), , "(float x, float y)"
+DefineEngineMethod( GuiTerrPreviewCtrl, setOrigin, void, (Point2F pos), , "(float x, float y)"
               "Set the origin of the view.")
 {
    object->setOrigin( pos );
 }
 
-DefineConsoleMethod( GuiTerrPreviewCtrl, getOrigin, Point2F, (), , "Return a Point2F containing the position of the origin.")
+DefineEngineMethod( GuiTerrPreviewCtrl, getOrigin, Point2F, (), , "Return a Point2F containing the position of the origin.")
 {
    return object->getOrigin();
 
 }
 
-DefineConsoleMethod( GuiTerrPreviewCtrl, getValue, const char*, (), , "Returns a 4-tuple containing: root_x root_y origin_x origin_y")
+DefineEngineMethod( GuiTerrPreviewCtrl, getValue, const char*, (), , "Returns a 4-tuple containing: root_x root_y origin_x origin_y")
 {
    Point2F r = object->getRoot();
    Point2F o = object->getOrigin();
@@ -126,7 +126,7 @@ DefineConsoleMethod( GuiTerrPreviewCtrl, getValue, const char*, (), , "Returns a
    return valuebuf;
 }
 
-DefineConsoleMethod( GuiTerrPreviewCtrl, setValue, void, (const char * tuple), , "Accepts a 4-tuple in the same form as getValue returns.\n\n"
+DefineEngineMethod( GuiTerrPreviewCtrl, setValue, void, (const char * tuple), , "Accepts a 4-tuple in the same form as getValue returns.\n\n"
               "@see GuiTerrPreviewCtrl::getValue()")
 {
    Point2F r,o;

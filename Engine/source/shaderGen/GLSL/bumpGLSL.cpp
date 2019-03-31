@@ -29,7 +29,7 @@
 #include "materials/processedMaterial.h"
 #include "materials/materialFeatureTypes.h"
 #include "shaderGen/shaderGenVars.h"
-
+#include "shaderGen/shaderGen.h"
 
 void BumpFeatGLSL::processVert(  Vector<ShaderComponent*> &componentList, 
                                  const MaterialFeatureData &fd )
@@ -235,7 +235,7 @@ void BumpFeatGLSL::setTexData(   Material::StageData &stageDat,
 
 
 ParallaxFeatGLSL::ParallaxFeatGLSL()
-   : mIncludeDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/gl/torque.glsl" ))
+   : mIncludeDep(ShaderGen::smCommonShaderPath + String("/gl/torque.glsl" ))
 {
    addDependency( &mIncludeDep );
 }
@@ -337,7 +337,7 @@ void ParallaxFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
    Var *normalMap = getNormalMapTex();
 	
    // Call the library function to do the rest.
-   if (fd.features.hasFeature(MFT_IsDXTnm, getProcessIndex()))
+   if (fd.features.hasFeature(MFT_IsBC3nm, getProcessIndex()))
    {
       meta->addStatement(new GenOp("   @.xy += parallaxOffsetDxtnm( @, @.xy, @, @ );\r\n",
       texCoord, normalMap, texCoord, negViewTS, parallaxInfo));

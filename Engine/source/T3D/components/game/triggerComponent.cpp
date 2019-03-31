@@ -239,8 +239,6 @@ bool TriggerComponent::testObject(SceneObject* enter)
                myList.setObject(mOwner);
 
                myCI->buildPolyList(PLC_Collision, &myList, enterBox, sphere);
-
-               bool test = true;
             }
          }
       }

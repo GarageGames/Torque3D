@@ -51,7 +51,7 @@ struct ItemData: public ShapeBaseData {
 
    bool        lightOnlyStatic;
    S32         lightType;
-   ColorF      lightColor;
+   LinearColorF      lightColor;
    S32         lightTime;
    F32         lightRadius;
 
@@ -88,7 +88,7 @@ class Item: public ShapeBase
       Point3F warpOffset;
       F32     dt;
    };
-   StateDelta delta;
+   StateDelta mDelta;
 
    // Static attributes
    ItemData* mDataBlock;

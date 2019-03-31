@@ -52,6 +52,9 @@ struct SceneData
       /// The deferred render bin.
       /// @RenderDeferredMgr
       DeferredBin,
+      /// The selection-highlight render bin.  
+      /// @afxRenderHighlightMgr  
+      HighlightBin,
    };
 
    /// This defines when we're rendering a special bin 
@@ -71,13 +74,13 @@ struct SceneData
    LightInfo* lights[8];
 
    ///
-   ColorF ambientLightColor;
+   LinearColorF ambientLightColor;
 
    // fog      
    F32 fogDensity;
    F32 fogDensityOffset;
    F32 fogHeightFalloff;
-   ColorF fogColor;
+   LinearColorF fogColor;
   
    // misc
    const MatrixF *objTrans;

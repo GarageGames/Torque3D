@@ -39,6 +39,9 @@
 #include "gfx/gfxCardProfile.h"
 #include "gfx/gfxTextureProfile.h"
 
+#ifndef TORQUE_BASIC_LIGHTING
+F32 AdvancedLightManager::smProjectedShadowFilterDistance = 40.0f;
+#endif
 
 ImplementEnumType( ShadowType,
    "\n\n"
@@ -85,7 +88,7 @@ bool AdvancedLightManager::isCompatible() const
 
    // TODO: Test for the necessary texture formats!
    bool autoMips;
-   if(!GFX->getCardProfiler()->checkFormat(GFXFormatR16F, &GFXDefaultRenderTargetProfile, autoMips))
+   if(!GFX->getCardProfiler()->checkFormat(GFXFormatR16F, &GFXRenderTargetProfile, autoMips))
       return false;
 
    return true;
@@ -106,7 +109,7 @@ void AdvancedLightManager::activate( SceneManager *sceneManager )
    Vector<GFXFormat> formats;
    formats.push_back( GFXFormatR16G16B16A16F );
    //formats.push_back( GFXFormatR16G16B16A16 );
-   GFXFormat blendTargetFormat = GFX->selectSupportedFormat( &GFXDefaultRenderTargetProfile,
+   GFXFormat blendTargetFormat = GFX->selectSupportedFormat( &GFXRenderTargetProfile,
                                                          formats,
                                                          true,
                                                          true,
@@ -702,7 +705,7 @@ LightShadowMap* AdvancedLightManager::findShadowMapForObject( SimObject *object 
    return sceneLight->getLight()->getExtended<ShadowMapParams>()->getShadowMap();
 }
 
-DefineConsoleFunction( setShadowVizLight, const char*, (const char* name), (""), "")
+DefineEngineFunction( setShadowVizLight, const char*, (const char* name), (""), "")
 {
    static const String DebugTargetName( "AL_ShadowVizTexture" );
 

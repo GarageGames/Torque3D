@@ -1,0 +1,9 @@
+<ModuleDefinition
+	ModuleId="Core_ClientServer"
+	VersionId="1"
+	Description="Default module for the game."
+	ScriptFile="Core_ClientServer.cs"
+	CreateFunction="create"
+	DestroyFunction="destroy"
+	Group="Core">
+</ModuleDefinition>

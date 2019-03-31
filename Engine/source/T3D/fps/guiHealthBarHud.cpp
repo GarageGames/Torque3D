@@ -45,9 +45,9 @@ class GuiHealthBarHud : public GuiControl
    bool     mDisplayEnergy;
    bool     mFlip;
 
-   ColorF   mFillColor;
-   ColorF   mFrameColor;
-   ColorF   mDamageFillColor;
+   LinearColorF   mFillColor;
+   LinearColorF   mFrameColor;
+   LinearColorF   mDamageFillColor;
 
    S32      mPulseRate;
    F32      mPulseThreshold;
@@ -163,7 +163,7 @@ void GuiHealthBarHud::onRender(Point2I offset, const RectI &updateRect)
 
    // Background first
    if (mShowFill)
-      GFX->getDrawUtil()->drawRectFill(updateRect, mFillColor);
+      GFX->getDrawUtil()->drawRectFill(updateRect, mFillColor.toColorI());
 
    // Pulse the damage fill if it's below the threshold
    if (mPulseRate != 0)
@@ -196,9 +196,9 @@ void GuiHealthBarHud::onRender(Point2I offset, const RectI &updateRect)
       else
          rect.point.y = bottomY - rect.extent.y;
    }
-   GFX->getDrawUtil()->drawRectFill(rect, mDamageFillColor);
+   GFX->getDrawUtil()->drawRectFill(rect, mDamageFillColor.toColorI());
 
    // Border last
    if (mShowFrame)
-      GFX->getDrawUtil()->drawRect(updateRect, mFrameColor);
+      GFX->getDrawUtil()->drawRect(updateRect, mFrameColor.toColorI());
 }

@@ -126,7 +126,7 @@ LightFlareData::LightFlareData()
 {
    dMemset( mElementRect, 0, sizeof( RectF ) * MAX_ELEMENTS );   
    dMemset( mElementScale, 0, sizeof( F32 ) * MAX_ELEMENTS );
-   dMemset( mElementTint, 0, sizeof( ColorF ) * MAX_ELEMENTS );
+   dMemset( mElementTint, 0, sizeof( LinearColorF ) * MAX_ELEMENTS );
    dMemset( mElementRotate, 0, sizeof( bool ) * MAX_ELEMENTS );
    dMemset( mElementUseLightColor, 0, sizeof( bool ) * MAX_ELEMENTS );   
 
@@ -524,7 +524,7 @@ void LightFlareData::prepRender(SceneRenderState *state, LightFlareState *flareS
    //
    // These are the factors which affect the "alpha" of the flare effect.
    // Modulate more in as appropriate.
-   ColorF baseColor = ColorF::WHITE * lightSourceBrightnessScale * occlusionFade;
+   LinearColorF baseColor = LinearColorF::WHITE * lightSourceBrightnessScale * occlusionFade;
 
    // Setup the vertex buffer for the maximum flare elements.
    const U32 vertCount = 4 * mElementCount;
@@ -544,7 +544,7 @@ void LightFlareData::prepRender(SceneRenderState *state, LightFlareState *flareS
 
       Point3F *basePos = mElementRotate[i] ? rotatedBasePoints : sBasePoints;
 
-      ColorF color( baseColor * mElementTint[i] );
+      LinearColorF color( baseColor * mElementTint[i] );
       if ( mElementUseLightColor[i] )
          color *= lightInfo->getColor();
       color.clamp();
@@ -571,22 +571,23 @@ void LightFlareData::prepRender(SceneRenderState *state, LightFlareState *flareS
       size.y = getMax( size.y, 1.0f );
       size *= oneOverViewportExtent;
 
-      vert->color = color;
+      const ColorI colori = color.toColorI();
+      vert->color = colori;
       vert->point = ( basePos[0] * size ) + pos;      
       vert->texCoord.set( texCoordMin.x, texCoordMax.y );
       vert++;
 
-      vert->color = color;
+      vert->color = colori;
       vert->point = ( basePos[1] * size ) + pos;
       vert->texCoord.set( texCoordMax.x, texCoordMax.y );
       vert++;
 
-      vert->color = color;
+      vert->color = colori;
       vert->point = ( basePos[2] * size ) + pos;
       vert->texCoord.set( texCoordMax.x, texCoordMin.y );
       vert++;
 
-      vert->color = color;
+      vert->color = colori;
       vert->point = ( basePos[3] * size ) + pos;
       vert->texCoord.set( texCoordMin.x, texCoordMin.y );
       vert++;
@@ -633,7 +634,7 @@ bool LightFlareData::_preload( bool server, String &errorStr )
    if ( !server )
    {
       if ( mFlareTextureName.isNotEmpty() )      
-         mFlareTexture.set( mFlareTextureName, &GFXDefaultStaticDiffuseProfile, "FlareTexture" );  
+         mFlareTexture.set( mFlareTextureName, &GFXStaticTextureSRGBProfile, "FlareTexture" );
    }
 
    return true;

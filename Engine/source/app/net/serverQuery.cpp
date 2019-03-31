@@ -223,8 +223,7 @@ struct ServerFilter
       Dedicated         = BIT(0),
       NotPassworded     = BIT(1),
       Linux             = BIT(2),
-      CurrentVersion    = BIT(7),
-      NotXenon          = BIT(6)
+      CurrentVersion    = BIT(6)
    };
 
    enum // Region mask flags
@@ -395,12 +394,12 @@ void queryLanServers(U32 port, U8 flags, const char* gameType, const char* missi
       if ( !sActiveFilter.gameType || dStricmp( sActiveFilter.gameType, "Any" ) != 0 )
       {
          sActiveFilter.gameType = (char*) dRealloc( sActiveFilter.gameType, 4 );
-         dStrcpy( sActiveFilter.gameType, "Any" );
+         dStrcpy( sActiveFilter.gameType, "Any", 4 );
       }
       if ( !sActiveFilter.missionType || dStricmp( sActiveFilter.missionType, "Any" ) != 0 )
       {
          sActiveFilter.missionType = (char*) dRealloc( sActiveFilter.missionType, 4 );
-         dStrcpy( sActiveFilter.missionType, "Any" );
+         dStrcpy( sActiveFilter.missionType, "Any", 4 );
       }
       sActiveFilter.queryFlags   = 0;
    sActiveFilter.minPlayers   = minPlayers;
@@ -430,7 +429,7 @@ void queryLanServers(U32 port, U8 flags, const char* gameType, const char* missi
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( queryAllServers
+DefineEngineFunction( queryAllServers
                      , void, ( U32 lanPort
                              , U32 flags
                              , const char * gameType
@@ -456,7 +455,7 @@ DefineConsoleFunction( queryAllServers
 
 }
 
-DefineConsoleFunction( queryLanServers
+DefineEngineFunction( queryLanServers
                      , void, ( U32 lanPort
                              , U32 flags
                              , const char * gameType
@@ -511,14 +510,16 @@ void queryMasterServer(U8 flags, const char* gameType, const char* missionType,
       // Update the active filter:
       if ( !sActiveFilter.gameType || dStrcmp( sActiveFilter.gameType, gameType ) != 0 )
       {
-         sActiveFilter.gameType = (char*) dRealloc( sActiveFilter.gameType, dStrlen( gameType ) + 1 );
-         dStrcpy( sActiveFilter.gameType, gameType );
+         dsize_t gameTypeLen = dStrlen(gameType) + 1;
+         sActiveFilter.gameType = (char*) dRealloc( sActiveFilter.gameType, gameTypeLen );
+         dStrcpy( sActiveFilter.gameType, gameType, gameTypeLen );
       }
 
       if ( !sActiveFilter.missionType || dStrcmp( sActiveFilter.missionType, missionType ) != 0 )
       {
-         sActiveFilter.missionType = (char*) dRealloc( sActiveFilter.missionType, dStrlen( missionType ) + 1 );
-         dStrcpy( sActiveFilter.missionType, missionType );
+         dsize_t missionTypeLen = dStrlen(missionType) + 1;
+         sActiveFilter.missionType = (char*) dRealloc( sActiveFilter.missionType, missionTypeLen );
+         dStrcpy( sActiveFilter.missionType, missionType, missionTypeLen );
       }
 
       sActiveFilter.queryFlags   = flags | ServerFilter::NewStyleResponse;
@@ -559,7 +560,7 @@ void queryMasterServer(U8 flags, const char* gameType, const char* missionType,
       processMasterServerQuery( gPingSession );
 }
 
-DefineConsoleFunction( queryMasterServer
+DefineEngineFunction( queryMasterServer
                      , void, (  U32 flags
                              , const char * gameType
                              , const char * missionType
@@ -581,7 +582,7 @@ DefineConsoleFunction( queryMasterServer
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( querySingleServer
+DefineEngineFunction( querySingleServer
                      , void, ( const char* addrText, U8 flags )
                      , (0), "querySingleServer(address, flags);" )
 {
@@ -667,7 +668,7 @@ void cancelServerQuery()
    }
 }
 
-DefineConsoleFunction( cancelServerQuery, void, (), , "cancelServerQuery();" )
+DefineEngineFunction( cancelServerQuery, void, (), , "cancelServerQuery();" )
 {
    cancelServerQuery();
 }
@@ -695,14 +696,14 @@ void stopServerQuery()
    }
 }
 
-DefineConsoleFunction( stopServerQuery, void, (), , "stopServerQuery();" )
+DefineEngineFunction( stopServerQuery, void, (), , "stopServerQuery();" )
 {
    stopServerQuery();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( startHeartbeat, void, (), , "startHeartbeat();" )
+DefineEngineFunction( startHeartbeat, void, (), , "startHeartbeat();" )
 {
    if (validateAuthenticatedServer()) {
       gHeartbeatSeq++;
@@ -710,19 +711,19 @@ DefineConsoleFunction( startHeartbeat, void, (), , "startHeartbeat();" )
    }
 }
 
-DefineConsoleFunction( stopHeartbeat, void, (), , "stopHeartbeat();" )
+DefineEngineFunction( stopHeartbeat, void, (), , "stopHeartbeat();" )
 {
    gHeartbeatSeq++;
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getServerCount, int, (), , "getServerCount();" )
+DefineEngineFunction( getServerCount, int, (), , "getServerCount();" )
 {
    return gServerList.size();
 }
 
-DefineConsoleFunction( setServerInfo, bool, (U32 index), , "setServerInfo(index);" )
+DefineEngineFunction( setServerInfo, bool, (U32 index), , "setServerInfo(index);" )
 {
    if (index < gServerList.size()) {
       ServerInfo& info = gServerList[index];
@@ -970,8 +971,9 @@ static void pushServerFavorites()
             Net::stringToAddress( addrString, &addr );
             ServerInfo* si = findOrCreateServerInfo( &addr );
             AssertFatal(si, "pushServerFavorites - failed to create Server Info!" );
-            si->name = (char*) dRealloc( (void*) si->name, dStrlen( serverName ) + 1 );
-            dStrcpy( si->name, serverName );
+            dsize_t nameLen = dStrlen(serverName) + 1;
+            si->name = (char*) dRealloc( (void*) si->name, nameLen );
+            dStrcpy( si->name, serverName, nameLen );
             si->isFavorite = true;
             pushPingRequest( &addr );
          }
@@ -1054,14 +1056,15 @@ void addFakeServers( S32 howMany )
       newServer.maxPlayers = 64;
       char buf[256];
       dSprintf( buf, 255, "Fake server #%d", sNumFakeServers );
-      newServer.name = (char*) dMalloc( dStrlen( buf ) + 1 );
-      dStrcpy( newServer.name, buf );
+      dsize_t nameLen = dStrlen(buf) + 1;
+      newServer.name = (char*) dMalloc( nameLen );
+      dStrcpy( newServer.name, buf, nameLen );
       newServer.gameType = (char*) dMalloc( 5 );
-      dStrcpy( newServer.gameType, "Fake" );
-      newServer.missionType = (char*) dMalloc( 4 );
-      dStrcpy( newServer.missionType, "FakeMissionType" );
+      dStrcpy( newServer.gameType, "Fake", 5 );
+      newServer.missionType = (char*) dMalloc( 16 );
+      dStrcpy( newServer.missionType, "FakeMissionType", 16 );
       newServer.missionName = (char*) dMalloc( 14 );
-      dStrcpy( newServer.missionName, "FakeMapName" );
+      dStrcpy( newServer.missionName, "FakeMapName", 14 );
       Net::stringToAddress( "IP:198.74.33.35:28000", &newServer.address );
       newServer.ping = (U32)( Platform::getRandom() * 200.0f );
       newServer.cpuSpeed = 470;
@@ -1298,7 +1301,7 @@ static void processPingsAndQueries( U32 session, bool schedule )
    if ( !gPingList.size() && !waitingForMaster )
    {
       // Start the query phase:
-      for ( U32 i = 0; i < gQueryList.size() && i < gMaxConcurrentQueries; )
+      for ( i = 0; i < gQueryList.size() && i < gMaxConcurrentQueries; )
       {
          Ping &p = gQueryList[i];
          if ( p.time + gPingTimeout < time )
@@ -1354,9 +1357,9 @@ static void processPingsAndQueries( U32 session, bool schedule )
       char msg[64];
       U32 foundCount = gServerList.size();
       if ( foundCount == 0 )
-         dStrcpy( msg, "No servers found." );
+         dStrcpy( msg, "No servers found.", 64 );
       else if ( foundCount == 1 )
-         dStrcpy( msg, "One server found." );
+         dStrcpy( msg, "One server found.", 64 );
       else
          dSprintf( msg, sizeof( msg ), "%d servers found.", foundCount );
 
@@ -1608,9 +1611,7 @@ static void handleExtendedMasterServerListResponse(BitStream* stream, U32 key, U
 {
    U16 packetIndex, packetTotal;
    U32 i;
-   U16 serverCount, port;
-   U8 netNum[16];
-   char addressBuffer[256];
+   U16 serverCount;
    NetAddress addr;
 
    stream->read(&packetIndex);
@@ -1740,6 +1741,7 @@ static void handleGameMasterInfoRequest( const NetAddress* address, U32 key, U8 
 #if defined(TORQUE_OS_LINUX) || defined(TORQUE_OS_OPENBSD)
       temp8 |= ServerInfo::Status_Linux;
 #endif
+
       if ( Con::getBoolVariable( "Server::Dedicated" ) )
          temp8 |= ServerInfo::Status_Dedicated;
       if ( dStrlen( Con::getVariable( "pref::Server::Password" ) ) > 0 )
@@ -1753,8 +1755,9 @@ static void handleGameMasterInfoRequest( const NetAddress* address, U32 key, U8 
       out->write( playerCount );
 
       const char* guidList = Con::getVariable( "Server::GuidList" );
-      char* buf = new char[dStrlen( guidList ) + 1];
-      dStrcpy( buf, guidList );
+      dsize_t bufLen = dStrlen(guidList) + 1;
+      char* buf = new char[bufLen];
+      dStrcpy( buf, guidList, bufLen );
       char* temp = dStrtok( buf, "\t" );
       temp8 = 0;
       for ( ; temp && temp8 < playerCount; temp8++ )
@@ -1948,8 +1951,9 @@ static void handleGamePingResponse( const NetAddress* address, BitStream* stream
    stream->readString( buf );
    if ( !si->name )
    {
-      si->name = (char*) dMalloc( dStrlen( buf ) + 1 );
-      dStrcpy( si->name, buf );
+      dsize_t bufLen = dStrlen(buf) + 1;
+      si->name = (char*) dMalloc(bufLen);
+      dStrcpy( si->name, buf, bufLen );
    }
 
    // Set the server up to be queried:
@@ -2001,6 +2005,7 @@ static void handleGameInfoRequest( const NetAddress* address, U32 key, U8 flags 
 #if defined(TORQUE_OS_LINUX) || defined(TORQUE_OS_OPENBSD)
       status |= ServerInfo::Status_Linux;
 #endif
+
       if ( Con::getBoolVariable( "Server::Dedicated" ) )
          status |= ServerInfo::Status_Dedicated;
       if ( dStrlen( Con::getVariable( "pref::Server::Password" ) ) )
@@ -2049,8 +2054,9 @@ static void handleGameInfoResponse( const NetAddress* address, BitStream* stream
    stream->readString( stringBuf );
    if ( !si->gameType || dStricmp( si->gameType, stringBuf ) != 0 )
    {
-      si->gameType = (char*) dRealloc( (void*) si->gameType, dStrlen( stringBuf ) + 1 );
-      dStrcpy( si->gameType, stringBuf );
+      dsize_t gameTypeLen = dStrlen(stringBuf) + 1;
+      si->gameType = (char*) dRealloc( (void*) si->gameType, gameTypeLen );
+      dStrcpy( si->gameType, stringBuf, gameTypeLen );
 
       // Test against the active filter:
       if ( applyFilter && dStricmp( sActiveFilter.gameType, "any" ) != 0
@@ -2066,8 +2072,9 @@ static void handleGameInfoResponse( const NetAddress* address, BitStream* stream
    stream->readString( stringBuf );
    if ( !si->missionType || dStrcmp( si->missionType, stringBuf ) != 0 )
    {
-      si->missionType = (char*) dRealloc( (void*) si->missionType, dStrlen( stringBuf ) + 1 );
-      dStrcpy( si->missionType, stringBuf );
+      dsize_t missionTypeLen = dStrlen(stringBuf) + 1;
+      si->missionType = (char*) dRealloc( (void*) si->missionType, missionTypeLen );
+      dStrcpy( si->missionType, stringBuf, missionTypeLen );
 
       // Test against the active filter:
       if ( applyFilter && dStricmp( sActiveFilter.missionType, "any" ) != 0
@@ -2087,8 +2094,9 @@ static void handleGameInfoResponse( const NetAddress* address, BitStream* stream
       *temp = '\0';
    if ( !si->missionName || dStrcmp( si->missionName, stringBuf ) != 0 )
    {
-      si->missionName = (char*) dRealloc( (void*) si->missionName, dStrlen( stringBuf ) + 1 );
-      dStrcpy( si->missionName, stringBuf );
+      dsize_t missionNameLen = dStrlen(stringBuf) + 1;
+      si->missionName = (char*) dRealloc( (void*) si->missionName, missionNameLen );
+      dStrcpy( si->missionName, stringBuf, missionNameLen );
    }
 
    // Get the server status:
@@ -2156,16 +2164,18 @@ static void handleGameInfoResponse( const NetAddress* address, BitStream* stream
    stream->readString( stringBuf );
    if ( !si->statusString || ( isUpdate && dStrcmp( si->statusString, stringBuf ) != 0 ) )
    {
-      si->infoString = (char*) dRealloc( (void*) si->infoString, dStrlen( stringBuf ) + 1 );
-      dStrcpy( si->infoString, stringBuf );
+      dsize_t infoLen = dStrlen(stringBuf) + 1;
+      si->infoString = (char*) dRealloc( (void*) si->infoString, infoLen );
+      dStrcpy( si->infoString, stringBuf, infoLen );
    }
 
    // Get the content string:
    readLongCString( stream, stringBuf );
    if ( !si->statusString || ( isUpdate && dStrcmp( si->statusString, stringBuf ) != 0 ) )
    {
-      si->statusString = (char*) dRealloc( (void*) si->statusString, dStrlen( stringBuf ) + 1 );
-      dStrcpy( si->statusString, stringBuf );
+      dsize_t statusLen = dStrlen(stringBuf) + 1;
+      si->statusString = (char*) dRealloc( (void*) si->statusString, statusLen );
+      dStrcpy( si->statusString, stringBuf, statusLen );
    }
 
    // Update the server browser gui!

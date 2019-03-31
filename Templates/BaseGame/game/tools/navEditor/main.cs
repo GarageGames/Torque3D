@@ -96,6 +96,7 @@ function NavEditorPlugin::onWorldEditorStartup(%this)
    EWCreatorWindow.beginGroup("Navigation");
 
       EWCreatorWindow.registerMissionObject("CoverPoint", "Cover point");
+      EWCreatorWindow.registerMissionObject("NavPath", "Nav Path");
 
    EWCreatorWindow.endGroup();
 }
@@ -204,7 +205,7 @@ function NavEditorPlugin::onSaveMission(%this, %missionFile)
 {
    if(NavEditorGui.isDirty)
    {
-      MissionGroup.save(%missionFile);
+      getScene(0).save(%missionFile);
       NavEditorGui.isDirty = false;
    }
 }

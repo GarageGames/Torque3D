@@ -17,7 +17,7 @@ typedef struct AmbDecConf {
 
     ALuint ChanMask;
     ALuint FreqBands; /* Must be 1 or 2 */
-    ALuint NumSpeakers;
+    ALsizei NumSpeakers;
     enum AmbDecScaleType CoeffScale;
 
     ALfloat XOverFreq;

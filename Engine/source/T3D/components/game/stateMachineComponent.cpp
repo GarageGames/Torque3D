@@ -57,7 +57,6 @@ StateMachineComponent::StateMachineComponent() : Component()
 
    //doesn't need to be networked
    mNetworked = false;
-   mNetFlags.clear();
 }
 
 StateMachineComponent::~StateMachineComponent()

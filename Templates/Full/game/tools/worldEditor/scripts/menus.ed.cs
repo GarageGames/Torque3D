@@ -110,9 +110,13 @@ function EditorGui::buildMenus(%this)
    };
       
    // Menu bar
-   %this.menuBar = new MenuBar(WorldEditorMenubar)
+   %this.menuBar = new GuiMenuBar(WorldEditorMenubar)
    {
       dynamicItemInsertPos = 3;
+      extent = Canvas.extent.x SPC "20";
+      minExtent = "320 20";
+      horizSizing = "width";
+      profile = "GuiMenuBarProfile";
    };
    
    // File Menu
@@ -158,7 +162,7 @@ function EditorGui::buildMenus(%this)
    %fileMenu.appendItem("Exit Level" TAB "" TAB "EditorExitMission();");
    %fileMenu.appendItem("Quit" TAB %quitShortcut TAB "EditorQuitGame();");
 
-   %this.menuBar.insert(%fileMenu, %this.menuBar.getCount());
+   %this.menuBar.insert(%fileMenu);
    
    // Edit Menu
    %editMenu = new PopupMenu()
@@ -187,7 +191,7 @@ function EditorGui::buildMenus(%this)
       item[15] = "Game Options..." TAB "" TAB "Canvas.pushDialog(optionsDlg);";
       item[16] = "PostEffect Manager" TAB "" TAB "Canvas.pushDialog(PostFXManager);";
    };
-   %this.menuBar.insert(%editMenu, %this.menuBar.getCount());
+   %this.menuBar.insert(%editMenu);
       
    // View Menu
    %viewMenu = new PopupMenu()
@@ -201,7 +205,7 @@ function EditorGui::buildMenus(%this)
       item[ 0 ] = "Visibility Layers" TAB "Alt V" TAB "VisibilityDropdownToggle();";
       item[ 1 ] = "Show Grid in Ortho Views" TAB %cmdCtrl @ "-Shift-Alt G" TAB "EditorGui.toggleOrthoGrid();";
    };
-   %this.menuBar.insert(%viewMenu, %this.menuBar.getCount());
+   %this.menuBar.insert(%viewMenu);
       
    // Camera Menu
    %cameraMenu = new PopupMenu()
@@ -229,7 +233,7 @@ function EditorGui::buildMenus(%this)
       Item[15] = "Manage Bookmarks..." TAB "Ctrl-Shift B" TAB "EditorGui.toggleCameraBookmarkWindow();";
       item[16] = "Jump to Bookmark" TAB %this.cameraBookmarksMenu;
    };
-   %this.menuBar.insert(%cameraMenu, %this.menuBar.getCount());
+   %this.menuBar.insert(%cameraMenu);
       
    // Editors Menu
    %editorsMenu = new PopupMenu()
@@ -246,7 +250,42 @@ function EditorGui::buildMenus(%this)
          //item[4] = "Terrain Painter" TAB "F4" TAB TerrainPainterPlugin;
          //item[5] = "-";
    };
-   %this.menuBar.insert(%editorsMenu, %this.menuBar.getCount());
+   %this.menuBar.insert(%editorsMenu);
+   
+   //if we're just refreshing the menus, we probably have a list of editors we want added to the Editors menu there, so check and if so, add them now
+   if(isObject(EditorsMenuList))
+   {
+      %editorsListCount = EditorsMenuList.count();
+      
+      for(%e = 0; %e < %editorsListCount; %e++)
+      {
+         %menuEntry = EditorsMenuList.getKey(%e);
+         %editorsMenu.addItem(%e, %menuEntry);
+      }
+   }
+   
+   if(isObject(PhysicsEditorPlugin))
+   {
+      %physicsToolsMenu = new PopupMenu()
+      {
+         superClass = "MenuBuilder";
+         //class = "PhysXToolsMenu";
+
+         barTitle = "Physics";
+                                    
+         item[0] = "Start Simulation" TAB "Ctrl-Alt P" TAB "physicsStartSimulation( \"client\" );physicsStartSimulation( \"server\" );";         
+         //item[1] = "Stop Simulation" TAB "" TAB "physicsSetTimeScale( 0 );";
+         item[1] = "-";
+         item[2] = "Speed 25%" TAB "" TAB "physicsSetTimeScale( 0.25 );";
+         item[3] = "Speed 50%" TAB "" TAB "physicsSetTimeScale( 0.5 );";
+         item[4] = "Speed 100%" TAB "" TAB "physicsSetTimeScale( 1.0 );";
+         item[5] = "-";
+         item[6] = "Reload NXBs" TAB "" TAB "";
+      };
+      
+      // Add our menu.
+      %this.menuBar.insert( %physicsToolsMenu, EditorGui.menuBar.dynamicItemInsertPos );
+   }
       
    // Lighting Menu
    %lightingMenu = new PopupMenu()
@@ -263,7 +302,7 @@ function EditorGui::buildMenus(%this)
          // NOTE: The light managers will be inserted as the
          // last menu items in EditorLightingMenu::onAdd().
    };
-   %this.menuBar.insert(%lightingMenu, %this.menuBar.getCount());
+   %this.menuBar.insert(%lightingMenu);
    
    // Tools Menu
    %toolsMenu = new PopupMenu()
@@ -278,7 +317,7 @@ function EditorGui::buildMenus(%this)
 	  item[2] = "Torque SimView" TAB "" TAB "tree();";
       item[3] = "Make Selected a Mesh" TAB "" TAB "makeSelectedAMesh();";
    };
-   %this.menuBar.insert(%toolsMenu, %this.menuBar.getCount());
+   %this.menuBar.insert(%toolsMenu);
       
    // Help Menu
    %helpMenu = new PopupMenu()
@@ -293,7 +332,7 @@ function EditorGui::buildMenus(%this)
       item[2] = "Offline Reference Guide..." TAB "" TAB "shellexecute(EWorldEditor.documentationReference);";
       item[3] = "Torque 3D Forums..." TAB "" TAB "gotoWebPage(EWorldEditor.forumURL);";
    };
-   %this.menuBar.insert(%helpMenu, %this.menuBar.getCount());
+   %this.menuBar.insert(%helpMenu);
    
    // Menus that are added/removed dynamically (temporary)
    
@@ -383,6 +422,11 @@ function EditorGui::buildMenus(%this)
 
 //////////////////////////////////////////////////////////////////////////
 
+function WorldEditorMenubar::onResize(%this)
+{
+   %this.extent.x = Canvas.extent.x;
+}
+
 function EditorGui::attachMenus(%this)
 {
    %this.menuBar.attachToCanvas(Canvas, 0);
@@ -398,9 +442,9 @@ function EditorGui::setMenuDefaultState(%this)
    if(! isObject(%this.menuBar))
       return 0;
       
-   for(%i = 0;%i < %this.menuBar.getCount();%i++)
+   for(%i = 0;%i < %this.menuBar.getMenuCount();%i++)
    {
-      %menu = %this.menuBar.getObject(%i);
+      %menu = %this.menuBar.getMenu(%i);
       %menu.setupDefaultState();
    }
    
@@ -414,9 +458,10 @@ function EditorGui::findMenu(%this, %name)
    if(! isObject(%this.menuBar))
       return 0;
       
-   for(%i = 0;%i < %this.menuBar.getCount();%i++)
+   
+   for(%i = 0; %i < %this.menuBar.getMenuCount(); %i++)
    {
-      %menu = %this.menuBar.getObject(%i);
+      %menu = %this.menuBar.getMenu(%i);
       
       if(%name $= %menu.barTitle)
          return %menu;

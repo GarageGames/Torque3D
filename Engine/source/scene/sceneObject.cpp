@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "scene/sceneObject.h"
 
@@ -144,6 +149,7 @@ SceneObject::SceneObject()
    mIsScopeAlways = false;
 
    mAccuTex = NULL;
+   mSelectionFlags = 0;
    mPathfindingIgnore = false;
 }
 
@@ -425,6 +431,64 @@ void SceneObject::setScale( const VectorF &scale )
    onScaleChanged();
 
    setMaskBits( ScaleMask );
+}
+
+void SceneObject::setForwardVector(VectorF newForward, VectorF upVector)
+{
+   MatrixF mat = getTransform();
+
+   VectorF up(0.0f, 0.0f, 1.0f);
+   VectorF axisX;
+   VectorF axisY = newForward;
+   VectorF axisZ;
+
+   if (upVector != VectorF::Zero)
+      up = upVector;
+
+   // Validate and normalize input:  
+   F32 lenSq;
+   lenSq = axisY.lenSquared();
+   if (lenSq < 0.000001f)
+   {
+      axisY.set(0.0f, 1.0f, 0.0f);
+      Con::errorf("SceneObject::setForwardVector() - degenerate forward vector");
+   }
+   else
+   {
+      axisY /= mSqrt(lenSq);
+   }
+
+
+   lenSq = up.lenSquared();
+   if (lenSq < 0.000001f)
+   {
+      up.set(0.0f, 0.0f, 1.0f);
+      Con::errorf("SceneObject::setForwardVector() - degenerate up vector - too small");
+   }
+   else
+   {
+      up /= mSqrt(lenSq);
+   }
+
+   if (fabsf(mDot(up, axisY)) > 0.9999f)
+   {
+      Con::errorf("SceneObject::setForwardVector() - degenerate up vector - same as forward");
+      // I haven't really tested this, but i think it generates something which should be not parallel to the previous vector:  
+      F32 tmp = up.x;
+      up.x = -up.y;
+      up.y = up.z;
+      up.z = tmp;
+   }
+
+   // construct the remaining axes:  
+   mCross(axisY, up, &axisX);
+   mCross(axisX, axisY, &axisZ);
+
+   mat.setColumn(0, axisX);
+   mat.setColumn(1, axisY);
+   mat.setColumn(2, axisZ);
+
+   setTransform(mat);
 }
 
 //-----------------------------------------------------------------------------
@@ -1201,7 +1265,7 @@ DefineEngineMethod( SceneObject, getType, S32, (),,
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( SceneObject, mountObject, bool,
-   ( SceneObject* objB, S32 slot, TransformF txfm ), ( MatrixF::Identity ),
+   ( SceneObject* objB, S32 slot, TransformF txfm ), ( TransformF::Identity ),
    "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
 
    "@param objB  Object to mount onto us\n"
@@ -1451,4 +1515,12 @@ DefineEngineMethod( SceneObject, isGlobalBounds, bool, (),,
    "@return true if the object has a global bounds." )
 {
    return object->isGlobalBounds();
+}
+
+DefineEngineMethod(SceneObject, setForwardVector, void, (VectorF newForward, VectorF upVector), (VectorF(0, 0, 0), VectorF(0, 0, 1)),
+   "Sets the forward vector of a scene object, making it face Y+ along the new vector.\n"
+   "@param The new forward vector to set.\n"
+   "@param (Optional) The up vector to use to help orient the rotation.")
+{
+   object->setForwardVector(newForward, upVector);
 }

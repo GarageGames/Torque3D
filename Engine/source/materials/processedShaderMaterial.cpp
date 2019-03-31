@@ -76,6 +76,7 @@ void ShaderConstHandles::init( GFXShader *shader, CustomMaterial* mat /*=NULL*/ 
    mWorldToObjSC = shader->getShaderConstHandle(ShaderGenVars::worldToObj);
    mViewToObjSC = shader->getShaderConstHandle(ShaderGenVars::viewToObj);
    mCubeTransSC = shader->getShaderConstHandle(ShaderGenVars::cubeTrans);
+   mCubeMipsSC = shader->getShaderConstHandle(ShaderGenVars::cubeMips);
    mObjTransSC = shader->getShaderConstHandle(ShaderGenVars::objTrans);
    mCubeEyePosSC = shader->getShaderConstHandle(ShaderGenVars::cubeEyePos);
    mEyePosSC = shader->getShaderConstHandle(ShaderGenVars::eyePos);
@@ -270,7 +271,7 @@ U32 ProcessedShaderMaterial::getNumStages()
 
       // If this stage has diffuse color, it's active
       if (  mMaterial->mDiffuse[i].alpha > 0 &&
-            mMaterial->mDiffuse[i] != ColorF::WHITE )
+            mMaterial->mDiffuse[i] != LinearColorF::WHITE )
          stageActive = true;
 
       // If we have a Material that is vertex lit
@@ -394,9 +395,12 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
    
    if ( fd.features[ MFT_NormalMap ] )   
    {   
-      if (  mStages[stageNum].getTex( MFT_NormalMap )->mFormat == GFXFormatDXT5 &&   
+      if (  mStages[stageNum].getTex( MFT_NormalMap )->mFormat == GFXFormatBC3 &&   
            !mStages[stageNum].getTex( MFT_NormalMap )->mHasTransparency )   
-         fd.features.addFeature( MFT_IsDXTnm );   
+         fd.features.addFeature( MFT_IsBC3nm );
+      else if ( mStages[stageNum].getTex(MFT_NormalMap)->mFormat == GFXFormatBC5 &&
+            !mStages[stageNum].getTex(MFT_NormalMap)->mHasTransparency )
+         fd.features.addFeature( MFT_IsBC5nm );
    }
 
    // Now for some more advanced features that we 
@@ -461,7 +465,7 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
    // If we have a diffuse map and the alpha on the diffuse isn't
    // zero and the color isn't pure white then multiply the color.
    else if (   mMaterial->mDiffuse[stageNum].alpha > 0.0f && 
-               mMaterial->mDiffuse[stageNum] != ColorF::WHITE )
+               mMaterial->mDiffuse[stageNum] != LinearColorF::WHITE )
       fd.features.addFeature( MFT_DiffuseColor );
 
    // If lightmaps or tonemaps are enabled or we 
@@ -527,9 +531,9 @@ bool ProcessedShaderMaterial::_createPasses( MaterialFeatureData &stageFeatures,
    ShaderRenderPassData passData;
    U32 texIndex = 0;
 
-   for( U32 i=0; i < FEATUREMGR->getFeatureCount(); i++ )
+   for( U32 featureIDx=0; featureIDx < FEATUREMGR->getFeatureCount(); featureIDx++ )
    {
-      const FeatureInfo &info = FEATUREMGR->getAt( i );
+      const FeatureInfo &info = FEATUREMGR->getAt(featureIDx);
       if ( !stageFeatures.features.hasFeature( *info.type ) ) 
          continue;
 
@@ -558,7 +562,7 @@ bool ProcessedShaderMaterial::_createPasses( MaterialFeatureData &stageFeatures,
 #if defined(TORQUE_DEBUG) && defined( TORQUE_OPENGL)
       if(oldTexNumber != texIndex)
       {
-         for(int i = oldTexNumber; i < texIndex; i++)
+         for(int texNum = oldTexNumber; texNum < texIndex; texNum++)
          {
             AssertFatal(passData.mSamplerNames[ oldTexNumber ].isNotEmpty(), avar( "ERROR: ShaderGen feature %s don't set used sampler name", info.feature->getName().c_str()) );
          }
@@ -575,9 +579,9 @@ bool ProcessedShaderMaterial::_createPasses( MaterialFeatureData &stageFeatures,
    }
 
 #if defined(TORQUE_DEBUG) && defined( TORQUE_OPENGL)
-   for(int i = 0; i < texIndex; i++)
+   for(int samplerIDx = 0; samplerIDx < texIndex; samplerIDx++)
    {
-      AssertFatal(passData.mSamplerNames[ i ].isNotEmpty(),"");
+      AssertFatal(passData.mSamplerNames[samplerIDx].isNotEmpty(),"");
    }
 #endif
 
@@ -1096,7 +1100,7 @@ void ProcessedShaderMaterial::_setShaderConstants(SceneRenderState * state, cons
    if ( handles->mSubSurfaceParamsSC->isValid() )
    {
       Point4F subSurfParams;
-      dMemcpy( &subSurfParams, &mMaterial->mSubSurfaceColor[stageNum], sizeof(ColorF) );
+      dMemcpy( &subSurfParams, &mMaterial->mSubSurfaceColor[stageNum], sizeof(LinearColorF) );
       subSurfParams.w = mMaterial->mSubSurfaceRolloff[stageNum];
       shaderConsts->set(handles->mSubSurfaceParamsSC, subSurfParams);
    }

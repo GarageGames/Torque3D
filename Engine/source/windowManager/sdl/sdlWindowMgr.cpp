@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "windowManager/sdl/sdlWindowMgr.h"
+#include "platformSDL/sdlInputManager.h"
 #include "gfx/gfxDevice.h"
 #include "core/util/journal/process.h"
 #include "core/strings/unicode.h"
@@ -61,8 +62,6 @@ PlatformWindowManagerSDL::PlatformWindowManagerSDL()
    mOffscreenRender = false;
 
    mInputState = KeyboardInputState::NONE;
-
-   buildMonitorsList();
 }
 
 PlatformWindowManagerSDL::~PlatformWindowManagerSDL()
@@ -75,9 +74,8 @@ PlatformWindowManagerSDL::~PlatformWindowManagerSDL()
 
 RectI PlatformWindowManagerSDL::getPrimaryDesktopArea()
 {
-   // TODO SDL
-   AssertFatal(0, "");
-   return RectI(0,0,0,0);
+   // Primary is monitor 0
+   return getMonitorRect(0);
 }
 
 Point2I PlatformWindowManagerSDL::getDesktopResolution()
@@ -100,46 +98,60 @@ S32 PlatformWindowManagerSDL::getDesktopBitDepth()
    return bbp;
 }
 
-void PlatformWindowManagerSDL::buildMonitorsList()
-{
-   // TODO SDL
-}
-
 S32 PlatformWindowManagerSDL::findFirstMatchingMonitor(const char* name)
 {
-   /// TODO SDL
-   AssertFatal(0, "");
+   S32 count = SDL_GetNumVideoDisplays();
+   for (U32 index = 0; index < count; ++index)
+   {
+      if (dStrstr(name, SDL_GetDisplayName(index)) == name)
+         return index;
+   }
 
    return 0;
 }
 
 U32 PlatformWindowManagerSDL::getMonitorCount()
 {
-   // TODO SDL
-   AssertFatal(0, "");
-   return 1;
+   S32 monitorCount = SDL_GetNumVideoDisplays();
+   if (monitorCount < 0)
+   {
+      Con::errorf("SDL_GetNumVideoDisplays() failed: %s", SDL_GetError());
+      monitorCount = 0;
+   }
+
+   return (U32)monitorCount;
 }
 
 const char* PlatformWindowManagerSDL::getMonitorName(U32 index)
 {
-   // TODO SDL
-   AssertFatal(0, "");
+   const char* monitorName = SDL_GetDisplayName(index);
+   if (monitorName == NULL)
+      Con::errorf("SDL_GetDisplayName() failed: %s", SDL_GetError());
 
-   return "Monitor";
+   return monitorName;
 }
 
 RectI PlatformWindowManagerSDL::getMonitorRect(U32 index)
 {
-   // TODO SDL
-   AssertFatal(0, "");
+   SDL_Rect sdlRect;
+   if (0 != SDL_GetDisplayBounds(index, &sdlRect))
+   {
+      Con::errorf("SDL_GetDisplayBounds() failed: %s", SDL_GetError());
+      return RectI(0, 0, 0, 0);
+   }
 
-   return RectI(0, 0, 0,0 );
+   return RectI(sdlRect.x, sdlRect.y, sdlRect.w, sdlRect.h);
 }
 
 void PlatformWindowManagerSDL::getMonitorRegions(Vector<RectI> &regions)
 {
-   // TODO SDL
-   AssertFatal(0, "");
+   SDL_Rect sdlRect;
+   S32 monitorCount = SDL_GetNumVideoDisplays();
+   for (S32 index = 0; index < monitorCount; ++index)
+   {
+      if (0 == SDL_GetDisplayBounds(index, &sdlRect))
+         regions.push_back(RectI(sdlRect.x, sdlRect.y, sdlRect.w, sdlRect.h));
+   }
 }
 
 void PlatformWindowManagerSDL::getWindows(VectorPtr<PlatformWindow*> &windows)
@@ -230,6 +242,13 @@ PlatformWindow *PlatformWindowManagerSDL::createWindow(GFXDevice *device, const 
       Con::warnf("PlatformWindowManagerSDL::createWindow - created a window with no device!");
    }
 
+   //Set it up for drag-n-drop events 
+#ifdef TORQUE_TOOLS
+   SDL_EventState(SDL_DROPBEGIN, SDL_ENABLE);
+   SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+   SDL_EventState(SDL_DROPCOMPLETE, SDL_ENABLE);
+#endif
+
    linkWindow(window);
 
    return window;
@@ -251,6 +270,13 @@ void PlatformWindowManagerSDL::_process()
    SDL_Event evt;
    while( SDL_PollEvent(&evt) )
    {      
+      if (evt.type >= SDL_JOYAXISMOTION && evt.type <= SDL_CONTROLLERDEVICEREMAPPED)
+      {
+         SDLInputManager* mgr = static_cast<SDLInputManager*>(Input::getManager());
+         if (mgr)
+            mgr->processEvent(evt);
+         continue;
+      }
       switch(evt.type)
       {
           case SDL_QUIT:
@@ -311,9 +337,43 @@ void PlatformWindowManagerSDL::_process()
             break;
          }
 
+         case(SDL_DROPBEGIN):
+         {
+            if (!Con::isFunction("onDropBegin"))
+               break;
+
+            Con::executef("onDropBegin");
+         }
+
+         case (SDL_DROPFILE):
+         {
+            // In case if dropped file
+            if (!Con::isFunction("onDropFile"))
+               break;
+
+            char* fileName = evt.drop.file;
+
+            if (!Platform::isFile(fileName))
+               break;
+
+            Con::executef("onDropFile", StringTable->insert(fileName));
+
+            SDL_free(fileName);    // Free dropped_filedir memory
+            break;
+         }
+
+         case(SDL_DROPCOMPLETE):
+         {
+            if (Con::isFunction("onDropEnd"))
+               Con::executef("onDropEnd");
+            break;
+         }
+
          default:
          {
-            //Con::printf("Event: %d", evt.type);
+#ifdef TORQUE_DEBUG
+            Con::warnf("Unhandled SDL input event: 0x%04x", evt.type);
+#endif
          }
       }
    }
@@ -444,10 +504,12 @@ void InitWindowingSystem()
 
 AFTER_MODULE_INIT(gfx)
 {
+#if !defined(TORQUE_DEDICATED)
    int res = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS | SDL_INIT_NOPARACHUTE);
    AssertFatal(res != -1, avar("SDL error:%s", SDL_GetError()));
 
    // By default, SDL enables text input. We disable it on initialization, and
    // we will enable it whenever the time is right.
    SDL_StopTextInput();
+#endif
 }

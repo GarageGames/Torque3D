@@ -370,24 +370,24 @@ bool ForestEditorCtrl::isDirty()
    return foundDirty;   
 }
 
-DefineConsoleMethod( ForestEditorCtrl, updateActiveForest, void, (), , "()" )
+DefineEngineMethod( ForestEditorCtrl, updateActiveForest, void, (), , "()" )
 {
    object->updateActiveForest( true );
 }
 
-DefineConsoleMethod( ForestEditorCtrl, setActiveTool, void, ( const char * toolName ), , "( ForestTool tool )" )
+DefineEngineMethod( ForestEditorCtrl, setActiveTool, void, ( const char * toolName ), , "( ForestTool tool )" )
 {
    ForestTool *tool = dynamic_cast<ForestTool*>( Sim::findObject( toolName ) );
    object->setActiveTool( tool );
 }
 
-DefineConsoleMethod( ForestEditorCtrl, getActiveTool, S32, (), , "()" )
+DefineEngineMethod( ForestEditorCtrl, getActiveTool, S32, (), , "()" )
 {
    ForestTool *tool = object->getActiveTool();
    return tool ? tool->getId() : 0;
 }
 
-DefineConsoleMethod( ForestEditorCtrl, deleteMeshSafe, void, ( const char * obj ), , "( ForestItemData obj )" )
+DefineEngineMethod( ForestEditorCtrl, deleteMeshSafe, void, ( const char * obj ), , "( ForestItemData obj )" )
 {
    ForestItemData *db;
    if ( !Sim::findObject( obj, db ) )
@@ -396,12 +396,12 @@ DefineConsoleMethod( ForestEditorCtrl, deleteMeshSafe, void, ( const char * obj 
    object->deleteMeshSafe( db );   
 }
 
-DefineConsoleMethod( ForestEditorCtrl, isDirty, bool, (), , "" )
+DefineEngineMethod( ForestEditorCtrl, isDirty, bool, (), , "" )
 {
    return object->isDirty();
 }
 
-DefineConsoleMethod(ForestEditorCtrl, setActiveForest, void, (const char * obj), , "( Forest obj )")
+DefineEngineMethod(ForestEditorCtrl, setActiveForest, void, (const char * obj), , "( Forest obj )")
 {
    Forest *forestObject;
    if (!Sim::findObject(obj, forestObject))

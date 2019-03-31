@@ -30,6 +30,9 @@
 #include <stdio.h>
 #endif
 
+#include <string>
+#include <unordered_map>
+
 class Stream;
 class DataChunker;
 
@@ -91,10 +94,15 @@ namespace Compiler
       OP_DIV,
       OP_NEG,
 
+      OP_INC,
+      OP_DEC,
+
       OP_SETCURVAR,
       OP_SETCURVAR_CREATE,
       OP_SETCURVAR_ARRAY,
+      OP_SETCURVAR_ARRAY_VARLOOKUP,
       OP_SETCURVAR_ARRAY_CREATE,
+      OP_SETCURVAR_ARRAY_CREATE_VARLOOKUP,
 
       OP_LOADVAR_UINT,// 40
       OP_LOADVAR_FLT,
@@ -113,6 +121,8 @@ namespace Compiler
       OP_SETCURFIELD,
       OP_SETCURFIELD_ARRAY, // 50
       OP_SETCURFIELD_TYPE,
+      OP_SETCURFIELD_ARRAY_VAR,
+      OP_SETCURFIELD_THIS,
 
       OP_LOADFIELD_UINT,
       OP_LOADFIELD_FLT,
@@ -142,6 +152,8 @@ namespace Compiler
 
       OP_CALLFUNC_RESOLVE,
       OP_CALLFUNC,
+      OP_CALLFUNC_POINTER,
+      OP_CALLFUNC_THIS,
 
       OP_ADVANCE_STR,
       OP_ADVANCE_STR_APPENDCHAR,
@@ -155,23 +167,26 @@ namespace Compiler
       OP_PUSH_UINT,     // Integer
       OP_PUSH_FLT,      // Float
       OP_PUSH_VAR,      // Variable
+      OP_PUSH_THIS,     // This pointer
       OP_PUSH_FRAME,    // Frame
 
       OP_ASSERT,
       OP_BREAK,
-      
+
       OP_ITER_BEGIN,       ///< Prepare foreach iterator.
       OP_ITER_BEGIN_STR,   ///< Prepare foreach$ iterator.
       OP_ITER,             ///< Enter foreach loop.
       OP_ITER_END,         ///< End foreach loop.
 
-      OP_INVALID   // 90
+      OP_INVALID,   // 90
+
+      MAX_OP_CODELEN ///< The amount of op codes.
    };
 
    //------------------------------------------------------------
 
    F64 consoleStringToNumber(const char *str, StringTableEntry file = 0, U32 line = 0);
-   
+
    U32 compileBlock(StmtNode *block, CodeStream &codeStream, U32 ip);
 
    //------------------------------------------------------------
@@ -207,6 +222,7 @@ namespace Compiler
       Entry *list;
 
       char buf[256];
+      std::unordered_map<std::string, Entry*> hashTable;
 
       U32 add(const char *str, bool caseSens = true, bool tag = false);
       U32 addIntString(U32 value);
@@ -239,14 +255,14 @@ namespace Compiler
    inline StringTableEntry CodeToSTE(U32 *code, U32 ip)
    {
 #ifdef TORQUE_CPU_X64
-      return (StringTableEntry)(*((U64*)(code+ip)));
+      return (StringTableEntry)(*((U64*)(code + ip)));
 #else
-      return (StringTableEntry)(*(code+ip));
+      return (StringTableEntry)(*(code + ip));
 #endif
    }
 
-   extern void (*STEtoCode)(StringTableEntry ste, U32 ip, U32 *ptr);
-   
+   extern void(*STEtoCode)(StringTableEntry ste, U32 ip, U32 *ptr);
+
    void evalSTEtoCode(StringTableEntry ste, U32 ip, U32 *ptr);
    void compileSTEtoCode(StringTableEntry ste, U32 ip, U32 *ptr);
 
@@ -254,13 +270,13 @@ namespace Compiler
    CompilerStringTable &getGlobalStringTable();
    CompilerStringTable &getFunctionStringTable();
 
-   void setCurrentStringTable (CompilerStringTable* cst);
+   void setCurrentStringTable(CompilerStringTable* cst);
 
    CompilerFloatTable *getCurrentFloatTable();
    CompilerFloatTable &getGlobalFloatTable();
    CompilerFloatTable &getFunctionFloatTable();
 
-   void setCurrentFloatTable (CompilerFloatTable* cst);
+   void setCurrentFloatTable(CompilerFloatTable* cst);
 
    CompilerIdentTable &getIdentTable();
 
@@ -280,7 +296,7 @@ namespace Compiler
 class CodeStream
 {
 public:
-   
+
    enum FixType
    {
       // For loops
@@ -288,37 +304,37 @@ public:
       FIXTYPE_BREAK,
       FIXTYPE_CONTINUE
    };
-   
+
    enum Constants
    {
       BlockSize = 16384,
    };
-   
+
 protected:
-   
+
    typedef struct PatchEntry
    {
       U32 addr;  ///< Address to patch
       U32 value; ///< Value to place at addr
-      
-      PatchEntry() {;}
-      PatchEntry(U32 a, U32 v)  : addr(a), value(v) {;}
+
+      PatchEntry() { ; }
+      PatchEntry(U32 a, U32 v) : addr(a), value(v) { ; }
    } PatchEntry;
-   
+
    typedef struct CodeData
    {
       U8 *data;       ///< Allocated data (size is BlockSize)
       U32 size;       ///< Bytes used in data
       CodeData *next; ///< Next block
    } CodeData;
-   
+
    /// @name Emitted code
    /// {
    CodeData *mCode;
    CodeData *mCodeHead;
    U32 mCodePos;
    /// }
-   
+
    /// @name Code fixing stacks
    /// {
    Vector<U32> mFixList;
@@ -326,28 +342,28 @@ protected:
    Vector<bool> mFixLoopStack;
    Vector<PatchEntry> mPatchList;
    /// }
-   
+
    Vector<U32> mBreakLines; ///< Line numbers
-   
+
 public:
 
    CodeStream() : mCode(0), mCodeHead(NULL), mCodePos(0)
    {
    }
-   
+
    ~CodeStream()
    {
       reset();
-      
+
       if (mCode)
       {
          dFree(mCode->data);
          delete mCode;
       }
    }
-   
+
    U8 *allocCode(U32 sz);
-   
+
    inline U32 emit(U32 code)
    {
       U32 *ptr = (U32*)allocCode(4);
@@ -357,7 +373,7 @@ public:
 #endif
       return mCodePos++;
    }
-   
+
    inline void patch(U32 addr, U32 code)
    {
 #ifdef DEBUG_CODESTREAM
@@ -365,7 +381,7 @@ public:
 #endif
       mPatchList.push_back(PatchEntry(addr, code));
    }
-   
+
    inline U32 emitSTE(const char *code)
    {
       U64 *ptr = (U64*)allocCode(8);
@@ -375,70 +391,70 @@ public:
       printf("code[%u] = %s\n", mCodePos, code);
 #endif
       mCodePos += 2;
-      return mCodePos-2;
+      return mCodePos - 2;
    }
-   
+
    inline U32 tell()
    {
       return mCodePos;
    }
-   
+
    inline bool inLoop()
    {
-      for (U32 i=0; i<mFixLoopStack.size(); i++)
+      for (U32 i = 0; i<mFixLoopStack.size(); i++)
       {
          if (mFixLoopStack[i])
             return true;
       }
       return false;
    }
-   
+
    inline U32 emitFix(FixType type)
    {
       U32 *ptr = (U32*)allocCode(4);
       *ptr = (U32)type;
-      
+
 #ifdef DEBUG_CODESTREAM
       printf("code[%u] = [FIX:%u]\n", mCodePos, (U32)type);
 #endif
-      
+
       mFixList.push_back(mCodePos);
       mFixList.push_back((U32)type);
       return mCodePos++;
    }
-   
+
    inline void pushFixScope(bool isLoop)
    {
       mFixStack.push_back(mFixList.size());
       mFixLoopStack.push_back(isLoop);
    }
-   
+
    inline void popFixScope()
    {
       AssertFatal(mFixStack.size() > 0, "Fix stack mismatch");
-      
-      U32 newSize = mFixStack[mFixStack.size()-1];
+
+      U32 newSize = mFixStack[mFixStack.size() - 1];
       while (mFixList.size() > newSize)
          mFixList.pop_back();
       mFixStack.pop_back();
       mFixLoopStack.pop_back();
    }
-   
+
    void fixLoop(U32 loopBlockStart, U32 breakPoint, U32 continuePoint);
-   
+
    inline void addBreakLine(U32 lineNumber, U32 ip)
    {
       mBreakLines.push_back(lineNumber);
       mBreakLines.push_back(ip);
    }
-   
+
    inline U32 getNumLineBreaks()
    {
       return mBreakLines.size() / 2;
    }
-   
+
    void emitCodeStream(U32 *size, U32 **stream, U32 **lineBreaks);
-   
+
    void reset();
 };
 

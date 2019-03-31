@@ -59,13 +59,14 @@ MODULE_END;
 
 GFX_ImplementTextureProfile( ReflectRenderTargetProfile, 
                              GFXTextureProfile::DiffuseMap, 
-                             GFXTextureProfile::PreserveSize | GFXTextureProfile::RenderTarget | GFXTextureProfile::Pooled, 
+                             GFXTextureProfile::PreserveSize | GFXTextureProfile::RenderTarget | GFXTextureProfile::SRGB | GFXTextureProfile::Pooled,
                              GFXTextureProfile::NONE );
 
 GFX_ImplementTextureProfile( RefractTextureProfile,
                              GFXTextureProfile::DiffuseMap,
                              GFXTextureProfile::PreserveSize | 
                              GFXTextureProfile::RenderTarget |
+                             GFXTextureProfile::SRGB | 
                              GFXTextureProfile::Pooled,
                              GFXTextureProfile::NONE );
 
@@ -83,7 +84,7 @@ U32 ReflectionManager::smFrameReflectionMS = 10;
 F32 ReflectionManager::smRefractTexScale = 0.5f;
 
 ReflectionManager::ReflectionManager() 
- : mReflectFormat( GFXFormatR8G8B8A8 ),
+ : mReflectFormat( GFXFormatR8G8B8A8_SRGB ),
    mUpdateRefract( true ),
    mLastUpdateMs( 0 )
 {

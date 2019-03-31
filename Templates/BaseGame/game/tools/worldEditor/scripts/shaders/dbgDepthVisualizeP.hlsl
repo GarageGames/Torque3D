@@ -20,14 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "core/shaders/postfx/postFx.hlsl"
-#include "core/shaders/shaderModelAutoGen.hlsl"
+#include "../../../../core/rendering/shaders/postFX/postFx.hlsl"
+#include "../../../../core/rendering/shaders/shaderModelAutoGen.hlsl"
 
 TORQUE_UNIFORM_SAMPLER2D(deferredTex, 0);
 TORQUE_UNIFORM_SAMPLER1D(depthViz, 1);
 
 float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
-   float depth = TORQUE_PREPASS_UNCONDITION( deferredTex, IN.uv0 ).w;
+   float depth = TORQUE_DEFERRED_UNCONDITION( deferredTex, IN.uv0 ).w;
    return float4( TORQUE_TEX1D( depthViz, depth ).rgb, 1.0 );
 }

@@ -69,7 +69,7 @@ MODULE_END;
 
 
 TerrainFeatHLSL::TerrainFeatHLSL()
-   : mTorqueDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/torque.hlsl" ))
+   : mTorqueDep(ShaderGen::smCommonShaderPath + String("/torque.hlsl" ))
 {      
    addDependency( &mTorqueDep );
 }
@@ -273,8 +273,6 @@ void TerrainBaseMapFeatHLSL::processPix(  Vector<ShaderComponent*> &componentLis
    diffuseTex->constNum = diffuseMap->constNum;
    meta->addStatement(new GenOp("   @ = @.Sample( @, @.xy );\r\n", new DecOp(baseColor), diffuseTex, diffuseMap, texCoord));
 
-   meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", baseColor, baseColor));
-
    ShaderFeature::OutputTarget target = ShaderFeature::DefaultTarget;
 
    if (fd.features.hasFeature(MFT_isDeferred))
@@ -301,8 +299,8 @@ U32 TerrainBaseMapFeatHLSL::getOutputTargets( const MaterialFeatureData &fd ) co
 }
 
 TerrainDetailMapFeatHLSL::TerrainDetailMapFeatHLSL()
-   :  mTorqueDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/torque.hlsl" )),
-      mTerrainDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/terrain/terrain.hlsl" ))
+   :  mTorqueDep(ShaderGen::smCommonShaderPath + String("/torque.hlsl" )),
+      mTerrainDep(ShaderGen::smCommonShaderPath + String("/terrain/terrain.hlsl" ))
       
 {
    addDependency( &mTorqueDep );
@@ -508,7 +506,7 @@ void TerrainDetailMapFeatHLSL::processPix(   Vector<ShaderComponent*> &component
       }
 
       // Call the library function to do the rest.
-      if (fd.features.hasFeature(MFT_IsDXTnm, detailIndex))
+      if (fd.features.hasFeature(MFT_IsBC3nm, detailIndex))
       {
          meta->addStatement(new GenOp("   @.xy += parallaxOffsetDxtnm( @, @, @.xy, @, @.z * @ );\r\n",
             inDet, normalMapTex, normalMap, inDet, negViewTS, detailInfo, detailBlend));
@@ -584,8 +582,12 @@ void TerrainDetailMapFeatHLSL::processPix(   Vector<ShaderComponent*> &component
 
    Var *outColor = (Var*)LangElement::find( getOutputTargetVarName(target) );
 
+   meta->addStatement(new GenOp("      @.rgb = toGamma(@.rgb);\r\n", outColor, outColor));
+
    meta->addStatement( new GenOp( "      @ += @ * @;\r\n",
                                     outColor, detailColor, detailBlend));
+
+   meta->addStatement(new GenOp("      @.rgb = toLinear(clamp(@.rgb, 0, 1));\r\n", outColor, outColor));
 
    meta->addStatement( new GenOp( "   }\r\n" ) );
 
@@ -631,8 +633,8 @@ U32 TerrainDetailMapFeatHLSL::getOutputTargets( const MaterialFeatureData &fd ) 
 
 
 TerrainMacroMapFeatHLSL::TerrainMacroMapFeatHLSL()
-   :  mTorqueDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/torque.hlsl" )),
-      mTerrainDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/terrain/terrain.hlsl" ))
+   :  mTorqueDep(ShaderGen::smCommonShaderPath + String("/torque.hlsl" )),
+      mTerrainDep(ShaderGen::smCommonShaderPath + String("/terrain/terrain.hlsl" ))
       
 {
    addDependency( &mTorqueDep );
@@ -850,8 +852,12 @@ void TerrainMacroMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentL
 
    Var *outColor = (Var*)LangElement::find( getOutputTargetVarName(target) );
 
+   meta->addStatement(new GenOp("      @.rgb = toGamma(@.rgb);\r\n", outColor, outColor));
+
    meta->addStatement(new GenOp("      @ += @ * @;\r\n",
                                     outColor, detailColor, detailBlend));
+
+   meta->addStatement(new GenOp("      @.rgb = toLinear(clamp(@.rgb, 0, 1));\r\n", outColor, outColor));
 
    meta->addStatement( new GenOp( "   }\r\n" ) );
 
@@ -902,6 +908,9 @@ void TerrainNormalMapFeatHLSL::processVert(  Vector<ShaderComponent*> &component
 void TerrainNormalMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList, 
                                              const MaterialFeatureData &fd )
 {
+   // We only need to process normals during the deferred.
+   if (!fd.features.hasFeature(MFT_DeferredConditioner))
+      return;
 
    MultiLine *meta = new MultiLine;
 

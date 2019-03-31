@@ -25,6 +25,10 @@
 
 #include <tuple>
 
+#ifndef _FIXEDTUPLE_H_
+#include "fixedTuple.h"
+#endif
+
 #ifndef _ENGINEEXPORTS_H_
    #include "console/engineExports.h"
 #endif
@@ -94,6 +98,7 @@ template<typename ...ArgTs>
 struct _EngineFunctionDefaultArguments< void(ArgTs...) > : public EngineFunctionDefaultArguments
 {
    template<typename T> using DefVST = typename EngineTypeTraits<T>::DefaultArgumentValueStoreType;
+   fixed_tuple<DefVST<ArgTs>  ...> mFixedArgs;
    std::tuple<DefVST<ArgTs>  ...> mArgs;
 private:
    using SelfType = _EngineFunctionDefaultArguments< void(ArgTs...) >;
@@ -108,7 +113,17 @@ private:
       std::tie(std::get<I + (sizeof...(ArgTs) - sizeof...(TailTs))>(args)...) = defaultArgs;
    }
    
+#if defined(_MSC_VER) && (_MSC_VER >= 1910)
+   template<typename ...TailTs>
+   struct DodgyVCHelper
+   {
+      using type = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), decltype(mArgs)>::type;
+   };
+
+   template<typename ...TailTs> using MaybeSelfEnabled = typename DodgyVCHelper<TailTs...>::type;
+#else
    template<typename ...TailTs> using MaybeSelfEnabled = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), decltype(mArgs)>::type;
+#endif
    
    template<typename ...TailTs> static MaybeSelfEnabled<TailTs...> tailInit(TailTs ...tail) {
       std::tuple<DefVST<ArgTs>...> argsT;
@@ -120,7 +135,9 @@ private:
 public:
    template<typename ...TailTs> _EngineFunctionDefaultArguments(TailTs ...tail)
    : EngineFunctionDefaultArguments({sizeof...(TailTs)}), mArgs(SelfType::tailInit(tail...))
-   {}
+   {
+      fixed_tuple_mutator<void(DefVST<ArgTs>...), void(DefVST<ArgTs>...)>::copy(mArgs, mFixedArgs);
+   }
 };
 
 #pragma pack( pop )

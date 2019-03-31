@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "terrain/terrCell.h"
 
@@ -56,6 +61,7 @@ TerrCell::TerrCell()
       mIsInteriorOnly( false )
 {
    dMemset( mChildren, 0, sizeof( mChildren ) );
+   zode_vertexBuffer = 0;
 }
 
 TerrCell::~TerrCell()
@@ -64,6 +70,7 @@ TerrCell::~TerrCell()
 
    for ( U32 i=0; i < 4; i++ )
       SAFE_DELETE( mChildren[i] );
+   deleteZodiacVertexBuffer();
 }
 
 void TerrCell::createPrimBuffer( GFXPrimitiveBufferHandle *primBuffer )
@@ -582,6 +589,7 @@ void TerrCell::_updateVertexBuffer()
 
    AssertFatal( vbcounter == smVBSize, "bad" );
    mVertexBuffer.unlock();
+   deleteZodiacVertexBuffer();
 }
 
 void TerrCell::_updatePrimitiveBuffer()
@@ -1040,14 +1048,14 @@ void TerrCell::getRenderPrimitive(  GFXPrimitive *prim,
 
 void TerrCell::renderBounds() const
 {
-   ColorI color;
+   LinearColorF color;
    color.interpolate( ColorI::RED, ColorI::GREEN, (F32)mLevel / 3.0f );
 
    GFXStateBlockDesc desc;
    desc.setZReadWrite( true, false );
    desc.fillMode = GFXFillWireframe;
    
-   GFX->getDrawUtil()->drawCube( desc, mBounds, color );
+   GFX->getDrawUtil()->drawCube( desc, mBounds, color.toColorI());
 }
 
 void TerrCell::preloadMaterials()
@@ -1089,3 +1097,114 @@ void TerrCell::deleteMaterials()
       if ( mChildren[i] ) 
          mChildren[i]->deleteMaterials();
 }
+
+const Point3F* TerrCell::getZodiacVertexBuffer()
+{
+   if (!zode_vertexBuffer)
+      createZodiacVertexBuffer();
+   return zode_vertexBuffer;
+}
+
+void TerrCell::createZodiacPrimBuffer(U16** zode_primBuffer)
+{
+   if (*zode_primBuffer != 0)
+      delete [] *zode_primBuffer;
+
+   *zode_primBuffer = new U16[TerrCell::smMinCellSize*TerrCell::smMinCellSize*6];
+
+   // Lock and fill it up!
+   U16* idxBuff = *zode_primBuffer;
+   U32 counter = 0;
+   U32 maxIndex = 0;
+
+   for ( U32 y = 0; y < smMinCellSize; y++ )
+   {
+      const U32 yTess = y % 2;
+
+      for ( U32 x = 0; x < smMinCellSize; x++ )
+      {
+         U32 index = ( y * smVBStride ) + x;
+         
+         const U32 xTess = x % 2;
+
+         if ( ( xTess == 0 && yTess == 0 ) ||
+              ( xTess != 0 && yTess != 0 ) )
+         {
+            idxBuff[0] = index + 0;
+            idxBuff[1] = index + smVBStride;
+            idxBuff[2] = index + smVBStride + 1;
+
+            idxBuff[3] = index + 0;
+            idxBuff[4] = index + smVBStride + 1;
+            idxBuff[5] = index + 1;
+         }
+         else
+         {
+            idxBuff[0] = index + 1;
+            idxBuff[1] = index;
+            idxBuff[2] = index + smVBStride;
+
+            idxBuff[3] = index + 1;
+            idxBuff[4] = index + smVBStride;
+            idxBuff[5] = index + smVBStride + 1;
+         }
+
+         idxBuff += 6;
+         maxIndex = index + 1 + smVBStride;         
+         counter += 6;         
+      }
+   }
+}
+
+void TerrCell::createZodiacVertexBuffer()
+{
+   const F32 squareSize = mTerrain->getSquareSize();
+   const U32 blockSize = mTerrain->getBlockSize();
+   const U32 stepSize = mSize / smMinCellSize;
+
+   if (zode_vertexBuffer)
+      delete [] zode_vertexBuffer;
+
+   zode_vertexBuffer = new Point3F[smVBStride*smVBStride];
+
+   Point3F* vert = zode_vertexBuffer;
+
+   Point2I gridPt;
+   Point2F point;
+   F32 height;
+   
+   const TerrainFile *file = mTerrain->getFile();
+
+   for ( U32 y = 0; y < smVBStride; y++ )
+   {
+      for ( U32 x = 0; x < smVBStride; x++ )
+      {
+         // We clamp here to keep the geometry from reading across
+         // one side of the height map to the other causing walls
+         // around the edges of the terrain.
+         gridPt.x = mClamp( mPoint.x + x * stepSize, 0, blockSize - 1 );
+         gridPt.y = mClamp( mPoint.y + y * stepSize, 0, blockSize - 1 );
+
+         // Setup this point.
+         point.x = (F32)gridPt.x * squareSize;
+         point.y = (F32)gridPt.y * squareSize;
+         height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
+
+         vert->x = point.x;
+         vert->y = point.y;
+         vert->z = height;
+
+         ++vert;
+      }
+   }
+}
+
+void TerrCell::deleteZodiacVertexBuffer()
+{
+   if (zode_vertexBuffer)
+   {
+      delete [] zode_vertexBuffer;
+      zode_vertexBuffer = 0;
+   }
+}
+

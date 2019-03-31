@@ -36,9 +36,7 @@
    #include "gui/editor/editorFunctions.h"
 #endif
 #include "console/engineAPI.h"
-#ifdef TORQUE_EXPERIMENTAL_EC
 #include "T3D/entity.h"
-#endif
 
 IMPLEMENT_CONOBJECT(GuiTreeViewCtrl);
 
@@ -647,20 +645,6 @@ void GuiTreeViewCtrl::Item::getTooltipText(U32 bufLen, char *buf)
 
 bool GuiTreeViewCtrl::Item::isParent() const
 {
-#ifdef TORQUE_EXPERIMENTAL_EC
-   //We might have a special case with entities
-   //So if our entity either has children, or has some component with the EditorInspect interface, we return true
-   if (mInspectorInfo.mObject)
-   {
-      Entity* e = dynamic_cast<Entity*>(mInspectorInfo.mObject.getObject());
-      if (e)
-      {
-         if (e->size() > 0 || e->getComponentCount() != 0)
-            return true;
-      }
-   }
-#endif
-
    if(mState.test(VirtualParent))
    {
       if( !isInspectorData() )
@@ -1871,7 +1855,7 @@ bool GuiTreeViewCtrl::buildIconTable(const char * icons)
          dStrncpy( buf, start, getMin( sizeof( buf ) / sizeof( buf[ 0 ] ) - 1, len ) );
          buf[ len ] = '\0';
                   
-         mIconTable[ numIcons ] = GFXTexHandle( buf, &GFXDefaultPersistentProfile, avar( "%s() - mIconTable[%d] (line %d)", __FUNCTION__, numIcons, __LINE__ ) );
+         mIconTable[ numIcons ] = GFXTexHandle( buf, &GFXTexturePersistentProfile, avar( "%s() - mIconTable[%d] (line %d)", __FUNCTION__, numIcons, __LINE__ ) );
       }
       else
          mIconTable[ numIcons ] = GFXTexHandle();
@@ -2517,6 +2501,19 @@ const char * GuiTreeViewCtrl::getItemValue(S32 itemId)
 
 //-----------------------------------------------------------------------------
 
+S32 GuiTreeViewCtrl::getItemAtPosition(Point2I position)
+{
+   BitSet32 hitFlags = 0;
+   Item* item;
+
+   if (_hitTest(position, item, hitFlags))
+      return item->mId;
+   else
+      return -1;
+}
+
+//-----------------------------------------------------------------------------
+
 bool GuiTreeViewCtrl::editItem( S32 itemId, const char* newText, const char* newValue )
 {
    Item* item = getItem( itemId );
@@ -3007,10 +3004,10 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
 {
    if( !mActive || !mAwake || !mVisible )
       return;
-
+   
+   BitSet32 hitFlags = 0;
    if( isMethod("onMouseUp") )
    {
-      BitSet32 hitFlags = 0;
       Item* item;
       
       S32 hitItemId = -1;
@@ -3028,26 +3025,26 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
       return;
    }
 
-   BitSet32 hitFlags = 0;
-   Item *item;
-   bool hitCheck = _hitTest( event.mousePoint, item, hitFlags );
+   hitFlags = 0;
+   Item *hitItem;
+   bool hitCheck = _hitTest( event.mousePoint, hitItem, hitFlags );
    mRenamingItem = NULL;
 
    if( hitCheck )
    {
       if ( event.mouseClickCount == 1 && !mMouseDragged && mPossibleRenameItem != NULL )
       {
-         if ( item == mPossibleRenameItem )
-            showItemRenameCtrl( item );
+         if (hitItem == mPossibleRenameItem )
+            showItemRenameCtrl(hitItem);
       }
       else // If mouseUp occurs on the same item as mouse down
       {
-         bool wasSelected = isSelected( item );
+         bool wasSelected = isSelected(hitItem);
          bool multiSelect = getSelectedItemsCount() > 1;
-         if( wasSelected && multiSelect && item == mTempItem )
+         if( wasSelected && multiSelect && hitItem == mTempItem )
          {
             clearSelection();
-            addSelection( item->mId );
+            addSelection( hitItem->mId );
          }
       }
    }
@@ -3064,7 +3061,7 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
    {
       Parent::onMouseMove( event );
          
-      BitSet32 hitFlags = 0;
+      hitFlags = 0;
       if( !_hitTest( event.mousePoint, newItem2, hitFlags ) )
       {
          if( !mShowRoot )
@@ -3790,7 +3787,6 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
       if( !item->isInspectorData() && item->mState.test(Item::VirtualParent) )
          onVirtualParentExpand(item);
       
-#ifdef TORQUE_EXPERIMENTAL_EC
       //Slightly hacky, but I'm not sure of a better setup until we get major update to the editors
       //We check if our object is an entity, and if it is, we call a 'onInspect' function.
       //This function is pretty much a special notifier to the entity so if it has any behaviors that do special
@@ -3798,19 +3794,14 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
       if (item->isInspectorData())
       {
          Entity* e = dynamic_cast<Entity*>(item->getObject());
-         //if (item->mScriptInfo.mText != StringTable->insert("Components"))
-         {
-            Entity* e = dynamic_cast<Entity*>(item->getObject());
-            if (e)
-            {
-               if (item->isExpanded())
-                  e->onInspect();
-               else
-                  e->onEndInspect();
-            }
+		 if (e)
+		 {
+			 if (item->isExpanded())
+				 e->onInspect();
+			 else
+				 e->onEndInspect();
          }
       }
-#endif
       
       mFlags.set( RebuildVisible );
       scrollVisible(item);
@@ -3942,7 +3933,7 @@ void GuiTreeViewCtrl::onRender(Point2I offset, const RectI &updateRect)
    if (mDragMidPoint == NomDragMidPoint || !mSupportMouseDragging )
       return;
 
-   ColorF greyLine(0.5,0.5,0.5,1);
+   ColorI greyLine(128,128,128);
    Point2F squarePt;
 
    // CodeReview: LineWidth is not supported in Direct3D. This is lame. [5/10/2007 Pat]
@@ -4257,7 +4248,6 @@ bool GuiTreeViewCtrl::renderTooltip( const Point2I &hoverPos, const Point2I& cur
 {
    Item* item;
    BitSet32 flags = 0;
-   char buf[ 2048 ];
    if( _hitTest( cursorPos, item, flags ) && (!item->mTooltip.isEmpty() || mUseInspectorTooltips) )
    {
       bool render = true;
@@ -4302,6 +4292,7 @@ bool GuiTreeViewCtrl::renderTooltip( const Point2I &hoverPos, const Point2I& cur
       {
          if( mUseInspectorTooltips )
          {
+            char buf[2048];
             item->getTooltipText( sizeof( buf ), buf );
             tipText = buf;
          }
@@ -4558,12 +4549,10 @@ bool GuiTreeViewCtrl::objectSearch( const SimObject *object, Item **item )
       if ( !pItem )
          continue;
 
-#ifdef TORQUE_EXPERIMENTAL_EC
       //A bit hackish, but we make a special exception here for items that are named 'Components', as they're merely
       //virtual parents to act as a container to an Entity's components
       if (pItem->mScriptInfo.mText == StringTable->insert("Components"))
          continue;
-#endif
 
       SimObject *pObj = pItem->getObject();
 
@@ -4628,11 +4617,10 @@ bool GuiTreeViewCtrl::onVirtualParentBuild(Item *item, bool bForceFullUpdate)
    
    // Go through our items and purge those that have disappeared from
    // the set.
-#ifdef TORQUE_EXPERIMENTAL_EC
+
    //Entities will be a special case here, if we're an entity, skip this step
    if (dynamic_cast<Entity*>(srcObj))
       return true;
-#endif
    
    for( Item* ptr = item->mChild; ptr != NULL; )
    {
@@ -4762,15 +4750,15 @@ StringTableEntry GuiTreeViewCtrl::getTextToRoot( S32 itemId, const char * delimi
    dMemset( bufferOne, 0, sizeof(bufferOne) );
    dMemset( bufferTwo, 0, sizeof(bufferTwo) );
 
-   dStrcpy( bufferOne, item->getText() );
+   dStrcpy( bufferOne, item->getText(), 1024 );
 
    Item *prevNode = item->mParent;
    while ( prevNode )
    {
       dMemset( bufferNodeText, 0, sizeof(bufferNodeText) );
-      dStrcpy( bufferNodeText, prevNode->getText() );
+      dStrcpy( bufferNodeText, prevNode->getText(), 128 );
       dSprintf( bufferTwo, 1024, "%s%s%s",bufferNodeText, delimiter, bufferOne );
-      dStrcpy( bufferOne, bufferTwo );
+      dStrcpy( bufferOne, bufferTwo, 1024 );
       dMemset( bufferTwo, 0, sizeof(bufferTwo) );
       prevNode = prevNode->mParent;
    }
@@ -5570,4 +5558,12 @@ DefineEngineMethod( GuiTreeViewCtrl, clearFilterText, void, (),,
    "@see getFilterText" )
 {
    object->clearFilterText();
+}
+
+DefineEngineMethod(GuiTreeViewCtrl, getItemAtPosition, S32, (Point2I position), (Point2I::Zero),
+   "Get the tree item at the passed in position.\n\n"
+   "@param position The position to check for what item is below it.\n"
+   "@return The id of the item under the position.")
+{
+   return object->getItemAtPosition(position);
 }

@@ -51,7 +51,7 @@ GuiInspectorVariableGroup::~GuiInspectorVariableGroup()
 
 GuiInspectorField* GuiInspectorVariableGroup::constructField( S32 fieldType )
 {
-   return NULL;
+   return Parent::constructField(fieldType);
 }
 
 bool GuiInspectorVariableGroup::inspectGroup()
@@ -59,39 +59,136 @@ bool GuiInspectorVariableGroup::inspectGroup()
    // to prevent crazy resizing, we'll just freeze our stack for a sec..
    mStack->freeze(true);
 
-   clearFields();
-
-   Vector<String> names;
-
-   gEvalState.globalVars.exportVariables( mSearchString, &names, NULL );
-
    bool bNewItems = false;
 
-   for ( U32 i = 0; i < names.size(); i++ )
-   {      
-      const String &varName = names[i];
+   if (!mSearchString.equal(""))
+   {
+      Vector<String> names;
 
-      // If the field already exists, just update it
-      GuiInspectorVariableField *field = dynamic_cast<GuiInspectorVariableField*>( findField( varName ) );
-      if ( field != NULL )
+      gEvalState.globalVars.exportVariables(mSearchString, &names, NULL);
+
+      for (U32 i = 0; i < names.size(); i++)
       {
-         field->updateValue();
+         const String &varName = names[i];
+
+         // If the field already exists, just update it
+         GuiInspectorVariableField *field = dynamic_cast<GuiInspectorVariableField*>(findField(varName));
+         if (field != NULL)
+         {
+            field->updateValue();
+            continue;
+         }
+
+         bNewItems = true;
+
+         field = new GuiInspectorVariableField();
+         field->init(mParent, this);
+         field->setInspectorField(NULL, StringTable->insert(varName));
+
+         if (field->registerObject())
+         {
+            mChildren.push_back(field);
+            mStack->addObject(field);
+         }
+         else
+            delete field;
+      }
+   }
+
+   for (U32 i = 0; i < mFields.size(); i++)
+   {
+      bNewItems = true;
+
+      GuiInspectorField *fieldGui = findField(mFields[i]->mFieldName);
+      if (fieldGui != NULL)
+      {
+         fieldGui->updateValue();
+         continue;
+      }
+
+      //first and foremost, nab the field type and check if it's a custom field or not.
+      //If it's not a custom field, proceed below, if it is, hand it off to script to be handled by the component
+      if (mFields[i]->mFieldType == -1)
+      {
+         if (isMethod("onConstructField"))
+         {
+            //ensure our stack variable is bound if we need it
+            Con::evaluatef("%d.stack = %d;", this->getId(), mStack->getId());
+
+            Con::executef(this, "onConstructField", mFields[i]->mFieldName,
+               mFields[i]->mFieldLabel, mFields[i]->mFieldTypeName, mFields[i]->mFieldDescription,
+               mFields[i]->mDefaultValue, mFields[i]->mDataValues, mFields[i]->mOwnerObject);
+         }
          continue;
       }
 
       bNewItems = true;
 
-      field = new GuiInspectorVariableField();
-      field->init( mParent, this );            
-      field->setInspectorField( NULL, StringTable->insert( varName ) );
+      fieldGui = constructField(mFields[i]->mFieldType);
+      if (fieldGui == NULL)
+         fieldGui = new GuiInspectorField();
 
-      if ( field->registerObject() )
+      fieldGui->init(mParent, this);
+
+      fieldGui->setSpecialEditField(true);
+
+      if (mFields[i]->mOwnerObject)
       {
-         mChildren.push_back( field );
-         mStack->addObject( field );
+         fieldGui->setTargetObject(mFields[i]->mOwnerObject);
       }
       else
-         delete field;         
+      {
+         //check if we're binding to a global var first, if we have no owner
+         if (mFields[i]->mFieldName[0] != '$')
+         {
+            fieldGui->setTargetObject(mParent);
+         }
+      }
+
+      fieldGui->setSpecialEditVariableName(mFields[i]->mFieldName);
+      fieldGui->setSpecialEditCallbackName(mFields[i]->mSetCallbackName);
+
+      fieldGui->setInspectorField(NULL, mFields[i]->mFieldLabel);
+      fieldGui->setDocs(mFields[i]->mFieldDescription);
+
+      if(mFields[i]->mSetCallbackName != StringTable->EmptyString())
+         fieldGui->setSpecialEditCallbackName(mFields[i]->mSetCallbackName);
+
+      /*if (mFields[i]->mSetCallbackName != StringTable->EmptyString())
+      {
+         fieldGui->on.notify()
+      }*/
+         
+      if (fieldGui->registerObject())
+      {
+#ifdef DEBUG_SPEW
+         Platform::outputDebugString("[GuiInspectorVariableGroup] Adding field '%s'",
+            field->pFieldname);
+#endif
+
+         if (mFields[i]->mOwnerObject)
+         {
+            String val = mFields[i]->mOwnerObject->getDataField(mFields[i]->mFieldName, NULL);
+
+            if(val.isEmpty())
+               fieldGui->setValue(mFields[i]->mDefaultValue);
+            else
+               fieldGui->setValue(val);
+         }
+         else
+         {
+            fieldGui->setValue(mFields[i]->mDefaultValue);
+         }
+
+         fieldGui->setActive(mFields[i]->mEnabled);
+
+         mChildren.push_back(fieldGui);
+         mStack->addObject(fieldGui);
+      }
+      else
+      {
+         SAFE_DELETE(fieldGui);
+      }
    }
    
    mStack->freeze(false);
@@ -106,4 +203,59 @@ bool GuiInspectorVariableGroup::inspectGroup()
    setUpdate();
 
    return true;
+}
+
+void GuiInspectorVariableGroup::clearFields()
+{
+   mFields.clear();
+}
+
+void GuiInspectorVariableGroup::addField(VariableField* field)
+{
+   bool found = false;
+
+   for (U32 i = 0; i < mFields.size(); i++)
+   {
+      if (mFields[i]->mFieldName == field->mFieldName)
+      {
+         found = true;
+         break;
+      }
+   }
+
+   if(!found)
+      mFields.push_back(field);
+}
+
+void GuiInspectorVariableGroup::addInspectorField(GuiInspectorField* field)
+{
+   mStack->addObject(field);
+   mChildren.push_back(field);
+   mStack->updatePanes();
+}
+
+GuiInspectorField* GuiInspectorVariableGroup::createInspectorField()
+{
+   GuiInspectorField* newField = new GuiInspectorField();
+
+   newField->init(mParent, this);
+
+   newField->setSpecialEditField(true);
+
+   if (newField->registerObject())
+   {
+      return newField;
+   }
+
+   return NULL;
+}
+
+DefineEngineMethod(GuiInspectorVariableGroup, createInspectorField, GuiInspectorField*, (),, "createInspectorField()")
+{
+   return object->createInspectorField();
+}
+
+DefineEngineMethod(GuiInspectorVariableGroup, addInspectorField, void, (GuiInspectorField* field), (nullAsType<GuiInspectorField*>()), "addInspectorField( GuiInspectorFieldObject )")
+{
+   object->addInspectorField(field);
 }

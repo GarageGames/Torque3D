@@ -200,6 +200,7 @@ public:
    // Data
    //-----------------------------------------------------------------------
    FileName mDiffuseMapFilename[MAX_STAGES];
+   bool     mDiffuseMapSRGB[MAX_STAGES];   // SRGB diffuse
    bool     mAccuEnabled[MAX_STAGES];
    F32      mAccuScale[MAX_STAGES];
    F32      mAccuDirection[MAX_STAGES];
@@ -224,9 +225,9 @@ public:
    /// This color is the diffuse color of the material
    /// or if it has a texture it is multiplied against 
    /// the diffuse texture color.
-   ColorF mDiffuse[MAX_STAGES];
+   LinearColorF mDiffuse[MAX_STAGES];
 
-   ColorF mSpecular[MAX_STAGES];
+   LinearColorF mSpecular[MAX_STAGES];
 
    F32 mSpecularPower[MAX_STAGES];
    F32 mSpecularStrength[MAX_STAGES];
@@ -242,7 +243,7 @@ public:
   
    F32 mMinnaertConstant[MAX_STAGES];
    bool mSubSurface[MAX_STAGES];
-   ColorF mSubSurfaceColor[MAX_STAGES];
+   LinearColorF mSubSurfaceColor[MAX_STAGES];
    F32 mSubSurfaceRolloff[MAX_STAGES];
 
    /// The repetition scale of the detail texture
@@ -321,7 +322,7 @@ public:
    bool mShowDust;                  ///< If true, show dust emitters (footpuffs, hover trails, etc) when on surface with this material.  Defaults to false.
 
    /// Color to use for particle effects and such when located on this material.
-   ColorF mEffectColor[ NUM_EFFECT_COLOR_STAGES ];
+   LinearColorF mEffectColor[ NUM_EFFECT_COLOR_STAGES ];
 
    /// Footstep sound to play when walking on surface with this material.
    /// Numeric ID of footstep sound defined on player datablock (0 == soft,

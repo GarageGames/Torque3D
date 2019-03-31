@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "T3D/physicalZone.h"
 #include "core/stream/bitStream.h"
 #include "collision/boxConvex.h"
@@ -33,6 +38,8 @@
 #include "gfx/gfxDrawUtil.h"
 #include "console/engineAPI.h"
 
+//#include "console/engineTypes.h"
+#include "sim/netConnection.h"
 IMPLEMENT_CO_NETOBJECT_V1(PhysicalZone);
 
 ConsoleDocClass( PhysicalZone,
@@ -103,6 +110,10 @@ PhysicalZone::PhysicalZone()
 
    mConvexList = new Convex;
    mActive = true;
+   force_type = VECTOR;
+   force_mag = 0.0f;
+   orient_force = false;
+   fade_amt = 1.0f;
 }
 
 PhysicalZone::~PhysicalZone()
@@ -110,6 +121,16 @@ PhysicalZone::~PhysicalZone()
    delete mConvexList;
    mConvexList = NULL;
 }
+
+
+ImplementEnumType( PhysicalZone_ForceType, "Possible physical zone force types.\n" "@ingroup PhysicalZone\n\n" )
+   { PhysicalZone::VECTOR,          "vector",        "..." },
+   { PhysicalZone::SPHERICAL,       "spherical",     "..." },
+   { PhysicalZone::CYLINDRICAL,     "cylindrical",   "..." },
+   // aliases
+   { PhysicalZone::SPHERICAL,       "sphere",        "..." },
+   { PhysicalZone::CYLINDRICAL,     "cylinder",      "..." },
+EndImplementEnumType;
 
 //--------------------------------------------------------------------------
 void PhysicalZone::consoleInit()
@@ -129,6 +150,10 @@ void PhysicalZone::initPersistFields()
       "point followed by three vectors representing the edges extending from the corner." );
    endGroup("Misc");
 
+   addGroup("AFX");
+   addField("forceType", TYPEID<PhysicalZone::ForceType>(), Offset(force_type, PhysicalZone));
+   addField("orientForce", TypeBool, Offset(orient_force, PhysicalZone));
+   endGroup("AFX");
    Parent::initPersistFields();
 }
 
@@ -158,6 +183,19 @@ bool PhysicalZone::onAdd()
    Polyhedron temp = mPolyhedron;
    setPolyhedron(temp);
 
+   switch (force_type)
+   {
+   case SPHERICAL:
+      force_mag = mAppliedForce.magnitudeSafe();
+      break;
+   case CYLINDRICAL:
+      {
+         Point3F force_vec = mAppliedForce;
+         force_vec.z = 0.0;
+         force_mag = force_vec.magnitudeSafe();
+      }
+      break;
+   }
    addToScene();
 
    return true;
@@ -174,8 +212,10 @@ void PhysicalZone::onRemove()
 
 void PhysicalZone::inspectPostApply()
 {
-   setPolyhedron(mPolyhedron);
    Parent::inspectPostApply();
+
+   setPolyhedron(mPolyhedron);
+   setMaskBits(PolyhedronMask | MoveMask | SettingsMask | FadeMask);
 }
 
 //------------------------------------------------------------------------------
@@ -191,7 +231,7 @@ void PhysicalZone::setTransform(const MatrixF & mat)
       mClippedList.setBaseTransform(base);
 
    if (isServerObject())
-      setMaskBits(InitialUpdateMask);
+      setMaskBits(MoveMask);
 }
 
 
@@ -210,30 +250,87 @@ void PhysicalZone::prepRenderImage( SceneRenderState *state )
 }
 
 
-void PhysicalZone::renderObject( ObjectRenderInst *ri,
-                                 SceneRenderState *state,
-                                 BaseMatInstance *overrideMat )
+void PhysicalZone::renderObject(ObjectRenderInst *ri,
+   SceneRenderState *state,
+   BaseMatInstance *overrideMat)
 {
    if (overrideMat)
       return;
-
+ 
    GFXStateBlockDesc desc;
-   desc.setZReadWrite( true, false );
-   desc.setBlend( true );
-   desc.setCullMode( GFXCullNone );
-
+   desc.setZReadWrite(true, false);
+   desc.setBlend(true);
+   desc.setCullMode(GFXCullNone);
+ 
    GFXTransformSaver saver;
+ 
+   GFXDrawUtil *drawer = GFX->getDrawUtil();
+ 
+   Point3F start = getBoxCenter();
+   Box3F obb = mObjBox; //object bounding box 
+
+   F32 baseForce = 10000; //roughly the ammount of force needed to push a player back as it walks into a zone. (used for visual scaling)
+
+   Point3F forceDir = getForce(&start);
+   F32 forceLen = forceDir.len()/ baseForce;
+   forceDir.normalizeSafe();
+   ColorI guideCol = LinearColorF(mFabs(forceDir.x), mFabs(forceDir.y), mFabs(forceDir.z), 0.125).toColorI();
+
+   if (force_type == VECTOR)
+   {
+	   Point3F endPos = start + (forceDir * mMax(forceLen,0.75f));
+	   drawer->drawArrow(desc, start, endPos, guideCol, 0.05f);
+   }
 
    MatrixF mat = getRenderTransform();
-   mat.scale( getScale() );
+   mat.scale(getScale());
+ 
+   GFX->multWorld(mat);
+   start = obb.getCenter();
+ 
+   if (force_type == VECTOR)
+   {
+      drawer->drawPolyhedron(desc, mPolyhedron, ColorI(0, 255, 0, 45));
+   }
+   else if (force_type == SPHERICAL)
+   {
+	   F32 rad = obb.getBoundingSphere().radius/ 2;
+      drawer->drawSphere(desc, rad, start, ColorI(0, 255, 0, 45));
 
-   GFX->multWorld( mat );
+	  rad = (rad + (mAppliedForce.most() / baseForce))/2;
+	  desc.setFillModeWireframe();
+	  drawer->drawSphere(desc, rad, start, ColorI(0, 0, 255, 255));
+   }
+   else
+   {
+      Point3F bottomPos = start;
+      bottomPos.z -= obb.len_z() / 2;
+ 
+      Point3F topPos = start;
+      topPos.z += obb.len_z() / 2;
+	  F32 rad = obb.len_x() / 2;
+      drawer->drawCylinder(desc, bottomPos, topPos, rad, ColorI(0, 255, 0, 45));
 
-   GFXDrawUtil *drawer = GFX->getDrawUtil();
-   drawer->drawPolyhedron( desc, mPolyhedron, ColorI( 0, 255, 0, 45 ) );
+	  Point3F force_vec = mAppliedForce; //raw relative-applied force here as oposed to derived
+	  F32 hieght = (force_vec.z / baseForce);
 
+	  if (force_vec.z<0)
+		  bottomPos.z = (bottomPos.z + hieght)/2;
+	  else
+		  topPos.z = (topPos.z + hieght) / 2;
+
+	  if (force_vec.x > force_vec.y)
+		  rad = (rad + (force_vec.x / baseForce)) / 2;
+	  else
+		  rad = (rad + (force_vec.y / baseForce)) / 2;
+
+
+	  desc.setFillModeWireframe();
+	  drawer->drawCylinder(desc, bottomPos, topPos, rad, guideCol);
+   }
+ 
    desc.setFillModeWireframe();
-   drawer->drawPolyhedron( desc, mPolyhedron, ColorF::BLACK );
+   drawer->drawPolyhedron(desc, mPolyhedron, ColorI::BLACK);
 }
 
 //--------------------------------------------------------------------------
@@ -242,38 +339,50 @@ U32 PhysicalZone::packUpdate(NetConnection* con, U32 mask, BitStream* stream)
    U32 i;
    U32 retMask = Parent::packUpdate(con, mask, stream);
 
-   if (stream->writeFlag((mask & InitialUpdateMask) != 0)) {
-      // Note that we don't really care about efficiency here, since this is an
-      //  edit-only ghost...
-      mathWrite(*stream, mObjToWorld);
-      mathWrite(*stream, mObjScale);
-
+   if (stream->writeFlag(mask & PolyhedronMask)) 
+   {
       // Write the polyhedron
-      stream->write(mPolyhedron.pointList.size());
-      for (i = 0; i < mPolyhedron.pointList.size(); i++)
-         mathWrite(*stream, mPolyhedron.pointList[i]);
+      stream->write(mPolyhedron.mPointList.size());
+      for (i = 0; i < mPolyhedron.mPointList.size(); i++)
+         mathWrite(*stream, mPolyhedron.mPointList[i]);
 
-      stream->write(mPolyhedron.planeList.size());
-      for (i = 0; i < mPolyhedron.planeList.size(); i++)
-         mathWrite(*stream, mPolyhedron.planeList[i]);
+      stream->write(mPolyhedron.mPlaneList.size());
+      for (i = 0; i < mPolyhedron.mPlaneList.size(); i++)
+         mathWrite(*stream, mPolyhedron.mPlaneList[i]);
 
-      stream->write(mPolyhedron.edgeList.size());
-      for (i = 0; i < mPolyhedron.edgeList.size(); i++) {
-         const Polyhedron::Edge& rEdge = mPolyhedron.edgeList[i];
+      stream->write(mPolyhedron.mEdgeList.size());
+      for (i = 0; i < mPolyhedron.mEdgeList.size(); i++) {
+         const Polyhedron::Edge& rEdge = mPolyhedron.mEdgeList[i];
 
          stream->write(rEdge.face[0]);
          stream->write(rEdge.face[1]);
          stream->write(rEdge.vertex[0]);
          stream->write(rEdge.vertex[1]);
       }
+   }
 
+   if (stream->writeFlag(mask & MoveMask))
+   {
+      stream->writeAffineTransform(mObjToWorld);
+      mathWrite(*stream, mObjScale);
+   }
+
+   if (stream->writeFlag(mask & SettingsMask))
+   {
       stream->write(mVelocityMod);
       stream->write(mGravityMod);
       mathWrite(*stream, mAppliedForce);
-      stream->writeFlag(mActive);
-   } else {
-      stream->writeFlag(mActive);
+      stream->writeInt(force_type, FORCE_TYPE_BITS);
+      stream->writeFlag(orient_force);
    }
+
+   if (stream->writeFlag(mask & FadeMask))
+   {
+      U8 fade_byte = (U8)(fade_amt*255.0f);
+      stream->write(fade_byte);
+   }
+
+   stream->writeFlag(mActive);
 
    return retMask;
 }
@@ -282,31 +391,27 @@ void PhysicalZone::unpackUpdate(NetConnection* con, BitStream* stream)
 {
    Parent::unpackUpdate(con, stream);
 
-   if (stream->readFlag()) {
+   bool new_ph = false;
+   if (stream->readFlag()) // PolyhedronMask
+   {
       U32 i, size;
-      MatrixF temp;
-      Point3F tempScale;
       Polyhedron tempPH;
-
-      // Transform
-      mathRead(*stream, &temp);
-      mathRead(*stream, &tempScale);
 
       // Read the polyhedron
       stream->read(&size);
-      tempPH.pointList.setSize(size);
-      for (i = 0; i < tempPH.pointList.size(); i++)
-         mathRead(*stream, &tempPH.pointList[i]);
+      tempPH.mPointList.setSize(size);
+      for (i = 0; i < tempPH.mPointList.size(); i++)
+         mathRead(*stream, &tempPH.mPointList[i]);
 
       stream->read(&size);
-      tempPH.planeList.setSize(size);
-      for (i = 0; i < tempPH.planeList.size(); i++)
-         mathRead(*stream, &tempPH.planeList[i]);
+      tempPH.mPlaneList.setSize(size);
+      for (i = 0; i < tempPH.mPlaneList.size(); i++)
+         mathRead(*stream, &tempPH.mPlaneList[i]);
 
       stream->read(&size);
-      tempPH.edgeList.setSize(size);
-      for (i = 0; i < tempPH.edgeList.size(); i++) {
-         Polyhedron::Edge& rEdge = tempPH.edgeList[i];
+      tempPH.mEdgeList.setSize(size);
+      for (i = 0; i < tempPH.mEdgeList.size(); i++) {
+         Polyhedron::Edge& rEdge = tempPH.mEdgeList[i];
 
          stream->read(&rEdge.face[0]);
          stream->read(&rEdge.face[1]);
@@ -314,17 +419,46 @@ void PhysicalZone::unpackUpdate(NetConnection* con, BitStream* stream)
          stream->read(&rEdge.vertex[1]);
       }
 
+      setPolyhedron(tempPH);
+      new_ph = true;
+   }
+
+   if (stream->readFlag()) // MoveMask
+   {
+      MatrixF temp;
+      stream->readAffineTransform(&temp);
+
+      Point3F tempScale;
+      mathRead(*stream, &tempScale);
+
+      //if (!new_ph)
+      //{
+      //  Polyhedron rPolyhedron = mPolyhedron;
+      //  setPolyhedron(rPolyhedron);
+      //}
+      setScale(tempScale);
+      setTransform(temp);
+   }
+
+   if (stream->readFlag()) //SettingsMask
+   {
       stream->read(&mVelocityMod);
       stream->read(&mGravityMod);
       mathRead(*stream, &mAppliedForce);
-
-      setPolyhedron(tempPH);
-      setScale(tempScale);
-      setTransform(temp);
-      mActive = stream->readFlag();
-   } else {
-      mActive = stream->readFlag();
+      force_type = stream->readInt(FORCE_TYPE_BITS); // AFX
+      orient_force = stream->readFlag(); // AFX
    }
+
+   if (stream->readFlag()) //FadeMask
+   {
+      U8 fade_byte;
+      stream->read(&fade_byte);
+      fade_amt = ((F32)fade_byte)/255.0f;
+   }
+   else
+      fade_amt = 1.0f;
+
+   mActive = stream->readFlag();
 }
 
 
@@ -333,12 +467,12 @@ void PhysicalZone::setPolyhedron(const Polyhedron& rPolyhedron)
 {
    mPolyhedron = rPolyhedron;
 
-   if (mPolyhedron.pointList.size() != 0) {
+   if (mPolyhedron.mPointList.size() != 0) {
       mObjBox.minExtents.set(1e10, 1e10, 1e10);
       mObjBox.maxExtents.set(-1e10, -1e10, -1e10);
-      for (U32 i = 0; i < mPolyhedron.pointList.size(); i++) {
-         mObjBox.minExtents.setMin(mPolyhedron.pointList[i]);
-         mObjBox.maxExtents.setMax(mPolyhedron.pointList[i]);
+      for (U32 i = 0; i < mPolyhedron.mPointList.size(); i++) {
+         mObjBox.minExtents.setMin(mPolyhedron.mPointList[i]);
+         mObjBox.maxExtents.setMax(mPolyhedron.mPointList[i]);
       }
    } else {
       mObjBox.minExtents.set(-0.5, -0.5, -0.5);
@@ -349,7 +483,7 @@ void PhysicalZone::setPolyhedron(const Polyhedron& rPolyhedron)
    setTransform(xform);
 
    mClippedList.clear();
-   mClippedList.mPlaneList = mPolyhedron.planeList;
+   mClippedList.mPlaneList = mPolyhedron.mPlaneList;
 
    MatrixF base(true);
    base.scale(Point3F(1.0/mObjScale.x,
@@ -406,7 +540,7 @@ bool PhysicalZone::testObject(SceneObject* enter)
    // all.  And whats the point of building a convex if no collision methods
    // are implemented?
 
-   if (mPolyhedron.pointList.size() == 0)
+   if (mPolyhedron.mPointList.size() == 0)
       return false;
 
    mClippedList.clear();
@@ -441,5 +575,106 @@ void PhysicalZone::deactivate()
    if (mActive != false)
       setMaskBits(ActiveMask);
    mActive = false;
+}
+
+void PhysicalZone::onStaticModified(const char* slotName, const char*newValue)
+{
+   if (dStricmp(slotName, "appliedForce") == 0 || dStricmp(slotName, "forceType") == 0)
+   {
+      switch (force_type)
+      {
+      case SPHERICAL:
+         force_mag = mAppliedForce.magnitudeSafe();
+         break;
+      case CYLINDRICAL:
+         {
+            Point3F force_vec = mAppliedForce;
+            force_vec.z = 0.0;
+            force_mag = force_vec.magnitudeSafe();
+         }
+         break;
+      }
+   }
+}
+
+const Point3F& PhysicalZone::getForce(const Point3F* center) const 
+{ 
+   static Point3F force_vec;
+
+   if (force_type == VECTOR)
+   {
+      if (orient_force)
+      {
+         getTransform().mulV(mAppliedForce, &force_vec);
+         force_vec *= fade_amt;
+         return force_vec; 
+      }
+      force_vec = mAppliedForce;
+      force_vec *= fade_amt;
+      return force_vec;
+   }
+
+   if (!center)
+   {
+      force_vec.zero();
+      return force_vec; 
+   }
+
+   if (force_type == SPHERICAL)
+   {
+      force_vec = *center - getPosition();
+      force_vec.normalizeSafe();
+      force_vec *= force_mag*fade_amt;
+      return force_vec;
+   }
+
+   if (orient_force)
+   {
+      force_vec = *center - getPosition();
+      getWorldTransform().mulV(force_vec);
+      force_vec.z = 0.0f;
+      force_vec.normalizeSafe();
+      force_vec *= force_mag;
+      force_vec.z = mAppliedForce.z;
+      getTransform().mulV(force_vec);
+      force_vec *= fade_amt;
+      return force_vec;
+   }
+
+   force_vec = *center - getPosition();
+   force_vec.z = 0.0f;
+   force_vec.normalizeSafe();
+   force_vec *= force_mag;
+   force_vec *= fade_amt;
+   return force_vec;
+}
+
+bool PhysicalZone::isExcludedObject(SceneObject* obj) const
+{
+   for (S32 i = 0; i < excluded_objects.size(); i++)
+      if (excluded_objects[i] == obj)
+         return true;
+
+   return false;
+}
+
+void PhysicalZone::registerExcludedObject(SceneObject* obj)
+{
+   if (isExcludedObject(obj))
+      return;
+
+   excluded_objects.push_back(obj);
+   setMaskBits(FadeMask);
+}
+
+void PhysicalZone::unregisterExcludedObject(SceneObject* obj)
+{
+   for (S32 i = 0; i < excluded_objects.size(); i++)
+      if (excluded_objects[i] == obj)
+      {
+         excluded_objects.erase(i);
+         setMaskBits(FadeMask);
+         return;
+      }
 }
 

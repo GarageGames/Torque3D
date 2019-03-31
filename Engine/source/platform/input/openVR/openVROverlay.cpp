@@ -29,7 +29,7 @@ OpenVROverlay::OpenVROverlay()
    mOverlayWidth = 1.5f;
    mOverlayFlags = 0;
 
-   mOverlayColor = ColorF(1, 1, 1, 1);
+   mOverlayColor = LinearColorF(1, 1, 1, 1);
    mTrackingOrigin = vr::TrackingUniverseSeated;
 
    mTargetFormat = GFXFormatR8G8B8A8_LINEAR_FORCE; // needed for openvr!

@@ -61,7 +61,7 @@ public:
 
    struct PlotInfo
    {
-	  ColorF		  mGraphColor;
+	  LinearColorF		  mGraphColor;
 	  Vector<Point2F> mGraphData;
 	  Vector<Point2F> mNutList;
 	  Point2F		  mGraphMax;
@@ -136,7 +136,7 @@ public:
 
    // Get Functions
    Point2F getGraphExtent(S32 plotID);
-   ColorF getGraphColor(S32 plotID);
+   LinearColorF getGraphColor(S32 plotID);
    S32 getSelectedPlot();
    S32 getSelectedPoint();
    Point2F getPlotPoint(S32 plotID, S32 samples);

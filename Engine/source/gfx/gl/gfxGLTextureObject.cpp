@@ -57,7 +57,7 @@ GFXGLTextureObject::~GFXGLTextureObject()
 
 GFXLockedRect* GFXGLTextureObject::lock(U32 mipLevel, RectI *inRect)
 {
-   AssertFatal(mBinding != GL_TEXTURE_3D, "GFXGLTextureObject::lock - We don't support locking 3D textures yet");
+   //AssertFatal(mBinding != GL_TEXTURE_3D, "GFXGLTextureObject::lock - We don't support locking 3D textures yet");
    U32 width = mTextureSize.x >> mipLevel;
    U32 height = mTextureSize.y >> mipLevel;
 
@@ -76,7 +76,7 @@ GFXLockedRect* GFXGLTextureObject::lock(U32 mipLevel, RectI *inRect)
    mLockedRect.pitch = mLockedRectRect.extent.x * mBytesPerTexel;
 
    // CodeReview [ags 12/19/07] This one texel boundary is necessary to keep the clipmap code from crashing.  Figure out why.
-   U32 size = (mLockedRectRect.extent.x + 1) * (mLockedRectRect.extent.y + 1) * mBytesPerTexel;
+   U32 size = (mLockedRectRect.extent.x + 1) * (mLockedRectRect.extent.y + 1) * getDepth() * mBytesPerTexel;
    AssertFatal(!mFrameAllocatorMark && !mFrameAllocatorPtr, "");
    mFrameAllocatorMark = FrameAllocator::getWaterMark();
    mFrameAllocatorPtr = (U8*)FrameAllocator::alloc( size );
@@ -103,8 +103,11 @@ void GFXGLTextureObject::unlock(U32 mipLevel)
    glBindTexture(mBinding, mHandle);
    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, mBuffer);
    glBufferData(GL_PIXEL_UNPACK_BUFFER, (mLockedRectRect.extent.x + 1) * (mLockedRectRect.extent.y + 1) * mBytesPerTexel, mFrameAllocatorPtr, GL_STREAM_DRAW);
-
-   if(mBinding == GL_TEXTURE_2D)
+   S32 z = getDepth();
+   if (mBinding == GL_TEXTURE_3D)
+      glTexSubImage3D(mBinding, mipLevel, mLockedRectRect.point.x, mLockedRectRect.point.y, z,
+      mLockedRectRect.extent.x, mLockedRectRect.extent.y, z, GFXGLTextureFormat[mFormat], GFXGLTextureType[mFormat], NULL);
+   else if(mBinding == GL_TEXTURE_2D)
 	   glTexSubImage2D(mBinding, mipLevel, mLockedRectRect.point.x, mLockedRectRect.point.y, 
 		  mLockedRectRect.extent.x, mLockedRectRect.extent.y, GFXGLTextureFormat[mFormat], GFXGLTextureType[mFormat], NULL);
    else if(mBinding == GL_TEXTURE_1D)
@@ -146,12 +149,13 @@ bool GFXGLTextureObject::copyToBmp(GBitmap * bmp)
    // check format limitations
    // at the moment we only support RGBA for the source (other 4 byte formats should
    // be easy to add though)
-   AssertFatal(mFormat == GFXFormatR8G8B8A8, "GFXGLTextureObject::copyToBmp - invalid format");
-   AssertFatal(bmp->getFormat() == GFXFormatR8G8B8A8 || bmp->getFormat() == GFXFormatR8G8B8, "GFXGLTextureObject::copyToBmp - invalid format");
-   if(mFormat != GFXFormatR8G8B8A8)
+   AssertFatal(mFormat == GFXFormatR8G8B8A8 || mFormat == GFXFormatR8G8B8A8_SRGB , "GFXGLTextureObject::copyToBmp - invalid format");
+   AssertFatal(bmp->getFormat() == GFXFormatR8G8B8A8 || bmp->getFormat() == GFXFormatR8G8B8 || bmp->getFormat() == GFXFormatR8G8B8A8_SRGB, "GFXGLTextureObject::copyToBmp - invalid format");
+   
+   if(mFormat != GFXFormatR8G8B8A8 && mFormat != GFXFormatR8G8B8A8_SRGB)
       return false;
 
-   if(bmp->getFormat() != GFXFormatR8G8B8A8 && bmp->getFormat() != GFXFormatR8G8B8)
+   if(bmp->getFormat() != GFXFormatR8G8B8A8 && bmp->getFormat() != GFXFormatR8G8B8 && bmp->getFormat() != GFXFormatR8G8B8A8_SRGB )
       return false;
 
    AssertFatal(bmp->getWidth() == getWidth(), "GFXGLTextureObject::copyToBmp - invalid size");
@@ -253,7 +257,7 @@ U8* GFXGLTextureObject::getTextureData( U32 mip )
    AssertFatal( mMipLevels, "");
    mip = (mip < mMipLevels) ? mip : 0;
 
-   const U32 dataSize = isCompressedFormat(mFormat) 
+   const U32 dataSize = ImageUtil::isCompressedFormat(mFormat) 
        ? getCompressedSurfaceSize( mFormat, mTextureSize.x, mTextureSize.y, mip ) 
        : (mTextureSize.x >> mip) * (mTextureSize.y >> mip) * mBytesPerTexel;
 
@@ -261,7 +265,7 @@ U8* GFXGLTextureObject::getTextureData( U32 mip )
    PRESERVE_TEXTURE(mBinding);
    glBindTexture(mBinding, mHandle);
 
-   if( isCompressedFormat(mFormat) )
+   if( ImageUtil::isCompressedFormat(mFormat) )
       glGetCompressedTexImage( mBinding, mip, data );
    else
       glGetTexImage(mBinding, mip, GFXGLTextureFormat[mFormat], GFXGLTextureType[mFormat], data);

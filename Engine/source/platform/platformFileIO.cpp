@@ -38,7 +38,7 @@ StringTableEntry Platform::getTemporaryDirectory()
    return path;
 }
 
-DefineConsoleFunction( getTemporaryDirectory, const char *, (), ,
+DefineEngineFunction( getTemporaryDirectory, const char *, (), ,
 				"@brief Returns the OS temporary directory, \"C:/Users/Mich/AppData/Local/Temp\" for example\n\n"
 				"@note This can be useful to adhering to OS standards and practices, "
 				"but not really used in Torque 3D right now.\n"
@@ -66,7 +66,7 @@ StringTableEntry Platform::getTemporaryFileName()
    return StringTable->insert(buf);
 }
 
-DefineConsoleFunction( getTemporaryFileName, const char *, (), ,
+DefineEngineFunction( getTemporaryFileName, const char *, (), ,
 				"@brief Creates a name and extension for a potential temporary file\n\n"
 				"This does not create the actual file. It simply creates a random name "
 				"for a file that does not exist.\n\n"
@@ -534,7 +534,7 @@ StringTableEntry Platform::makeRelativePathName(const char *path, const char *to
 
       // Copy the rest
       if(*branch)
-         dStrcpy(bufPtr, branch + 1);
+         dStrcpy(bufPtr, branch + 1, temp.size - (bufPtr - temp.ptr));
       else
          *--bufPtr = 0;
 
@@ -611,12 +611,17 @@ StringTableEntry Platform::getPrefsPath(const char *file /* = NULL */)
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getUserDataDirectory, const char *, (), , "getUserDataDirectory()")
+DefineEngineFunction( getUserDataDirectory, const char *, (), , "getUserDataDirectory()")
 {
    return Platform::getUserDataDirectory();
 }
 
-DefineConsoleFunction( getUserHomeDirectory, const char *, (), , "getUserHomeDirectory()")
+DefineEngineFunction( getUserHomeDirectory, const char *, (), , "getUserHomeDirectory()")
 {
    return Platform::getUserHomeDirectory();
+}
+
+DefineEngineFunction(setMainDotCsDir, void, (const char* path), , "setMainDotCsDir()")
+{
+   Platform::setMainDotCsDir(StringTable->insert(path));
 }

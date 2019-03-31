@@ -30,7 +30,6 @@
 #include "math/mRandom.h"
 #include "core/stream/fileStream.h"
 #include "T3D/resource.h"
-#include <d3d9.h>
 #include "gfx/gfxInit.h"
 #include "gfx/gfxDevice.h"
 #include "core/strings/unicode.h"
@@ -607,7 +606,7 @@ const char* Platform::getLoginPassword()
       if ( RegQueryValueEx( regKey, dT("LoginPassword"), NULL, NULL, buf, &size ) == ERROR_SUCCESS )
       {
          returnString = Con::getReturnBuffer( size + 1 );
-         dStrcpy( returnString, (const char*) buf );
+         dStrcpy( returnString, (const char*) buf, size + 1 );
       }
 
       RegCloseKey( regKey );
@@ -644,7 +643,7 @@ bool Platform::setLoginPassword( const char* password )
 //       as commentary on Koreans as a nationality. Thank you for your
 //       attention.
 //--------------------------------------
-DefineConsoleFunction( isKoreanBuild, bool, ( ), , "isKoreanBuild()")
+DefineEngineFunction( isKoreanBuild, bool, ( ), , "isKoreanBuild()")
 {
    HKEY regKey;
    bool result = false;

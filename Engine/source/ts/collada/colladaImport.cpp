@@ -120,19 +120,20 @@ static void processNode(GuiTreeViewCtrl* tree, domNode* node, S32 parentID, Scen
    for (S32 i = 0; i < node->getInstance_node_array().getCount(); i++)
    {
       domInstance_node* instnode = node->getInstance_node_array()[i];
-      domNode* node = daeSafeCast<domNode>(instnode->getUrl().getElement());
-      if (node)
-         processNode(tree, node, nodeID, stats);
+      domNode* dNode = daeSafeCast<domNode>(instnode->getUrl().getElement());
+      if (dNode)
+         processNode(tree, dNode, nodeID, stats);
    }
 }
 
-DefineConsoleFunction( enumColladaForImport, bool, (const char * shapePath, const char * ctrl), , 
+DefineEngineFunction( enumColladaForImport, bool, (const char * shapePath, const char * ctrl, bool loadCachedDts), ("", "", true),
    "(string shapePath, GuiTreeViewCtrl ctrl) Collect scene information from "
    "a COLLADA file and store it in a GuiTreeView control. This function is "
    "used by the COLLADA import gui to show a preview of the scene contents "
    "prior to import, and is probably not much use for anything else.\n"
    "@param shapePath COLLADA filename\n"
    "@param ctrl GuiTreeView control to add elements to\n"
+   "@param loadCachedDts dictates if it should try and load the cached dts file if it exists"
    "@return true if successful, false otherwise\n"
    "@ingroup Editors\n"
    "@internal")
@@ -147,7 +148,7 @@ DefineConsoleFunction( enumColladaForImport, bool, (const char * shapePath, cons
    // Check if a cached DTS is available => no need to import the collada file
    // if we can load the DTS instead
    Torque::Path path(shapePath);
-   if (ColladaShapeLoader::canLoadCachedDTS(path))
+   if (loadCachedDts && ColladaShapeLoader::canLoadCachedDTS(path))
       return false;
 
    // Check if this is a Sketchup file (.kmz) and if so, mount the zip filesystem
@@ -198,7 +199,7 @@ DefineConsoleFunction( enumColladaForImport, bool, (const char * shapePath, cons
       for (S32 j = 0; j < libraryMats->getMaterial_array().getCount(); j++)
       {
          domMaterial* mat = libraryMats->getMaterial_array()[j];
-         tree->insertItem(matsID, _GetNameOrId(mat), _GetNameOrId(mat), "", 0, 0);
+         tree->insertItem(matsID, _GetNameOrId(mat), "", "", 0, 0);
       }
    }
 
@@ -255,6 +256,17 @@ DefineConsoleFunction( enumColladaForImport, bool, (const char * shapePath, cons
       tree->setDataField(StringTable->insert("_upAxis"), 0, "Y_AXIS");
    else
       tree->setDataField(StringTable->insert("_upAxis"), 0, "Z_AXIS");
+
+   char shapesStr[16];
+   dSprintf(shapesStr, 16, "%i", stats.numMeshes);
+   char materialsStr[16];
+   dSprintf(materialsStr, 16, "%i", stats.numMaterials);
+   char animationsStr[16];
+   dSprintf(animationsStr, 16, "%i", stats.numClips);
+
+   tree->setItemValue(nodesID, StringTable->insert(shapesStr));
+   tree->setItemValue(matsID, StringTable->insert(materialsStr));
+   tree->setItemValue(animsID, StringTable->insert(animationsStr));
 
    return true;
 }

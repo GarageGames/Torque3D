@@ -74,7 +74,7 @@ struct LightAnimState
    MatrixF transform;
 
    /// The set light color before animation occurs.
-   ColorF color;
+   LinearColorF color;
 };
 
 

@@ -160,7 +160,7 @@ class Precipitation : public GameBase
    bool mUseLighting;            ///< This enables shading of the drops and splashes
                                  ///< by the sun color.
 
-   ColorF mGlowIntensity;        ///< Set it to 0 to disable the glow or use it to control 
+   LinearColorF mGlowIntensity;        ///< Set it to 0 to disable the glow or use it to control 
                                  ///< the intensity of each channel.
 
    bool mReflect;                ///< This enables the precipitation to be rendered

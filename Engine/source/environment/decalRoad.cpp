@@ -1265,7 +1265,7 @@ void DecalRoad::_generateEdges()
    //      
    for ( U32 i = 0; i < mEdges.size(); i++ )
    {
-      RoadEdge *edge = &mEdges[i];
+      edge = &mEdges[i];
       edge->p0 = edge->p1 - edge->rvec * edge->width * 0.5f;
       edge->p2 = edge->p1 + edge->rvec * edge->width * 0.5f;
       _getTerrainHeight( edge->p0 );
@@ -1467,20 +1467,20 @@ void DecalRoad::_captureVerts()
    for ( U32 i = 0; i < clipperList.size(); i++ )
    {   
       ClippedPolyList *clipper = &clipperList[i];
-      RoadEdge &edge = mEdges[i];
-      RoadEdge &nextEdge = mEdges[i+1];      
+      edge = &mEdges[i];
+      nextEdge = &mEdges[i+1];      
 
-      VectorF segFvec = nextEdge.p1 - edge.p1;
+      VectorF segFvec = nextEdge->p1 - edge->p1;
       F32 segLen = segFvec.len();
       segFvec.normalize();
 
       F32 texLen = segLen / mTextureLength;
       texEnd = texStart + texLen;
 
-      BiQuadToSqr quadToSquare(  Point2F( edge.p0.x, edge.p0.y ), 
-                                 Point2F( edge.p2.x, edge.p2.y ), 
-                                 Point2F( nextEdge.p2.x, nextEdge.p2.y ), 
-                                 Point2F( nextEdge.p0.x, nextEdge.p0.y ) );  
+      BiQuadToSqr quadToSquare(  Point2F( edge->p0.x, edge->p0.y ),
+                                 Point2F( edge->p2.x, edge->p2.y ),
+                                 Point2F( nextEdge->p2.x, nextEdge->p2.y ),
+                                 Point2F( nextEdge->p0.x, nextEdge->p0.y ) );
 
       //
       if ( i % mSegmentsPerBatch == 0 )
@@ -1572,12 +1572,12 @@ void DecalRoad::_captureVerts()
    Box3F box;
    for ( U32 i = 0; i < mBatches.size(); i++ )
    {
-      const RoadBatch &batch = mBatches[i];
+      batch = &mBatches[i];
 
       if ( i == 0 )      
-         box = batch.bounds;               
+         box = batch->bounds;               
       else      
-         box.intersect( batch.bounds );               
+         box.intersect( batch->bounds );
    }
 
    mWorldBox = box;

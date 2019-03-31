@@ -6,5 +6,10 @@
 	CreateFunction="create"
 	DestroyFunction="destroy"
 	Group="Game"
-    Dependencies="clientServer=1,UI=1">
+    Dependencies="UI=1">
+	<DeclaredAssets
+        canSave="true"
+        canSaveDynamicFields="true"
+        Extension="asset.taml"
+        Recurse="true" />
 </ModuleDefinition>

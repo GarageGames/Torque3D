@@ -53,7 +53,7 @@ void TamlCustomField::set( const char* pFieldName, const char* pFieldValue )
     }
 #endif
     // Copy field value.
-    dStrcpy( mFieldValue, pFieldValue );
+    dStrcpy( mFieldValue, pFieldValue, MAX_TAML_NODE_FIELDVALUE_LENGTH );
 }
 
 //-----------------------------------------------------------------------------

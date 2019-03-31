@@ -125,7 +125,7 @@ protected:
    Point2F mTexDirection[TEX_COUNT];
    F32 mTexSpeed[TEX_COUNT];   
    
-   ColorF mBaseColor;
+   LinearColorF mBaseColor;
    F32 mExposure;
    F32 mCoverage;
    F32 mWindSpeed;   

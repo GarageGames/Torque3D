@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _LIGHTBASE_H_
 #define _LIGHTBASE_H_
 
@@ -51,7 +56,7 @@ protected:
 
    bool mIsEnabled;
 
-   ColorF mColor;
+   LinearColorF mColor;
 
    F32 mBrightness;
 
@@ -132,6 +137,8 @@ public:
    virtual void pauseAnimation( void );
    virtual void playAnimation( void );
    virtual void playAnimation( LightAnimData *animData );
+protected:
+   bool mLocalRenderViz;
 };
 
 #endif // _LIGHTBASE_H_

@@ -65,6 +65,7 @@ public:
    GFXShaderConstHandle* mWorldToObjSC;         
    GFXShaderConstHandle* mViewToObjSC;         
    GFXShaderConstHandle* mCubeTransSC;
+   GFXShaderConstHandle* mCubeMipsSC;
    GFXShaderConstHandle* mObjTransSC;
    GFXShaderConstHandle* mCubeEyePosSC;
    GFXShaderConstHandle* mEyePosSC;

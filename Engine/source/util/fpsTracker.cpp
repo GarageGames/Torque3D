@@ -88,7 +88,7 @@ void FPSTracker::update()
    }
 }
 
-DefineConsoleFunction( resetFPSTracker, void, (), , "()"
+DefineEngineFunction( resetFPSTracker, void, (), , "()"
    "@brief Reset FPS stats (fps::)\n\n"
    "@ingroup Game")
 {

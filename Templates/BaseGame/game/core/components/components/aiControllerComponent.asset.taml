@@ -1,0 +1,8 @@
+<ComponentAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="AIControllerComponentAsset"
+    componentClass="AIControllerComponent"
+    friendlyName="AI Player Controller"
+    componentType="Game"
+    description="Enables an entity to move like a player object." />

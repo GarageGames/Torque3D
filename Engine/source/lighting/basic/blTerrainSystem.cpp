@@ -96,7 +96,7 @@ protected:
 
    BitVector               mShadowMask;
    ShadowVolumeBSP *       mShadowVolume;
-   ColorF *                mLightmap;
+   LinearColorF *                mLightmap;
 
    /// The dimension of the lightmap in pixels.
    const U32 mLightMapSize;
@@ -104,7 +104,7 @@ protected:
    /// The dimension of the terrain height map sample array.
    const U32 mTerrainBlockSize;
 
-   ColorF *sgBakedLightmap;
+   LinearColorF *sgBakedLightmap;
    Vector<LightInfo *> sgLights;
    bool sgMarkStaticShadow(void *terrainproxy, SceneObject *sceneobject, LightInfo *light);
    //void postLight(bool lastLight);
@@ -122,7 +122,7 @@ protected:
    bool markObjectShadow(ObjectProxy *);
    bool sgIsCorrectStaticObjectType(SceneObject *obj);
 
-   inline ColorF _getValue( S32 row, S32 column );
+   inline LinearColorF _getValue( S32 row, S32 column );
 
 public:
 
@@ -173,8 +173,8 @@ blTerrainProxy::~blTerrainProxy()
 //-------------------------------------------------------------------------------
 void blTerrainProxy::init()
 {
-   mLightmap = new ColorF[ mLightMapSize * mLightMapSize ];
-   dMemset(mLightmap, 0, mLightMapSize * mLightMapSize * sizeof(ColorF));
+   mLightmap = new LinearColorF[ mLightMapSize * mLightMapSize ];
+   dMemset(mLightmap, 0, mLightMapSize * mLightMapSize * sizeof(LinearColorF));
    mShadowMask.setSize( mTerrainBlockSize * mTerrainBlockSize );
 }
 
@@ -190,7 +190,7 @@ bool blTerrainProxy::preLight(LightInfo * light)
    return(true);
 }
 
-inline ColorF blTerrainProxy::_getValue( S32 row, S32 column )
+inline LinearColorF blTerrainProxy::_getValue( S32 row, S32 column )
 {
    while( row < 0 )
       row += mLightMapSize;
@@ -282,7 +282,7 @@ void blTerrainProxy::light(LightInfo * light)
       for( U32 j=0; j < mLightMapSize; j++ )
       {
 
-         ColorF val;
+         LinearColorF val;
          val  = _getValue( i-1, j-1  ) * kernel[0][0];
          val += _getValue( i-1, j    ) * kernel[0][1];
          val += _getValue( i-1, j+1  ) * kernel[0][2];
@@ -583,7 +583,7 @@ void blTerrainProxy::lightVector(LightInfo * light)
          }
 
          // Set the final lightmap color.
-         mLightmap[i++] += ColorF::WHITE * mClampF( 1.0f - shadowed, 0.0f, 1.0f );
+         mLightmap[i++] += LinearColorF::WHITE * mClampF( 1.0f - shadowed, 0.0f, 1.0f );
       }
    }
 }
@@ -688,7 +688,7 @@ bool blTerrainSystem::createPersistChunkFromProxy(SceneLighting::ObjectProxy* ob
 }
 
 // Given a ray, this will return the color from the lightmap of this object, return true if handled
-bool blTerrainSystem::getColorFromRayInfo(const RayInfo & collision, ColorF& result) const
+bool blTerrainSystem::getColorFromRayInfo(const RayInfo & collision, LinearColorF& result) const
 {
    TerrainBlock *terrain = dynamic_cast<TerrainBlock *>(collision.object);
    if (!terrain)

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -50,6 +50,8 @@ SDL_DYNAPI_PROC(int,SDL_snprintf,(SDL_OUT_Z_CAP(b) char *a, size_t b, SDL_PRINTF
 
 #if defined(__WIN32__) && !defined(HAVE_LIBC)
 SDL_DYNAPI_PROC(SDL_Thread*,SDL_CreateThread,(SDL_ThreadFunction a, const char *b, void *c, pfnSDL_CurrentBeginThread d, pfnSDL_CurrentEndThread e),(a,b,c,d,e),return)
+#elif defined(__OS2__)
+SDL_DYNAPI_PROC(SDL_Thread*,SDL_CreateThread,(SDL_ThreadFunction a, const char *b, void *c, pfnSDL_CurrentBeginThread d, pfnSDL_CurrentEndThread e),(a,b,c,d,e),return)
 #else
 SDL_DYNAPI_PROC(SDL_Thread*,SDL_CreateThread,(SDL_ThreadFunction a, const char *b, void *c),(a,b,c),return)
 #endif
@@ -60,12 +62,6 @@ SDL_DYNAPI_PROC(SDL_RWops*,SDL_RWFromFP,(FILE *a, SDL_bool b),(a,b),return)
 SDL_DYNAPI_PROC(SDL_RWops*,SDL_RWFromFP,(void *a, SDL_bool b),(a,b),return)
 #endif
 
-/* so annoying. */
-#if defined(__thumb__) && (defined(__ARM_ARCH_6__) || defined(__ARM_ARCH_6J__) || defined(__ARM_ARCH_6K__) || defined(__ARM_ARCH_6T2__) || defined(__ARM_ARCH_6Z__) || defined(__ARM_ARCH_6ZK__))
-SDL_DYNAPI_PROC(void,SDL_MemoryBarrierRelease,(void),(),)
-SDL_DYNAPI_PROC(void,SDL_MemoryBarrierAcquire,(void),(),)
-#endif
-
 #ifdef __WIN32__
 SDL_DYNAPI_PROC(int,SDL_RegisterApp,(char *a, Uint32 b, void *c),(a,b,c),return)
 SDL_DYNAPI_PROC(void,SDL_UnregisterApp,(void),(),)
@@ -73,12 +69,12 @@ SDL_DYNAPI_PROC(int,SDL_Direct3D9GetAdapterIndex,(int a),(a),return)
 SDL_DYNAPI_PROC(IDirect3DDevice9*,SDL_RenderGetD3D9Device,(SDL_Renderer *a),(a),return)
 #endif
 
-#if defined(__IPHONEOS__) && __IPHONEOS__
+#ifdef __IPHONEOS__
 SDL_DYNAPI_PROC(int,SDL_iPhoneSetAnimationCallback,(SDL_Window *a, int b, void c, void *d),(a,b,c,d),return)
 SDL_DYNAPI_PROC(void,SDL_iPhoneSetEventPump,(SDL_bool a),(a),)
 #endif
 
-#if defined(__ANDROID__) && __ANDROID__
+#ifdef __ANDROID__
 SDL_DYNAPI_PROC(void*,SDL_AndroidGetJNIEnv,(void),(),return)
 SDL_DYNAPI_PROC(void*,SDL_AndroidGetActivity,(void),(),return)
 SDL_DYNAPI_PROC(const char*,SDL_AndroidGetInternalStoragePath,(void),(),return)
@@ -644,3 +640,70 @@ SDL_DYNAPI_PROC(void,SDL_SetWindowResizable,(SDL_Window *a, SDL_bool b),(a,b),)
 SDL_DYNAPI_PROC(SDL_Surface*,SDL_CreateRGBSurfaceWithFormat,(Uint32 a, int b, int c, int d, Uint32 e),(a,b,c,d,e),return)
 SDL_DYNAPI_PROC(SDL_Surface*,SDL_CreateRGBSurfaceWithFormatFrom,(void *a, int b, int c, int d, int e, Uint32 f),(a,b,c,d,e,f),return)
 SDL_DYNAPI_PROC(SDL_bool,SDL_GetHintBoolean,(const char *a, SDL_bool b),(a,b),return)
+SDL_DYNAPI_PROC(Uint16,SDL_JoystickGetDeviceVendor,(int a),(a),return)
+SDL_DYNAPI_PROC(Uint16,SDL_JoystickGetDeviceProduct,(int a),(a),return)
+SDL_DYNAPI_PROC(Uint16,SDL_JoystickGetDeviceProductVersion,(int a),(a),return)
+SDL_DYNAPI_PROC(Uint16,SDL_JoystickGetVendor,(SDL_Joystick *a),(a),return)
+SDL_DYNAPI_PROC(Uint16,SDL_JoystickGetProduct,(SDL_Joystick *a),(a),return)
+SDL_DYNAPI_PROC(Uint16,SDL_JoystickGetProductVersion,(SDL_Joystick *a),(a),return)
+SDL_DYNAPI_PROC(Uint16,SDL_GameControllerGetVendor,(SDL_GameController *a),(a),return)
+SDL_DYNAPI_PROC(Uint16,SDL_GameControllerGetProduct,(SDL_GameController *a),(a),return)
+SDL_DYNAPI_PROC(Uint16,SDL_GameControllerGetProductVersion,(SDL_GameController *a),(a),return)
+SDL_DYNAPI_PROC(SDL_bool,SDL_HasNEON,(void),(),return)
+SDL_DYNAPI_PROC(int,SDL_GameControllerNumMappings,(void),(),return)
+SDL_DYNAPI_PROC(char*,SDL_GameControllerMappingForIndex,(int a),(a),return)
+SDL_DYNAPI_PROC(SDL_bool,SDL_JoystickGetAxisInitialState,(SDL_Joystick *a, int b, Sint16 *c),(a,b,c),return)
+SDL_DYNAPI_PROC(SDL_JoystickType,SDL_JoystickGetDeviceType,(int a),(a),return)
+SDL_DYNAPI_PROC(SDL_JoystickType,SDL_JoystickGetType,(SDL_Joystick *a),(a),return)
+SDL_DYNAPI_PROC(void,SDL_MemoryBarrierReleaseFunction,(void),(),)
+SDL_DYNAPI_PROC(void,SDL_MemoryBarrierAcquireFunction,(void),(),)
+SDL_DYNAPI_PROC(SDL_JoystickID,SDL_JoystickGetDeviceInstanceID,(int a),(a),return)
+SDL_DYNAPI_PROC(size_t,SDL_utf8strlen,(const char *a),(a),return)
+SDL_DYNAPI_PROC(void*,SDL_LoadFile_RW,(SDL_RWops *a, size_t *b, int c),(a,b,c),return)
+SDL_DYNAPI_PROC(int,SDL_wcscmp,(const wchar_t *a, const wchar_t *b),(a,b),return)
+SDL_DYNAPI_PROC(SDL_BlendMode,SDL_ComposeCustomBlendMode,(SDL_BlendFactor a, SDL_BlendFactor b, SDL_BlendOperation c, SDL_BlendFactor d, SDL_BlendFactor e, SDL_BlendOperation f),(a,b,c,d,e,f),return)
+SDL_DYNAPI_PROC(SDL_Surface*,SDL_DuplicateSurface,(SDL_Surface *a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_Vulkan_LoadLibrary,(const char *a),(a),return)
+SDL_DYNAPI_PROC(void*,SDL_Vulkan_GetVkGetInstanceProcAddr,(void),(),return)
+SDL_DYNAPI_PROC(void,SDL_Vulkan_UnloadLibrary,(void),(),)
+SDL_DYNAPI_PROC(SDL_bool,SDL_Vulkan_GetInstanceExtensions,(SDL_Window *a, unsigned int *b, const char **c),(a,b,c),return)
+SDL_DYNAPI_PROC(SDL_bool,SDL_Vulkan_CreateSurface,(SDL_Window *a, VkInstance b, VkSurfaceKHR *c),(a,b,c),return)
+SDL_DYNAPI_PROC(void,SDL_Vulkan_GetDrawableSize,(SDL_Window *a, int *b, int *c),(a,b,c),)
+SDL_DYNAPI_PROC(void,SDL_LockJoysticks,(void),(),)
+SDL_DYNAPI_PROC(void,SDL_UnlockJoysticks,(void),(),)
+SDL_DYNAPI_PROC(void,SDL_GetMemoryFunctions,(SDL_malloc_func *a, SDL_calloc_func *b, SDL_realloc_func *c, SDL_free_func *d),(a,b,c,d),)
+SDL_DYNAPI_PROC(int,SDL_SetMemoryFunctions,(SDL_malloc_func a, SDL_calloc_func b, SDL_realloc_func c, SDL_free_func d),(a,b,c,d),return)
+SDL_DYNAPI_PROC(int,SDL_GetNumAllocations,(void),(),return)
+SDL_DYNAPI_PROC(SDL_AudioStream*,SDL_NewAudioStream,(const SDL_AudioFormat a, const Uint8 b, const int c, const SDL_AudioFormat d, const Uint8 e, const int f),(a,b,c,d,e,f),return)
+SDL_DYNAPI_PROC(int,SDL_AudioStreamPut,(SDL_AudioStream *a, const void *b, int c),(a,b,c),return)
+SDL_DYNAPI_PROC(int,SDL_AudioStreamGet,(SDL_AudioStream *a, void *b, int c),(a,b,c),return)
+SDL_DYNAPI_PROC(void,SDL_AudioStreamClear,(SDL_AudioStream *a),(a),)
+SDL_DYNAPI_PROC(int,SDL_AudioStreamAvailable,(SDL_AudioStream *a),(a),return)
+SDL_DYNAPI_PROC(void,SDL_FreeAudioStream,(SDL_AudioStream *a),(a),)
+SDL_DYNAPI_PROC(int,SDL_AudioStreamFlush,(SDL_AudioStream *a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_acosf,(float a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_asinf,(float a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_atanf,(float a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_atan2f,(float a, float b),(a,b),return)
+SDL_DYNAPI_PROC(float,SDL_ceilf,(float a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_copysignf,(float a, float b),(a,b),return)
+SDL_DYNAPI_PROC(float,SDL_fabsf,(float a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_floorf,(float a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_logf,(float a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_powf,(float a, float b),(a,b),return)
+SDL_DYNAPI_PROC(float,SDL_scalbnf,(float a, int b),(a,b),return)
+SDL_DYNAPI_PROC(double,SDL_fmod,(double a, double b),(a,b),return)
+SDL_DYNAPI_PROC(float,SDL_fmodf,(float a, float b),(a,b),return)
+SDL_DYNAPI_PROC(void,SDL_SetYUVConversionMode,(SDL_YUV_CONVERSION_MODE a),(a),)
+SDL_DYNAPI_PROC(SDL_YUV_CONVERSION_MODE,SDL_GetYUVConversionMode,(void),(),return)
+SDL_DYNAPI_PROC(SDL_YUV_CONVERSION_MODE,SDL_GetYUVConversionModeForResolution,(int a, int b),(a,b),return)
+SDL_DYNAPI_PROC(void*,SDL_RenderGetMetalLayer,(SDL_Renderer *a),(a),return)
+SDL_DYNAPI_PROC(void*,SDL_RenderGetMetalCommandEncoder,(SDL_Renderer *a),(a),return)
+#ifdef __WINRT__
+SDL_DYNAPI_PROC(SDL_WinRT_DeviceFamily,SDL_WinRTGetDeviceFamily,(void),(),return)
+#endif
+#ifdef __ANDROID__
+SDL_DYNAPI_PROC(SDL_bool,SDL_IsAndroidTV,(void),(),return)
+#endif
+SDL_DYNAPI_PROC(double,SDL_log10,(double a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_log10f,(float a),(a),return)

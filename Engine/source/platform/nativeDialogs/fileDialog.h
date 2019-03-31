@@ -106,6 +106,7 @@ protected:
    FileDialogData mData; ///< Stores platform agnostic information about the dialogs properties
    bool mChangePath; ///< Exposed ChangePath Property
    bool mBoolTranslator; ///< Internally used to translate boolean values into their respective bits of dialog style
+   bool mForceRelativePath;
 public:
 
    FileDialog();

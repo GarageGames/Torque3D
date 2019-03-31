@@ -144,70 +144,53 @@ void SFXEnvironment::initPersistFields()
 {
    addGroup( "Reverb" );
    
-      addField( "envSize",             TypeF32,    Offset( mReverb.mEnvSize, SFXEnvironment ),
-         "Environment size in meters." );
-      addField( "envDiffusion",        TypeF32,    Offset( mReverb.mEnvDiffusion, SFXEnvironment ),
-         "Environment diffusion." );
-      addField( "room",                TypeS32,    Offset( mReverb.mRoom, SFXEnvironment ),
-         "Room effect level at mid-frequencies." );
-      addField( "roomHF",              TypeS32,    Offset( mReverb.mRoomHF, SFXEnvironment ),
-         "Relative room effect level at high frequencies." );
-      addField( "roomLF",              TypeS32,    Offset( mReverb.mRoomLF, SFXEnvironment ),
-         "Relative room effect level at low frequencies." );
-      addField( "decayTime",           TypeF32,    Offset( mReverb.mDecayTime, SFXEnvironment ),
-         "Reverberation decay time at mid frequencies." );
-      addField( "decayHFRatio",        TypeF32,    Offset( mReverb.mDecayHFRatio, SFXEnvironment ),
-         "High-frequency to mid-frequency decay time ratio." );
-      addField( "decayLFRatio",        TypeF32,    Offset( mReverb.mDecayLFRatio, SFXEnvironment ),
-         "Low-frequency to mid-frequency decay time ratio." );
-      addField( "reflections",         TypeS32,    Offset( mReverb.mReflections, SFXEnvironment ),
-         "Early reflections level relative to room effect." );
-      addField( "reflectionsDelay",    TypeF32,    Offset( mReverb.mReflectionsDelay, SFXEnvironment ),
-         "Initial reflection delay time." );
-      addField( "reflectionsPan",      TypeF32,    Offset( mReverb.mReflectionsPan, SFXEnvironment ), 3,
-         "Early reflections panning vector." );
-      addField( "reverb",              TypeS32,    Offset( mReverb.mReverb, SFXEnvironment ),
-         "Late reverberation level relative to room effect." );
-      addField( "reverbDelay",         TypeF32,    Offset( mReverb.mReverbDelay, SFXEnvironment ),
-         "Late reverberation delay time relative to initial reflection." );
-      addField( "reverbPan",           TypeF32,    Offset( mReverb.mReverbPan, SFXEnvironment ), 3,
-         "Late reverberation panning vector." );
-      addField( "echoTime",            TypeF32,    Offset( mReverb.mEchoTime, SFXEnvironment ),
-         "Echo time." );
-      addField( "echoDepth",           TypeF32,    Offset( mReverb.mEchoDepth, SFXEnvironment ),
-         "Echo depth." );
-      addField( "modulationTime",      TypeF32,    Offset( mReverb.mModulationTime, SFXEnvironment ),
-         "Modulation time." );
-      addField( "modulationDepth",     TypeF32,    Offset( mReverb.mModulationDepth, SFXEnvironment ),
-         "Modulation depth." );
-      addField( "airAbsorptionHF",     TypeF32,    Offset( mReverb.mAirAbsorptionHF, SFXEnvironment ),
-         "Change in level per meter at high frequencies." );
-      addField( "HFReference",         TypeF32,    Offset( mReverb.mHFReference, SFXEnvironment ),
-         "Reference high frequency in Hertz." );
-      addField( "LFReference",         TypeF32,    Offset( mReverb.mLFReference, SFXEnvironment ),
-         "Reference low frequency in Hertz." );
-      addField( "roomRolloffFactor",   TypeF32,    Offset( mReverb.mRoomRolloffFactor, SFXEnvironment ),
-         "Logarithmic distance attenuation rolloff scale factor for reverb room size effect." );
-      addField( "diffusion",           TypeF32,    Offset( mReverb.mDiffusion, SFXEnvironment ),
-         "Value that controls the echo density in the late reverberation decay." );
-      addField( "density",             TypeF32,    Offset( mReverb.mDensity, SFXEnvironment ),
-         "Value that controls the modal density in the late reverberation decay." );
-      addField( "flags",               TypeS32,    Offset( mReverb.mFlags, SFXEnvironment ),
-         "A bitfield of reverb flags.\n"
-         "@see REVERB_DECAYTIMESCALE\n"
-         "@see REVERB_REFLECTIONSSCALE\n"
-         "@see REVERB_REFLECTIONSDELAYSCALE\n"
-         "@see REVERB_REVERBSCALE\n"
-         "@see REVERB_REVERBDELAYSCALE\n"
-         "@see REVERB_DECAYHFLIMIT\n"
-         "@see REVERB_ECHOTIMESCALE\n"
-         "@see REVERB_MODULATIONTIMESCALE\n"
-         "@see REVERB_CORE0\n"
-         "@see REVERB_CORE1\n"
-         "@see REVERB_HIGHQUALITYREVERB\n"
-         "@see REVERB_HIGHQUALITYDPL2REVERB\n" );
-
-   endGroup( "Reverb" );
+   addField("reverbDensity", TypeF32, Offset(mReverb.flDensity, SFXEnvironment),
+      "Density of reverb environment.");
+   addField("reverbDiffusion", TypeF32, Offset(mReverb.flDiffusion, SFXEnvironment),
+      "Environment diffusion.");
+   addField("reverbGain", TypeF32, Offset(mReverb.flGain, SFXEnvironment),
+      "Reverb Gain Level.");
+   addField("reverbGainHF", TypeF32, Offset(mReverb.flGainHF, SFXEnvironment),
+      "Reverb Gain to high frequencies");
+   addField("reverbGainLF", TypeF32, Offset(mReverb.flGainLF, SFXEnvironment),
+      "Reverb Gain to high frequencies");
+   addField("reverbDecayTime", TypeF32, Offset(mReverb.flDecayTime, SFXEnvironment),
+      "Decay time for the reverb.");
+   addField("reverbDecayHFRatio", TypeF32, Offset(mReverb.flDecayHFRatio, SFXEnvironment),
+      "High frequency decay time ratio.");
+   addField("reverbDecayLFRatio", TypeF32, Offset(mReverb.flDecayLFRatio, SFXEnvironment),
+      "High frequency decay time ratio.");
+   addField("reflectionsGain", TypeF32, Offset(mReverb.flReflectionsGain, SFXEnvironment),
+      "Reflection Gain.");
+   addField("reflectionDelay", TypeF32, Offset(mReverb.flReflectionsDelay, SFXEnvironment),
+      "How long to delay reflections.");
+   addField("reflectionsPan", TypeF32, Offset(mReverb.flReflectionsPan, SFXEnvironment), 3,
+      "Reflection reverberation panning vector.");
+   addField("lateReverbGain", TypeF32, Offset(mReverb.flLateReverbGain, SFXEnvironment),
+      "Late reverb gain amount.");
+   addField("lateReverbDelay", TypeF32, Offset(mReverb.flLateReverbDelay, SFXEnvironment),
+      "Late reverb delay time.");
+   addField("lateReverbPan", TypeF32, Offset(mReverb.flLateReverbPan, SFXEnvironment), 3,
+      "Late reverberation panning vector.");
+   addField("reverbEchoTime", TypeF32, Offset(mReverb.flEchoTime, SFXEnvironment),
+      "Reverb echo time.");
+   addField("reverbEchoDepth", TypeF32, Offset(mReverb.flEchoDepth, SFXEnvironment),
+      "Reverb echo depth.");
+   addField("reverbModTime", TypeF32, Offset(mReverb.flModulationTime, SFXEnvironment),
+      "Reverb Modulation time.");
+   addField("reverbModDepth", TypeF32, Offset(mReverb.flModulationDepth, SFXEnvironment),
+      "Reverb Modulation time.");
+   addField("airAbsorbtionGainHF", TypeF32, Offset(mReverb.flAirAbsorptionGainHF, SFXEnvironment),
+      "High Frequency air absorbtion");
+   addField("reverbHFRef", TypeF32, Offset(mReverb.flHFReference, SFXEnvironment),
+      "Reverb High Frequency Reference.");
+   addField("reverbLFRef", TypeF32, Offset(mReverb.flLFReference, SFXEnvironment),
+      "Reverb Low Frequency Reference.");
+   addField("roomRolloffFactor", TypeF32, Offset(mReverb.flRoomRolloffFactor, SFXEnvironment),
+      "Rolloff factor for reverb.");
+   addField("decayHFLimit", TypeS32, Offset(mReverb.iDecayHFLimit, SFXEnvironment),
+      "High Frequency decay limit.");
+   endGroup("Reverb");
 
    Parent::initPersistFields();
 }
@@ -257,35 +240,27 @@ void SFXEnvironment::packData( BitStream* stream )
 {
    Parent::packData( stream );
 
-   stream->write( mReverb.mEnvSize );
-   stream->write( mReverb.mEnvDiffusion );
-   stream->write( mReverb.mRoom );
-   stream->write( mReverb.mRoomHF );
-   stream->write( mReverb.mRoomLF );
-   stream->write( mReverb.mDecayTime );
-   stream->write( mReverb.mDecayHFRatio );
-   stream->write( mReverb.mDecayLFRatio );
-   stream->write( mReverb.mReflections );
-   stream->write( mReverb.mReflectionsDelay );
-   stream->write( mReverb.mReflectionsPan[ 0 ] );
-   stream->write( mReverb.mReflectionsPan[ 1 ] );
-   stream->write( mReverb.mReflectionsPan[ 2 ] );
-   stream->write( mReverb.mReverb );
-   stream->write( mReverb.mReverbDelay );
-   stream->write( mReverb.mReverbPan[ 0 ] );
-   stream->write( mReverb.mReverbPan[ 1 ] );
-   stream->write( mReverb.mReverbPan[ 2 ] );
-   stream->write( mReverb.mEchoTime );
-   stream->write( mReverb.mEchoDepth );
-   stream->write( mReverb.mModulationTime );
-   stream->write( mReverb.mModulationDepth );
-   stream->write( mReverb.mAirAbsorptionHF );
-   stream->write( mReverb.mHFReference );
-   stream->write( mReverb.mLFReference );
-   stream->write( mReverb.mRoomRolloffFactor );
-   stream->write( mReverb.mDiffusion );
-   stream->write( mReverb.mDensity );
-   stream->write( mReverb.mFlags );
+   stream->write(mReverb.flDensity);
+   stream->write(mReverb.flDiffusion);
+   stream->write(mReverb.flGain);
+   stream->write(mReverb.flGainHF);
+   stream->write(mReverb.flGainLF);
+   stream->write(mReverb.flDecayTime);
+   stream->write(mReverb.flDecayHFRatio);
+   stream->write(mReverb.flDecayLFRatio);
+   stream->write(mReverb.flReflectionsGain);
+   stream->write(mReverb.flReflectionsDelay);
+   stream->write(mReverb.flLateReverbGain);
+   stream->write(mReverb.flLateReverbDelay);
+   stream->write(mReverb.flEchoTime);
+   stream->write(mReverb.flEchoDepth);
+   stream->write(mReverb.flModulationTime);
+   stream->write(mReverb.flModulationDepth);
+   stream->write(mReverb.flAirAbsorptionGainHF);
+   stream->write(mReverb.flHFReference);
+   stream->write(mReverb.flLFReference);
+   stream->write(mReverb.flRoomRolloffFactor);
+   stream->write(mReverb.iDecayHFLimit);
 }
 
 //-----------------------------------------------------------------------------
@@ -294,33 +269,25 @@ void SFXEnvironment::unpackData( BitStream* stream )
 {
    Parent::unpackData( stream );
    
-   stream->read( &mReverb.mEnvSize );
-   stream->read( &mReverb.mEnvDiffusion );
-   stream->read( &mReverb.mRoom );
-   stream->read( &mReverb.mRoomHF );
-   stream->read( &mReverb.mRoomLF );
-   stream->read( &mReverb.mDecayTime );
-   stream->read( &mReverb.mDecayHFRatio );
-   stream->read( &mReverb.mDecayLFRatio );
-   stream->read( &mReverb.mReflections );
-   stream->read( &mReverb.mReflectionsDelay );
-   stream->read( &mReverb.mReflectionsPan[ 0 ] );
-   stream->read( &mReverb.mReflectionsPan[ 1 ] );
-   stream->read( &mReverb.mReflectionsPan[ 2 ] );
-   stream->read( &mReverb.mReverb );
-   stream->read( &mReverb.mReverbDelay );
-   stream->read( &mReverb.mReverbPan[ 0 ] );
-   stream->read( &mReverb.mReverbPan[ 1 ] );
-   stream->read( &mReverb.mReverbPan[ 2 ] );
-   stream->read( &mReverb.mEchoTime );
-   stream->read( &mReverb.mEchoDepth );
-   stream->read( &mReverb.mModulationTime );
-   stream->read( &mReverb.mModulationDepth );
-   stream->read( &mReverb.mAirAbsorptionHF );
-   stream->read( &mReverb.mHFReference );
-   stream->read( &mReverb.mLFReference );
-   stream->read( &mReverb.mRoomRolloffFactor );
-   stream->read( &mReverb.mDiffusion );
-   stream->read( &mReverb.mDensity );
-   stream->read( &mReverb.mFlags );
+   stream->read(&mReverb.flDensity);
+   stream->read(&mReverb.flDiffusion);
+   stream->read(&mReverb.flGain);
+   stream->read(&mReverb.flGainHF);
+   stream->read(&mReverb.flGainLF);
+   stream->read(&mReverb.flDecayTime);
+   stream->read(&mReverb.flDecayHFRatio);
+   stream->read(&mReverb.flDecayLFRatio);
+   stream->read(&mReverb.flReflectionsGain);
+   stream->read(&mReverb.flReflectionsDelay);
+   stream->read(&mReverb.flLateReverbGain);
+   stream->read(&mReverb.flLateReverbDelay);
+   stream->read(&mReverb.flEchoTime);
+   stream->read(&mReverb.flEchoDepth);
+   stream->read(&mReverb.flModulationTime);
+   stream->read(&mReverb.flModulationDepth);
+   stream->read(&mReverb.flAirAbsorptionGainHF);
+   stream->read(&mReverb.flHFReference);
+   stream->read(&mReverb.flLFReference);
+   stream->read(&mReverb.flRoomRolloffFactor);
+   stream->read(&mReverb.iDecayHFLimit);
 }

@@ -282,7 +282,7 @@ bool SplashData::preload(bool server, String &errorStr)
       {
          if (textureName[i] && textureName[i][0])
          {
-            textureHandle[i] = GFXTexHandle(textureName[i], &GFXDefaultStaticDiffuseProfile, avar("%s() - textureHandle[%d] (line %d)", __FUNCTION__, i, __LINE__) );
+            textureHandle[i] = GFXTexHandle(textureName[i], &GFXStaticTextureSRGBProfile, avar("%s() - textureHandle[%d] (line %d)", __FUNCTION__, i, __LINE__) );
          }
       }
    }

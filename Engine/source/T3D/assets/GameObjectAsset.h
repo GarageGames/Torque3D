@@ -38,16 +38,14 @@
 #ifndef _ASSET_FIELD_TYPES_H_
 #include "assets/assetFieldTypes.h"
 #endif
+#ifndef _GUI_INSPECTOR_TYPES_H_
+#include "gui/editor/guiInspectorTypes.h"
+#endif
 
 //-----------------------------------------------------------------------------
 class GameObjectAsset : public AssetBase
 {
    typedef AssetBase Parent;
-
-   AssetManager*           mpOwningAssetManager;
-   bool                    mAssetInitialized;
-   AssetDefinition*        mpAssetDefinition;
-   U32                     mAcquireReferenceCount;
 
    StringTableEntry mGameObjectName;
    StringTableEntry mScriptFilePath;
@@ -65,11 +63,29 @@ public:
    DECLARE_CONOBJECT(GameObjectAsset);
 
 protected:
-   virtual void            initializeAsset(void) {}
-   virtual void            onAssetRefresh(void) {}
+   virtual void            initializeAsset(void);
+   virtual void            onAssetRefresh(void);
 };
 
 DefineConsoleType(TypeGameObjectAssetPtr, GameObjectAsset)
+
+
+//-----------------------------------------------------------------------------
+// TypeAssetId GuiInspectorField Class
+//-----------------------------------------------------------------------------
+class GuiInspectorTypeGameObjectAssetPtr : public GuiInspectorTypeFileName
+{
+   typedef GuiInspectorTypeFileName Parent;
+public:
+
+   GuiBitmapButtonCtrl  *mSMEdButton;
+
+   DECLARE_CONOBJECT(GuiInspectorTypeGameObjectAssetPtr);
+   static void consoleInit();
+
+   virtual GuiControl* constructEditControl();
+   virtual bool updateRects();
+};
 
 #endif // _ASSET_BASE_H_
 

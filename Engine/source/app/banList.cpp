@@ -86,7 +86,7 @@ void BanList::addBan(S32 uniqueId, const char *TA, S32 banTime)
    }
 
    BanInfo b;
-   dStrcpy(b.transportAddress, TA);
+   dStrcpy(b.transportAddress, TA, 128);
    b.uniqueId = uniqueId;
    b.bannedUntil = banTime;
 

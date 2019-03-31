@@ -29,6 +29,7 @@
 #include "math/util/frustum.h"
 #include "platform/profiler.h"
 #include "core/tAlgorithm.h"
+#include "gfx/gfxDevice.h"
 
 namespace MathUtils
 {
@@ -1085,9 +1086,9 @@ bool mRayQuadCollide(   const Quad &quad,
          - (beta * (alpha_11 - 1.0f)) - 1.0f;
       F32 C = alpha;
       F32 D = (B * B) - (4.0f * A * C);
-      F32 Q = -0.5f * (B + (B < 0.0f ? -1.0f : 1.0f) ) * mSqrt(D);
-      u = Q / A;
-      if ((u < 0.0f) || (u > 1.0f)) u = C / Q;
+      F32 F = -0.5f * (B + (B < 0.0f ? -1.0f : 1.0f) ) * mSqrt(D);
+      u = F / A;
+      if ((u < 0.0f) || (u > 1.0f)) u = C / F;
       v = beta / ((u * (beta_11 - 1.0f)) + 1.0f); 
    }
 
@@ -1462,44 +1463,45 @@ void makeFovPortFrustum(
 ///
 static const MatrixF sGFXProjRotMatrix( EulerF( (M_PI_F / 2.0f), 0.0f, 0.0f ) );
 
-void makeProjection( MatrixF *outMatrix, 
-                     F32 left, 
-                     F32 right, 
-                     F32 top, 
-                     F32 bottom, 
-                     F32 nearPlane, 
+void makeProjection( MatrixF *outMatrix,
+                     F32 left,
+                     F32 right,
+                     F32 top,
+                     F32 bottom,
+                     F32 nearPlane,
                      F32 farPlane,
-                     bool gfxRotate )
+                     bool gfxRotate)
 {
+   const bool isGL = GFX->getAdapterType() == OpenGL;
    Point4F row;
-   row.x = 2.0*nearPlane / (right-left);
-   row.y = 0.0;
-   row.z = 0.0;
-   row.w = 0.0;
-   outMatrix->setRow( 0, row );
+   row.x = 2.0f * nearPlane / (right - left);
+   row.y = 0.0f;
+   row.z = 0.0f;
+   row.w = 0.0f;
+   outMatrix->setRow(0, row);
 
-   row.x = 0.0;
-   row.y = 2.0 * nearPlane / (top-bottom);
-   row.z = 0.0;
-   row.w = 0.0;
-   outMatrix->setRow( 1, row );
+   row.x = 0.0f;
+   row.y = 2.0f * nearPlane / (top - bottom);
+   row.z = 0.0f;
+   row.w = 0.0f;
+   outMatrix->setRow(1, row);
 
-   row.x = (left+right) / (right-left);
-   row.y = (top+bottom) / (top-bottom);
-   row.z = farPlane / (nearPlane - farPlane);
-   row.w = -1.0;
-   outMatrix->setRow( 2, row );
+   row.x = (left + right) / (right - left);
+   row.y = (top + bottom) / (top - bottom);
+   row.z = isGL ? (nearPlane + farPlane) / (nearPlane - farPlane) : farPlane / (nearPlane - farPlane);
+   row.w = -1.0f;
+   outMatrix->setRow(2, row);
 
-   row.x = 0.0;
-   row.y = 0.0;
-   row.z = nearPlane * farPlane / (nearPlane - farPlane);
-   row.w = 0.0;
-   outMatrix->setRow( 3, row );
+   row.x = 0.0f;
+   row.y = 0.0f;
+   row.z = isGL ? 2.0f * nearPlane * farPlane / (nearPlane - farPlane) : farPlane * nearPlane / (nearPlane - farPlane);
+   row.w = 0.0f;
+   outMatrix->setRow(3, row);
 
    outMatrix->transpose();
 
-   if ( gfxRotate )
-      outMatrix->mul( sGFXProjRotMatrix );
+   if (gfxRotate)
+      outMatrix->mul(sGFXProjRotMatrix);
 }
 
 //-----------------------------------------------------------------------------
@@ -1528,11 +1530,8 @@ void makeOrthoProjection(  MatrixF *outMatrix,
 
    row.x = 0.0f;
    row.y = 0.0f;
-   row.w = 0.0f;
-
-   //Unlike D3D, which has a 0-1 range, OpenGL uses a -1-1 range. 
-   //However, epoxy internally handles the swap, so the math here is the same for both APIs
    row.z = 1.0f / (nearPlane - farPlane);
+   row.w = 0.0f;
 
    outMatrix->setRow( 2, row );
 
@@ -1707,7 +1706,7 @@ bool clipFrustumByPolygon( const Point3F* points, U32 numPoints, const RectI& vi
       // Make the output of the last iteration the
       // input of this iteration.
 
-      swap( tempPolygon, clippedPolygon );
+	  T3D::swap( tempPolygon, clippedPolygon );
       numTempPolygonVertices = numClippedPolygonVertices;
 
       // Clip our current remainder of the original polygon

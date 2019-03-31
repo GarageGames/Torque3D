@@ -113,7 +113,7 @@ MODULE_END;
 // BRKCLR file line - sent when a breakpoint cannot be moved to a breakable line on the client.
 //
 
-DefineConsoleFunction( dbgSetParameters, void, (S32 port, const char * password, bool waitForClient ), (false), "( int port, string password, bool waitForClient )"
+DefineEngineFunction( dbgSetParameters, void, (S32 port, const char * password, bool waitForClient ), (false), "( int port, string password, bool waitForClient )"
                 "Open a debug server port on the specified port, requiring the specified password, "
             "and optionally waiting for the debug client to connect.\n"
             "@internal Primarily used for Torsion and other debugging tools")
@@ -124,14 +124,14 @@ DefineConsoleFunction( dbgSetParameters, void, (S32 port, const char * password,
    }
 }
 
-DefineConsoleFunction( dbgIsConnected, bool, (), , "()"
+DefineEngineFunction( dbgIsConnected, bool, (), , "()"
                 "Returns true if a script debugging client is connected else return false.\n"
             "@internal Primarily used for Torsion and other debugging tools")
 {
    return TelDebugger && TelDebugger->isConnected();
 }
 
-DefineConsoleFunction( dbgDisconnect, void, (), , "()"
+DefineEngineFunction( dbgDisconnect, void, (), , "()"
                 "Forcibly disconnects any attached script debugging client.\n"
             "@internal Primarily used for Torsion and other debugging tools")
 {
@@ -470,19 +470,19 @@ void TelnetDebugger::sendBreak()
       if ( ns ) {
 
          if ( ns->mParent && ns->mParent->mPackage && ns->mParent->mPackage[0] ) {
-            dStrcat( scope, ns->mParent->mPackage );
-            dStrcat( scope, "::" );
+            dStrcat( scope, ns->mParent->mPackage, MaxCommandSize );
+            dStrcat( scope, "::", MaxCommandSize );
          }
          if ( ns->mName && ns->mName[0] ) {
-            dStrcat( scope, ns->mName );
-            dStrcat( scope, "::" );
+            dStrcat( scope, ns->mName, MaxCommandSize );
+            dStrcat( scope, "::", MaxCommandSize );
          }
       }
 
       const char *function = gEvalState.stack[i]->scopeName;
       if ((!function) || (!function[0]))
          function = "<none>";
-      dStrcat( scope, function );
+      dStrcat( scope, function, MaxCommandSize );
 
       U32 line=0, inst;
       U32 ip = gEvalState.stack[i]->ip;

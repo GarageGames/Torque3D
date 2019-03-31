@@ -53,7 +53,7 @@ public:
    SignalBase()
    {
       mList.next = mList.prev = &mList;
-      mList.order = 0.5f;
+      mList.mOrder = 0.5f;
    }
 
    ~SignalBase();
@@ -72,7 +72,7 @@ protected:
    struct DelegateLink
    {
       DelegateLink *next,*prev;
-      F32 order;
+      F32 mOrder;
 
       void insert(DelegateLink* node, F32 order);
       void unlink();
@@ -191,7 +191,7 @@ public:
       for ( DelegateLink *ptr = base.mList.next; ptr != &base.mList; ptr = ptr->next )
       {
          DelegateLinkImpl *del = static_cast<DelegateLinkImpl*>( ptr );
-         notify( del->mDelegate, del->order );
+         notify( del->mDelegate, del->mOrder );
       }
    }
 

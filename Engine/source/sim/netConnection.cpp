@@ -316,7 +316,10 @@ void NetConnection::checkMaxRate()
    {
       packetRateToServer = 128;
       packetRateToClient = 128;
-      packetSize = 1024;
+      // These changes introduced in T3D 1.1 Preview reduce the packet headroom which leads
+      // to some spells and effects running out of room when dynamic variables are used
+      // to send launch-time parameters to clients.
+      packetSize = 512;
    }
 
    gPacketUpdateDelayToServer = 1024 / packetRateToServer;

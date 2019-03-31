@@ -147,7 +147,7 @@ public:
       bool              mHideReplications;
       bool              mShowPlacementArea;
       U32               mPlacementBandHeight;
-      ColorF            mPlaceAreaColour;
+      LinearColorF            mPlaceAreaColour;
 
       tagFieldData()
       {

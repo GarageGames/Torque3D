@@ -39,8 +39,7 @@ class GuiSwatchButtonCtrl : public GuiButtonBaseCtrl
    protected:
       
       /// The color to display on the button.
-      ColorF mSwatchColor;
-      bool mUseSRGB;          ///< use sRGB color scale
+      LinearColorF mSwatchColor;
       /// Bitmap used for mGrid
       String mGridBitmap;
 
@@ -52,10 +51,10 @@ class GuiSwatchButtonCtrl : public GuiButtonBaseCtrl
       GuiSwatchButtonCtrl();
 
       /// Return the color displayed in the swatch.
-      ColorF getColor() { return mSwatchColor; }
+      LinearColorF getColor() { return mSwatchColor; }
 
       /// Set the color to display in the swatch.
-      void setColor( const ColorF &color ) { mSwatchColor = color; }
+      void setColor( const LinearColorF &color ) { mSwatchColor = color; }
 
       // GuiButtonBaseCtrl
       virtual bool onWake();

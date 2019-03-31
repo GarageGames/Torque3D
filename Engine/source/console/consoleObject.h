@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #ifndef _CONSOLEOBJECT_H_
 #define _CONSOLEOBJECT_H_
 
@@ -475,6 +479,7 @@ public:
       FIELD_HideInInspectors     = BIT( 0 ),    ///< Do not show the field in inspectors.
       FIELD_ComponentInspectors = BIT(1),       ///< Custom fields used by components. They are likely to be non-standard size/configuration, so 
                                                 ///< They are handled specially
+      FIELD_CustomInspectors = BIT(2),          ///< Display as a button in inspectors.
    };
 
    struct Field
@@ -490,8 +495,10 @@ public:
             table( NULL ),
             validator( NULL ),
             setDataFn( NULL ),
-            getDataFn( NULL )
+            getDataFn( NULL ),
+            networkMask(0)
       {
+         doNotSubstitute = keepClearSubsOnly = false;
       }
 
       StringTableEntry pFieldname;    ///< Name of the field.
@@ -509,7 +516,11 @@ public:
       TypeValidator *validator;     ///< Validator, if any.
       SetDataNotify  setDataFn;     ///< Set data notify Fn
       GetDataNotify  getDataFn;     ///< Get data notify Fn
-      WriteDataNotify writeDataFn;  ///< Function to determine whether data should be written or not.
+	    WriteDataNotify writeDataFn;  ///< Function to determine whether data should be written or not.
+      bool           doNotSubstitute;
+      bool           keepClearSubsOnly;
+
+      U32            networkMask;
    };
    typedef Vector<Field> FieldList;
 
@@ -651,6 +662,29 @@ public:
       // Finally, do any class specific initialization...
       T::initPersistFields();
       T::consoleInit();
+
+      EnginePropertyTable::Property* props = new EnginePropertyTable::Property[sg_tempFieldList.size()];
+
+      for (int i = 0; i < sg_tempFieldList.size(); ++i)
+      {
+         EnginePropertyTable::Property prop;
+         prop.mDocString = sg_tempFieldList[i].pFieldDocs;
+         prop.mName = sg_tempFieldList[i].pFieldname;
+         prop.mNumElements = sg_tempFieldList[i].elementCount;
+         prop.mFlags = 0;
+         if (sg_tempFieldList[i].type == StartGroupFieldType)
+            prop.mFlags |= EnginePropertyGroupBegin;
+         if (sg_tempFieldList[i].type == EndGroupFieldType)
+            prop.mFlags |= EnginePropertyGroupEnd;
+         prop.mType = sg_tempFieldList[i].type;
+
+         props[i] = prop;
+      }
+
+      _smPropertyTable = EnginePropertyTable(sg_tempFieldList.size(), props);
+      smPropertyTable = _smPropertyTable;
+
+      const_cast<EngineTypeInfo*>(mTypeInfo)->mPropertyTable = &_smPropertyTable;
  
       // Let the base finish up.
       AbstractClassRep::init();
@@ -1054,6 +1088,9 @@ public:
 
    static ConsoleObject* __findObject( const char* ) { return NULL; }
    static const char* __getObjectId( ConsoleObject* ) { return ""; }
+protected:
+   static bool disableFieldSubstitutions(const char* in_pFieldname);
+   static bool onlyKeepClearSubstitutions(const char* in_pFieldname);
 };
 
 #define addNamedField(fieldName,type,className) addField(#fieldName, type, Offset(fieldName,className))
@@ -1251,10 +1288,6 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
       };                                                                                                 \
       EnginePropertyTable _propTable( sizeof( _props ) / sizeof( _props[ 0 ] ) - 1, _props );            \
    } }
-
-/// Add an auto-doc for a class.
-#define ConsoleDocClass( className, docString ) \
-   CLASSDOC( className, docString )
 
 /// @}
 

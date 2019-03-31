@@ -27,7 +27,6 @@
 #include "windowManager/sdl/sdlWindowMgr.h"
 #include "windowManager/sdl/sdlCursorController.h"
 #include "platformSDL/sdlInput.h"
-#include "platform/menus/popupMenu.h"
 #include "platform/platformInput.h"
 
 #include "gfx/gfxDevice.h"
@@ -245,7 +244,7 @@ const char * PlatformWindowSDL::getCaption()
 
 void PlatformWindowSDL::setFocus()
 {
-   SDL_SetWindowGrab( mWindowHandle, SDL_TRUE );
+   SDL_SetWindowInputFocus(mWindowHandle);
 }
 
 void PlatformWindowSDL::setClientExtent( const Point2I newExtent )
@@ -578,9 +577,7 @@ void PlatformWindowSDL::_processSDLEvent(SDL_Event &evt)
       case SDL_MOUSEBUTTONDOWN:
       case SDL_MOUSEBUTTONUP:
       {
-         appEvent.trigger(getWindowId(), GainFocus);
          _triggerMouseButtonNotify(evt);
-         
          break;
       }
 
@@ -588,6 +585,12 @@ void PlatformWindowSDL::_processSDLEvent(SDL_Event &evt)
       {
          switch( evt.window.event )
          {
+            case SDL_WINDOWEVENT_FOCUS_GAINED:
+               appEvent.trigger(getWindowId(), GainFocus);
+               break;
+            case SDL_WINDOWEVENT_FOCUS_LOST:
+               appEvent.trigger(getWindowId(), LoseFocus);
+               break;
             case SDL_WINDOWEVENT_MAXIMIZED:
             case SDL_WINDOWEVENT_RESIZED:
             {
@@ -595,6 +598,7 @@ void PlatformWindowSDL::_processSDLEvent(SDL_Event &evt)
                SDL_GetWindowSize( mWindowHandle, &width, &height );
                mVideoMode.resolution.set( width, height );
                getGFXTarget()->resetMode();
+               resizeEvent.trigger(getWindowId(), width, height);
                break;
             }
 

@@ -248,7 +248,7 @@ Precipitation::Precipitation()
    mDropAnimateMS    = 0;
 
    mUseLighting = false;
-   mGlowIntensity = ColorF( 0,0,0,0 );
+   mGlowIntensity = LinearColorF( 0,0,0,0 );
 
    mReflect = false;
 
@@ -604,7 +604,7 @@ void Precipitation::initMaterials()
    mDropShader = NULL;
    mSplashShader = NULL;
 
-   if( dStrlen(pd->mDropName) > 0 && !mDropHandle.set(pd->mDropName, &GFXDefaultStaticDiffuseProfile, avar("%s() - mDropHandle (line %d)", __FUNCTION__, __LINE__)) )
+   if( dStrlen(pd->mDropName) > 0 && !mDropHandle.set(pd->mDropName, &GFXStaticTextureSRGBProfile, avar("%s() - mDropHandle (line %d)", __FUNCTION__, __LINE__)) )
       Con::warnf("Precipitation::initMaterials - failed to locate texture '%s'!", pd->mDropName);
 
    if ( dStrlen(pd->mDropShaderName) > 0 )
@@ -625,7 +625,7 @@ void Precipitation::initMaterials()
       }
    }
 
-   if( dStrlen(pd->mSplashName) > 0 && !mSplashHandle.set(pd->mSplashName, &GFXDefaultStaticDiffuseProfile, avar("%s() - mSplashHandle (line %d)", __FUNCTION__, __LINE__)) )
+   if( dStrlen(pd->mSplashName) > 0 && !mSplashHandle.set(pd->mSplashName, &GFXStaticTextureSRGBProfile, avar("%s() - mSplashHandle (line %d)", __FUNCTION__, __LINE__)) )
       Con::warnf("Precipitation::initMaterials - failed to locate texture '%s'!", pd->mSplashName);
 
    if ( dStrlen(pd->mSplashShaderName) > 0 )
@@ -1581,7 +1581,7 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
    // shader.  Once the lighting and shadow systems
    // are added into TSE we can expand this to include
    // the N nearest lights to the camera + the ambient.
-   ColorF ambient( 1, 1, 1 );
+   LinearColorF ambient( 1, 1, 1 );
    if ( mUseLighting )
    {
       const LightInfo *sunlight = LIGHTMGR->getSpecialLight(LightManager::slSunLightType);

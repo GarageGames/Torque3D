@@ -43,7 +43,7 @@ public:
    virtual bool createPersistChunkFromProxy(SceneLighting::ObjectProxy* objproxy, PersistInfo::PersistChunk **ret);      
 
    // Given a ray, this will return the color from the lightmap of this object, return true if handled
-   virtual bool getColorFromRayInfo(const RayInfo & collision, ColorF& result) const;
+   virtual bool getColorFromRayInfo(const RayInfo & collision, LinearColorF& result) const;
 };
 
 #endif // !_BLTERRAINSYSTEM_H_

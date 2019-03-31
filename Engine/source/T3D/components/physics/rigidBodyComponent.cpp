@@ -288,7 +288,7 @@ void RigidBodyComponent::processTick()
       return;
 
    // SINGLE PLAYER HACK!!!!
-   if (PHYSICSMGR->isSinglePlayer() && isClientObject() && getServerObject())
+   /*if (PHYSICSMGR->isSinglePlayer() && isClientObject() && getServerObject())
    {
       RigidBodyComponent *servObj = (RigidBodyComponent*)getServerObject();
       mOwner->setTransform(servObj->mState.getTransform());
@@ -296,7 +296,7 @@ void RigidBodyComponent::processTick()
       mRenderState[1] = servObj->mRenderState[1];
 
       return;
-   }
+   }*/
 
    // Store the last render state.
    mRenderState[0] = mRenderState[1];

@@ -784,12 +784,12 @@ void GuiDecalEditorCtrl::setMode( String mode, bool sourceShortcut = false )
 		Con::executef( this, "paletteSync", mMode );
 }
 
-DefineConsoleMethod( GuiDecalEditorCtrl, deleteSelectedDecal, void, (), , "deleteSelectedDecal()" )
+DefineEngineMethod( GuiDecalEditorCtrl, deleteSelectedDecal, void, (), , "deleteSelectedDecal()" )
 {
    object->deleteSelectedDecal();
 }
 
-DefineConsoleMethod( GuiDecalEditorCtrl, deleteDecalDatablock, void, ( const char * datablock ), , "deleteSelectedDecalDatablock( String datablock )" )
+DefineEngineMethod( GuiDecalEditorCtrl, deleteDecalDatablock, void, ( const char * datablock ), , "deleteSelectedDecalDatablock( String datablock )" )
 {
 	String lookupName( datablock );
 	if( lookupName == String::EmptyString )
@@ -798,22 +798,22 @@ DefineConsoleMethod( GuiDecalEditorCtrl, deleteDecalDatablock, void, ( const cha
 	object->deleteDecalDatablock( lookupName );
 }
 
-DefineConsoleMethod( GuiDecalEditorCtrl, setMode, void, ( String newMode ), , "setMode( String mode )()" )
+DefineEngineMethod( GuiDecalEditorCtrl, setMode, void, ( String newMode ), , "setMode( String mode )()" )
 {
 	object->setMode( newMode );
 }
 
-DefineConsoleMethod( GuiDecalEditorCtrl, getMode, const char*, (), , "getMode()" )
+DefineEngineMethod( GuiDecalEditorCtrl, getMode, const char*, (), , "getMode()" )
 {
 	return object->mMode;
 }
 
-DefineConsoleMethod( GuiDecalEditorCtrl, getDecalCount, S32, (), , "getDecalCount()" )
+DefineEngineMethod( GuiDecalEditorCtrl, getDecalCount, S32, (), , "getDecalCount()" )
 {
 	return gDecalManager->mDecalInstanceVec.size();
 }
 
-DefineConsoleMethod( GuiDecalEditorCtrl, getDecalTransform, const char*, ( U32 id ), , "getDecalTransform()" )
+DefineEngineMethod( GuiDecalEditorCtrl, getDecalTransform, const char*, ( U32 id ), , "getDecalTransform()" )
 {
    DecalInstance *decalInstance = gDecalManager->mDecalInstanceVec[id];
 
@@ -835,7 +835,7 @@ DefineConsoleMethod( GuiDecalEditorCtrl, getDecalTransform, const char*, ( U32 i
 	return returnBuffer;
 }
 
-DefineConsoleMethod( GuiDecalEditorCtrl, getDecalLookupName, const char*, ( U32 id ), , "getDecalLookupName( S32 )()" )
+DefineEngineMethod( GuiDecalEditorCtrl, getDecalLookupName, const char*, ( U32 id ), , "getDecalLookupName( S32 )()" )
 {
 	DecalInstance *decalInstance = gDecalManager->mDecalInstanceVec[id];
 	if( decalInstance == NULL )
@@ -844,7 +844,7 @@ DefineConsoleMethod( GuiDecalEditorCtrl, getDecalLookupName, const char*, ( U32 
 	return decalInstance->mDataBlock->lookupName;
 }
 
-DefineConsoleMethod( GuiDecalEditorCtrl, selectDecal, void, ( U32 id ), , "selectDecal( S32 )()" )
+DefineEngineMethod( GuiDecalEditorCtrl, selectDecal, void, ( U32 id ), , "selectDecal( S32 )()" )
 {
 	DecalInstance *decalInstance = gDecalManager->mDecalInstanceVec[id];
 	if( decalInstance == NULL )
@@ -853,7 +853,7 @@ DefineConsoleMethod( GuiDecalEditorCtrl, selectDecal, void, ( U32 id ), , "selec
 	object->selectDecal( decalInstance );
 }
 
-DefineConsoleMethod( GuiDecalEditorCtrl, editDecalDetails, void, ( U32 id, Point3F pos, Point3F tan,F32 size ), , "editDecalDetails( S32 )()" )
+DefineEngineMethod( GuiDecalEditorCtrl, editDecalDetails, void, ( U32 id, Point3F pos, Point3F tan,F32 size ), , "editDecalDetails( S32 )()" )
 {
 	DecalInstance *decalInstance = gDecalManager->mDecalInstanceVec[id];
 	if( decalInstance == NULL )
@@ -872,14 +872,14 @@ DefineConsoleMethod( GuiDecalEditorCtrl, editDecalDetails, void, ( U32 id, Point
 	gDecalManager->notifyDecalModified( decalInstance );
 }
 
-DefineConsoleMethod( GuiDecalEditorCtrl, getSelectionCount, S32, (), , "" )
+DefineEngineMethod( GuiDecalEditorCtrl, getSelectionCount, S32, (), , "" )
 {
    if ( object->mSELDecal != NULL )
       return 1;
    return 0;
 }
 
-DefineConsoleMethod( GuiDecalEditorCtrl, retargetDecalDatablock, void, ( const char * dbFrom, const char * dbTo ), , "" )
+DefineEngineMethod( GuiDecalEditorCtrl, retargetDecalDatablock, void, ( const char * dbFrom, const char * dbTo ), , "" )
 {
    if( dStrcmp( dbFrom, "" ) != 0 && dStrcmp( dbTo, "" ) != 0 )
 		object->retargetDecalDatablock( dbFrom, dbTo );

@@ -110,7 +110,7 @@ public:
    SimpleNetObject()
    {
       mNetFlags.set(ScopeAlways | Ghostable);
-      dStrcpy(message, "Hello World!");
+      dStrcpy(message, "Hello World!", 256);
    }
    U32 packUpdate(NetConnection *conn, U32 mask, BitStream *stream)
    {
@@ -125,7 +125,7 @@ public:
    void setMessage(const char *msg)
    {
       setMaskBits(1);
-      dStrcpy(message, msg);
+      dStrcpy(message, msg, 256);
    }
 
    DECLARE_CONOBJECT(SimpleNetObject);

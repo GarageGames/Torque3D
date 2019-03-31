@@ -59,7 +59,7 @@ static ConsoleDocFragment _setProcessTicks(
    "void setProcessTicks( bool tick )"
 );
 
-DefineConsoleMethod( GuiTickCtrl, setProcessTicks, void, (bool tick), (true), "( [tick = true] ) - This will set this object to either be processing ticks or not" )
+DefineEngineMethod( GuiTickCtrl, setProcessTicks, void, (bool tick), (true), "( [tick = true] ) - This will set this object to either be processing ticks or not" )
 {
    object->setProcessTicks(tick);
 }

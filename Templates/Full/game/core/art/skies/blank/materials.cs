@@ -34,7 +34,6 @@ singleton Material( BlackSkyMat )
 {
    cubemap = BlackSkyCubemap;
    materialTag0 = "Skies";
-   isSky = true;
 };
 
 singleton CubemapData( BlueSkyCubemap )

@@ -145,6 +145,13 @@ function ShapeEditorPlugin::onWorldEditorStartup(%this)
    }
 }
 
+function ShapeEditorPlugin::openShapeAsset(%this, %assetId)
+{
+   %this.selectedAssetId = %assetId;
+   %this.selectedAssetDef = AssetDatabase.acquireAsset(%assetId);
+   %this.open(%this.selectedAssetDef.fileName);
+}
+
 function ShapeEditorPlugin::open(%this, %filename)
 {
    if ( !%this.isActivated )
@@ -168,7 +175,7 @@ function ShapeEditorPlugin::open(%this, %filename)
          ShapeEdNodes-->worldTransform.setStateOn(1);
 
       // Initialise and show the shape editor
-      ShapeEdShapeTreeView.open(MissionGroup);
+      ShapeEdShapeTreeView.open(getScene(0));
       ShapeEdShapeTreeView.buildVisibleTree(true);
 
       ShapeEdPreviewGui.setVisible(true);

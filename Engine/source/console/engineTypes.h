@@ -236,16 +236,16 @@ template< typename T >
 struct _EngineStructTypeTraits
 {
    typedef T Type;
-   typedef const T& ValueType;
+   typedef const T ValueType;
    typedef void SuperType;
    
    // Structs get passed in as pointers and passed out as full copies.
-   typedef T* ArgumentValueType;
+   typedef T ArgumentValueType;
    typedef T ReturnValueType;
    typedef T DefaultArgumentValueStoreType;
 
    typedef ReturnValueType ReturnValue;
-   static ValueType ArgumentToValue( ArgumentValueType val ) { return *val; }
+   static ValueType ArgumentToValue( ArgumentValueType val ) { return val; }
 
    static const EngineTypeInfo* const TYPEINFO;
 };
@@ -576,7 +576,7 @@ namespace _Private {
    uintptr_t( ( ( const char* ) &( ( ( ThisType* ) 16 )->fieldName ) ) - 16 ) // Artificial offset to avoid compiler warnings.
    
 ///
-#define CLASSDOC( className, doc ) \
+#define ConsoleDocClass( className, doc ) \
    template<> const char* EngineClassTypeInfo< className, className::_ClassBase >::smDocString = doc;
    
 

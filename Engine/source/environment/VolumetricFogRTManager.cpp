@@ -150,7 +150,7 @@ bool VolumetricFogRTManager::Init()
    mHeight = mFloor(mPlatformWindow->getClientExtent().y / mTargetScale);
    
    mDepthBuffer = GFXTexHandle(mWidth, mHeight, GFXFormatR32F,
-   &GFXDefaultRenderTargetProfile, avar("%s() - mDepthBuffer (line %d)", __FUNCTION__, __LINE__));
+   &GFXRenderTargetProfile, avar("%s() - mDepthBuffer (line %d)", __FUNCTION__, __LINE__));
    if (!mDepthBuffer.isValid())
    {
       Con::errorf("VolumetricFogRTManager Fatal Error: Unable to create Depthbuffer");
@@ -164,7 +164,7 @@ bool VolumetricFogRTManager::Init()
    mDepthTarget.setTexture(mDepthBuffer);
    
    mFrontBuffer = GFXTexHandle(mWidth, mHeight, GFXFormatR32F,
-   &GFXDefaultRenderTargetProfile, avar("%s() - mFrontBuffer (line %d)", __FUNCTION__, __LINE__));
+   &GFXRenderTargetProfile, avar("%s() - mFrontBuffer (line %d)", __FUNCTION__, __LINE__));
    if (!mFrontBuffer.isValid())
    {
       Con::errorf("VolumetricFogRTManager Fatal Error: Unable to create front buffer");
@@ -240,7 +240,7 @@ bool VolumetricFogRTManager::Resize()
       mFrontBuffer->kill();
    
    mFrontBuffer = GFXTexHandle(mWidth, mHeight, GFXFormatR32F,
-   &GFXDefaultRenderTargetProfile, avar("%s() - mFrontBuffer (line %d)", __FUNCTION__, __LINE__));
+   &GFXRenderTargetProfile, avar("%s() - mFrontBuffer (line %d)", __FUNCTION__, __LINE__));
    if (!mFrontBuffer.isValid())
    {
       Con::errorf("VolumetricFogRTManager::Resize() Fatal Error: Unable to create front buffer");
@@ -249,7 +249,7 @@ bool VolumetricFogRTManager::Resize()
    mFrontTarget.setTexture(mFrontBuffer);
    
    mDepthBuffer = GFXTexHandle(mWidth, mHeight, GFXFormatR32F,
-   &GFXDefaultRenderTargetProfile, avar("%s() - mDepthBuffer (line %d)", __FUNCTION__, __LINE__));
+   &GFXRenderTargetProfile, avar("%s() - mDepthBuffer (line %d)", __FUNCTION__, __LINE__));
    if (!mDepthBuffer.isValid())
    {
       Con::errorf("VolumetricFogRTManager::Resize() Fatal Error: Unable to create Depthbuffer");
@@ -283,7 +283,7 @@ VolumetricFogRTManager* VolumetricFogRTManager::get()
    return gVolumetricFogRTManager;
 }
    
-DefineConsoleFunction(SetFogVolumeQuality, S32, (U32 new_quality), ,
+DefineEngineFunction(SetFogVolumeQuality, S32, (U32 new_quality), ,
 "@brief Resizes the rendertargets of the Volumetric Fog object.\n"
 "@params new_quality new quality for the rendertargets 1 = full size, 2 = halfsize, 3 = 1/3, 4 = 1/4 ...")
 {

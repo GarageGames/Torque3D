@@ -1154,14 +1154,14 @@ function MaterialSelector::buildPreviewArray( %this, %material )
       %matName = %material.getInternalName();
       
       if( %material.diffuseMap $= "")
-         %previewImage = "core/art/warnmat";
+         %previewImage = "core/images/warnmat";
       else
          %previewImage = %material.diffuseMap;
    }
    else if( %material.toneMap[0] $= "" && %material.diffuseMap[0] $= "" && !isObject(%material.cubemap) )
    {
       %matName = %material.name;
-      %previewImage = "core/art/warnmat";
+      %previewImage = "core/images/warnmat";
    }
    else
    {
@@ -1611,7 +1611,7 @@ function MaterialSelector::createNewMaterial( %this )
       
    new Material(%material) 
    {
-      diffuseMap[0] = "core/art/warnMat";
+      diffuseMap[0] = "core/images/warnmat";
       mapTo = "unmapped_mat";
       parentGroup = RootGroup;
    };
@@ -1649,7 +1649,7 @@ function MaterialSelector::createNewMaterial( %this )
          position = "7 4";
          extent = "64 64";
          buttonType = "PushButton";
-         bitmap = "core/art/warnMat";
+         bitmap = "core/images/warnmat";
          Command = "";
          text = "Loading...";
          useStates = false;
@@ -1690,7 +1690,7 @@ function MaterialSelector::createNewMaterial( %this )
    }
    
    // select me
-   MaterialSelector.updateSelection( %material, "core/art/warnMat.png" );
+   MaterialSelector.updateSelection( %material, "core/images/warnmat.png" );
 }
 
 //needs to be deleted with the persistence manager and needs to be blanked out of the matmanager

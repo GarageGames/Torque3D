@@ -117,7 +117,7 @@ public:
    // Runtime / dynamic methods
    //
    // Given a ray, this will return the color from the lightmap of this object, return true if handled
-   virtual bool getColorFromRayInfo(const RayInfo & collision, ColorF& result) const { return false; }
+   virtual bool getColorFromRayInfo(const RayInfo & collision, LinearColorF& result) const { return false; }
 };
 
 #endif

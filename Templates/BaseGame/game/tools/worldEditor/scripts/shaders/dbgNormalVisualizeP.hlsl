@@ -20,13 +20,13 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "core/shaders/postfx/postFx.hlsl"
-#include "core/shaders/shaderModelAutoGen.hlsl"
+#include "../../../../core/rendering/shaders/postFX/postFx.hlsl"
+#include "../../../../core/rendering/shaders/shaderModelAutoGen.hlsl"
 
 TORQUE_UNIFORM_SAMPLER2D(deferredTex, 0);
 
 float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {   
-   float3 normal = TORQUE_PREPASS_UNCONDITION( deferredTex, IN.uv0 ).xyz;   
+   float3 normal = TORQUE_DEFERRED_UNCONDITION( deferredTex, IN.uv0 ).xyz;   
    return float4( ( normal + 1.0 ) * 0.5, 1.0 );
 }

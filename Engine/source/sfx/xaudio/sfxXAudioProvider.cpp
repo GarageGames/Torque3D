@@ -146,11 +146,9 @@ bool SFXXAudioProvider::_createXAudio( IXAudio2 **xaudio )
       #define XAUDIO_FLAGS 0
    #endif
 
-#ifndef TORQUE_OS_XENON
    // This must be called first... it doesn't hurt to 
    // call it more than once.
    CoInitialize( NULL );
-#endif
 
    // Try creating the xaudio engine.
    HRESULT hr = XAudio2Create( xaudio, XAUDIO_FLAGS, XAUDIO2_DEFAULT_PROCESSOR );
@@ -162,10 +160,7 @@ SFXDevice* SFXXAudioProvider::createDevice( const String& deviceName, bool useHa
 {
    String devName;
 
-   // On the 360, ignore what the prefs say, and create the only audio device
-#ifndef TORQUE_OS_XENON
    devName = deviceName;
-#endif
 
    XADeviceInfo* info = dynamic_cast< XADeviceInfo* >( _findDeviceInfo( devName ) );
 

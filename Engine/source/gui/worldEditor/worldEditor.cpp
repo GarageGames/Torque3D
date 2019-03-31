@@ -49,6 +49,9 @@
 #include "math/mEase.h"
 #include "T3D/tsStatic.h"
 
+#include "tools/editorTool.h"
+
+#include "T3D/Scene.h"
 
 IMPLEMENT_CONOBJECT( WorldEditor );
 
@@ -454,19 +457,20 @@ bool WorldEditor::pasteSelection( bool dropSel )
       return false;           
    }
 
-   SimGroup *missionGroup = NULL;   
+   SimGroup *targetGroup = NULL;   
    if( isMethod( "getNewObjectGroup" ) )
    {
       const char* targetGroupName = Con::executef( this, "getNewObjectGroup" );
-      if( targetGroupName && targetGroupName[ 0 ] && !Sim::findObject( targetGroupName, missionGroup ) )
+      if( targetGroupName && targetGroupName[ 0 ] && !Sim::findObject( targetGroupName, targetGroup) )
          Con::errorf( "WorldEditor::pasteSelection() - no SimGroup called '%s'", targetGroupName );
    }
 
-   if( !missionGroup )
+   if( !targetGroup)
    {
-      if( !Sim::findObject( "MissionGroup", missionGroup ) )
+      targetGroup = Scene::getRootScene();
+      if( !targetGroup)
       {
-         Con::errorf( "WorldEditor::pasteSelection() - MissionGroup not found" );
+         Con::errorf( "WorldEditor::pasteSelection() - Scene not found" );
          return false;
       }
    }
@@ -480,8 +484,8 @@ bool WorldEditor::pasteSelection( bool dropSel )
       if ( !obj )
          continue;
 
-      if ( missionGroup )
-         missionGroup->addObject( obj );
+      if (targetGroup)
+         targetGroup->addObject( obj );
 
       action->addObject( obj );
 
@@ -593,7 +597,7 @@ void WorldEditor::hideObject(SceneObject* serverObj, bool hide)
 
 void WorldEditor::hideSelection(bool hide)
 {
-   SimGroup* pGroup = dynamic_cast<SimGroup*>(Sim::findObject("MissionGroup"));
+   Scene* scene = Scene::getRootScene();
 
    // set server/client objects hide field
    for(U32 i = 0; i < mSelected->size(); i++)
@@ -604,7 +608,7 @@ void WorldEditor::hideSelection(bool hide)
 
       // Prevent non-mission group objects (i.e. Player) from being hidden.
       // Otherwise it is difficult to show them again.
-      if(!serverObj->isChildOfGroup(pGroup))
+      if(!serverObj->isChildOfGroup(scene))
          continue;
 
       hideObject(serverObj, hide);
@@ -1453,16 +1457,16 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
 
       }
 
-      CameraSpline::Knot::Path path;
+      CameraSpline::Knot::Path tPath;
       switch (pathmarker->mSmoothingType)
       {
-         case Marker::SmoothingTypeLinear:   path = CameraSpline::Knot::LINEAR; break;
+         case Marker::SmoothingTypeLinear:   tPath = CameraSpline::Knot::LINEAR; break;
          case Marker::SmoothingTypeSpline:
-         default:                            path = CameraSpline::Knot::SPLINE; break;
+         default:                            tPath = CameraSpline::Knot::SPLINE; break;
 
       }
 
-      spline.push_back(new CameraSpline::Knot(pos, rot, 1.0f, type, path));
+      spline.push_back(new CameraSpline::Knot(pos, rot, 1.0f, type, tPath));
    }
 
    F32 t = 0.0f;
@@ -1558,8 +1562,8 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
 
          // Reset for next pass...
          vIdx = 0;
-         void *lockPtr = vb.lock();
-         if(!lockPtr) return;
+         void *nextlockPtr = vb.lock();
+         if(!nextlockPtr) return;
       }
    }
 
@@ -1823,6 +1827,8 @@ WorldEditor::WorldEditor()
    mUseGroupCenter = true;
    mFadeIcons = true;
    mFadeIconsDist = 8.f;
+
+   mActiveEditorTool = nullptr;
 }
 
 WorldEditor::~WorldEditor()
@@ -1839,9 +1845,9 @@ bool WorldEditor::onAdd()
    // create the default class entry
    mDefaultClassEntry.mName = 0;
    mDefaultClassEntry.mIgnoreCollision = false;
-   mDefaultClassEntry.mDefaultHandle   = GFXTexHandle(mDefaultHandle,   &GFXDefaultStaticDiffuseProfile, avar("%s() - mDefaultClassEntry.mDefaultHandle (line %d)", __FUNCTION__, __LINE__));
-   mDefaultClassEntry.mSelectHandle    = GFXTexHandle(mSelectHandle,    &GFXDefaultStaticDiffuseProfile, avar("%s() - mDefaultClassEntry.mSelectHandle (line %d)", __FUNCTION__, __LINE__));
-   mDefaultClassEntry.mLockedHandle    = GFXTexHandle(mLockedHandle,    &GFXDefaultStaticDiffuseProfile, avar("%s() - mDefaultClassEntry.mLockedHandle (line %d)", __FUNCTION__, __LINE__));
+   mDefaultClassEntry.mDefaultHandle   = GFXTexHandle(mDefaultHandle,   &GFXStaticTextureSRGBProfile, avar("%s() - mDefaultClassEntry.mDefaultHandle (line %d)", __FUNCTION__, __LINE__));
+   mDefaultClassEntry.mSelectHandle    = GFXTexHandle(mSelectHandle,    &GFXStaticTextureSRGBProfile, avar("%s() - mDefaultClassEntry.mSelectHandle (line %d)", __FUNCTION__, __LINE__));
+   mDefaultClassEntry.mLockedHandle    = GFXTexHandle(mLockedHandle,    &GFXStaticTextureSRGBProfile, avar("%s() - mDefaultClassEntry.mLockedHandle (line %d)", __FUNCTION__, __LINE__));
 
    if(!(mDefaultClassEntry.mDefaultHandle && mDefaultClassEntry.mSelectHandle && mDefaultClassEntry.mLockedHandle))
       return false;
@@ -1915,6 +1921,10 @@ void WorldEditor::on3DMouseMove(const Gui3DMouseEvent & event)
    setCursor(PlatformCursorController::curArrow);
    mHitObject = NULL;
 
+   //If we have an active tool and it's intercepted our input, bail out
+   if (mActiveEditorTool != nullptr && mActiveEditorTool->onMouseMove(event))
+      return;
+
    //
    mUsingAxisGizmo = false;
 
@@ -1943,6 +1953,10 @@ void WorldEditor::on3DMouseMove(const Gui3DMouseEvent & event)
 
 void WorldEditor::on3DMouseDown(const Gui3DMouseEvent & event)
 {
+   //If we have an active tool and it's intercepted our input, bail out
+   if (mActiveEditorTool != nullptr && mActiveEditorTool->onMouseDown(event))
+      return;
+
    mMouseDown = true;
    mMouseDragged = false;
    mPerformedDragCopy = false;
@@ -2010,6 +2024,10 @@ void WorldEditor::on3DMouseDown(const Gui3DMouseEvent & event)
 
 void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
 {
+   //If we have an active tool and it's intercepted our input, bail out
+   if (mActiveEditorTool != nullptr && mActiveEditorTool->onMouseUp(event))
+      return;
+
    const bool wasUsingAxisGizmo = mUsingAxisGizmo;
    
    mMouseDown = false;
@@ -2165,6 +2183,10 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
 
 void WorldEditor::on3DMouseDragged(const Gui3DMouseEvent & event)
 {
+   //If we have an active tool and it's intercepted our input, bail out
+   if (mActiveEditorTool != nullptr && mActiveEditorTool->onMouseDragged(event))
+      return;
+
    if ( !mMouseDown )
       return;
 
@@ -2400,6 +2422,9 @@ void WorldEditor::renderScene( const RectI &updateRect )
    GFXDEBUGEVENT_SCOPE( Editor_renderScene, ColorI::RED );
 
    smRenderSceneSignal.trigger(this);
+
+   if (mActiveEditorTool != nullptr)
+      mActiveEditorTool->render();
 	
    // Grab this before anything here changes it.
    Frustum frustum;
@@ -2415,7 +2440,7 @@ void WorldEditor::renderScene( const RectI &updateRect )
    }
 
    // Render the paths
-   renderPaths(Sim::findObject("MissionGroup"));
+   renderPaths(Scene::getRootScene());
 
    // walk selected
    Selection* selection = getActiveSelectionSet();
@@ -3014,25 +3039,25 @@ bool WorldEditor::alignByAxis( S32 axis )
    if(mSelected->size() < 2)
       return true;
       
-   SceneObject* object = dynamic_cast< SceneObject* >( ( *mSelected )[ 0 ] );
-   if( !object )
+   SceneObject* primaryObj = dynamic_cast< SceneObject* >( ( *mSelected )[ 0 ] );
+   if( !primaryObj)
       return false;
 
    submitUndo( mSelected, "Align By Axis" );
 
    // All objects will be repositioned to line up with the
    // first selected object
-   Point3F pos = object->getPosition();
+   Point3F pos = primaryObj->getPosition();
 
    for(S32 i=0; i<mSelected->size(); ++i)
    {
-      SceneObject* object = dynamic_cast< SceneObject* >( ( *mSelected )[ i ] );
-      if( !object )
+      SceneObject* additionalObj = dynamic_cast< SceneObject* >( ( *mSelected )[ i ] );
+      if( !additionalObj)
          continue;
          
-      Point3F objPos = object->getPosition();
+      Point3F objPos = additionalObj->getPosition();
       objPos[axis] = pos[axis];
-      object->setPosition(objPos);
+	  additionalObj->setPosition(objPos);
    }
 
    return true;
@@ -3190,7 +3215,20 @@ void WorldEditor::resetSelectedScale()
 
 //------------------------------------------------------------------------------
 
-ConsoleMethod( WorldEditor, ignoreObjClass, void, 3, 0, "(string class_name, ...)")
+void WorldEditor::setEditorTool(EditorTool* newTool)
+{
+   if (mActiveEditorTool)
+      mActiveEditorTool->onDeactivated();
+
+   mActiveEditorTool = newTool;
+
+   if (mActiveEditorTool)
+      mActiveEditorTool->onActivated(this);
+}
+
+//------------------------------------------------------------------------------
+
+DefineEngineStringlyVariadicMethod( WorldEditor, ignoreObjClass, void, 3, 0, "(string class_name, ...)")
 {
 	object->ignoreObjClass(argc, argv);
 }
@@ -3217,7 +3255,7 @@ DefineEngineMethod( WorldEditor, getActiveSelection, S32, (),,
    return object->getActiveSelectionSet()->getId();
 }
 
-DefineConsoleMethod( WorldEditor, setActiveSelection, void, ( WorldEditorSelection* selection), ,
+DefineEngineMethod( WorldEditor, setActiveSelection, void, ( WorldEditorSelection* selection), ,
    "Set the currently active WorldEditorSelection object.\n"
    "@param	selection A WorldEditorSelectionSet object to use for the selection container.")
 {
@@ -3618,10 +3656,10 @@ void WorldEditor::makeSelectionPrefab( const char *filename )
       return;
    }
 
-   SimGroup *missionGroup;
-   if ( !Sim::findObject( "MissionGroup", missionGroup ) )
+   Scene* scene = Scene::getRootScene();
+   if ( !scene)
    {
-      Con::errorf( "WorldEditor::makeSelectionPrefab - Could not find MissionGroup." );
+      Con::errorf( "WorldEditor::makeSelectionPrefab - Could not find root Scene." );
       return;
    }
 
@@ -3711,7 +3749,7 @@ void WorldEditor::makeSelectionPrefab( const char *filename )
    fabMat.inverse();
    fab->setTransform( fabMat );
    fab->registerObject();
-   missionGroup->addObject( fab );
+   scene->addObject( fab );
 
    // Select it, mark level as dirty.
    clearSelection();
@@ -3777,10 +3815,10 @@ void WorldEditor::makeSelectionAMesh(const char *filename)
       return;
    }
 
-   SimGroup *missionGroup;
-   if (!Sim::findObject("MissionGroup", missionGroup))
+   Scene* scene = Scene::getRootScene();
+   if (!scene)
    {
-      Con::errorf("WorldEditor::makeSelectionAMesh - Could not find MissionGroup.");
+      Con::errorf("WorldEditor::makeSelectionAMesh - Could not find root Scene.");
       return;
    }
 
@@ -3842,8 +3880,6 @@ void WorldEditor::makeSelectionAMesh(const char *filename)
    fabMat.inverse();
 
    MatrixF objMat;
-   SimObject *obj = NULL;
-   SceneObject *sObj = NULL;
 
    Vector< SceneObject* > objectList;
 
@@ -3892,15 +3928,38 @@ void WorldEditor::makeSelectionAMesh(const char *filename)
    OptimizedPolyList polyList;
    polyList.setBaseTransform(orientation);
 
+   ColladaUtils::ExportData exportData;
+
    for (S32 i = 0; i < objectList.size(); i++)
    {
       SceneObject *pObj = objectList[i];
-      if (!pObj->buildPolyList(PLC_Export, &polyList, pObj->getWorldBox(), pObj->getWorldSphere()))
+      if (!pObj->buildExportPolyList(&exportData, pObj->getWorldBox(), pObj->getWorldSphere()))
          Con::warnf("colladaExportObjectList() - object %i returned no geometry.", pObj->getId());
    }
 
+   //Now that we have all of our mesh data, process it so we can correctly collapse everything.
+   exportData.processData();
+
+   //recenter generated visual mesh results
+   for (U32 dl = 0; dl < exportData.colMeshes.size(); dl++)
+   {
+      for (U32 pnt = 0; pnt < exportData.colMeshes[dl].mesh.mPoints.size(); pnt++)
+      {
+         exportData.colMeshes[dl].mesh.mPoints[pnt] -= centroid;
+      }
+   }
+
+   //recenter generated collision mesh results
+   for (U32 dl = 0; dl < exportData.detailLevels.size(); dl++)
+   {
+      for (U32 pnt = 0; pnt < exportData.detailLevels[dl].mesh.mPoints.size(); pnt++)
+      {
+         exportData.detailLevels[dl].mesh.mPoints[pnt] -= centroid;
+      }
+   }
+
    // Use a ColladaUtils function to do the actual export to a Collada file
-   ColladaUtils::exportToCollada(filename, polyList);
+   ColladaUtils::exportToCollada(filename, exportData);
    //
 
    // Allocate TSStatic object and add to level.
@@ -3909,7 +3968,7 @@ void WorldEditor::makeSelectionAMesh(const char *filename)
    fabMat.inverse();
    ts->setTransform(fabMat);
    ts->registerObject();
-   missionGroup->addObject(ts);
+   scene->addObject(ts);
 
    // Select it, mark level as dirty.
    clearSelection();
@@ -4015,8 +4074,8 @@ DefineEngineMethod( WorldEditor, createPolyhedralObject, SceneObject*, ( const c
 
    // Create the object.
 
-   SceneObject* object = dynamic_cast< SceneObject* >( classRep->create() );
-   if( !Object )
+   SceneObject* polyObj = dynamic_cast< SceneObject* >( classRep->create() );
+   if( !polyObj)
    {
       Con::errorf( "WorldEditor::createPolyhedralObject - Could not create SceneObject with class '%s'", className );
       return NULL;
@@ -4034,7 +4093,7 @@ DefineEngineMethod( WorldEditor, createPolyhedralObject, SceneObject*, ( const c
    for( U32 i = 0; i < numPoints; ++ i )
    {
       static StringTableEntry sPoint = StringTable->insert( "point" );
-      object->setDataField( sPoint, NULL, EngineMarshallData( points[ i ] ) );
+	  polyObj->setDataField( sPoint, NULL, EngineMarshallData( points[ i ] ) );
    }
 
    // Add the plane data.
@@ -4050,7 +4109,7 @@ DefineEngineMethod( WorldEditor, createPolyhedralObject, SceneObject*, ( const c
       char buffer[ 1024 ];
       dSprintf( buffer, sizeof( buffer ), "%g %g %g %g", plane.x, plane.y, plane.z, plane.d );
 
-      object->setDataField( sPlane, NULL, buffer );
+	  polyObj->setDataField( sPlane, NULL, buffer );
    }
 
    // Add the edge data.
@@ -4069,24 +4128,24 @@ DefineEngineMethod( WorldEditor, createPolyhedralObject, SceneObject*, ( const c
          edge.vertex[ 0 ], edge.vertex[ 1 ]
       );
 
-      object->setDataField( sEdge, NULL, buffer );
+	  polyObj->setDataField( sEdge, NULL, buffer );
    }
 
    // Set the transform.
 
-   object->setTransform( savedTransform );
-   object->setScale( savedScale );
+   polyObj->setTransform( savedTransform );
+   polyObj->setScale( savedScale );
 
    // Register and return the object.
 
-   if( !object->registerObject() )
+   if( !polyObj->registerObject() )
    {
       Con::errorf( "WorldEditor::createPolyhedralObject - Failed to register object!" );
-      delete object;
+      delete polyObj;
       return NULL;
    }
 
-   return object;
+   return polyObj;
 }
 
 //-----------------------------------------------------------------------------
@@ -4174,4 +4233,16 @@ DefineEngineMethod( WorldEditor, createConvexShapeFrom, ConvexShape*, ( SceneObj
    }
 
    return shape;
+}
+
+DefineEngineMethod(WorldEditor, setEditorTool, void, (EditorTool* newEditorTool), (nullAsType<EditorTool*>()),
+   "Sets the active Editor Tool for the world editor.")
+{
+   object->setEditorTool(newEditorTool);
+}
+
+DefineEngineMethod(WorldEditor, getActiveEditorTool, EditorTool*, (),,
+   "Gets the active Editor Tool for the world editor.")
+{
+   return object->getActiveEditorTool();
 }

@@ -151,7 +151,7 @@ void ForestConvex::getFeatures( const MatrixF &mat, const VectorF &n, ConvexFeat
    for (i = 0; i < numVerts; i++) 
    {
       cf->mVertexList.increment();
-      U32 index = emitString[currPos++];
+      index = emitString[currPos++];
       mat.mulP(pAccel->vertexList[index], &cf->mVertexList.last());
    }
 

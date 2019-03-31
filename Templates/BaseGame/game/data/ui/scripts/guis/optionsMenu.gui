@@ -866,65 +866,6 @@
                   };
                };
                new GuiControl() {
-                  position = "0 160";
-                  extent = "450 20";
-                  minExtent = "8 2";
-                  horizSizing = "right";
-                  vertSizing = "bottom";
-                  profile = "GuiDefaultProfile";
-                  visible = "1";
-                  active = "1";
-                  tooltipProfile = "GuiToolTipProfile";
-                  hovertime = "1000";
-                  isContainer = "1";
-                  canSave = "1";
-                  canSaveDynamicFields = "0";
-
-                  new GuiTextCtrl() {
-                     text = "Gamma";
-                     maxLength = "1024";
-                     margin = "0 0 0 0";
-                     padding = "0 0 0 0";
-                     anchorTop = "1";
-                     anchorBottom = "0";
-                     anchorLeft = "1";
-                     anchorRight = "0";
-                     position = "0 0";
-                     extent = "175 20";
-                     minExtent = "8 2";
-                     horizSizing = "right";
-                     vertSizing = "bottom";
-                     profile = "GuiMenuTextProfile";
-                     visible = "1";
-                     active = "1";
-                     tooltipProfile = "GuiToolTipProfile";
-                     hovertime = "1000";
-                     isContainer = "1";
-                     canSave = "1";
-                     canSaveDynamicFields = "0";
-                  };
-                  new GuiSliderCtrl() {
-                     range = "2 2.5";
-                     ticks = "0";
-                     snap = "0";
-                     value = "2";
-                     position = "190 0";
-                     extent = "261 20";
-                     minExtent = "8 2";
-                     horizSizing = "right";
-                     vertSizing = "bottom";
-                     profile = "GuiSliderProfile";
-                     visible = "1";
-                     active = "1";
-                     variable = "$pref::Video::Gamma";
-                     tooltipProfile = "GuiToolTipProfile";
-                     hovertime = "1000";
-                     isContainer = "0";
-                     canSave = "1";
-                     canSaveDynamicFields = "0";
-                  };
-               };
-               new GuiControl() {
                   position = "0 180";
                   extent = "450 20";
                   minExtent = "8 2";

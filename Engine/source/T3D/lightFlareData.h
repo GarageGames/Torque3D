@@ -123,7 +123,7 @@ protected:
    RectF mElementRect[MAX_ELEMENTS];
    F32 mElementDist[MAX_ELEMENTS];
    F32 mElementScale[MAX_ELEMENTS];
-   ColorF mElementTint[MAX_ELEMENTS];
+   LinearColorF mElementTint[MAX_ELEMENTS];
    bool mElementRotate[MAX_ELEMENTS];
    bool mElementUseLightColor[MAX_ELEMENTS];   
 

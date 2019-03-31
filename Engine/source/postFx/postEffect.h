@@ -86,6 +86,7 @@ public:
 protected:
 
    FileName mTexFilename[NumTextures];
+   bool mTexSRGB[NumTextures];
 
    GFXTexHandle mTextures[NumTextures];
 
@@ -169,7 +170,7 @@ protected:
 
    /// The color to prefill the named target when
    /// first created by the effect.
-   ColorF mTargetClearColor;
+   LinearColorF mTargetClearColor;
 
    PFXRenderTime mRenderTime;
    PFXTargetClear mTargetClear;

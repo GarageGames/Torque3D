@@ -178,11 +178,12 @@ enum GFXFormat
 
    // 24 bit texture formats...
    GFXFormatR8G8B8,// first in group...
-
+   GFXFormatR8G8B8_SRGB,
    // 32 bit texture formats...
    GFXFormatR8G8B8A8,// first in group...
    GFXFormatR8G8B8X8,
    GFXFormatB8G8R8A8,
+   GFXFormatR8G8B8A8_SRGB,
    GFXFormatR32F,
    GFXFormatR16G16,
    GFXFormatR16G16F,
@@ -191,9 +192,6 @@ enum GFXFormat
    GFXFormatD24X8,
    GFXFormatD24S8,   
    GFXFormatD24FS8,
-
-   // sRGB formats
-   GFXFormatR8G8B8A8_SRGB,
 
    // Guaranteed RGBA8 (for apis which really dont like bgr)
    GFXFormatR8G8B8A8_LINEAR_FORCE,
@@ -205,12 +203,16 @@ enum GFXFormat
    // 128 bit texture formats...
    GFXFormatR32G32B32A32F,// first in group...
 
-   // unknown size...
-   GFXFormatDXT1,// first in group...
-   GFXFormatDXT2,
-   GFXFormatDXT3,
-   GFXFormatDXT4,
-   GFXFormatDXT5,
+   // unknown size...Block compression
+   GFXFormatBC1,  //dxt1
+   GFXFormatBC2,  //dxt2/3
+   GFXFormatBC3,  //dxt4/5
+   GFXFormatBC4,  //3dc+ / ati1
+   GFXFormatBC5,  //3dc / ati2
+   // compressed sRGB formats   
+   GFXFormatBC1_SRGB,
+   GFXFormatBC2_SRGB,
+   GFXFormatBC3_SRGB,
 
    GFXFormat_COUNT,
 
@@ -220,7 +222,7 @@ enum GFXFormat
    GFXFormat_32BIT = GFXFormatR8G8B8A8,
    GFXFormat_64BIT = GFXFormatR16G16B16A16,
    GFXFormat_128BIT = GFXFormatR32G32B32A32F,
-   GFXFormat_UNKNOWNSIZE = GFXFormatDXT1,
+   GFXFormat_UNKNOWNSIZE = GFXFormatBC1
 };
 
 /// Returns the byte size of the pixel for non-compressed formats.

@@ -71,7 +71,6 @@ private:
    
    void releaseSurfaces();
 
-   bool isCompressed(GFXFormat format);
    /// The callback used to get texture events.
    /// @see GFXTextureManager::addEventDelegate
    void _onTextureEvent(GFXTexCallbackCode code);

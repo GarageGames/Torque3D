@@ -1,0 +1,8 @@
+<ComponentAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="ArmAnimationComponentAsset"
+    componentClass="ArmAnimationComponent"
+    friendlyName="Arm Animation"
+    componentType="animation"
+    description="Allows a mesh component to be animated." />

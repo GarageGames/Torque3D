@@ -501,7 +501,7 @@ function UVEditor::showDialog( %this, %applyCallback, %obj, %uv)
    %material = %obj.material;
    if( %material.toneMap[0] $= "" && %material.diffuseMap[0] $= "" && !isObject(%material.cubemap) )
    {
-      %previewImage = "core/art/warnmat";
+      %previewImage = "core/images/warnmat";
    }
    else
    {

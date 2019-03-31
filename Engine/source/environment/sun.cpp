@@ -394,7 +394,7 @@ void Sun::setElevation( F32 elevation )
    setMaskBits( UpdateMask ); // TODO: Break out the masks to save some space!
 }
 
-void Sun::setColor( const ColorF &color )
+void Sun::setColor( const LinearColorF &color )
 {
    mLightColor = color;
    _conformLights();
@@ -490,7 +490,7 @@ void Sun::_renderCorona( ObjectRenderInst *ri, SceneRenderState *state, BaseMatI
       points[i] += mLightWorldPos;
    }
 
-   ColorF vertColor;
+   LinearColorF vertColor;
    if ( mCoronaUseLightColor )
       vertColor = mLightColor;
    else
@@ -503,7 +503,7 @@ void Sun::_renderCorona( ObjectRenderInst *ri, SceneRenderState *state, BaseMatI
 
    for ( S32 i = 0; i < 4; i++ )
    {
-      pVert->color.set( vertColor );
+      pVert->color.set( vertColor.toColorI());
       pVert->point.set( points[i] );
       pVert->texCoord.set( sCoords[i].x, sCoords[i].y );
       pVert++;
@@ -558,12 +558,12 @@ void Sun::_onUnselected()
    Parent::_onUnselected();
 }
 
-DefineConsoleMethod(Sun, apply, void, (), , "")
+DefineEngineMethod(Sun, apply, void, (), , "")
 {
    object->inspectPostApply();
 }
 
-DefineConsoleMethod(Sun, animate, void, ( F32 duration, F32 startAzimuth, F32 endAzimuth, F32 startElevation, F32 endElevation ), , "animate( F32 duration, F32 startAzimuth, F32 endAzimuth, F32 startElevation, F32 endElevation )")
+DefineEngineMethod(Sun, animate, void, ( F32 duration, F32 startAzimuth, F32 endAzimuth, F32 startElevation, F32 endElevation ), , "animate( F32 duration, F32 startAzimuth, F32 endAzimuth, F32 startElevation, F32 endElevation )")
 {
 
    object->animate(duration, startAzimuth, endAzimuth, startElevation, endElevation);

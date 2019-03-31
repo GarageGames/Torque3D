@@ -204,39 +204,6 @@ bool GFXD3D11ConstBufferLayout::setMatrix(const ParamDesc& pd, const GFXShaderCo
 
       return false;
    }
-   else if (pd.constType == GFXSCT_Float4x3)
-   {
-      const U32 csize = 48;
-
-      // Loop through and copy 
-      bool ret = false;
-      U8* currDestPointer = basePointer + pd.offset;
-      const U8* currSourcePointer = static_cast<const U8*>(data);
-      const U8* endData = currSourcePointer + size;
-      while (currSourcePointer < endData)
-      {
-#ifdef TORQUE_DOUBLE_CHECK_43MATS
-         Point4F col;
-         ((MatrixF*)currSourcePointer)->getRow(3, &col);
-         AssertFatal(col.x == 0.0f && col.y == 0.0f && col.z == 0.0f && col.w == 1.0f, "3rd row used");
-#endif
-
-         if (dMemcmp(currDestPointer, currSourcePointer, csize) != 0)
-         {
-            dMemcpy(currDestPointer, currSourcePointer, csize);
-            ret = true;
-         }
-         else if (pd.constType == GFXSCT_Float4x3)
-         {
-            ret = true;
-         }
-
-         currDestPointer += csize;
-         currSourcePointer += sizeof(MatrixF);
-      }
-
-      return ret;
-   }
    else
    {
       PROFILE_SCOPE(GFXD3D11ConstBufferLayout_setMatrix_not4x4);
@@ -250,6 +217,9 @@ bool GFXD3D11ConstBufferLayout::setMatrix(const ParamDesc& pd, const GFXShaderCo
          break;
       case GFXSCT_Float3x3 : 
          csize = 44; //This takes up 16+16+12
+         break;
+      case GFXSCT_Float4x3:
+         csize = 48;
          break;
       default:
          AssertFatal(false, "Unhandled case!");
@@ -267,6 +237,10 @@ bool GFXD3D11ConstBufferLayout::setMatrix(const ParamDesc& pd, const GFXShaderCo
          if (dMemcmp(currDestPointer, currSourcePointer, csize) != 0)
          {
             dMemcpy(currDestPointer, currSourcePointer, csize);            
+            ret = true;
+         }
+         else if (pd.constType == GFXSCT_Float4x3)
+         {
             ret = true;
          }
 
@@ -302,6 +276,8 @@ GFXD3D11ShaderConstBuffer::GFXD3D11ShaderConstBuffer( GFXD3D11Shader* shader,
     
     mPixelConstBufferLayout = pixelLayout;
     mPixelConstBuffer = new GenericConstBuffer(pixelLayout);
+
+    mDeviceContext = D3D11DEVICECONTEXT;
 
     _createBuffers();
 	
@@ -431,7 +407,7 @@ void GFXD3D11ShaderConstBuffer::set(GFXShaderConstHandle* handle, const PlaneF& 
    SET_CONSTANT(handle, fv, mVertexConstBuffer, mPixelConstBuffer);
 }
 
-void GFXD3D11ShaderConstBuffer::set(GFXShaderConstHandle* handle, const ColorF& fv)
+void GFXD3D11ShaderConstBuffer::set(GFXShaderConstHandle* handle, const LinearColorF& fv)
 { 
    SET_CONSTANT(handle, fv, mVertexConstBuffer, mPixelConstBuffer);
 }
@@ -654,8 +630,6 @@ void GFXD3D11ShaderConstBuffer::activate( GFXD3D11ShaderConstBuffer *prevShaderB
       }      
    }
 
-   ID3D11DeviceContext* devCtx = D3D11DEVICECONTEXT;
-
    D3D11_MAPPED_SUBRESOURCE pConstData;
    ZeroMemory(&pConstData, sizeof(D3D11_MAPPED_SUBRESOURCE));
    
@@ -670,11 +644,11 @@ void GFXD3D11ShaderConstBuffer::activate( GFXD3D11ShaderConstBuffer *prevShaderB
       for (U32 i = 0; i < subBuffers.size(); ++i)
       {
          const ConstSubBufferDesc &desc = subBuffers[i];
-         devCtx->UpdateSubresource(mConstantBuffersV[i], 0, NULL, buf + desc.start, desc.size, 0);
+         mDeviceContext->UpdateSubresource(mConstantBuffersV[i], 0, NULL, buf + desc.start, desc.size, 0);
          nbBuffers++;
       }
 
-      devCtx->VSSetConstantBuffers(0, nbBuffers, mConstantBuffersV);
+      mDeviceContext->VSSetConstantBuffers(0, nbBuffers, mConstantBuffersV);
    }
 
    nbBuffers = 0;
@@ -688,11 +662,11 @@ void GFXD3D11ShaderConstBuffer::activate( GFXD3D11ShaderConstBuffer *prevShaderB
       for (U32 i = 0; i < subBuffers.size(); ++i)
       {
          const ConstSubBufferDesc &desc = subBuffers[i];
-         devCtx->UpdateSubresource(mConstantBuffersP[i], 0, NULL, buf + desc.start, desc.size, 0);
+         mDeviceContext->UpdateSubresource(mConstantBuffersP[i], 0, NULL, buf + desc.start, desc.size, 0);
          nbBuffers++;
       }
 
-      devCtx->PSSetConstantBuffers(0, nbBuffers, mConstantBuffersP);
+      mDeviceContext->PSSetConstantBuffers(0, nbBuffers, mConstantBuffersP);
    }
 
    #ifdef TORQUE_DEBUG
@@ -877,12 +851,12 @@ bool GFXD3D11Shader::_compileShader( const Torque::Path &filePath,
    ID3DBlob* errorBuff = NULL;
    ID3D11ShaderReflection* reflectionTable = NULL;
 
-#ifdef TORQUE_DEBUG
-	U32 flags = D3DCOMPILE_DEBUG | D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_WARNINGS_ARE_ERRORS;
-#else
-   U32 flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3; //TODO double check load times with D3DCOMPILE_OPTIMIZATION_LEVEL3
-   //recommended flags for NSight, uncomment to use. NSight should be used in release mode only. *Still works with above flags however
-   //flags = D3DCOMPILE_DEBUG | D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PREFER_FLOW_CONTROL | D3DCOMPILE_SKIP_OPTIMIZATION;
+#ifdef TORQUE_GFX_VISUAL_DEBUG //for use with NSight, GPU Perf studio, VS graphics debugger
+	U32 flags = D3DCOMPILE_DEBUG | D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PREFER_FLOW_CONTROL | D3DCOMPILE_SKIP_OPTIMIZATION;
+#elif defined(TORQUE_DEBUG) //debug build
+   U32 flags = D3DCOMPILE_DEBUG | D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_WARNINGS_ARE_ERRORS;
+#else //release build
+   U32 flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3;
 #endif
 
 #ifdef D3D11_DEBUG_SPEW
@@ -1054,20 +1028,20 @@ bool GFXD3D11Shader::_compileShader( const Torque::Path &filePath,
 
    return result;
 }
-void GFXD3D11Shader::_getShaderConstants( ID3D11ShaderReflection *pTable, 
+void GFXD3D11Shader::_getShaderConstants( ID3D11ShaderReflection *refTable,
                                          GenericConstBufferLayout *bufferLayoutIn,
                                          Vector<GFXShaderConstDesc> &samplerDescriptions )
 {
    PROFILE_SCOPE( GFXD3D11Shader_GetShaderConstants );
 
-   AssertFatal(pTable, "NULL constant table not allowed, is this an assembly shader?");
+   AssertFatal(refTable, "NULL constant table not allowed, is this an assembly shader?");
 
    GFXD3D11ConstBufferLayout *bufferLayout = (GFXD3D11ConstBufferLayout*)bufferLayoutIn;
    Vector<ConstSubBufferDesc> &subBuffers = bufferLayout->getSubBufferDesc();
    subBuffers.clear();
 
    D3D11_SHADER_DESC tableDesc;
-   HRESULT hr = pTable->GetDesc(&tableDesc);
+   HRESULT hr = refTable->GetDesc(&tableDesc);
    if (FAILED(hr))
    {
 	   AssertFatal(false, "Shader Reflection table unable to be created");
@@ -1077,7 +1051,7 @@ void GFXD3D11Shader::_getShaderConstants( ID3D11ShaderReflection *pTable,
    U32 bufferOffset = 0;
    for (U32 i = 0; i < tableDesc.ConstantBuffers; i++)
    {
-	   ID3D11ShaderReflectionConstantBuffer* constantBuffer = pTable->GetConstantBufferByIndex(i);
+	   ID3D11ShaderReflectionConstantBuffer* constantBuffer = refTable->GetConstantBufferByIndex(i);
 	   D3D11_SHADER_BUFFER_DESC constantBufferDesc;
 
       if (constantBuffer->GetDesc(&constantBufferDesc) == S_OK)
@@ -1162,7 +1136,7 @@ void GFXD3D11Shader::_getShaderConstants( ID3D11ShaderReflection *pTable,
    {
       GFXShaderConstDesc desc;
       D3D11_SHADER_INPUT_BIND_DESC bindDesc;
-      pTable->GetResourceBindingDesc(i, &bindDesc);
+      refTable->GetResourceBindingDesc(i, &bindDesc);
 
       switch (bindDesc.Type)
       {

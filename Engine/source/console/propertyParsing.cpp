@@ -377,7 +377,7 @@ namespace PropertyInfo
    //-----------------------------------------------------------------------------
    // Colors
    //-----------------------------------------------------------------------------
-   bool default_scan(const String &data, ColorF & result)
+   bool default_scan(const String &data, LinearColorF & result)
    {
       if(StringUnit::getUnitCount(data," ") == 3)
       {
@@ -389,7 +389,7 @@ namespace PropertyInfo
       return true;
    }
 
-   bool default_print(String & result, ColorF const & data)
+   bool default_print(String & result, LinearColorF const & data)
    {
       if(data.alpha == 1.0f)
          result = String::ToString("%g %g %g",data.red,data.green,data.blue);

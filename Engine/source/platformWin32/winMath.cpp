@@ -33,7 +33,7 @@ extern void mInstall_AMD_Math();
 extern void mInstall_Library_SSE();
 
 //--------------------------------------
-ConsoleFunction( mathInit, void, 1, 10, "( ... )"
+DefineEngineStringlyVariadicFunction( mathInit, void, 1, 10, "( ... )"
                 "@brief Install the math library with specified extensions.\n\n"
                 "Possible parameters are:\n\n"
                 "    - 'DETECT' Autodetect math lib settings.\n\n"

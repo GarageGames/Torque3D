@@ -131,7 +131,7 @@ void ShaderMaterialParameters::set(MaterialParameterHandle* handle, const PlaneF
    SHADERMATPARAM_SET(handle, fv);
 }
 
-void ShaderMaterialParameters::set(MaterialParameterHandle* handle, const ColorF& fv)
+void ShaderMaterialParameters::set(MaterialParameterHandle* handle, const LinearColorF& fv)
 {
    SHADERMATPARAM_SET(handle, fv);
 }

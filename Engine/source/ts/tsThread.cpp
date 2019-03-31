@@ -170,17 +170,17 @@ void TSThread::setSequence(S32 seq, F32 toPos)
 
    sequence = seq;
    priority = getSequence()->priority;
-   pos = toPos;
+   mSeqPos = toPos;
    makePath = getSequence()->makePath();
    path.start = path.end = 0;
    path.loop = 0;
 
    // 1.0f doesn't exist on cyclic sequences
-   if (pos>0.9999f && getSequence()->isCyclic())
-      pos = 0.9999f;
+   if (mSeqPos>0.9999f && getSequence()->isCyclic())
+	   mSeqPos = 0.9999f;
 
    // select keyframes
-   selectKeyframes(pos,getSequence(),&keyNum1,&keyNum2,&keyPos);
+   selectKeyframes(mSeqPos,getSequence(),&keyNum1,&keyNum2,&keyPos);
 }
 
 void TSThread::transitionToSequence(S32 seq, F32 toPos, F32 duration, bool continuePlay)
@@ -207,7 +207,7 @@ void TSThread::transitionToSequence(S32 seq, F32 toPos, F32 duration, bool conti
 
    // set time characteristics of transition
    transitionData.oldSequence = sequence;
-   transitionData.oldPos = pos;
+   transitionData.oldPos = mSeqPos;
    transitionData.duration = duration;
    transitionData.pos = 0.0f;
    transitionData.direction = timeScale>0.0f ? 1.0f : -1.0f;
@@ -219,17 +219,17 @@ void TSThread::transitionToSequence(S32 seq, F32 toPos, F32 duration, bool conti
    // set target sequence data
    sequence = seq;
    priority = getSequence()->priority;
-   pos = toPos;
+   mSeqPos = toPos;
    makePath = getSequence()->makePath();
    path.start = path.end = 0;
    path.loop = 0;
 
    // 1.0f doesn't exist on cyclic sequences
-   if (pos>0.9999f && getSequence()->isCyclic())
-      pos = 0.9999f;
+   if (mSeqPos>0.9999f && getSequence()->isCyclic())
+	   mSeqPos = 0.9999f;
 
    // select keyframes
-   selectKeyframes(pos,getSequence(),&keyNum1,&keyNum2,&keyPos);
+   selectKeyframes(mSeqPos,getSequence(),&keyNum1,&keyNum2,&keyPos);
 }
 
 bool TSThread::isInTransition()
@@ -322,12 +322,12 @@ void TSThread::activateTriggers(F32 a, F32 b)
 
 F32 TSThread::getPos()
 {
-   return transitionData.inTransition ? transitionData.pos : pos;
+   return transitionData.inTransition ? transitionData.pos : mSeqPos;
 }
 
 F32 TSThread::getTime()
 {
-   return transitionData.inTransition ? transitionData.pos * transitionData.duration : pos * getSequence()->duration;
+   return transitionData.inTransition ? transitionData.pos * transitionData.duration : mSeqPos * getSequence()->duration;
 }
 
 F32 TSThread::getDuration()
@@ -378,48 +378,48 @@ void TSThread::advancePos(F32 delta)
 
    if (makePath)
    {
-      path.start = pos;
-      pos += delta;
+      path.start = mSeqPos;
+	  mSeqPos += delta;
       if (!getSequence()->isCyclic())
       {
-         pos = mClampF(pos , 0.0f, 1.0f);
+		  mSeqPos = mClampF(mSeqPos, 0.0f, 1.0f);
          path.loop = 0;
       }
       else
       {
-         path.loop = (S32)pos;
-         if (pos < 0.0f)
+         path.loop = (S32)mSeqPos;
+         if (mSeqPos < 0.0f)
             path.loop--;
-         pos -= path.loop;
+		 mSeqPos -= path.loop;
          // following necessary because of floating point roundoff errors
-         if (pos < 0.0f) pos += 1.0f;
-         if (pos >= 1.0f) pos -= 1.0f;
+         if (mSeqPos < 0.0f) mSeqPos += 1.0f;
+         if (mSeqPos >= 1.0f) mSeqPos -= 1.0f;
       }
-      path.end = pos;
+      path.end = mSeqPos;
 
       animateTriggers(); // do this automatically...no need for user to call it
 
-      AssertFatal(pos>=0.0f && pos<=1.0f,"TSThread::advancePos (1)");
-      AssertFatal(!getSequence()->isCyclic() || pos<1.0f,"TSThread::advancePos (2)");
+      AssertFatal(mSeqPos >=0.0f && mSeqPos <=1.0f,"TSThread::advancePos (1)");
+      AssertFatal(!getSequence()->isCyclic() || mSeqPos<1.0f,"TSThread::advancePos (2)");
    }
    else
    {
-      pos += delta;
+	   mSeqPos += delta;
       if (!getSequence()->isCyclic())
-         pos = mClampF(pos, 0.0f, 1.0f);
+		  mSeqPos = mClampF(mSeqPos, 0.0f, 1.0f);
       else
       {
-         pos -= S32(pos);
+		  mSeqPos -= S32(mSeqPos);
          // following necessary because of floating point roundoff errors
-         if (pos < 0.0f) pos += 1.0f;
-         if (pos >= 1.0f) pos -= 1.0f;
+         if (mSeqPos < 0.0f) mSeqPos += 1.0f;
+         if (mSeqPos >= 1.0f) mSeqPos -= 1.0f;
       }
-      AssertFatal(pos>=0.0f && pos<=1.0f,"TSThread::advancePos (3)");
-      AssertFatal(!getSequence()->isCyclic() || pos<1.0f,"TSThread::advancePos (4)");
+      AssertFatal(mSeqPos >=0.0f && mSeqPos <=1.0f,"TSThread::advancePos (3)");
+      AssertFatal(!getSequence()->isCyclic() || mSeqPos<1.0f,"TSThread::advancePos (4)");
    }
 
    // select keyframes
-   selectKeyframes(pos,getSequence(),&keyNum1,&keyNum2,&keyPos);
+   selectKeyframes(mSeqPos,getSequence(),&keyNum1,&keyNum2,&keyPos);
 }
 
 void TSThread::advanceTime(F32 delta)
@@ -459,7 +459,7 @@ void TSThread::setKeyframeNumber(S32 kf)
 
    keyNum1 = keyNum2 = kf;
    keyPos = 0;
-   pos = 0;
+   mSeqPos = 0;
 }
 
 TSThread::TSThread(TSShapeInstance * _shapeInst)

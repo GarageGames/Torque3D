@@ -347,8 +347,8 @@ bool VolumetricFog::LoadShape()
       return false;
    }
 
-   mObjBox = mShape->bounds;
-   mRadius = mShape->radius;
+   mObjBox = mShape->mBounds;
+   mRadius = mShape->mRadius;
    resetWorldBox();
 
    if (!isClientObject())
@@ -421,13 +421,13 @@ bool VolumetricFog::LoadShape()
 
                det_size[i].indices = new Vector<U32>();
 
-               for (U32 k = 0; k < mesh->indices.size(); k++)
-                  det_size[i].indices->push_back(mesh->indices[k]);
+               for (U32 k = 0; k < mesh->mIndices.size(); k++)
+                  det_size[i].indices->push_back(mesh->mIndices[k]);
 
-               U32 primitivesSize = mesh->primitives.size();
+               U32 primitivesSize = mesh->mPrimitives.size();
                for (U32 k = 0; k < primitivesSize; k++)
                {
-                  const TSDrawPrimitive & draw = mesh->primitives[k];
+                  const TSDrawPrimitive & draw = mesh->mPrimitives[k];
                   GFXPrimitiveType drawType = GFXdrawTypes[draw.matIndex >> 30];
                   switch (drawType)
                   {
@@ -436,7 +436,7 @@ bool VolumetricFog::LoadShape()
                         pInfo.numPrimitives = draw.numElements / 3;
                         pInfo.startIndex = draw.start;
                         // Use the first index to determine which 16-bit address space we are operating in
-                        pInfo.startVertex = mesh->indices[draw.start] & 0xFFFF0000;
+                        pInfo.startVertex = mesh->mIndices[draw.start] & 0xFFFF0000;
                         pInfo.minIndex = pInfo.startVertex;
                         pInfo.numVertices = getMin((U32)0x10000, mesh->mNumVerts - pInfo.startVertex);
                         break;
@@ -445,7 +445,7 @@ bool VolumetricFog::LoadShape()
                         pInfo.numPrimitives = draw.numElements - 2;
                         pInfo.startIndex = draw.start;
                         // Use the first index to determine which 16-bit address space we are operating in
-                        pInfo.startVertex = mesh->indices[draw.start] & 0xFFFF0000;
+                        pInfo.startVertex = mesh->mIndices[draw.start] & 0xFFFF0000;
                         pInfo.minIndex = pInfo.startVertex;
                         pInfo.numVertices = getMin((U32)0x10000, mesh->mNumVerts - pInfo.startVertex);
                         break;
@@ -560,8 +560,8 @@ U32 VolumetricFog::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       mShape = ResourceManager::get().load(mShapeName);
       if (bool(mShape) == false)
          return retMask;
-      mObjBox = mShape->bounds;
-      mRadius = mShape->radius;
+      mObjBox = mShape->mBounds;
+      mRadius = mShape->mRadius;
       resetWorldBox();
       mObjSize = mWorldBox.getGreatestDiagonalLength();
       mObjScale = getScale();
@@ -620,25 +620,20 @@ void VolumetricFog::unpackUpdate(NetConnection *con, BitStream *stream)
       stream->read(&mLightRayMod);
       if (isTicking())
       {
-         char buf[20];
-         dSprintf(buf, sizeof(buf), "%3.7f", mGlowStrength);
-         Con::setVariable("$VolFogGlowPostFx::glowStrength", buf);
+         char glowStrBuf[20];
+         dSprintf(glowStrBuf, sizeof(glowStrBuf), "%3.7f", mGlowStrength);
+         Con::setVariable("$VolFogGlowPostFx::glowStrength", glowStrBuf);
          if (mUseGlow && !glowFX->isEnabled())
             glowFX->enable();
          if (!mUseGlow && glowFX->isEnabled())
             glowFX->disable();
-         if (mModifLightRays)
-         {
-            char buf[20];
-            dSprintf(buf, sizeof(buf), "%3.7f", mOldLightRayStrength * mLightRayMod);
-            Con::setVariable("$LightRayPostFX::brightScalar", buf);
-         }
-         if (!mModifLightRays)
-         {
-            char buf[20];
-            dSprintf(buf, sizeof(buf), "%3.7f", mOldLightRayStrength);
-            Con::setVariable("$LightRayPostFX::brightScalar", buf);
-         }
+
+		 F32 rayStrength = mOldLightRayStrength;
+		 if (mModifLightRays)
+			 rayStrength *= mLightRayMod;
+		 char rayStrBuf[20];
+		 dSprintf(rayStrBuf, sizeof(rayStrBuf), "%3.7f", rayStrength);
+		 Con::setVariable("$LightRayPostFX::brightScalar", rayStrBuf);
       }
    }
    if (stream->readFlag())//Volumetric Fog
@@ -1074,7 +1069,7 @@ void VolumetricFog::render(ObjectRenderInst *ri, SceneRenderState *state, BaseMa
 
    mPPShaderConsts->setSafe(mPPModelViewProjSC, xform);
 
-   const ColorF &sunlight = state->getAmbientLightColor();
+   const LinearColorF &sunlight = state->getAmbientLightColor();
 
    Point3F ambientColor(sunlight.red, sunlight.green, sunlight.blue);
    mShaderConsts->setSafe(mAmbientColorSC, ambientColor);
@@ -1159,10 +1154,9 @@ void VolumetricFog::render(ObjectRenderInst *ri, SceneRenderState *state, BaseMa
 
    GFX->drawPrimitive(0);
 
-   // Ensure these two textures are bound to the pixel shader input on the second run as they are used as pixel shader outputs (render targets).
-   GFX->setTexture(1, NULL); //mDepthBuffer
-   GFX->setTexture(2, NULL); //mFrontBuffer
-   GFX->updateStates(); //update the dirty texture state we set above
+   // Ensure these two textures are NOT bound to the pixel shader input on the second run as they are used as pixel shader outputs (render targets).
+   GFX->clearTextureStateImmediate(1); //mDepthBuffer
+   GFX->clearTextureStateImmediate(2); //mFrontBuffer
 }
 
 void VolumetricFog::reflect_render(ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *overrideMat)
@@ -1204,7 +1198,7 @@ void VolumetricFog::InitTexture()
    mIsTextured = false;
 
    if (mTextureName.isNotEmpty())
-      mTexture.set(mTextureName, &GFXDefaultStaticDiffuseProfile, "VolumetricFogMod");
+      mTexture.set(mTextureName, &GFXStaticTextureSRGBProfile, "VolumetricFogMod");
 
    if (!mTexture.isNull())
    {
@@ -1218,7 +1212,7 @@ void VolumetricFog::InitTexture()
    }
 }
 
-void VolumetricFog::setFogColor(ColorF color)
+void VolumetricFog::setFogColor(LinearColorF color)
 {
    mFogColor.set(255 * color.red,255 * color.green,255 * color.blue);
    setMaskBits(FogColorMask);
@@ -1266,7 +1260,7 @@ bool VolumetricFog::isInsideFog()
    return mCamInFog;
 }
 
-DefineEngineMethod(VolumetricFog, SetFogColorF, void, (ColorF new_color), ,
+DefineEngineMethod(VolumetricFog, SetFogColorF, void, (LinearColorF new_color), ,
 "@brief Changes the color of the fog\n\n."
 "@params new_color the new fog color (rgb 0.0 - 1.0, a is ignored.")
 {

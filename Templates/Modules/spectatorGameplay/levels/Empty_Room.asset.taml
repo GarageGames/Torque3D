@@ -1,0 +1,7 @@
+<LevelAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="Empty_Room"
+    LevelFile="data/spectatorGameplay/levels/Empty_Room.mis"
+    LevelDescription="An empty room"
+    VersionId="1" />

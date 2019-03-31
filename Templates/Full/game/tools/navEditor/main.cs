@@ -96,6 +96,7 @@ function NavEditorPlugin::onWorldEditorStartup(%this)
    EWCreatorWindow.beginGroup("Navigation");
 
       EWCreatorWindow.registerMissionObject("CoverPoint", "Cover point");
+      EWCreatorWindow.registerMissionObject("NavPath", "Nav Path");
 
    EWCreatorWindow.endGroup();
 }

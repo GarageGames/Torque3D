@@ -289,7 +289,7 @@ void TerrainCellMaterial::init(  TerrainBlock *block,
          // The pass failed to be generated... give up.
          mPasses.last().materials.clear();
          mPasses.clear();
-         for_each( materials.begin(), materials.end(), delete_pointer() );
+		 T3D::for_each( materials.begin(), materials.end(), T3D::delete_pointer() );
          return;
       }
 
@@ -298,7 +298,7 @@ void TerrainCellMaterial::init(  TerrainBlock *block,
    }
 
    // Cleanup any remaining matinfo.
-   for_each( materials.begin(), materials.end(), delete_pointer() );
+   T3D::for_each( materials.begin(), materials.end(), T3D::delete_pointer() );
 
    // If we have attached mats then update them too.
    if ( mDeferredMat )
@@ -436,10 +436,13 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
             features.addFeature( MFT_TerrainNormalMap, featureIndex );
 
             normalMaps.last().set( mat->getNormalMap(), 
-               &GFXDefaultStaticNormalMapProfile, "TerrainCellMaterial::_createPass() - NormalMap" );
+               &GFXNormalMapProfile, "TerrainCellMaterial::_createPass() - NormalMap" );
 
-            if ( normalMaps.last().getFormat() == GFXFormatDXT5 )
-               features.addFeature( MFT_IsDXTnm, featureIndex );
+            GFXFormat normalFmt = normalMaps.last().getFormat();
+            if ( normalFmt == GFXFormatBC3 )
+               features.addFeature( MFT_IsBC3nm, featureIndex );
+            else if ( normalFmt == GFXFormatBC5)
+               features.addFeature( MFT_IsBC5nm, featureIndex);
 
             // Do we need and can we do parallax mapping?
             if (  !disableParallaxMaps &&
@@ -610,7 +613,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
             desc.samplers[sampler].minFilter = GFXTextureFilterLinear;
 
          matInfo->detailTex.set( matInfo->mat->getDetailMap(), 
-            &GFXDefaultStaticDiffuseProfile, "TerrainCellMaterial::_createPass() - DetailMap" );
+            &GFXStaticTextureProfile, "TerrainCellMaterial::_createPass() - DetailMap" );
       }
 
       matInfo->macroInfoVConst = pass->shader->getShaderConstHandle( avar( "$macroScaleAndFade%d", i ) );
@@ -634,7 +637,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
             desc.samplers[sampler].minFilter = GFXTextureFilterLinear;
 
          matInfo->macroTex.set( matInfo->mat->getMacroMap(), 
-            &GFXDefaultStaticDiffuseProfile, "TerrainCellMaterial::_createPass() - MacroMap" );
+            &GFXStaticTextureProfile, "TerrainCellMaterial::_createPass() - MacroMap" );
       }
 	  //end macro texture
 

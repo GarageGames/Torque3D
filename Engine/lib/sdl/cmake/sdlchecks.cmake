@@ -161,6 +161,36 @@ endmacro()
 # Requires:
 # - PkgCheckModules
 # Optional:
+# - JACK_SHARED opt
+# - HAVE_DLOPEN opt
+macro(CheckJACK)
+  if(JACK)
+    pkg_check_modules(PKG_JACK jack)
+    if(PKG_JACK_FOUND)
+      set(HAVE_JACK TRUE)
+      file(GLOB JACK_SOURCES ${SDL2_SOURCE_DIR}/src/audio/jack/*.c)
+      set(SOURCE_FILES ${SOURCE_FILES} ${JACK_SOURCES})
+      set(SDL_AUDIO_DRIVER_JACK 1)
+      list(APPEND EXTRA_CFLAGS ${PKG_JACK_CFLAGS})
+      if(JACK_SHARED)
+        if(NOT HAVE_DLOPEN)
+          message_warn("You must have SDL_LoadObject() support for dynamic JACK audio loading")
+        else()
+          FindLibraryAndSONAME("jack")
+          set(SDL_AUDIO_DRIVER_JACK_DYNAMIC "\"${JACK_LIB_SONAME}\"")
+          set(HAVE_JACK_SHARED TRUE)
+        endif()
+      else()
+        list(APPEND EXTRA_LDFLAGS ${PKG_JACK_LDFLAGS})
+      endif()
+      set(HAVE_SDL_AUDIO TRUE)
+    endif()
+  endif()
+endmacro()
+
+# Requires:
+# - PkgCheckModules
+# Optional:
 # - ESD_SHARED opt
 # - HAVE_DLOPEN opt
 macro(CheckESD)
@@ -311,6 +341,31 @@ macro(CheckFusionSound)
         list(APPEND EXTRA_LDFLAGS ${PKG_FUSIONSOUND_LDFLAGS})
       endif()
       set(HAVE_SDL_AUDIO TRUE)
+    endif()
+  endif()
+endmacro()
+
+# Requires:
+# - LIBSAMPLERATE
+# Optional:
+# - LIBSAMPLERATE_SHARED opt
+# - HAVE_DLOPEN opt
+macro(CheckLibSampleRate)
+  if(LIBSAMPLERATE)
+    check_include_file(samplerate.h HAVE_LIBSAMPLERATE_H)
+    if(HAVE_LIBSAMPLERATE_H)
+      set(HAVE_LIBSAMPLERATE TRUE)
+      if(LIBSAMPLERATE_SHARED)
+        if(NOT HAVE_DLOPEN)
+          message_warn("You must have SDL_LoadObject() support for dynamic libsamplerate loading")
+        else()
+          FindLibraryAndSONAME("samplerate")
+          set(SDL_LIBSAMPLERATE_DYNAMIC "\"${SAMPLERATE_LIB_SONAME}\"")
+          set(HAVE_LIBSAMPLERATE_SHARED TRUE)
+        endif()
+      else()
+        list(APPEND EXTRA_LDFLAGS -lsamplerate)
+      endif()
     endif()
   endif()
 endmacro()
@@ -508,7 +563,7 @@ endmacro()
 macro(CheckMir)
     if(VIDEO_MIR)
         find_library(MIR_LIB mirclient mircommon egl)
-        pkg_check_modules(MIR_TOOLKIT mirclient mircommon)
+        pkg_check_modules(MIR_TOOLKIT mirclient>=0.26 mircommon)
         pkg_check_modules(EGL egl)
         pkg_check_modules(XKB xkbcommon)
 
@@ -520,7 +575,7 @@ macro(CheckMir)
             set(SOURCE_FILES ${SOURCE_FILES} ${MIR_SOURCES})
             set(SDL_VIDEO_DRIVER_MIR 1)
 
-            list(APPEND EXTRA_CFLAGS ${MIR_TOOLKIT_CFLAGS} ${EGL_CLFAGS} ${XKB_CLFLAGS})
+            list(APPEND EXTRA_CFLAGS ${MIR_TOOLKIT_CFLAGS} ${EGL_CFLAGS} ${XKB_CFLAGS})
 
             if(MIR_SHARED)
                 if(NOT HAVE_DLOPEN)
@@ -557,7 +612,7 @@ macro(WaylandProtocolGen _SCANNER _XML _PROTL)
         ARGS code "${_XML}" "${_WAYLAND_PROT_C_CODE}"
     )
 
-    set(SOURCE_FILES ${SOURCE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols/${_PROTL}-protocol.c")
+    set(SOURCE_FILES ${SOURCE_FILES} "${_WAYLAND_PROT_C_CODE}")
 endmacro()
 
 # Requires:
@@ -632,7 +687,7 @@ macro(CheckWayland)
 
       WaylandProtocolGen("${WAYLAND_SCANNER}" "${WAYLAND_CORE_PROTOCOL_DIR}/wayland.xml" "wayland")
 
-      foreach(_PROTL relative-pointer-unstable-v1 pointer-constraints-unstable-v1)
+      foreach(_PROTL relative-pointer-unstable-v1 pointer-constraints-unstable-v1 xdg-shell-unstable-v6)
         string(REGEX REPLACE "\\-unstable\\-.*$" "" PROTSUBDIR ${_PROTL})
         WaylandProtocolGen("${WAYLAND_SCANNER}" "${WAYLAND_PROTOCOLS_DIR}/unstable/${PROTSUBDIR}/${_PROTL}.xml" "${_PROTL}")
       endforeach()
@@ -803,7 +858,10 @@ endmacro()
 # PTHREAD_LIBS
 macro(CheckPTHREAD)
   if(PTHREADS)
-    if(LINUX)
+    if(ANDROID)
+      # the android libc provides built-in support for pthreads, so no
+      # additional linking or compile flags are necessary
+    elseif(LINUX)
       set(PTHREAD_CFLAGS "-D_REENTRANT")
       set(PTHREAD_LDFLAGS "-pthread")
     elseif(BSDI)
@@ -878,7 +936,7 @@ macro(CheckPTHREAD)
             #include <pthread.h>
             int main(int argc, char **argv) {
               pthread_mutexattr_t attr;
-              pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+              pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
               return 0;
             }" HAVE_RECURSIVE_MUTEXES_NP)
         if(HAVE_RECURSIVE_MUTEXES_NP)
@@ -907,7 +965,6 @@ macro(CheckPTHREAD)
           int main(int argc, char** argv) { return 0; }" HAVE_PTHREAD_NP_H)
       check_function_exists(pthread_setname_np HAVE_PTHREAD_SETNAME_NP)
       check_function_exists(pthread_set_name_np HAVE_PTHREAD_SET_NAME_NP)
-      set(CMAKE_REQUIRED_FLAGS "${ORIG_CMAKE_REQUIRED_FLAGS}")
 
       set(SOURCE_FILES ${SOURCE_FILES}
           ${SDL2_SOURCE_DIR}/src/thread/pthread/SDL_systhread.c
@@ -924,6 +981,7 @@ macro(CheckPTHREAD)
       endif()
       set(HAVE_SDL_THREADS TRUE)
     endif()
+    set(CMAKE_REQUIRED_FLAGS "${ORIG_CMAKE_REQUIRED_FLAGS}")
   endif()
 endmacro()
 
@@ -1071,15 +1129,19 @@ endmacro()
 # - n/a
 macro(CheckRPI)
   if(VIDEO_RPI)
-    set(VIDEO_RPI_INCLUDE_DIRS "/opt/vc/include" "/opt/vc/include/interface/vcos/pthreads" "/opt/vc/include/interface/vmcs_host/linux/" )
-    set(VIDEO_RPI_LIBRARY_DIRS "/opt/vc/lib" )
-    set(VIDEO_RPI_LIBS bcm_host )
+    pkg_check_modules(VIDEO_RPI bcm_host brcmegl)
+    if (NOT VIDEO_RPI_FOUND)
+      set(VIDEO_RPI_INCLUDE_DIRS "/opt/vc/include" "/opt/vc/include/interface/vcos/pthreads" "/opt/vc/include/interface/vmcs_host/linux/" )
+      set(VIDEO_RPI_LIBRARY_DIRS "/opt/vc/lib" )
+      set(VIDEO_RPI_LIBRARIES bcm_host )
+      set(VIDEO_RPI_LDFLAGS "-Wl,-rpath,/opt/vc/lib")
+    endif()
     listtostr(VIDEO_RPI_INCLUDE_DIRS VIDEO_RPI_INCLUDE_FLAGS "-I")
     listtostr(VIDEO_RPI_LIBRARY_DIRS VIDEO_RPI_LIBRARY_FLAGS "-L")
 
     set(ORIG_CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS}")
     set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${VIDEO_RPI_INCLUDE_FLAGS} ${VIDEO_RPI_LIBRARY_FLAGS}")
-    set(CMAKE_REQUIRED_LIBRARIES "${VIDEO_RPI_LIBS}")
+    set(CMAKE_REQUIRED_LIBRARIES "${VIDEO_RPI_LIBRARIES}")
     check_c_source_compiles("
         #include <bcm_host.h>
         int main(int argc, char **argv) {}" HAVE_VIDEO_RPI)
@@ -1091,8 +1153,52 @@ macro(CheckRPI)
       set(SDL_VIDEO_DRIVER_RPI 1)
       file(GLOB VIDEO_RPI_SOURCES ${SDL2_SOURCE_DIR}/src/video/raspberry/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${VIDEO_RPI_SOURCES})
-      list(APPEND EXTRA_LIBS ${VIDEO_RPI_LIBS})
+      list(APPEND EXTRA_LIBS ${VIDEO_RPI_LIBRARIES})
       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${VIDEO_RPI_INCLUDE_FLAGS} ${VIDEO_RPI_LIBRARY_FLAGS}")
+      list(APPEND EXTRA_LDFLAGS ${VIDEO_RPI_LDFLAGS})
     endif(SDL_VIDEO AND HAVE_VIDEO_RPI)
   endif(VIDEO_RPI)
 endmacro(CheckRPI)
+
+# Requires:
+# - EGL
+# - PkgCheckModules
+# Optional:
+# - KMSDRM_SHARED opt
+# - HAVE_DLOPEN opt
+macro(CheckKMSDRM)
+  if(VIDEO_KMSDRM)
+    pkg_check_modules(KMSDRM libdrm gbm egl)
+    if(KMSDRM_FOUND)
+      link_directories(
+        ${KMSDRM_LIBRARY_DIRS}
+      )
+      include_directories(
+        ${KMSDRM_INCLUDE_DIRS}
+      )
+      set(HAVE_VIDEO_KMSDRM TRUE)
+      set(HAVE_SDL_VIDEO TRUE)
+
+      file(GLOB KMSDRM_SOURCES ${SDL2_SOURCE_DIR}/src/video/kmsdrm/*.c)
+      set(SOURCE_FILES ${SOURCE_FILES} ${KMSDRM_SOURCES})
+
+      list(APPEND EXTRA_CFLAGS ${KMSDRM_CFLAGS})
+
+      set(SDL_VIDEO_DRIVER_KMSDRM 1)
+
+      if(KMSDRM_SHARED)
+        if(NOT HAVE_DLOPEN)
+          message_warn("You must have SDL_LoadObject() support for dynamic KMS/DRM loading")
+        else()
+          FindLibraryAndSONAME(drm)
+          FindLibraryAndSONAME(gbm)
+          set(SDL_VIDEO_DRIVER_KMSDRM_DYNAMIC "\"${DRM_LIB_SONAME}\"")
+          set(SDL_VIDEO_DRIVER_KMSDRM_DYNAMIC_GBM "\"${GBM_LIB_SONAME}\"")
+          set(HAVE_KMSDRM_SHARED TRUE)
+        endif()
+      else()
+        set(EXTRA_LIBS ${KMSDRM_LIBRARIES} ${EXTRA_LIBS})
+      endif()
+    endif()
+  endif()
+endmacro()

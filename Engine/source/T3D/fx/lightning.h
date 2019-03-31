@@ -191,8 +191,8 @@ class Lightning : public GameBase
    F32      chanceToHitTarget;
    F32      strikeRadius;
    F32      boltStartRadius;
-   ColorF   color;
-   ColorF   fadeColor;
+   LinearColorF   color;
+   LinearColorF   fadeColor;
    bool     useFog;
 
    GFXStateBlockRef  mLightningSB;

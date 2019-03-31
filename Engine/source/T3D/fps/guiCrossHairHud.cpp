@@ -42,8 +42,8 @@ class GuiCrossHairHud : public GuiBitmapCtrl
 {
    typedef GuiBitmapCtrl Parent;
 
-   ColorF   mDamageFillColor;
-   ColorF   mDamageFrameColor;
+   LinearColorF   mDamageFillColor;
+   LinearColorF   mDamageFrameColor;
    Point2I  mDamageRectSize;
    Point2I  mDamageOffset;
 
@@ -178,7 +178,7 @@ void GuiCrossHairHud::drawDamage(Point2I offset, F32 damage, F32 opacity)
    rect.point.x -= mDamageRectSize.x / 2;
 
    // Draw the border
-   GFX->getDrawUtil()->drawRect(rect, mDamageFrameColor);
+   GFX->getDrawUtil()->drawRect(rect, mDamageFrameColor.toColorI());
 
    // Draw the damage % fill
    rect.point += Point2I(1, 1);
@@ -187,5 +187,5 @@ void GuiCrossHairHud::drawDamage(Point2I offset, F32 damage, F32 opacity)
    if (rect.extent.x == 1)
       rect.extent.x = 2;
    if (rect.extent.x > 0)
-      GFX->getDrawUtil()->drawRectFill(rect, mDamageFillColor);
+      GFX->getDrawUtil()->drawRectFill(rect, mDamageFillColor.toColorI());
 }

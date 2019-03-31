@@ -2719,7 +2719,7 @@ function ShapeEdDetailTree::onRightMouseUp( %this, %itemId, %mouse )
             superClass = "MenuBuilder";
             isPopup = "1";
 
-            item[ 0 ] = "Hidden" TAB "" TAB "ShapeEdDetailTree.onHideMeshItem( %this._objName, !%this._itemHidden );";
+            item[ 0 ] = "Hidden" TAB "" TAB "ShapeEdDetailTree.onHideMeshItem(" @ ShapeEdMeshPopup._objName @ ", !" @ ShapeEdMeshPopup @ "._itemHidden );";
             item[ 1 ] = "-";
             item[ 2 ] = "Hide all" TAB "" TAB "ShapeEdDetailTree.onHideMeshItem( \"\", true );";
             item[ 3 ] = "Show all" TAB "" TAB "ShapeEdDetailTree.onHideMeshItem( \"\", false );";

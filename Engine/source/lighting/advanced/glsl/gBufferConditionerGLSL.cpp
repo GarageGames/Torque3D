@@ -249,11 +249,7 @@ Var* GBufferConditionerGLSL::printMethodHeader( MethodType methodType, const Str
 
       // The gbuffer has no mipmaps, so use tex2dlod when 
       // possible so that the shader compiler can optimize.
-      meta->addStatement( new GenOp( "   #if TORQUE_SM >= 30\r\n" ) );
-      meta->addStatement( new GenOp( "      @ = tex2Dlod(@, float4(@,0,0));\r\n", bufferSampleDecl, deferredSampler, screenUV ) );
-      meta->addStatement( new GenOp( "   #else\r\n" ) );
-      meta->addStatement( new GenOp( "      @ = tex2D(@, @);\r\n", bufferSampleDecl, deferredSampler, screenUV ) );
-      meta->addStatement( new GenOp( "   #endif\r\n\r\n" ) );
+      meta->addStatement( new GenOp( "@ = tex2Dlod(@, float4(@,0,0));\r\n", bufferSampleDecl, deferredSampler, screenUV ) );
 
       // We don't use this way of passing var's around, so this should cause a crash
       // if something uses this improperly

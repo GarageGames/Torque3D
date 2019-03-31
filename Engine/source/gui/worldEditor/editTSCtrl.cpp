@@ -38,6 +38,7 @@
 #include "scene/sceneRenderState.h"
 #include "renderInstance/renderBinManager.h"
 
+#include "T3D/Scene.h"
 
 IMPLEMENT_CONOBJECT(EditTSCtrl);
 ConsoleDocClass( EditTSCtrl,
@@ -702,12 +703,12 @@ void EditTSCtrl::calcOrthoCamOffset(F32 mousex, F32 mousey, U8 modifier)
          break;
 
       case DisplayTypeFront:
-         mOrthoCamTrans.x += mousex * mOrthoFOV * camScale;
+         mOrthoCamTrans.x -= mousex * mOrthoFOV * camScale;
          mOrthoCamTrans.z += mousey * mOrthoFOV * camScale;
          break;
 
       case DisplayTypeBack:
-         mOrthoCamTrans.x -= mousex * mOrthoFOV * camScale;
+         mOrthoCamTrans.x += mousex * mOrthoFOV * camScale;
          mOrthoCamTrans.z += mousey * mOrthoFOV * camScale;
          break;
 
@@ -795,15 +796,15 @@ void EditTSCtrl::_renderScene( ObjectRenderInst*, SceneRenderState *state, BaseM
    GFXTransformSaver saver;
 
    // render through console callbacks
-   SimSet * missionGroup = static_cast<SimSet*>(Sim::findObject("MissionGroup"));
-   if(missionGroup)
+   Scene* scene = Scene::getRootScene();
+   if(scene)
    {
       mConsoleRendering = true;
 
       // [ rene, 27-Jan-10 ] This calls onEditorRender on the server objects instead
       //    of on the client objects which seems a bit questionable to me.
  
-      for(SimSetIterator itr(missionGroup); *itr; ++itr)
+      for(SimSetIterator itr(scene); *itr; ++itr)
       {
          SceneObject* object = dynamic_cast< SceneObject* >( *itr );
          if( object && object->isRenderEnabled() && !object->isHidden() )
@@ -1125,17 +1126,17 @@ bool EditTSCtrl::processCameraQuery(CameraQuery * query)
                break;
 
             case DisplayTypeFront:
-               camRot.setColumn(0, Point3F(-1.0,  0.0,  0.0));
-               camRot.setColumn(1, Point3F( 0.0, -1.0,  0.0));
-               camRot.setColumn(2, Point3F( 0.0,  0.0,  1.0));
-               camPos.y = getMax(camPos.y + smMinSceneBounds.y, sceneBounds.maxExtents.y + camBuffer);
+               camRot.setColumn(0, Point3F(1.0, 0.0, 0.0));
+               camRot.setColumn(1, Point3F(0.0, 1.0, 0.0));
+               camRot.setColumn(2, Point3F(0.0, 0.0, 1.0));
+               camPos.y = getMin(camPos.y - smMinSceneBounds.y, sceneBounds.minExtents.y - camBuffer);
                break;
 
             case DisplayTypeBack:
-               camRot.setColumn(0, Point3F(1.0,  0.0,  0.0));
-               camRot.setColumn(1, Point3F(0.0,  1.0,  0.0));
-               camRot.setColumn(2, Point3F(0.0,  0.0,  1.0));
-               camPos.y = getMin(camPos.y - smMinSceneBounds.y, sceneBounds.minExtents.y - camBuffer);
+               camRot.setColumn(0, Point3F(-1.0, 0.0, 0.0));
+               camRot.setColumn(1, Point3F(0.0, -1.0, 0.0));
+               camRot.setColumn(2, Point3F(0.0, 0.0, 1.0));
+               camPos.y = getMax(camPos.y + smMinSceneBounds.y, sceneBounds.maxExtents.y + camBuffer);
                break;
 
             case DisplayTypeLeft:

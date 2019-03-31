@@ -58,7 +58,7 @@ const UTF8 *getCoreString(S32 id)
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getCoreLangTable, S32, (), , "()"
+DefineEngineFunction( getCoreLangTable, S32, (), , "()"
 				"@brief Gets the primary LangTable used by the game\n\n"
 				"@return ID of the core LangTable\n"
 				"@ingroup Localization")
@@ -69,7 +69,7 @@ DefineConsoleFunction( getCoreLangTable, S32, (), , "()"
       return 0;
 }
 
-DefineConsoleFunction( setCoreLangTable, void, (const char * lgTable), , "(string LangTable)"
+DefineEngineFunction( setCoreLangTable, void, (const char * lgTable), , "(string LangTable)"
 				"@brief Sets the primary LangTable used by the game\n\n"
 				"@param LangTable ID of the core LangTable\n"
 				"@ingroup Localization")

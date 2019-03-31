@@ -400,7 +400,7 @@ ConsoleDocClass( GuiInspectorTypeCheckBox,
 
 GuiControl* GuiInspectorTypeCheckBox::constructEditControl()
 {
-   if ( mField->flag.test(AbstractClassRep::FieldFlags::FIELD_ComponentInspectors) )
+   if (mField && mField->flag.test(AbstractClassRep::FIELD_CustomInspectors))
    {
       // This checkbox (bool field) is meant to be treated as a button.
       GuiControl* retCtrl = new GuiButtonCtrl();
@@ -425,27 +425,55 @@ GuiControl* GuiInspectorTypeCheckBox::constructEditControl()
       button->setField("Command", szBuffer );
 
       return retCtrl;
-   } else {
-   GuiControl* retCtrl = new GuiCheckBoxCtrl();
+   }
+   else if (mField && mField->flag.test(AbstractClassRep::FieldFlags::FIELD_ComponentInspectors))
+   {
+      // This checkbox (bool field) is meant to be treated as a button.
+      GuiControl* retCtrl = new GuiButtonCtrl();
 
-   GuiCheckBoxCtrl *check = dynamic_cast<GuiCheckBoxCtrl*>(retCtrl);
+      // If we couldn't construct the control, bail!
+      if (retCtrl == NULL)
+         return retCtrl;
 
-   // Let's make it look pretty.
-   retCtrl->setDataField( StringTable->insert("profile"), NULL, "InspectorTypeCheckboxProfile" );
-   retCtrl->setField( "text", "" );
+      GuiButtonCtrl *button = dynamic_cast<GuiButtonCtrl*>(retCtrl);
 
-   check->setIndent( 4 );
+      // Let's make it look pretty.
+      retCtrl->setDataField(StringTable->insert("profile"), NULL, "InspectorTypeButtonProfile");
+      retCtrl->setField("text", "Click Here");
 
-   retCtrl->setScriptValue( getData() );
+      retCtrl->setScriptValue(getData());
 
-   _registerEditControl( retCtrl );
+      _registerEditControl(retCtrl);
 
-   // Configure it to update our value when the popup is closed
-   char szBuffer[512];
-   dSprintf( szBuffer, 512, "%d.apply(%d.getValue());",getId(),check->getId() );
-   check->setField("Command", szBuffer );
+      // Configure it to update our value when the popup is closed
+      char szBuffer[512];
+      dSprintf(szBuffer, 512, "%d.apply(%d.getValue());", getId(), button->getId());
+      button->setField("Command", szBuffer);
 
-   return retCtrl;
+      return retCtrl;
+   }
+   else 
+   {
+      GuiControl* retCtrl = new GuiCheckBoxCtrl();
+
+      GuiCheckBoxCtrl *check = dynamic_cast<GuiCheckBoxCtrl*>(retCtrl);
+
+      // Let's make it look pretty.
+      retCtrl->setDataField(StringTable->insert("profile"), NULL, "InspectorTypeCheckboxProfile");
+      retCtrl->setField("text", "");
+
+      check->setIndent(4);
+
+      retCtrl->setScriptValue(getData());
+
+      _registerEditControl(retCtrl);
+
+      // Configure it to update our value when the popup is closed
+      char szBuffer[512];
+      dSprintf(szBuffer, 512, "%d.apply(%d.getValue());", getId(), check->getId());
+      check->setField("Command", szBuffer);
+
+      return retCtrl;
    }
 }
 
@@ -573,13 +601,12 @@ void GuiInspectorTypeFileName::updateValue()
    }
 }
 
-ConsoleMethod( GuiInspectorTypeFileName, apply, void, 3,3, "apply(newValue);" )
+DefineEngineMethod(GuiInspectorTypeFileName, apply, void, (String path), , "")
 {
-   String path( (const char*)argv[2] );
-   if ( path.isNotEmpty() )
-      path = Platform::makeRelativePathName( path, Platform::getMainDotCsDir() );
-      
-   object->setData( path.c_str() );
+   if (path.isNotEmpty())
+      path = Platform::makeRelativePathName(path, Platform::getMainDotCsDir());
+
+   object->setData(path.c_str());
 }
 
 
@@ -662,7 +689,7 @@ bool GuiInspectorTypeImageFileName::renderTooltip( const Point2I &hoverPos, cons
    if ( !filename || !filename[0] )
       return false;
 
-   GFXTexHandle texture( filename, &GFXDefaultStaticDiffuseProfile, avar("%s() - tooltip texture (line %d)", __FUNCTION__, __LINE__) );
+   GFXTexHandle texture( filename, &GFXStaticTextureSRGBProfile, avar("%s() - tooltip texture (line %d)", __FUNCTION__, __LINE__) );
    if ( texture.isNull() )
       return false;
 
@@ -1007,7 +1034,6 @@ GuiControl* GuiInspectorTypeEaseF::constructEditControl()
    mBrowseButton = new GuiButtonCtrl();
    {
       RectI browseRect( Point2I( ( getLeft() + getWidth()) - 26, getTop() + 2), Point2I(20, getHeight() - 4) );
-      char szBuffer[512];
       dSprintf( szBuffer, sizeof( szBuffer ), "GetEaseF(%d.getText(), \"%d.apply\", %d.getRoot());", retCtrl->getId(), getId(), getId() );
       mBrowseButton->setField( "Command", szBuffer );
       mBrowseButton->setField( "text", "E" );
@@ -1058,7 +1084,7 @@ bool GuiInspectorTypeEaseF::updateRects()
 }
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeColor (Base for ColorI/ColorF) 
+// GuiInspectorTypeColor (Base for ColorI/LinearColorF) 
 //-----------------------------------------------------------------------------
 GuiInspectorTypeColor::GuiInspectorTypeColor()
  : mBrowseButton( NULL )
@@ -1209,7 +1235,7 @@ void GuiInspectorTypeColorI::setValue( StringTableEntry newValue )
 IMPLEMENT_CONOBJECT(GuiInspectorTypeColorF);
 
 ConsoleDocClass( GuiInspectorTypeColorF,
-   "@brief Inspector field type for ColorF\n\n"
+   "@brief Inspector field type for LinearColorF\n\n"
    "Editor use only.\n\n"
    "@internal"
 );
@@ -1234,7 +1260,7 @@ void GuiInspectorTypeColorF::setValue( StringTableEntry newValue )
    // Now we also set our color swatch button to the new color value.
    if ( mBrowseButton )
    {      
-      ColorF color(1,0,1,1);
+      LinearColorF color(1,0,1,1);
       dSscanf( newValue, "%f %f %f %f", &color.red, &color.green, &color.blue, &color.alpha );
       mBrowseButton->setColor( color );
    }
@@ -1474,7 +1500,7 @@ void GuiInspectorTypeBitMask32::updateData()
    setData( data );   
 }
 
-ConsoleMethod( GuiInspectorTypeBitMask32, applyBit, void, 2,2, "apply();" )
+DefineEngineMethod( GuiInspectorTypeBitMask32, applyBit, void, (),, "" )
 {
    object->updateData();
 }

@@ -105,9 +105,6 @@ public:
    virtual S32       getDesktopBitDepth();
    virtual Point2I   getDesktopResolution();
 
-   /// Build out the monitors list.
-   virtual void buildMonitorsList();
-
    virtual S32 findFirstMatchingMonitor(const char* name);
    virtual U32 getMonitorCount();
    virtual const char* getMonitorName(U32 index);

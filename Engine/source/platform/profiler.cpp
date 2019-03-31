@@ -328,9 +328,9 @@ const char * Profiler::constructProfilePath(ProfilerData * pd)
 
       U32 mark = FrameAllocator::getWaterMark();
       char * buf = (char*)FrameAllocator::alloc(len+1);
-      dStrcpy(buf,pd->mParent->mPath);
-      dStrcat(buf,connector);
-      dStrcat(buf,pd->mRoot->mName);
+      dStrcpy(buf,pd->mParent->mPath,len+1);
+      dStrcat(buf,connector,len+1);
+      dStrcat(buf,pd->mRoot->mName,len+1);
       const char * ret = StringTable->insert(buf);
       FrameAllocator::setWaterMark(mark);
       
@@ -433,7 +433,7 @@ void Profiler::dumpToFile(const char* fileName)
    AssertFatal(dStrlen(fileName) < DumpFileNameLength, "Error, dump filename too long");
    mDumpToFile = true;
    mDumpToConsole = false;
-   dStrcpy(mDumpFileName, fileName);
+   dStrcpy(mDumpFileName, fileName, DumpFileNameLength);
 }
 
 void Profiler::hashPop(ProfilerRootData *expected)
@@ -645,11 +645,11 @@ void Profiler::dump()
       AssertFatal(success, "Cannot write profile dump to specified file!");
          char buffer[1024];
 
-         dStrcpy(buffer, "Profiler Data Dump:\n");
+         dStrcpy(buffer, "Profiler Data Dump:\n", 1024);
          fws.write(dStrlen(buffer), buffer);
-         dStrcpy(buffer, "Ordered by non-sub total time -\n");
+         dStrcpy(buffer, "Ordered by non-sub total time -\n", 1024);
          fws.write(dStrlen(buffer), buffer);
-         dStrcpy(buffer, "%%NSTime  %% Time  Invoke #  Name\n");
+         dStrcpy(buffer, "%%NSTime  %% Time  Invoke #  Name\n", 1024);
          fws.write(dStrlen(buffer), buffer);
 
          for(U32 i = 0; i < rootVector.size(); i++)
@@ -665,9 +665,9 @@ void Profiler::dump()
             rootVector[i]->mTotalTime = 0;
             rootVector[i]->mSubTime = 0;
          }
-         dStrcpy(buffer, "\nOrdered by non-sub total time -\n");
+         dStrcpy(buffer, "\nOrdered by non-sub total time -\n", 1024);
          fws.write(dStrlen(buffer), buffer);
-         dStrcpy(buffer, "%%NSTime  %% Time  Invoke #  Name\n");
+         dStrcpy(buffer, "%%NSTime  %% Time  Invoke #  Name\n", 1024);
          fws.write(dStrlen(buffer), buffer);
 
       mCurrentProfilerData->mTotalTime = endHighResolutionTimer(mCurrentProfilerData->mStartTime);

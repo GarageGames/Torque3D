@@ -198,7 +198,7 @@ void SkyBox::prepRenderImage( SceneRenderState *state )
 
 void SkyBox::_renderObject( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *mi )
 {
-   GFXDEBUGEVENT_SCOPE( SkyBox_RenderObject, ColorF::WHITE );
+   GFXDEBUGEVENT_SCOPE( SkyBox_RenderObject, ColorI::WHITE );
 
    GFXTransformSaver saver;  
    GFX->setVertexBuffer( mVB );         
@@ -640,7 +640,7 @@ BaseMatInstance* SkyBox::_getMaterialInstance()
    return mMatInstance;
 }
 
-DefineConsoleMethod( SkyBox, postApply, void, (), , "")
+DefineEngineMethod( SkyBox, postApply, void, (), , "")
 {
 	object->inspectPostApply();
 }

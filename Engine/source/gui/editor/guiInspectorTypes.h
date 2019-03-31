@@ -346,7 +346,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// TypeColor GuiInspectorField Class (Base for ColorI/ColorF)
+// TypeColor GuiInspectorField Class (Base for ColorI/LinearColorF)
 //-----------------------------------------------------------------------------
 
 class GuiSwatchButtonCtrl;

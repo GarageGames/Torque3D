@@ -35,6 +35,7 @@ new GFXStateBlockData( AL_DeferredShadingState : PFX_DefaultStateBlock )
    samplerStates[1] = SamplerWrapLinear;
    samplerStates[2] = SamplerWrapLinear;
    samplerStates[3] = SamplerWrapLinear;
+   samplerStates[4] = SamplerWrapLinear;
 };
 
 new ShaderData( AL_DeferredShader )
