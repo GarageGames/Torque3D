@@ -43,7 +43,7 @@ function GameConnection::initialControlSet(%this)
    // first check if the editor is active
    if (!isToolBuild() || !isMethod("Editor", "checkActiveLoadDone") || !Editor::checkActiveLoadDone())
    {
-      if (Canvas.getContent() != PlayGui.getId())
+      if (isObject(PlayGui) && Canvas.getContent() != PlayGui.getId())
          Canvas.setContent(PlayGui);
    }
 }
