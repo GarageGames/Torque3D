@@ -1872,6 +1872,7 @@ function Editor::open(%this)
 
    %this.editorEnabled();
    Canvas.setContent(EditorGui);   
+   $isFirstPersonVar = true;
    EditorGui.syncCameraGui();
 }
 
