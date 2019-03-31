@@ -6345,6 +6345,14 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
          if(len > 8191)
             len = 8191;
          stream->writeInt((S32)len, 13);
+
+         // constrain the range of mRot.z
+         while (mRot.z < 0.0f)
+            mRot.z += M_2PI_F;
+         while (mRot.z > M_2PI_F)
+            mRot.z -= M_2PI_F;
+
+
       }
       stream->writeFloat(mRot.z / M_2PI_F, 7);
       stream->writeSignedFloat(mHead.x / (mDataBlock->maxLookAngle - mDataBlock->minLookAngle), 6);
