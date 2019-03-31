@@ -6150,8 +6150,22 @@ void Player::updateWorkingCollisionSet()
       mWorkingQueryBox.maxExtents += twolPoint;
 
       disableCollision();
+
+      //We temporarily disable the collisions of anything mounted to us so we don't accidentally walk into things we've attached to us
+      for (SceneObject *ptr = mMount.list; ptr; ptr = ptr->getMountLink())
+      {
+         ptr->disableCollision();
+      }
+
       mConvex.updateWorkingList(mWorkingQueryBox,
          isGhost() ? sClientCollisionContactMask : sServerCollisionContactMask);
+
+      //And now re-enable the collisions of the mounted things
+      for (SceneObject *ptr = mMount.list; ptr; ptr = ptr->getMountLink())
+      {
+         ptr->enableCollision();
+      }
+
       enableCollision();
    }
 }
