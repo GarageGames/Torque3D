@@ -1,39 +1,57 @@
 //--- OBJECT WRITE BEGIN ---
-new SimGroup(MissionGroup) {
+new Scene(EmptyTerrainLevel) {
+   canSave = "1";
    canSaveDynamicFields = "1";
+   isSubscene = "0";
+   isEditing = "0";
+   isDirty = "0";
       enabled = "1";
 
    new LevelInfo(theLevelInfo) {
       nearClip = "0.1";
       visibleDistance = "2000";
+      visibleGhostDistance = "0";
       decalBias = "0.0015";
       fogColor = "1 1 0.6 1";
       fogDensity = "0.001";
       fogDensityOffset = "10";
       fogAtmosphereHeight = "100";
       canvasClearColor = "233 220 143 255";
+      ambientLightBlendPhase = "1";
+      ambientLightBlendCurve = "0 0 -1 -1";
       advancedLightmapSupport = "0";
+      soundAmbience = "AudioAmbienceDefault";
+      soundDistanceModel = "Linear";
+      canSave = "1";
+      canSaveDynamicFields = "1";
          desc0 = "An empty terrain ready to be populated with Torque objects.";
-         LevelName = "Empty Terrain";
+         levelName = "Empty Terrain";
    };
    new ScatterSky() {
       skyBrightness = "30";
-      mieScattering = "0.0015";
+      sunSize = "1";
+      colorizeAmount = "0";
+      colorize = "0 0 0 1";
       rayleighScattering = "0.0035";
       sunScale = "1 1 0.8 1";
       ambientScale = "0.5 0.5 0.4 1";
+      fogScale = "1 1 1 1";
       exposure = "0.85";
+      zOffset = "0";
       azimuth = "84";
       elevation = "54";
+      moonAzimuth = "0";
+      moonElevation = "45";
       castShadows = "1";
+      staticRefreshFreq = "8";
+      dynamicRefreshFreq = "8";
       brightness = "1";
-      flareType = "SunFlareExample1";
       flareScale = "1";
       nightColor = "0.0196078 0.0117647 0.109804 1";
+      nightFogColor = "0.0196078 0.0117647 0.109804 1";
       moonEnabled = "1";
-      moonTexture = "core/art/skies/night/moon_wglow";
       moonScale = "0.3";
-      moonTint = "0.192157 0.192157 0.192157 1";
+      moonLightColor = "0.192157 0.192157 0.192157 1";
       useNightCubemap = "0";
       attenuationRatio = "0 1 1";
       shadowType = "PSSM";
@@ -51,40 +69,86 @@ new SimGroup(MissionGroup) {
       position = "0 0 0";
       rotation = "1 0 0 0";
       scale = "1 1 1";
+      canSave = "1";
       canSaveDynamicFields = "1";
+         mieScattering = "0.0015";
+         moonTexture = "core/art/skies/night/moon_wglow";
+         moonTint = "0.192157 0.192157 0.192157 1";
          sunBrightness = "50";
    };
    new TerrainBlock(theTerrain) {
       terrainFile = "art/terrains/Empty Terrain_0.ter";
+      castShadows = "1";
       squareSize = "2";
-      tile = "0";
       baseTexSize = "1024";
+      baseTexFormat = "DDS";
+      lightMapSize = "256";
       screenError = "16";
+      ignoreZodiacs = "0";
       position = "-1024 -1024 179.978";
       rotation = "1 0 0 0";
-      scale = "1 1 1";
+      canSave = "1";
       canSaveDynamicFields = "1";
+         scale = "1 1 1";
+         tile = "0";
    };
    new SimGroup(PlayerDropPoints) {
+      canSave = "1";
       canSaveDynamicFields = "1";
          enabled = "1";
 
       new SpawnSphere() {
          autoSpawn = "0";
+         spawnTransform = "0";
          radius = "1";
          sphereWeight = "1";
          indoorWeight = "1";
          outdoorWeight = "1";
+         isAIControlled = "0";
          dataBlock = "SpawnSphereMarker";
          position = "0 0 241.772";
          rotation = "1 0 0 0";
          scale = "1 1 1";
+         canSave = "1";
          canSaveDynamicFields = "1";
             enabled = "1";
             homingCount = "0";
             lockCount = "0";
-            TypeBool locked = "False";
       };
+   };
+   new ConvexShape() {
+      Material = "Grid512_OrangeLines_Mat";
+      position = "6.31688 13.7911 241.9";
+      rotation = "0.475487 0.209976 -0.854296 13.8377";
+      scale = "1 1 1";
+      canSave = "1";
+      canSaveDynamicFields = "1";
+
+      surface = "0 0 0 1 0 0 1.58549";
+      surface = "0 1 0 0 0 0 -1.58549";
+      surface = "0.707107 0 0 0.707107 0 4.99426 0";
+      surface = "0 0.707107 -0.707107 0 0 -4.99426 0";
+      surface = "0.5 0.5 -0.5 0.5 -4.01359 0 0";
+      surface = "0.5 -0.5 0.5 0.5 4.01359 0 0";
+   };
+   new MeshRoad() {
+      topMaterial = "DefaultRoadMaterialTop";
+      bottomMaterial = "DefaultRoadMaterialOther";
+      sideMaterial = "DefaultRoadMaterialOther";
+      textureLength = "5";
+      breakAngle = "3";
+      widthSubdivisions = "0";
+      position = "46.4415 52.221 236.031";
+      rotation = "1 0 0 0";
+      scale = "1 1 1";
+      canSave = "1";
+      canSaveDynamicFields = "1";
+
+      Node = "46.4415 52.221 236.031 10 5 0 0 1";
+      Node = "21.9538 4.57701 242.652 10 5 0 0 1";
+      Node = "1.52535 -12.3952 243.532 10 5 0 0 1";
+      Node = "-47.4526 30.2515 249.092 10 5 0 0 1";
+      Node = "-26.0405 51.9559 255.77 10 5 0 0 1";
    };
 };
 //--- OBJECT WRITE END ---

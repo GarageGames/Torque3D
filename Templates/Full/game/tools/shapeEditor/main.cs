@@ -168,7 +168,7 @@ function ShapeEditorPlugin::open(%this, %filename)
          ShapeEdNodes-->worldTransform.setStateOn(1);
 
       // Initialise and show the shape editor
-      ShapeEdShapeTreeView.open(MissionGroup);
+      ShapeEdShapeTreeView.open(getRootScene());
       ShapeEdShapeTreeView.buildVisibleTree(true);
 
       ShapeEdPreviewGui.setVisible(true);

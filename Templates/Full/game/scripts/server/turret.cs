@@ -87,7 +87,7 @@ function TurretShapeData::onRemove(%this, %obj)
 }
 
 // This is on MissionGroup so it doesn't happen when the mission has ended
-function MissionGroup::respawnTurret(%this, %datablock, %className, %transform, %static, %respawn)
+function Scene::respawnTurret(%this, %datablock, %className, %transform, %static, %respawn)
 {
    %turret = new (%className)()
    {
@@ -97,7 +97,7 @@ function MissionGroup::respawnTurret(%this, %datablock, %className, %transform, 
    };
 
    %turret.setTransform(%transform);
-   MissionGroup.add(%turret);
+   getRootScene().add(%turret);
    return %turret;
 }
 
@@ -149,7 +149,7 @@ function TurretShapeData::onDestroyed(%this, %obj, %lastState)
 
    if (%obj.doRespawn())
    {
-      MissionGroup.schedule($TurretShape::RespawnTime, "respawnTurret", %this, %obj.getClassName(), %obj.getTransform(), true, true);
+      getRootScene().schedule($TurretShape::RespawnTime, "respawnTurret", %this, %obj.getClassName(), %obj.getTransform(), true, true);
    }
 }
 
@@ -331,7 +331,7 @@ function AITurretShapeData::onThrow(%this, %user, %amount)
       client = %user.client;
       isAiControlled = true;
    };
-   MissionGroup.add(%obj);
+   getRootScene().add(%obj);
    
    // Let the turret know that we're a firend
    %obj.addToIgnoreList(%user);

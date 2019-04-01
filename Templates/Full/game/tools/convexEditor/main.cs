@@ -189,7 +189,7 @@ function ConvexEditorPlugin::onSaveMission( %this, %missionFile )
 {
    if( ConvexEditorGui.isDirty )
    {
-      MissionGroup.save( %missionFile );
+      getRootScene().save( %missionFile );
       ConvexEditorGui.isDirty = false;
    }
 }
