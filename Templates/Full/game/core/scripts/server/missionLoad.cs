@@ -96,12 +96,12 @@ function loadMissionStage2()
       // to caching mission lighting.
       $missionCRC = getFileCRC( %file );
 
-      // Exec the mission.  The MissionGroup (loaded components) is added to the ServerGroup
+      // Exec the mission.  The Scene (loaded components) is added to the ServerGroup
       exec(%file);
 
-      if( !isObject(MissionGroup) )
+      if( !isObject(getRootScene()) )
       {
-         $Server::LoadFailMsg = "No 'MissionGroup' found in mission \"" @ %file @ "\".";
+         $Server::LoadFailMsg = "No 'Scene' found in mission \"" @ %file @ "\".";
       }
    }
 
@@ -145,7 +145,7 @@ function loadMissionStage2()
 
 function endMission()
 {
-   if (!isObject( MissionGroup ))
+   if (!isObject( getRootScene() ))
       return;
 
    echo("*** ENDING MISSION");
@@ -163,7 +163,7 @@ function endMission()
    }
    
    // Delete everything
-   MissionGroup.delete();
+   getRootScene().delete();
    MissionCleanup.delete();
    
    clearServerPaths();

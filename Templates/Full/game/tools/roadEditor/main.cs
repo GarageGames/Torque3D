@@ -156,7 +156,7 @@ function RoadEditorPlugin::onSaveMission( %this, %missionFile )
 {
    if( RoadEditorGui.isDirty )
    {
-      MissionGroup.save( %missionFile );
+      getRootScene().save( %missionFile );
       RoadEditorGui.isDirty = false;
    }
 }

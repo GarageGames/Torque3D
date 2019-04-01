@@ -645,7 +645,7 @@ function EditorGui::addCameraBookmark( %this, %name )
    if( !isObject(CameraBookmarks) )
    {
       %grp = new SimGroup(CameraBookmarks);
-      MissionGroup.add(%grp);
+      getRootScene().add(%grp);
    }
    CameraBookmarks.add( %obj );
 
@@ -843,12 +843,17 @@ function EditorGui::syncCameraGui( %this )
 
 function WorldEditorPlugin::onActivated( %this )
 {
+   if(!isObject(Scenes))
+      $scenesRootGroup = new SimGroup(Scenes);
+   
+   $scenesRootGroup.add(getRootScene());
+   
    EditorGui.bringToFront( EWorldEditor );
    EWorldEditor.setVisible(true);
    EditorGui.menuBar.insert( EditorGui.worldMenu, EditorGui.menuBar.dynamicItemInsertPos );
    EWorldEditor.makeFirstResponder(true);
-   EditorTree.open(MissionGroup,true);
-   EWCreatorWindow.setNewObjectGroup(MissionGroup);
+   EditorTree.open($scenesRootGroup,true);
+   EWCreatorWindow.setNewObjectGroup(getRootScene());
 
    EWorldEditor.syncGui();
 
@@ -1472,7 +1477,7 @@ function EditorTree::onDeleteObject( %this, %object )
       return true;
    
    if( %object == EWCreatorWindow.objectGroup )
-      EWCreatorWindow.setNewObjectGroup( MissionGroup );
+      EWCreatorWindow.setNewObjectGroup( getRootScene() );
 
    // Append it to our list.
    %this.undoDeleteList = %this.undoDeleteList TAB %object;
@@ -1604,6 +1609,13 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
       {
          %popup.item[ 0 ] = "Add Camera Bookmark" TAB "" TAB "EditorGui.addCameraBookmarkByGui();";
       }
+      else if( %obj.isMemberOfClass( "Scene" ))
+      {
+         %popup.item[ 0 ] = "Set as Active Scene" TAB "" TAB "EditorTree.showItemRenameCtrl( EditorTree.findItemByObjectId(" @ %popup.object @ ") );";
+         %popup.item[ 1 ] = "Delete" TAB "" TAB "EWorldEditor.deleteMissionObject(" @ %popup.object @ ");";
+         %popup.item[ 2 ] = "Inspect" TAB "" TAB "inspectObject(" @ %popup.object @ ");";
+         %popup.item[ 3 ] = "-";
+      }
       else 
       {
          %popup.object = %obj;
@@ -1681,8 +1693,8 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
 
    if( %haveObjectEntries )
    {         
-      %popup.enableItem( 0, %obj.isNameChangeAllowed() && %obj.getName() !$= "MissionGroup" );
-      %popup.enableItem( 1, %obj.getName() !$= "MissionGroup" );
+      %popup.enableItem( 0, %obj.isNameChangeAllowed() && %obj.getName() !$= getRootScene() );
+      %popup.enableItem( 1, %obj.getName() !$= getRootScene() );
       
       if( %haveLockAndHideEntries )
       {
@@ -2034,21 +2046,21 @@ function EWorldEditor::syncToolPalette( %this )
 function EWorldEditor::addSimGroup( %this, %groupCurrentSelection )
 {
    %activeSelection = %this.getActiveSelection();
-   if ( %activeSelection.getObjectIndex( MissionGroup ) != -1 )
+   if ( %activeSelection.getObjectIndex( getRootScene() ) != -1 )
    {
-      MessageBoxOK( "Error", "Cannot add MissionGroup to a new SimGroup" );
+      MessageBoxOK( "Error", "Cannot add Scene to a new SimGroup" );
       return;
    }
 
    // Find our parent.
 
-   %parent = MissionGroup;
+   %parent = getRootScene();
    if( !%groupCurrentSelection && isObject( %activeSelection ) && %activeSelection.getCount() > 0 )
    {
       %firstSelectedObject = %activeSelection.getObject( 0 );
       if( %firstSelectedObject.isMemberOfClass( "SimGroup" ) )
          %parent = %firstSelectedObject;
-      else if( %firstSelectedObject.getId() != MissionGroup.getId() )
+      else if( %firstSelectedObject.getId() != getRootScene().getId() )
          %parent = %firstSelectedObject.parentGroup;
    }
    

@@ -1051,7 +1051,7 @@ function MaterialEditorGui::updateActiveMaterialName(%this, %name)
    // Some objects (ConvexShape, DecalRoad etc) reference Materials by name => need
    // to find and update all these references so they don't break when we rename the
    // Material.
-   MaterialEditorGui.updateMaterialReferences( MissionGroup, %action.oldName, %action.newName );
+   MaterialEditorGui.updateMaterialReferences( getRootScene(), %action.oldName, %action.newName );
 }
 
 function MaterialEditorGui::updateMaterialReferences( %this, %obj, %oldName, %newName )
