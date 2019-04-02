@@ -151,6 +151,12 @@ SceneObject::SceneObject()
    mAccuTex = NULL;
    mSelectionFlags = 0;
    mPathfindingIgnore = false;
+
+   //Ubiq:
+   mAllowPlayerClimb = true;
+   mAllowPlayerLedgeGrab = true;
+   mAllowPlayerWallHug = true;
+   mCameraIgnores = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -648,6 +654,17 @@ void SceneObject::initPersistFields()
 
    endGroup( "Mounting" );
 
+   //Ubiq:
+   addGroup("PlayerMoves");
+   addField("allowPlayerClimb", TypeBool, Offset(mAllowPlayerClimb, SceneObject));
+   addField("allowPlayerLedgeGrab", TypeBool, Offset(mAllowPlayerLedgeGrab, SceneObject));
+   addField("allowPlayerWallHug", TypeBool, Offset(mAllowPlayerWallHug, SceneObject));
+   endGroup("PlayerMoves");
+   
+   addGroup("Camera");
+   addField("cameraIgnores", TypeBool, Offset(mCameraIgnores, SceneObject));
+   endGroup("Camera");
+
    Parent::initPersistFields();
 }
 
@@ -845,6 +862,12 @@ U32 SceneObject::packUpdate( NetConnection* conn, U32 mask, BitStream* stream )
 {
    U32 retMask = Parent::packUpdate( conn, mask, stream );
 
+   //Ubiq:
+   stream->writeFlag(mAllowPlayerClimb);
+   stream->writeFlag(mAllowPlayerLedgeGrab);
+   stream->writeFlag(mAllowPlayerWallHug);
+   stream->writeFlag(mCameraIgnores);
+
    if ( stream->writeFlag( mask & FlagMask ) )
       stream->writeRangedU32( (U32)mObjectFlags, 0, getObjectFlagMax() );
 
@@ -882,6 +905,12 @@ U32 SceneObject::packUpdate( NetConnection* conn, U32 mask, BitStream* stream )
 void SceneObject::unpackUpdate( NetConnection* conn, BitStream* stream )
 {
    Parent::unpackUpdate( conn, stream );
+
+   //Ubiq:
+   mAllowPlayerClimb = stream->readFlag();
+   mAllowPlayerLedgeGrab = stream->readFlag();
+   mAllowPlayerWallHug = stream->readFlag();
+   mCameraIgnores = stream->readFlag();
    
    // FlagMask
    if ( stream->readFlag() )      

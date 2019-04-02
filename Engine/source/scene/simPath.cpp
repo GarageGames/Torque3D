@@ -230,8 +230,7 @@ void Path::updatePath()
       }
    }
 
-   // DMMTODO: Looping paths.
-   gServerPathManager->updatePath(mPathIndex, positions, rotations, times, smoothingTypes);
+   gServerPathManager->updatePath(mPathIndex, positions, rotations, times, smoothingTypes, mIsLooping);
 }
 
 void Path::addObject(SimObject* obj)

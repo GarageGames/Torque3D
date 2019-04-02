@@ -59,7 +59,7 @@ S32 TSShape::smNumSkipLoadDetails = 0;
 
 bool TSShape::smInitOnRead = true;
 bool TSShape::smUseHardwareSkinning = true;
-U32 TSShape::smMaxSkinBones = 70;
+U32 TSShape::smMaxSkinBones = 100;
 
 
 TSShape::TSShape()

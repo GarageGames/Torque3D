@@ -296,6 +296,40 @@ function GameConnection::spawnPlayer(%this, %spawnPoint, %noControl)
 
       return;
    }
+   
+   //Ubiq: load autosave (see triggers.cs SaveTrigger for saving)
+   //-----------------------------------------------
+   //delete saveData if it already exists
+   if(isObject(saveData))
+      saveData.delete();
+      
+   //load from the save
+   %file = fileBase($Server::MissionFile);
+   %path = "saves/"@%file@"-autosave.sav";
+   echo("Loading autosave from "@%path@"...");
+ 
+   if(isfile(%path))
+      exec(%path);
+   
+   if(isObject(saveData))
+   {
+      //load successful, use saveData
+      %player.dieOnNextCollision = false;
+      %player.setDamageLevel(saveData.playerDamage);
+      %player.setActionThread("root", true, false);
+      %player.setVelocity("0 0 0");
+      %player.setTransform(saveData.playerTransform);
+      %this.cameraGoalPlayer.setTransform(saveData.cameraGoalPlayerTransform);
+      %this.cameraGoalFollower.setTransform(saveData.cameraGoalFollowerTransform);
+      echo("Loaded autosave!");
+   }
+   else
+   {
+      //no autosave file, or something went wrong
+      //just leave the player spawned as normal
+      echo("Failed to load autosave!");
+   }
+   //-----------------------------------------------   
 
    // Update the default camera to start with the player
    if (isObject(%this.camera))
@@ -324,7 +358,31 @@ function GameConnection::spawnPlayer(%this, %spawnPoint, %noControl)
 
    // Give the client control of the player
    %this.player = %player;
-
+   
+   
+   // Ubiq:
+   //-----------------------------------------------
+   //update the cameraGoalPlayer to follow the new player we spawned
+   %this.cameraGoalPlayer.setPlayerObject(%this.player);
+   
+   //the cameraGoalPlayer needs Moves (for manual orbit mode)
+   //this line asks the player to send a copy of it's Move to it
+   %this.player.setControlObject(%this.cameraGoalPlayer);
+   
+   //update the cameraGoalPath to follow the new player we spawned
+   %this.cameraGoalPath.setPlayerObject(%this.player);
+   
+   //update the goal camera to follow the player and player goal
+   %this.cameraGoalFollower.setPlayerObject(%this.player);
+   %this.cameraGoalFollower.setGoalObject(%this.cameraGoalPlayer);   
+   
+   //use the cameraGoalFollower as our camera
+   %this.setCameraObject(%this.cameraGoalFollower);
+   %this.setControlObject(%this.player);
+   %this.setFirstPerson(false);
+   //-----------------------------------------------
+   
+   
    // Give the client control of the camera if in the editor
    if( $startWorldEditor )
    {

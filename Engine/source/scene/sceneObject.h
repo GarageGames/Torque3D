@@ -806,7 +806,7 @@ class SceneObject : public NetObject, private SceneContainer::Link, public Proce
    // Note: This was placed in SceneObject to both ShapeBase and TSStatic could support it.
    public:
       GFXTextureObject* mAccuTex;
-      //   mSelectionFlags field keeps track of flags related to object selection.
+//   mSelectionFlags field keeps track of flags related to object selection.
       //     PRE_SELECTED marks an object as pre-selected (object under cursor)
       //     SELECTED marks an object as selected (a target)
    protected:
@@ -823,7 +823,20 @@ class SceneObject : public NetObject, private SceneContainer::Link, public Proce
       //   as opposed to something like a Player that has a built-in camera that requires
       //   special calculations to determine the view transform.
       virtual bool isCamera() const { return false; }
-};
+   // Ubiq:
+   private:
+      bool mAllowPlayerClimb;
+      bool mAllowPlayerLedgeGrab;
+      bool mAllowPlayerWallHug;
+
+      bool mCameraIgnores;
+
+   public:
+      bool allowPlayerClimb() {return mAllowPlayerClimb;}
+      bool allowPlayerLedgeGrab() {return mAllowPlayerLedgeGrab;}
+      bool allowPlayerWallHug() {return mAllowPlayerWallHug;}
+
+      bool cameraIgnores() {return mCameraIgnores;}};
 
 #endif  // _SCENEOBJECT_H_
 

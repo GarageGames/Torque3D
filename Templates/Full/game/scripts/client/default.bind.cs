@@ -177,35 +177,22 @@ function pitch(%val)
 
 function jump(%val)
 {
-   $mvTriggerCount2++;
+   //Ubiq:
+   //jet jump
+   $mvTriggerCount1++;
+   
+   //regular jump
+   $mvTriggerCount2 += %val;
 }
 
 function gamePadMoveX( %val )
 {
-   if(%val > 0)
-   {
-      $mvRightAction = %val * $movementSpeed;
-      $mvLeftAction = 0;
-   }
-   else
-   {
-      $mvRightAction = 0;
-      $mvLeftAction = -%val * $movementSpeed;
-   }
+   $mvXAxis_L = %val;
 }
 
 function gamePadMoveY( %val )
 {
-   if(%val > 0)
-   {
-      $mvForwardAction = %val * $movementSpeed;
-      $mvBackwardAction = 0;
-   }
-   else
-   {
-      $mvForwardAction = 0;
-      $mvBackwardAction = -%val * $movementSpeed;
-   }
+   $mvYAxis_L = %val;
 }
 
 function gamepadYaw(%val)
@@ -269,10 +256,10 @@ moveMap.bind( keyboard, space, jump );
 moveMap.bind( mouse, xaxis, yaw );
 moveMap.bind( mouse, yaxis, pitch );
 
-moveMap.bind( gamepad, thumbrx, "D", "-0.23 0.23", gamepadYaw );
-moveMap.bind( gamepad, thumbry, "D", "-0.23 0.23", gamepadPitch );
-moveMap.bind( gamepad, thumblx, "D", "-0.23 0.23", gamePadMoveX );
-moveMap.bind( gamepad, thumbly, "D", "-0.23 0.23", gamePadMoveY );
+moveMap.bind( gamepad, thumbrx, gamepadYaw );
+moveMap.bind( gamepad, thumbry, gamepadPitch );
+moveMap.bind( gamepad, thumblx, gamePadMoveX );
+moveMap.bind( gamepad, thumbly, gamePadMoveY );
 
 moveMap.bind( gamepad, btn_a, jump );
 moveMap.bindCmd( gamepad, btn_back, "disconnect();", "" );
@@ -310,13 +297,14 @@ function mouseFire(%val)
    $mvTriggerCount0++;
 }
 
-//function altTrigger(%val)
-//{
-   //$mvTriggerCount1++;
-//}
+//Ubiq: manual camera orbit
+function altTrigger(%val)
+{
+   $mvTriggerCount4++;
+}
 
 moveMap.bind( mouse, button0, mouseFire );
-//moveMap.bind( mouse, button1, altTrigger );
+moveMap.bind( mouse, button1, altTrigger );
 
 //------------------------------------------------------------------------------
 // Gamepad Trigger
@@ -423,14 +411,9 @@ function toggleZoom(%val)
    }
 }
 
-function mouseButtonZoom(%val)
-{
-   toggleZoom(%val);
-}
-
-moveMap.bind(keyboard, f, setZoomFOV); // f for field of view
-moveMap.bind(keyboard, z, toggleZoom); // z for zoom
-moveMap.bind( mouse, button1, mouseButtonZoom );
+moveMap.bind(keyboard, f, setZoomFOV);
+moveMap.bind(keyboard, z, toggleZoom);
+moveMap.bind( gamepad, btn_b, toggleZoom );
 
 //------------------------------------------------------------------------------
 // Camera & View functions
@@ -462,22 +445,14 @@ moveMap.bind( keyboard, v, toggleFreeLook ); // v for vanity
 moveMap.bind(keyboard, tab, toggleFirstPerson );
 moveMap.bind(keyboard, "alt c", toggleCamera);
 
-moveMap.bind( gamepad, btn_start, toggleCamera );
-moveMap.bind( gamepad, btn_x, toggleFirstPerson );
+moveMap.bind( gamepad, btn_back, toggleCamera );
 
 // ----------------------------------------------------------------------------
 // Misc. Player stuff
 // ----------------------------------------------------------------------------
 
-// Gideon does not have these animations, so the player does not need access to
-// them.  Commenting instead of removing so as to retain an example for those
-// who will want to use a player model that has these animations and wishes to
-// use them.
-
-//moveMap.bindCmd(keyboard, "ctrl w", "commandToServer('playCel',\"wave\");", "");
-//moveMap.bindCmd(keyboard, "ctrl s", "commandToServer('playCel',\"salute\");", "");
-
 moveMap.bindCmd(keyboard, "ctrl k", "commandToServer('suicide');", "");
+
 
 //------------------------------------------------------------------------------
 // Item manipulation
@@ -535,34 +510,6 @@ function mouseWheelWeaponCycle(%val)
 moveMap.bind(keyboard, q, nextWeapon);
 moveMap.bind(keyboard, "ctrl q", prevWeapon);
 moveMap.bind(mouse, "zaxis", mouseWheelWeaponCycle);
-
-//------------------------------------------------------------------------------
-// Message HUD functions
-//------------------------------------------------------------------------------
-
-function pageMessageHudUp( %val )
-{
-   if ( %val )
-      pageUpMessageHud();
-}
-
-function pageMessageHudDown( %val )
-{
-   if ( %val )
-      pageDownMessageHud();
-}
-
-function resizeMessageHud( %val )
-{
-   if ( %val )
-      cycleMessageHudSize();
-}
-
-moveMap.bind(keyboard, u, toggleMessageHud );
-//moveMap.bind(keyboard, y, teamMessageHud );
-moveMap.bind(keyboard, "pageUp", pageMessageHudUp );
-moveMap.bind(keyboard, "pageDown", pageMessageHudDown );
-moveMap.bind(keyboard, "p", resizeMessageHud );
 
 //------------------------------------------------------------------------------
 // Demo recording functions
@@ -705,6 +652,9 @@ GlobalActionMap.bindCmd(keyboard, "alt k", "cls();","");
 GlobalActionMap.bindCmd(keyboard, "alt enter", "", "Canvas.attemptFullscreenToggle();");
 GlobalActionMap.bindCmd(keyboard, "F1", "", "contextHelp();");
 moveMap.bindCmd(keyboard, "n", "toggleNetGraph();", "");
+
+//Ubiq: reload player datablock for quick in-game editing & testing
+GlobalActionMap.bindCmd(keyboard, "insert", "", "exec(\"art/datablocks/player.cs\");");
 
 // ----------------------------------------------------------------------------
 // Useful vehicle stuff

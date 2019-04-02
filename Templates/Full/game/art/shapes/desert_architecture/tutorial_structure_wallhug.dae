@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='utf-8'?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+    <asset>
+        <contributor>
+            <author />
+            <authoring_tool>Torque 3D 2011 Interior Exporter</authoring_tool>
+            <comments />
+        </contributor>
+        <created>15/05/2013 2:11:03 AM</created>
+        <modified>15/05/2013 2:11:03 AM</modified>
+        <revision />
+        <title />
+        <subject />
+        <keywords />
+        <unit meter="1.000000" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images>
+        <image id="DESERT_BRICK_VERTICAL_TRIM-Diffuse" name="DESERT_BRICK_VERTICAL_TRIM-Diffuse">
+            <init_from>DESERT_BRICK_VERTICAL_TRIM.jpg</init_from>
+        </image>
+    </library_images>
+    <library_materials>
+        <material id="DESERT_BRICK_VERTICAL_TRIM" name="DESERT_BRICK_VERTICAL_TRIM">
+            <instance_effect url="#DESERT_BRICK_VERTICAL_TRIM-fx" />
+        </material>
+    </library_materials>
+    <library_effects>
+        <effect id="DESERT_BRICK_VERTICAL_TRIM-fx" name="DESERT_BRICK_VERTICAL_TRIM-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_VERTICAL_TRIM-Surface"><surface type="2D"><init_from>DESERT_BRICK_VERTICAL_TRIM-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_VERTICAL_TRIM-Sampler"><sampler2D><source>DESERT_BRICK_VERTICAL_TRIM-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_VERTICAL_TRIM-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_geometries>
+        <geometry id="tutorial_structure_wallhug-lib" name="tutorial_structure_wallhugMesh">
+            <mesh>
+                <source id="tutorial_structure_wallhug-Position">
+                    <float_array count="24" id="tutorial_structure_wallhug-Position-array">
+                        -3.1116 -0.1908 -0.0000
+                        -3.1116 0.1843 -0.0000
+                        -3.1116 -0.1908 0.2315
+                        -3.1116 0.1843 0.2315
+                        3.1116 -0.1908 -0.0000
+                        3.1116 0.1843 -0.0000
+                        3.1116 -0.1908 0.2315
+                        3.1116 0.1843 0.2315
+                    </float_array>
+                    <technique_common>
+                        <accessor count="8" source="#tutorial_structure_wallhug-Position-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="tutorial_structure_wallhug-Normal">
+                    <float_array count="18" id="tutorial_structure_wallhug-Normal-array">
+                        -1.0000 0.0000 0.0000
+                        -0.0000 -0.0000 -1.0000
+                        -0.0000 -1.0000 -0.0001
+                        0.0000 0.0000 1.0000
+                        0.0000 1.0000 0.0000
+                        1.0000 0.0000 0.0000
+                    </float_array>
+                    <technique_common>
+                        <accessor count="6" source="#tutorial_structure_wallhug-Normal-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="tutorial_structure_wallhug-UV0">
+                    <float_array count="32" id="tutorial_structure_wallhug-UV0-array">
+                        -2.4429 -0.7495
+                        -2.6731 -0.7494
+                        -2.4428 -1.0007
+                        -2.6730 -1.0007
+                        4.0047 -2.2465
+                        4.0047 -2.4979
+                        -0.3306 -2.2465
+                        -0.3305 -2.4979
+                        -0.3306 -1.9947
+                        4.0047 -1.9947
+                        -0.3305 -1.7466
+                        4.0047 -1.7466
+                        -0.3306 -2.7482
+                        4.0047 -2.7482
+                        -2.6730 -0.7494
+                        -2.4428 -0.7494
+</float_array>
+                    <technique_common>
+                        <accessor count="16" source="#tutorial_structure_wallhug-UV0-array" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="tutorial_structure_wallhug-Vertex">
+                    <input semantic="POSITION" source="#tutorial_structure_wallhug-Position" />
+                </vertices>
+                <triangles count="12" material="DESERT_BRICK_VERTICAL_TRIM">
+                    <input offset="0" semantic="VERTEX" source="#tutorial_structure_wallhug-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#tutorial_structure_wallhug-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#tutorial_structure_wallhug-UV0" />
+                    <p>
+                        3 0 3 1 0 1 0 0 0
+                        2 0 2 3 0 3 0 0 0
+                        1 1 7 5 1 5 4 1 4
+                        0 1 6 1 1 7 4 1 4
+                        4 2 4 6 2 9 2 2 8
+                        0 2 6 4 2 4 2 2 8
+                        7 3 11 3 3 10 2 3 8
+                        6 3 9 7 3 11 2 3 8
+                        7 4 13 5 4 5 1 4 7
+                        3 4 12 7 4 13 1 4 7
+                        6 5 2 4 5 15 5 5 14
+                        7 5 3 6 5 2 5 5 14
+                    </p>
+                </triangles>
+            </mesh>
+        </geometry>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="tutorial_structure_wallhug" name="tutorial_structure_wallhug">
+                <instance_geometry url="#tutorial_structure_wallhug-lib">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="DESERT_BRICK_VERTICAL_TRIM" target="#DESERT_BRICK_VERTICAL_TRIM" />
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>

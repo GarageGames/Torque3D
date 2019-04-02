@@ -46,35 +46,23 @@ function clientCmdSyncClock(%time)
 }
 
 //-----------------------------------------------------------------------------
-// Damage Direction Indicator
+// Numerical Health Counter
 //-----------------------------------------------------------------------------
 
-function clientCmdSetDamageDirection(%direction)
+function clientCmdSetNumericalHealthHUD(%curHealth)
 {
-   eval("%ctrl = DamageHUD-->damage_" @ %direction @ ";");
-   if (isObject(%ctrl))
-   {
-      // Show the indicator, and schedule an event to hide it again
-      cancelAll(%ctrl);
-      %ctrl.setVisible(true);
-      %ctrl.schedule(500, setVisible, false);
-   }
-}
+   // Skip if the hud is missing.
+   if (!isObject(numericalHealthHUD))
+      return;
 
-//-----------------------------------------------------------------------------
-// Teleporter visual effect
-//-----------------------------------------------------------------------------
+   // The server has sent us our current health, display it on the HUD
+   numericalHealthHUD.setValue(%curHealth);
 
-function clientCmdPlayTeleportEffect(%position, %effectDataBlock)
-{
-   if (isObject(%effectDataBlock))
-   {
-      new Explosion()
-      {
-         position = %position;
-         dataBlock = %effectDataBlock;
-      };
-   }
+   // Ensure the HUD is set to visible while we have health / are alive
+   if (%curHealth)
+      HealthHUD.setVisible(true);
+   else
+      HealthHUD.setVisible(false);
 }
 
 // ----------------------------------------------------------------------------
@@ -82,14 +70,15 @@ function clientCmdPlayTeleportEffect(%position, %effectDataBlock)
 // ----------------------------------------------------------------------------
 
 // Update the Ammo Counter with current ammo, if not any then hide the counter.
-function clientCmdSetAmmoAmountHud(%amount, %amountInClips)
+
+function clientCmdSetAmmoAmountHud(%amount)
 {
    if (!%amount)
       AmmoAmount.setVisible(false);
    else
    {
       AmmoAmount.setVisible(true);
-      AmmoAmount.setText("Ammo: " @ %amount @ "/" @ %amountInClips);
+      AmmoAmount.setText("Ammo: "@%amount);
    }
 }
 
@@ -97,14 +86,14 @@ function clientCmdSetAmmoAmountHud(%amount, %amountInClips)
 // update the Ammo Counter (just so we don't have to call it separately).
 // Passing an empty parameter ("") hides the HUD component.
 
-function clientCmdRefreshWeaponHUD(%amount, %preview, %ret, %zoomRet, %amountInClips)
+function clientCmdRefreshWeaponHUD(%amount, %preview, %ret)
 {
    if (!%amount)
       AmmoAmount.setVisible(false);
    else
    {
       AmmoAmount.setVisible(true);
-      AmmoAmount.setText("Ammo: " @ %amount @ "/" @ %amountInClips);
+      AmmoAmount.setText("Ammo: "@ %amount);
    }
 
    if (%preview $= "")
@@ -122,61 +111,35 @@ function clientCmdRefreshWeaponHUD(%amount, %preview, %ret, %zoomRet, %amountInC
       Reticle.setVisible(true);
       Reticle.setbitmap("art/gui/weaponHud/"@ detag(%ret));
    }
-
-   if (isObject(ZoomReticle))
-   {
-      if (%zoomRet $= "")
-      {
-         ZoomReticle.setBitmap("");
-      }
-      else
-      {
-         ZoomReticle.setBitmap("art/gui/weaponHud/"@ detag(%zoomRet));
-      }
-   }
 }
 
 // ----------------------------------------------------------------------------
-// Vehicle Support
+// Zoom reticle
 // ----------------------------------------------------------------------------
 
-function clientCmdtoggleVehicleMap(%toggle)
+// Here we turn the normal reticle off and show the zoom reticle.  The "reticle"
+// parameter is the "zoomReticle" field in the weapon's datablock.
+
+
+function clientCmdsetZoom(%reticle)
 {
-   if(%toggle)
-   {
-      moveMap.pop();
-	  // clear movement
-	  $mvForwardAction = 0;
-	  $mvBackwardAction = 0;
-      vehicleMap.push();
-   }
-   else
-   {
-      vehicleMap.pop();
-      moveMap.push();
-   }
+   $ZoomOn = true;
+   setFov($Pref::Player::CurrentFOV);
+   zoomReticle.setBitmap("art/gui/weaponHud/"@ detag(%reticle));
+   Reticle.setVisible(false);
+   zoomReticle.setVisible(true);
+
+   DOFPostEffect.setAutoFocus( true );
+   DOFPostEffect.setFocusParams( 0.5, 0.5, 50, 500, -5, 5 );
+   DOFPostEffect.enable();
 }
 
-// ----------------------------------------------------------------------------
-// Turret Support
-// ----------------------------------------------------------------------------
-
-// Call by the Turret class when a player mounts or unmounts it.
-// %turret = The turret that was mounted
-// %player = The player doing the mounting
-// %mounted = True if the turret was mounted, false if it was unmounted
-function turretMountCallback(%turret, %player, %mounted)
+function clientCmdUnSetZoom(%reticle)
 {
-   //echo ( "\c4turretMountCallback -> " @ %mounted );
+   $ZoomOn = false;
+   setFov($Pref::Player::defaultFOV);
+   Reticle.setVisible(true);
+   zoomReticle.setVisible(false);
 
-   if (%mounted)
-   {
-      // Push the action map
-      turretMap.push();
-   }
-   else
-   {
-      // Pop the action map
-      turretMap.pop();
-   }
+   DOFPostEffect.disable();
 }
