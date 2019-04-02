@@ -189,7 +189,7 @@ ShapeBaseImageData::ShapeBaseImageData()
    lightRadius = 10.f;
    lightBrightness = 1.0f;
 
-   shapeName = "core/art/shapes/noshape.dts";
+   shapeName = "core/shapes/noshape.dts";
    shapeNameFP = "";
    imageAnimPrefix = "";
    imageAnimPrefixFP = "";

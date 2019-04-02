@@ -116,7 +116,7 @@ public:
    U32 getMenuListCount() { return mMenuList.size(); }
 
    PopupMenu* getMenu(U32 index);
-   PopupMenu* findMenu(StringTableEntry barTitle);
+   PopupMenu* findMenu(String barTitle);
 
    DECLARE_CONOBJECT(GuiMenuBar);
    DECLARE_CALLBACK( void, onMouseInMenu, ( bool hasLeftMenu ));

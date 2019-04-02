@@ -20,10 +20,11 @@ function CoreModule::onCreate(%this)
    ModuleDatabase.LoadExplicit( "Core_Rendering" );
    ModuleDatabase.LoadExplicit( "Core_Utility" );
    ModuleDatabase.LoadExplicit( "Core_GUI" );
-   ModuleDatabase.LoadExplicit( "CoreModule" );
    ModuleDatabase.LoadExplicit( "Core_Lighting" );
    ModuleDatabase.LoadExplicit( "Core_SFX" );
    ModuleDatabase.LoadExplicit( "Core_PostFX" );
+   ModuleDatabase.LoadExplicit( "Core_Components" );
+   ModuleDatabase.LoadExplicit( "Core_GameObjects" );
    ModuleDatabase.LoadExplicit( "Core_ClientServer" );
    
    %prefPath = getPrefpath();
@@ -32,63 +33,6 @@ function CoreModule::onCreate(%this)
    else
       exec("data/defaults.cs");
       
-   %der = $pref::Video::displayDevice;
-   
-   //We need to hook the missing/warn material stuff early, so do it here
-   /*$Core::MissingTexturePath = "core/images/missingTexture";
-   $Core::UnAvailableTexturePath = "core/images/unavailable";
-   $Core::WarningTexturePath = "core/images/warnMat";
-   $Core::CommonShaderPath = "core/shaders";
-   
-   /*%classList = enumerateConsoleClasses( "Component" );
-
-   foreach$( %componentClass in %classList )
-   {
-      echo("Native Component of type: " @ %componentClass);
-   }*/
-
-   //exec("./helperFunctions.cs");
-
-   // We need some of the default GUI profiles in order to get the canvas and
-   // other aspects of the GUI system ready.
-   //exec("./profiles.cs");
-
-   //This is a bit of a shortcut, but we'll load the client's default settings to ensure all the prefs get initialized correctly
-   
-
-   // Initialization of the various subsystems requires some of the preferences
-   // to be loaded... so do that first.
-   /*exec("./globals.cs");
-
-   exec("./canvas.cs");
-   exec("./cursor.cs");
-
-   exec("./renderManager.cs");
-   exec("./lighting.cs");
-
-   exec("./audio.cs");
-   exec("./sfx/audioAmbience.cs");
-   exec("./sfx/audioData.cs");
-   exec("./sfx/audioDescriptions.cs");
-   exec("./sfx/audioEnvironments.cs");
-   exec("./sfx/audioStates.cs");
-
-   exec("./parseArgs.cs");
-
-   // Materials and Shaders for rendering various object types
-   exec("./gfxData/commonMaterialData.cs");
-   exec("./gfxData/shaders.cs");
-   exec("./gfxData/terrainBlock.cs");
-   exec("./gfxData/water.cs");
-   exec("./gfxData/scatterSky.cs");
-   exec("./gfxData/clouds.cs");
-
-   // Initialize all core post effects.   
-   exec("./postFx.cs");
-
-   //VR stuff
-   exec("./oculusVR.cs");*/
-
    // Seed the random number generator.
    setRandomSeed();
    

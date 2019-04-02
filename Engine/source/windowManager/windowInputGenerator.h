@@ -37,8 +37,6 @@ class PlatformWindow;
 
 class WindowInputGenerator
 {
-      bool mNotifyPosition;
-      
    protected:
 
       PlatformWindow *mWindow;

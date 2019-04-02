@@ -6150,8 +6150,22 @@ void Player::updateWorkingCollisionSet()
       mWorkingQueryBox.maxExtents += twolPoint;
 
       disableCollision();
+
+      //We temporarily disable the collisions of anything mounted to us so we don't accidentally walk into things we've attached to us
+      for (SceneObject *ptr = mMount.list; ptr; ptr = ptr->getMountLink())
+      {
+         ptr->disableCollision();
+      }
+
       mConvex.updateWorkingList(mWorkingQueryBox,
          isGhost() ? sClientCollisionContactMask : sServerCollisionContactMask);
+
+      //And now re-enable the collisions of the mounted things
+      for (SceneObject *ptr = mMount.list; ptr; ptr = ptr->getMountLink())
+      {
+         ptr->enableCollision();
+      }
+
       enableCollision();
    }
 }
@@ -6345,6 +6359,14 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
          if(len > 8191)
             len = 8191;
          stream->writeInt((S32)len, 13);
+
+         // constrain the range of mRot.z
+         while (mRot.z < 0.0f)
+            mRot.z += M_2PI_F;
+         while (mRot.z > M_2PI_F)
+            mRot.z -= M_2PI_F;
+
+
       }
       stream->writeFloat(mRot.z / M_2PI_F, 7);
       stream->writeSignedFloat(mHead.x / (mDataBlock->maxLookAngle - mDataBlock->minLookAngle), 6);

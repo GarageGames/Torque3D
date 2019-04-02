@@ -74,9 +74,9 @@ EndImplementEnumType;
 
 //-----------------------------------------------------------------------------
 
-String TSShapeConstructor::smCapsuleShapePath("core/art/shapes/unit_capsule.dts");
-String TSShapeConstructor::smCubeShapePath("core/art/shapes/unit_cube.dts");
-String TSShapeConstructor::smSphereShapePath("core/art/shapes/unit_sphere.dts");
+String TSShapeConstructor::smCapsuleShapePath("tools/shapes/unit_capsule.dts");
+String TSShapeConstructor::smCubeShapePath("tools/shapes/unit_cube.dts");
+String TSShapeConstructor::smSphereShapePath("tools/shapes/unit_sphere.dts");
 
 ResourceRegisterPostLoadSignal< TSShape > TSShapeConstructor::_smAutoLoad( &TSShapeConstructor::_onTSShapeLoaded );
 ResourceRegisterUnloadSignal< TSShape > TSShapeConstructor::_smAutoUnload( &TSShapeConstructor::_onTSShapeUnloaded );
