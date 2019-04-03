@@ -55,7 +55,7 @@ class GFont;
 // builds.... you better be using shipping builds
 // for your final release.
 #ifndef TORQUE_SHIPPING
-#define ENABLE_DEBUGDRAW
+//#define ENABLE_DEBUGDRAW
 #endif
 
 
