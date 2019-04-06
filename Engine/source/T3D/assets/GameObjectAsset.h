@@ -59,6 +59,8 @@ public:
    static void initPersistFields();
    virtual void copyTo(SimObject* object);
 
+   const char* create();
+
    /// Declare Console Object.
    DECLARE_CONOBJECT(GameObjectAsset);
 
@@ -73,12 +75,12 @@ DefineConsoleType(TypeGameObjectAssetPtr, GameObjectAsset)
 //-----------------------------------------------------------------------------
 // TypeAssetId GuiInspectorField Class
 //-----------------------------------------------------------------------------
-class GuiInspectorTypeGameObjectAssetPtr : public GuiInspectorTypeFileName
+class GuiInspectorTypeGameObjectAssetPtr : public GuiInspectorField
 {
-   typedef GuiInspectorTypeFileName Parent;
+   typedef GuiInspectorField Parent;
 public:
 
-   GuiBitmapButtonCtrl  *mSMEdButton;
+   GuiButtonCtrl  *mGameObjectEditButton;
 
    DECLARE_CONOBJECT(GuiInspectorTypeGameObjectAssetPtr);
    static void consoleInit();

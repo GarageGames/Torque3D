@@ -105,10 +105,6 @@ ShapeAnimationAsset::ShapeAnimationAsset() :
 
 ShapeAnimationAsset::~ShapeAnimationAsset()
 {
-   // If the asset manager does not own the asset then we own the
-   // asset definition so delete it.
-   if (!getOwned())
-      delete mpAssetDefinition;
 }
 
 //-----------------------------------------------------------------------------
@@ -172,4 +168,19 @@ void ShapeAnimationAsset::initializeAsset(void)
 void ShapeAnimationAsset::onAssetRefresh(void)
 {
 
+}
+
+S32 ShapeAnimationAsset::getAnimationCount()
+{ 
+   if (mSourceShape == nullptr)
+      return 0;
+
+   return mSourceShape->sequences.size(); 
+}
+
+DefineEngineMethod(ShapeAnimationAsset, getAnimationCount, S32, (), ,
+   "Gets the number of animations for this shape asset.\n"
+   "@return Animation count.\n")
+{
+   return object->getAnimationCount();
 }

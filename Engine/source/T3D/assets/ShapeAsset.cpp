@@ -92,10 +92,6 @@ ShapeAsset::ShapeAsset()
 
 ShapeAsset::~ShapeAsset()
 {
-   // If the asset manager does not own the asset then we own the
-   // asset definition so delete it.
-   if (!getOwned())
-      delete mpAssetDefinition;
 }
 
 //-----------------------------------------------------------------------------
@@ -127,7 +123,17 @@ void ShapeAsset::initializeAsset()
    // Call parent.
    Parent::initializeAsset();
 
-   if (dStrcmp(mFileName, "") == 0)
+   if (mFileName == StringTable->EmptyString())
+      return;
+
+   ResourceManager::get().getChangedSignal().notify(this, &ShapeAsset::_onResourceChanged);
+
+   loadShape();
+}
+
+void ShapeAsset::_onResourceChanged(const Torque::Path &path)
+{
+   if (path != Torque::Path(mFileName) )
       return;
 
    loadShape();
@@ -152,12 +158,12 @@ bool ShapeAsset::loadShape()
 
          if (assetType == StringTable->insert("MaterialAsset"))
          {
-            mMaterialAssetIds.push_back(assetDependenciesItr->value);
+            mMaterialAssetIds.push_front(assetDependenciesItr->value);
 
             //Force the asset to become initialized if it hasn't been already
             AssetPtr<MaterialAsset> matAsset = assetDependenciesItr->value;
 
-            mMaterialAssets.push_back(matAsset);
+            mMaterialAssets.push_front(matAsset);
          }
          else if (assetType == StringTable->insert("ShapeAnimationAsset"))
          {
@@ -226,6 +232,8 @@ bool ShapeAsset::loadShape()
          }
       }
    }
+
+   onShapeChanged.trigger(this);
 
    return true;
 }

@@ -92,6 +92,7 @@ ConsoleSetType(TypeLevelAssetPtr)
 
 LevelAsset::LevelAsset() : AssetBase(), mIsSubLevel(false)
 {
+   mLevelName = StringTable->EmptyString();
    mLevelFile = StringTable->EmptyString();
    mPreviewImage = StringTable->EmptyString();
 
@@ -116,7 +117,8 @@ void LevelAsset::initPersistFields()
    Parent::initPersistFields();
 
    addField("LevelFile", TypeString, Offset(mLevelFile, LevelAsset), "Path to the actual level file.");
-   addField("PreviewImage", TypeString, Offset(mPreviewImage, LevelAsset), "Path to the image used for selection preview.");
+   addField("LevelName", TypeString, Offset(mLevelName, LevelAsset), "Human-friendly name for the level.");
+   addField("PreviewImage", TypeImageFilename, Offset(mPreviewImage, LevelAsset), "Path to the image used for selection preview.");
 }
 
 //------------------------------------------------------------------------------
