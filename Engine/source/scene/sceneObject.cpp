@@ -93,6 +93,9 @@ ConsoleDocClass( SceneObject,
    "@ingroup gameObjects\n"
 );
 
+#ifdef TORQUE_TOOLS
+extern bool gEditingMission;
+#endif
 
 Signal< void( SceneObject* ) > SceneObject::smSceneObjectAdd;
 Signal< void( SceneObject* ) > SceneObject::smSceneObjectRemove;
@@ -763,8 +766,14 @@ void SceneObject::onCameraScopeQuery( NetConnection* connection, CameraScopeQuer
 
 bool SceneObject::isRenderEnabled() const
 {
-   AbstractClassRep *classRep = getClassRep();
-   return ( mObjectFlags.test( RenderEnabledFlag ) && classRep->isRenderEnabled() );
+#ifdef TORQUE_TOOLS
+	if (gEditingMission)
+	{
+		AbstractClassRep *classRep = getClassRep();
+		return (mObjectFlags.test(RenderEnabledFlag) && classRep->isRenderEnabled());
+	}
+#endif
+	return (mObjectFlags.test(RenderEnabledFlag));
 }
 
 //-----------------------------------------------------------------------------
