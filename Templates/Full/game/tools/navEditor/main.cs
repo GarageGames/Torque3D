@@ -205,7 +205,7 @@ function NavEditorPlugin::onSaveMission(%this, %missionFile)
 {
    if(NavEditorGui.isDirty)
    {
-      MissionGroup.save(%missionFile);
+      getRootScene().save(%missionFile);
       NavEditorGui.isDirty = false;
    }
 }

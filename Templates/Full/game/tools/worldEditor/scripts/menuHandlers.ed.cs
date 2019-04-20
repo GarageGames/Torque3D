@@ -272,7 +272,7 @@ function EditorSaveMission()
    // now write the terrain and mission files out:
 
    if(EWorldEditor.isDirty || ETerrainEditor.isMissionDirty)
-      MissionGroup.save($Server::MissionFile);
+      getRootScene().save($Server::MissionFile);
    if(ETerrainEditor.isDirty)
    {
       // Find all of the terrain files
@@ -480,6 +480,21 @@ function EditorOpenMission(%filename)
       Editor.open();
    
       popInstantGroup();
+   }
+}
+
+function EditorOpenSceneAppend(%levelAsset)
+{
+   //Load the asset's level file
+   exec(%levelAsset.levelFile);
+   
+   //We'll assume the scene name and assetname are the same for now
+   %sceneName = %levelAsset.AssetName;
+   %scene = nameToID(%sceneName);
+   if(isObject(%scene))
+   {
+      //Append it to our scene heirarchy
+      $scenesRootGroup.add(%scene);
    }
 }
 
