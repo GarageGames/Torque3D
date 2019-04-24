@@ -12,7 +12,7 @@ function AssetBrowser::createPostEffectAsset(%this)
    {
       AssetName = %assetName;
       versionId = 1;
-      scriptFilePath = %scriptPath;
+      scriptFile = %assetName @ ".cs";
    };
    
    TamlWrite(%asset, %tamlpath);

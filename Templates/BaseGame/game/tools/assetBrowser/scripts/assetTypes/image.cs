@@ -106,7 +106,7 @@ function AssetBrowser::importImageAsset(%this, %assetItem)
    {
       assetName = %assetName;
       versionId = 1;
-      imageFile = %assetFullPath;
+      imageFile = fileName(%filePath);
       originalFilePath = %filePath;
    };
    

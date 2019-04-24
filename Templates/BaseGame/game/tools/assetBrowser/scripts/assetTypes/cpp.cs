@@ -25,8 +25,8 @@ function AssetBrowser::createCppAsset(%this)
    {
       AssetName = %assetName;
       versionId = 1;
-      codeFilePath = %codePath;
-      headerFilePath = %headerPath;
+      codeFile = %codePath;
+      headerFile = %headerPath;
    };
    
    TamlWrite(%asset, %tamlpath);

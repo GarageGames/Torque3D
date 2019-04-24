@@ -410,6 +410,22 @@ function EditorOpenSceneAppend(%levelAsset)
    }
 }
 
+function MakeSelectionASublevel()
+{
+   /*%size = EWorldEditor.getSelectionSize();
+   if ( %size == 0 )
+      return;
+      
+   //Make a new Scene object
+      
+   for(%i=0; %i < %size; %i++)
+   {
+      
+   }
+   %a = EWorldEditor.getSelectedObject(0);
+   %b = EWorldEditor.getSelectedObject(1);*/
+}
+
 function EditorExportToCollada()
 {
 

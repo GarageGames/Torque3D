@@ -19,9 +19,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-
-#ifndef COMPONENT_ASSET_H
-#include "ComponentAsset.h"
+#ifndef CPP_ASSET_H
+#include "CppAsset.h"
 #endif
 
 #ifndef _ASSET_MANAGER_H_
@@ -45,21 +44,21 @@
 
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(ComponentAsset);
+IMPLEMENT_CONOBJECT(CppAsset);
 
-ConsoleType(ComponentAssetPtr, TypeComponentAssetPtr, ComponentAsset, ASSET_ID_FIELD_PREFIX)
+ConsoleType(CppAssetPtr, TypeCppAssetPtr, CppAsset, ASSET_ID_FIELD_PREFIX)
 
 //-----------------------------------------------------------------------------
 
-ConsoleGetType(TypeComponentAssetPtr)
+ConsoleGetType(TypeCppAssetPtr)
 {
    // Fetch asset Id.
-   return (*((AssetPtr<ComponentAsset>*)dptr)).getAssetId();
+   return (*((AssetPtr<CppAsset>*)dptr)).getAssetId();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleSetType(TypeComponentAssetPtr)
+ConsoleSetType(TypeCppAssetPtr)
 {
    // Was a single argument specified?
    if (argc == 1)
@@ -68,13 +67,13 @@ ConsoleSetType(TypeComponentAssetPtr)
       const char* pFieldValue = argv[0];
 
       // Fetch asset pointer.
-      AssetPtr<ComponentAsset>* pAssetPtr = dynamic_cast<AssetPtr<ComponentAsset>*>((AssetPtrBase*)(dptr));
+      AssetPtr<CppAsset>* pAssetPtr = dynamic_cast<AssetPtr<CppAsset>*>((AssetPtrBase*)(dptr));
 
       // Is the asset pointer the correct type?
       if (pAssetPtr == NULL)
       {
          // No, so fail.
-         //Con::warnf("(TypeComponentAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
+         //Con::warnf("(TypeCppAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
          return;
       }
 
@@ -85,25 +84,20 @@ ConsoleSetType(TypeComponentAssetPtr)
    }
 
    // Warn.
-   Con::warnf("(TypeComponentAssetPtr) - Cannot set multiple args to a single asset.");
+   Con::warnf("(TypeCppAssetPtr) - Cannot set multiple args to a single asset.");
 }
 
 //-----------------------------------------------------------------------------
 
-ComponentAsset::ComponentAsset()
+CppAsset::CppAsset() : AssetBase()
 {
-   mComponentName = StringTable->EmptyString();
-   mComponentClass = StringTable->EmptyString();
-   mFriendlyName = StringTable->EmptyString();
-   mComponentType = StringTable->EmptyString();
-   mDescription = StringTable->EmptyString();
-
-   mScriptFile = StringTable->EmptyString();
+   mCodeFile = StringTable->EmptyString();
+   mHeaderFile = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
 
-ComponentAsset::~ComponentAsset()
+CppAsset::~CppAsset()
 {
    // If the asset manager does not own the asset then we own the
    // asset definition so delete it.
@@ -113,59 +107,60 @@ ComponentAsset::~ComponentAsset()
 
 //-----------------------------------------------------------------------------
 
-void ComponentAsset::initPersistFields()
+void CppAsset::initPersistFields()
 {
    // Call parent.
    Parent::initPersistFields();
 
-   addField("componentName", TypeString, Offset(mComponentName, ComponentAsset), "Unique Name of the component. Defines the namespace of the scripts for the component.");
-   addField("componentClass", TypeString, Offset(mComponentClass, ComponentAsset), "Class of object this component uses.");
-   addField("friendlyName", TypeString, Offset(mFriendlyName, ComponentAsset), "The human-readble name for the component.");
-   addField("componentType", TypeString, Offset(mComponentType, ComponentAsset), "The category of the component for organizing in the editor.");
-   addField("description", TypeString, Offset(mDescription, ComponentAsset), "Simple description of the component.");
+   addProtectedField("codeFile", TypeAssetLooseFilePath, Offset(mCodeFile, CppAsset),
+      &setCppFile, &getCppFile, "Path to the cpp file.");
 
-   addProtectedField("scriptFile", TypeAssetLooseFilePath, Offset(mScriptFile, ComponentAsset),
-      &setScriptFile, &getScriptFile, "A script file with additional scripted functionality for this component.");
+   addProtectedField("headerFile", TypeAssetLooseFilePath, Offset(mHeaderFile, CppAsset),
+      &setHeaderFile, &getHeaderFile, "Path to the h file.");
+
 }
 
 //------------------------------------------------------------------------------
 
-void ComponentAsset::copyTo(SimObject* object)
+void CppAsset::copyTo(SimObject* object)
 {
    // Call to parent.
    Parent::copyTo(object);
 }
 
-void ComponentAsset::initializeAsset()
-{
-   mScriptFile = expandAssetFilePath(mScriptFile);
-
-   if(Platform::isFile(mScriptFile))
-      Con::executeFile(mScriptFile, false, false);
-}
-
-void ComponentAsset::onAssetRefresh()
-{
-   mScriptFile = expandAssetFilePath(mScriptFile);
-
-   if (Platform::isFile(mScriptFile))
-      Con::executeFile(mScriptFile, false, false);
-}
-
-void ComponentAsset::setScriptFile(const char* pScriptFile)
+void CppAsset::setCppFile(const char* pCppFile)
 {
    // Sanity!
-   AssertFatal(pScriptFile != NULL, "Cannot use a NULL script file.");
+   AssertFatal(pCppFile != NULL, "Cannot use a NULL code file.");
 
    // Fetch image file.
-   pScriptFile = StringTable->insert(pScriptFile);
+   pCppFile = StringTable->insert(pCppFile);
 
    // Ignore no change,
-   if (pScriptFile == mScriptFile)
+   if (pCppFile == mCodeFile)
       return;
 
    // Update.
-   mScriptFile = getOwned() ? expandAssetFilePath(pScriptFile) : StringTable->insert(pScriptFile);
+   mCodeFile = getOwned() ? expandAssetFilePath(pCppFile) : StringTable->insert(pCppFile);
+
+   // Refresh the asset.
+   refreshAsset();
+}
+
+void CppAsset::setHeaderFile(const char* pHeaderFile)
+{
+   // Sanity!
+   AssertFatal(pHeaderFile != NULL, "Cannot use a NULL header file.");
+
+   // Fetch image file.
+   pHeaderFile = StringTable->insert(pHeaderFile);
+
+   // Ignore no change,
+   if (pHeaderFile == mHeaderFile)
+      return;
+
+   // Update.
+   mHeaderFile = getOwned() ? expandAssetFilePath(pHeaderFile) : StringTable->insert(pHeaderFile);
 
    // Refresh the asset.
    refreshAsset();

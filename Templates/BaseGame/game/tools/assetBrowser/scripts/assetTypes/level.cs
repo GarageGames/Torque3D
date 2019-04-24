@@ -12,7 +12,7 @@ function AssetBrowser::createLevelAsset(%this)
    {
       AssetName = %assetName;
       versionId = 1;
-      LevelFile = %levelPath;
+      LevelFile = %assetName @ ".mis";
       LevelName = AssetBrowser.newAssetSettings.levelName;
       AssetDescription = AssetBrowser.newAssetSettings.description;
       PreviewImage = AssetBrowser.newAssetSettings.levelPreviewImage;

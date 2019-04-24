@@ -66,7 +66,8 @@ public:
    /// Declare Console Object.
    DECLARE_CONOBJECT(ImageAsset);
 
-   StringTableEntry getImageFileName() { return mImageFileName; }
+   void                    setImageFileName(const char* pScriptFile);
+   inline StringTableEntry getImageFileName(void) const { return mImageFileName; };
 
    bool isValid() { return mIsValidImage; }
 
@@ -75,6 +76,9 @@ public:
 protected:
    virtual void            initializeAsset(void);
    virtual void            onAssetRefresh(void);
+
+   static bool setImageFileName(void *obj, const char *index, const char *data) { static_cast<ImageAsset*>(obj)->setImageFileName(data); return false; }
+   static const char* getImageFileName(void* obj, const char* data) { return static_cast<ImageAsset*>(obj)->getImageFileName(); }
 
    void loadImage();
 };

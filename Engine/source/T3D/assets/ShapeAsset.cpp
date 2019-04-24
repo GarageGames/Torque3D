@@ -101,7 +101,8 @@ void ShapeAsset::initPersistFields()
    // Call parent.
    Parent::initPersistFields();
 
-   addField("fileName", TypeFilename, Offset(mFileName, ShapeAsset), "Path to the shape file we want to render");
+   addProtectedField("fileName", TypeAssetLooseFilePath, Offset(mFileName, ShapeAsset),
+      &setShapeFile, &getShapeFile, "Path to the shape file we want to render");
 }
 
 void ShapeAsset::setDataField(StringTableEntry slotName, const char *array, const char *value)
@@ -129,6 +130,25 @@ void ShapeAsset::initializeAsset()
    ResourceManager::get().getChangedSignal().notify(this, &ShapeAsset::_onResourceChanged);
 
    loadShape();
+}
+
+void ShapeAsset::setShapeFile(const char* pShapeFile)
+{
+   // Sanity!
+   AssertFatal(pShapeFile != NULL, "Cannot use a NULL shape file.");
+
+   // Fetch image file.
+   pShapeFile = StringTable->insert(pShapeFile);
+
+   // Ignore no change,
+   if (pShapeFile == mFileName)
+      return;
+
+   // Update.
+   mFileName = getOwned() ? expandAssetFilePath(pShapeFile) : StringTable->insert(pShapeFile);
+
+   // Refresh the asset.
+   refreshAsset();
 }
 
 void ShapeAsset::_onResourceChanged(const Torque::Path &path)

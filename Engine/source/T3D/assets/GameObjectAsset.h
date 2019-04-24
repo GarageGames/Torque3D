@@ -48,8 +48,8 @@ class GameObjectAsset : public AssetBase
    typedef AssetBase Parent;
 
    StringTableEntry mGameObjectName;
-   StringTableEntry mScriptFilePath;
-   StringTableEntry mTAMLFilePath;
+   StringTableEntry mScriptFile;
+   StringTableEntry mTAMLFile;
 
 public:
    GameObjectAsset();
@@ -64,9 +64,19 @@ public:
    /// Declare Console Object.
    DECLARE_CONOBJECT(GameObjectAsset);
 
+   void                    setScriptFile(const char* pScriptFile);
+   inline StringTableEntry getScriptFile(void) const { return mScriptFile; };
+   void                    setTAMLFile(const char* pScriptFile);
+   inline StringTableEntry getTAMLFile(void) const { return mTAMLFile; };
+
 protected:
    virtual void            initializeAsset(void);
    virtual void            onAssetRefresh(void);
+
+   static bool setScriptFile(void *obj, const char *index, const char *data) { static_cast<GameObjectAsset*>(obj)->setScriptFile(data); return false; }
+   static const char* getScriptFile(void* obj, const char* data) { return static_cast<GameObjectAsset*>(obj)->getScriptFile(); }
+   static bool setTAMLFile(void *obj, const char *index, const char *data) { static_cast<GameObjectAsset*>(obj)->setTAMLFile(data); return false; }
+   static const char* getTAMLFile(void* obj, const char* data) { return static_cast<GameObjectAsset*>(obj)->getTAMLFile(); }
 };
 
 DefineConsoleType(TypeGameObjectAssetPtr, GameObjectAsset)

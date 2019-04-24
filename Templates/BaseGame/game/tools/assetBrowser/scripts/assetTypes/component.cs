@@ -17,7 +17,7 @@ function AssetBrowser::createComponentAsset(%this)
       friendlyName = AssetBrowser.newAssetSettings.friendlyName;
       componentType = AssetBrowser.newAssetSettings.componentGroup;
       description = AssetBrowser.newAssetSettings.description;
-      scriptFile = %scriptPath;
+      scriptFile = %assetName @ ".cs";
    };
    
    TamlWrite(%asset, %tamlpath);

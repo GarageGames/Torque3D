@@ -116,9 +116,12 @@ void LevelAsset::initPersistFields()
    // Call parent.
    Parent::initPersistFields();
 
-   addField("LevelFile", TypeString, Offset(mLevelFile, LevelAsset), "Path to the actual level file.");
+   addProtectedField("LevelFile", TypeAssetLooseFilePath, Offset(mLevelFile, LevelAsset),
+      &setLevelFile, &getLevelFile, "Path to the actual level file.");
    addField("LevelName", TypeString, Offset(mLevelName, LevelAsset), "Human-friendly name for the level.");
-   addField("PreviewImage", TypeImageFilename, Offset(mPreviewImage, LevelAsset), "Path to the image used for selection preview.");
+   //addField("PreviewImage", TypeImageFilename, Offset(mPreviewImage, LevelAsset), "Path to the image used for selection preview.");
+   addProtectedField("PreviewImage", TypeAssetLooseFilePath, Offset(mPreviewImage, LevelAsset),
+      &setPreviewImageFile, &getPreviewImageFile, "Path to the image used for selection preview.");
 }
 
 //------------------------------------------------------------------------------
@@ -127,4 +130,54 @@ void LevelAsset::copyTo(SimObject* object)
 {
    // Call to parent.
    Parent::copyTo(object);
+}
+
+//
+void LevelAsset::initializeAsset()
+{
+   // Call parent.
+   Parent::initializeAsset();
+
+   // Ensure the image-file is expanded.
+   mPreviewImage = expandAssetFilePath(mPreviewImage);
+   mLevelFile = expandAssetFilePath(mLevelFile);
+}
+
+//
+void LevelAsset::setLevelFile(const char* pLevelFile)
+{
+   // Sanity!
+   AssertFatal(pLevelFile != NULL, "Cannot use a NULL level file.");
+
+   // Fetch image file.
+   pLevelFile = StringTable->insert(pLevelFile);
+
+   // Ignore no change,
+   if (pLevelFile == mLevelFile)
+      return;
+
+   // Update.
+   mLevelFile = getOwned() ? expandAssetFilePath(pLevelFile) : StringTable->insert(pLevelFile);
+
+   // Refresh the asset.
+   refreshAsset();
+}
+
+void LevelAsset::setImageFile(const char* pImageFile)
+{
+   // Sanity!
+   AssertFatal(pImageFile != NULL, "Cannot use a NULL image file.");
+
+   // Fetch image file.
+   pImageFile = StringTable->insert(pImageFile);
+
+   // Ignore no change,
+   if (pImageFile == mPreviewImage)
+      return;
+
+   // Update.
+   mPreviewImage = getOwned() ? expandAssetFilePath(pImageFile) : StringTable->insert(pImageFile);
+
+   // Refresh the asset.
+   refreshAsset();
 }

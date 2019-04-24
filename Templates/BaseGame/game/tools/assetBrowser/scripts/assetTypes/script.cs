@@ -12,7 +12,7 @@ function AssetBrowser::createScriptAsset(%this)
    {
       AssetName = %assetName;
       versionId = 1;
-      scriptFilePath = %scriptPath;
+      scriptFile = %assetName @ ".cs";
    };
    
    TamlWrite(%asset, %tamlpath);
@@ -39,7 +39,7 @@ function AssetBrowser::createScriptAsset(%this)
 
 function AssetBrowser::editScriptAsset(%this, %assetDef)
 {
-   %scriptFile = %assetDef.scriptFilePath;
+   %scriptFile = %assetDef.scriptFile;
    
    EditorOpenFileInTorsion(makeFullPath(%scriptFile), 0);
 }
@@ -69,7 +69,7 @@ function AssetBrowser::deleteScriptAsset(%this, %assetDef)
 function AssetBrowser::buildScriptAssetPreview(%this, %assetDef, %previewData)
 {
    %previewData.assetName = %assetDef.assetName;
-   %previewData.assetPath = %assetDef.scriptFilePath;
+   %previewData.assetPath = %assetDef.scriptFile;
    %previewData.doubleClickCommand = "EditorOpenFileInTorsion( \""@%previewData.assetPath@"\", 0 );";
    
    if(%assetDef.isServerSide)

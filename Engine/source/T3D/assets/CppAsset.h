@@ -19,8 +19,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-#ifndef SCRIPT_ASSET_H
-#define SCRIPT_ASSET_H
+#ifndef CPP_ASSET_H
+#define CPP_ASSET_H
 #pragma once
 
 #ifndef _ASSET_BASE_H_
@@ -40,38 +40,42 @@
 #endif
 
 //-----------------------------------------------------------------------------
-class ScriptAsset : public AssetBase
+class CppAsset : public AssetBase
 {
    typedef AssetBase Parent;
 
-   StringTableEntry        mScriptFile;
-   bool                    mIsServerSide;
+   StringTableEntry        mCodeFile;
+   StringTableEntry        mHeaderFile;
 
 public:
-   ScriptAsset();
-   virtual ~ScriptAsset();
+   CppAsset();
+   virtual ~CppAsset();
 
    /// Engine.
    static void initPersistFields();
    virtual void copyTo(SimObject* object);
 
    /// Declare Console Object.
-   DECLARE_CONOBJECT(ScriptAsset);
+   DECLARE_CONOBJECT(CppAsset);
 
-   void                    setScriptFile(const char* pScriptFile);
-   inline StringTableEntry getScriptFile(void) const { return mScriptFile; };
+   void                    setCppFile(const char* pCppFile);
+   inline StringTableEntry getCppFile(void) const { return mCodeFile; };
 
-   bool execScript();
+   void                    setHeaderFile(const char* pHeaderFile);
+   inline StringTableEntry getHeaderFile(void) const { return mHeaderFile; };
 
 protected:
-   virtual void            initializeAsset(void) {}
-   virtual void            onAssetRefresh(void) {}
+	virtual void            initializeAsset(void) {};
+	virtual void            onAssetRefresh(void) {};
 
-   static bool setScriptFile(void *obj, const char *index, const char *data) { static_cast<ScriptAsset*>(obj)->setScriptFile(data); return false; }
-   static const char* getScriptFile(void* obj, const char* data) { return static_cast<ScriptAsset*>(obj)->getScriptFile(); }
+   static bool setCppFile(void *obj, const char *index, const char *data) { static_cast<CppAsset*>(obj)->setCppFile(data); return false; }
+   static const char* getCppFile(void* obj, const char* data) { return static_cast<CppAsset*>(obj)->getCppFile(); }
+
+   static bool setHeaderFile(void *obj, const char *index, const char *data) { static_cast<CppAsset*>(obj)->setHeaderFile(data); return false; }
+   static const char* getHeaderFile(void* obj, const char* data) { return static_cast<CppAsset*>(obj)->getHeaderFile(); }
 };
 
-DefineConsoleType(TypeScriptAssetPtr, ScriptAsset)
+DefineConsoleType(TypeCppAssetPtr, CppAsset)
 
 #endif // _ASSET_BASE_H_
 

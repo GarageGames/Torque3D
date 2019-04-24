@@ -19,7 +19,7 @@ function AssetBrowser::editGameObjectAsset(%this, %assetDef)
 
 function AssetBrowser::editGameObjectAssetScript(%this, %assetDef)
 {
-   %scriptFile = %assetDef.scriptFilePath;
+   %scriptFile = %assetDef.scriptFile;
    
    EditorOpenFileInTorsion(makeFullPath(%scriptFile), 0);  
 }
@@ -53,8 +53,8 @@ function AssetBrowser::duplicateGameObjectAsset(%this, %assetDef, %targetModule)
       createPath(%modulePath);
    
    %assetFile = AssetDatabase.getAssetFilePath(%assetId);
-   %scriptFile = %assetDef.scriptFilePath;
-   %gameObjectFile = %assetDef.TAMLFilePath;
+   %scriptFile = %assetDef.scriptFile;
+   %gameObjectFile = %assetDef.TAMLFile;
    
    echo("AssetBrowser::duplicateGameObjectAsset - duplicating! " @ %assetId @ " to " @ %targetModule);
    
@@ -124,11 +124,11 @@ function AssetBrowser::dragAndDropGameObjectAsset(%this, %assetDef, %dropTarget)
 
 function AssetBrowser::renameGameObjectAsset(%this, %assetDef, %newAssetId, %originalName, %newName)
 {
-   %oldScriptFilePath = %assetDef.scriptFilePath;
-   %scriptFilePath = filePath(%assetDef.scriptFilePath);
-   %scriptExt = fileExt(%assetDef.scriptFilePath);
+   %oldScriptFilePath = %assetDef.scriptFile;
+   %scriptFilePath = filePath(%assetDef.scriptFile);
+   %scriptExt = fileExt(%assetDef.scriptFile);
    
-   %oldGOFilePath = %assetDef.TAMLFilePath;
+   %oldGOFilePath = %assetDef.TAMLFile;
    
    %filepath = AssetDatabase.getAssetFilePath(%assetDef.getAssetId());
    %path = makeRelativePath(filePath(%filepath));
@@ -138,8 +138,8 @@ function AssetBrowser::renameGameObjectAsset(%this, %assetDef, %newAssetId, %ori
    %newGOFile = %path @ "/" @ %newName @ ".taml";
    
    %assetDef.gameObjectName = %newName;
-   %assetDef.scriptFilePath = %newScriptFileName;
-   %assetDef.TAMLFilePath = %newGOFile;
+   %assetDef.scriptFile = %newScriptFileName;
+   %assetDef.TAMLFile = %newGOFile;
    
    TamlWrite(%assetDef, %newAssetFile);
    fileDelete(%filepath);
@@ -208,7 +208,7 @@ function AssetBrowser::renameGameObjectAsset(%this, %assetDef, %newAssetId, %ori
 function AssetBrowser::buildGameObjectAssetPreview(%this, %assetDef, %previewData)
 {
    %previewData.assetName = %assetDef.assetName;
-   %previewData.assetPath = %assetDef.scriptFilePath;
+   %previewData.assetPath = %assetDef.scriptFile;
    %previewData.doubleClickCommand = "EditorOpenFileInTorsion( "@%previewData.assetPath@", 0 );";
    
    %previewData.previewImage = "tools/assetBrowser/art/gameObjectIcon";

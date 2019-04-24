@@ -108,7 +108,9 @@ void MaterialAsset::initPersistFields()
    Parent::initPersistFields();
 
    //addField("shaderGraph", TypeRealString, Offset(mShaderGraphFile, MaterialAsset), "");
-   addField("scriptFile", TypeRealString, Offset(mScriptFile, MaterialAsset), "Path to the file containing the material definition.");
+   addProtectedField("scriptFile", TypeAssetLooseFilePath, Offset(mScriptFile, MaterialAsset),
+      &setScriptFile, &getScriptFile, "Path to the file containing the material definition.");
+
    addField("materialDefinitionName", TypeRealString, Offset(mMatDefinitionName, MaterialAsset), "Name of the material definition this asset is for.");
 }
 
@@ -139,6 +141,25 @@ void MaterialAsset::onAssetRefresh()
 
       matDef->reload();
    }
+}
+
+void MaterialAsset::setScriptFile(const char* pScriptFile)
+{
+   // Sanity!
+   AssertFatal(pScriptFile != NULL, "Cannot use a NULL script file.");
+
+   // Fetch image file.
+   pScriptFile = StringTable->insert(pScriptFile);
+
+   // Ignore no change,
+   if (pScriptFile == mScriptFile)
+      return;
+
+   // Update.
+   mScriptFile = getOwned() ? expandAssetFilePath(pScriptFile) : StringTable->insert(pScriptFile);
+
+   // Refresh the asset.
+   refreshAsset();
 }
 
 //------------------------------------------------------------------------------

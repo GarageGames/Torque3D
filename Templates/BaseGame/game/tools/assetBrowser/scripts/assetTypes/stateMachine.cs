@@ -27,7 +27,7 @@ function AssetBrowser::createStateMachineAsset(%this)
    {
       AssetName = %assetName;
       versionId = 1;
-      stateMachineFile = %smFilePath;
+      stateMachineFile = %assetName @ ".xml";
    };
    
    %xmlDoc = new SimXMLDocument();

@@ -121,8 +121,14 @@ public:
 
    Signal< void(ShapeAsset*) > onShapeChanged;
 
+   void                    setShapeFile(const char* pScriptFile);
+   inline StringTableEntry getShapeFile(void) const { return mFileName; };
+
 protected:
    virtual void            onAssetRefresh(void);
+
+   static bool setShapeFile(void *obj, const char *index, const char *data) { static_cast<ShapeAsset*>(obj)->setShapeFile(data); return false; }
+   static const char* getShapeFile(void* obj, const char* data) { return static_cast<ShapeAsset*>(obj)->getShapeFile(); }
 };
 
 DefineConsoleType(TypeShapeAssetPtr, S32)

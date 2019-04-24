@@ -14,7 +14,7 @@ function AssetBrowser::createShapeAsset(%this)
       versionId = 1;
       friendlyName = AssetBrowser.newAssetSettings.friendlyName;
       description = AssetBrowser.newAssetSettings.description;
-      fileName = %shapeFilePath;
+      fileName = %assetName @ ".dae";
    };
    
    TamlWrite(%asset, %tamlpath);
@@ -155,7 +155,7 @@ function AssetBrowser::importShapeAsset(%this, %assetItem)
    {
       assetName = %assetName;
       versionId = 1;
-      fileName = %assetFullPath;
+      fileName = fileName(%filePath);
       originalFilePath = %filePath;
       isNewShape = true;
    };

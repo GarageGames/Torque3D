@@ -92,7 +92,7 @@ ConsoleSetType(TypePostEffectAssetPtr)
 
 PostEffectAsset::PostEffectAsset()
 {
-   mScriptFilePath = StringTable->EmptyString();
+   mScriptFile = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
@@ -112,7 +112,8 @@ void PostEffectAsset::initPersistFields()
    // Call parent.
    Parent::initPersistFields();
 
-   addField("scriptFilePath", TypeFilename, Offset(mScriptFilePath, PostEffectAsset), "Path to the script file.");
+   addProtectedField("scriptFile", TypeAssetLooseFilePath, Offset(mScriptFile, PostEffectAsset),
+      &setScriptFile, &getScriptFile, "Path to the script file.");
 }
 
 //------------------------------------------------------------------------------
@@ -125,12 +126,31 @@ void PostEffectAsset::copyTo(SimObject* object)
 
 void PostEffectAsset::initializeAsset()
 {
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
+   if (Platform::isFile(mScriptFile))
+      Con::executeFile(mScriptFile, false, false);
 }
 
 void PostEffectAsset::onAssetRefresh()
 {
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
+   if (Platform::isFile(mScriptFile))
+      Con::executeFile(mScriptFile, false, false);
+}
+
+void PostEffectAsset::setScriptFile(const char* pScriptFile)
+{
+   // Sanity!
+   AssertFatal(pScriptFile != NULL, "Cannot use a NULL script file.");
+
+   // Fetch image file.
+   pScriptFile = StringTable->insert(pScriptFile);
+
+   // Ignore no change,
+   if (pScriptFile == mScriptFile)
+      return;
+
+   // Update.
+   mScriptFile = getOwned() ? expandAssetFilePath(pScriptFile) : StringTable->insert(pScriptFile);
+
+   // Refresh the asset.
+   refreshAsset();
 }

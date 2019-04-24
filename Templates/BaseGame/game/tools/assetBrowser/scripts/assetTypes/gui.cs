@@ -13,8 +13,8 @@ function AssetBrowser::createGUIAsset(%this)
    {
       AssetName = %assetName;
       versionId = 1;
-      scriptFilePath = %scriptPath;
-      guiFilePath = %guipath;
+      scriptFile = %assetName @ ".cs";
+      guiFile = %assetName @ ".gui";
    };
    
    TamlWrite(%asset, %tamlpath);

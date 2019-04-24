@@ -67,15 +67,22 @@ public:
    static void initPersistFields();
    virtual void copyTo(SimObject* object);
 
-   virtual void initializeAsset();
-   virtual void onAssetRefresh(void);
-
    void compileShader();
 
    StringTableEntry getMaterialDefinitionName() { return mMatDefinitionName; }
 
+   void                    setScriptFile(const char* pScriptFile);
+   inline StringTableEntry getScriptFile(void) const { return mScriptFile; };
+
    /// Declare Console Object.
    DECLARE_CONOBJECT(MaterialAsset);
+
+protected:
+   virtual void initializeAsset();
+   virtual void onAssetRefresh(void);
+
+   static bool setScriptFile(void *obj, const char *index, const char *data) { static_cast<MaterialAsset*>(obj)->setScriptFile(data); return false; }
+   static const char* getScriptFile(void* obj, const char* data) { return static_cast<MaterialAsset*>(obj)->getScriptFile(); }
 };
 
 DefineConsoleType(TypeMaterialAssetPtr, MaterialAsset)

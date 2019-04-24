@@ -92,9 +92,9 @@ ConsoleSetType(TypeGameObjectAssetPtr)
 
 GameObjectAsset::GameObjectAsset()
 {
-   mGameObjectName = StringTable->lookup("");
-   mScriptFilePath = StringTable->lookup("");
-   mTAMLFilePath = StringTable->lookup("");
+   mGameObjectName = StringTable->EmptyString();
+   mScriptFile = StringTable->EmptyString();
+   mTAMLFile = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
@@ -115,8 +115,11 @@ void GameObjectAsset::initPersistFields()
    Parent::initPersistFields();
 
    addField("gameObjectName", TypeString, Offset(mGameObjectName, GameObjectAsset), "Name of the game object. Defines the created object's class.");
-   addField("scriptFilePath", TypeString, Offset(mScriptFilePath, GameObjectAsset), "Path to the script file for the GameObject's script code.");
-   addField("TAMLFilePath", TypeString, Offset(mTAMLFilePath, GameObjectAsset), "Path to the taml file for the GameObject's heirarchy.");
+
+   addProtectedField("scriptFile", TypeAssetLooseFilePath, Offset(mScriptFile, GameObjectAsset),
+      &setScriptFile, &getScriptFile, "Path to the script file for the GameObject's script code.");
+   addProtectedField("TAMLFile", TypeAssetLooseFilePath, Offset(mTAMLFile, GameObjectAsset),
+      &setTAMLFile, &getTAMLFile, "Path to the taml file for the GameObject's heirarchy.");
 }
 
 //------------------------------------------------------------------------------
@@ -129,19 +132,65 @@ void GameObjectAsset::copyTo(SimObject* object)
 
 void GameObjectAsset::initializeAsset()
 {
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
+   //Ensure we have an expanded filepath
+   mScriptFile = expandAssetFilePath(mScriptFile);
+
+   if (Platform::isFile(mScriptFile))
+      Con::executeFile(mScriptFile, false, false);
 }
 
 void GameObjectAsset::onAssetRefresh()
 {
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
+   //Ensure we have an expanded filepath
+   mScriptFile = expandAssetFilePath(mScriptFile);
+
+   if (Platform::isFile(mScriptFile))
+      Con::executeFile(mScriptFile, false, false);
 }
+
+void GameObjectAsset::setScriptFile(const char* pScriptFile)
+{
+   // Sanity!
+   AssertFatal(pScriptFile != NULL, "Cannot use a NULL script file.");
+
+   // Fetch image file.
+   pScriptFile = StringTable->insert(pScriptFile);
+
+   // Ignore no change,
+   if (pScriptFile == mScriptFile)
+      return;
+
+   // Update.
+   mScriptFile = getOwned() ? expandAssetFilePath(pScriptFile) : StringTable->insert(pScriptFile);
+
+   // Refresh the asset.
+   refreshAsset();
+}
+
+
+void GameObjectAsset::setTAMLFile(const char* pTAMLFile)
+{
+   // Sanity!
+   AssertFatal(pTAMLFile != NULL, "Cannot use a NULL TAML file.");
+
+   // Fetch image file.
+   pTAMLFile = StringTable->insert(pTAMLFile);
+
+   // Ignore no change,
+   if (pTAMLFile == mScriptFile)
+      return;
+
+   // Update.
+   mTAMLFile = getOwned() ? expandAssetFilePath(pTAMLFile) : StringTable->insert(pTAMLFile);
+
+   // Refresh the asset.
+   refreshAsset();
+}
+
 
 const char* GameObjectAsset::create()
 {
-   if (!Platform::isFile(mTAMLFilePath))
+   if (!Platform::isFile(mTAMLFile))
       return "";
 
    // Set the format mode.
@@ -154,13 +203,13 @@ const char* GameObjectAsset::create()
    taml.setAutoFormat(false);
 
    // Read object.
-   SimObject* pSimObject = taml.read(mTAMLFilePath);
+   SimObject* pSimObject = taml.read(mTAMLFile);
 
    // Did we find the object?
    if (pSimObject == NULL)
    {
       // No, so warn.
-      Con::warnf("GameObjectAsset::create() - Could not read object from file '%s'.", mTAMLFilePath);
+      Con::warnf("GameObjectAsset::create() - Could not read object from file '%s'.", mTAMLFile);
       return "";
    }
 
