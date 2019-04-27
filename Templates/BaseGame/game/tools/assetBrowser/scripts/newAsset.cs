@@ -77,7 +77,7 @@ function AssetBrowser::setupCreateNewAsset(%this, %assetType, %moduleName, %call
    
    AssetBrowser_newAssetWindow.text = "New" SPC %assetType SPC "Asset";
    
-   NewAssetPropertiesInspector.clear();
+   NewAssetPropertiesInspector.clearFields();
    
    NewAssetModuleList.setText(%moduleName);
    
