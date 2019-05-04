@@ -358,6 +358,8 @@ class WorldEditor : public EditTSCtrl
       bool              mStickToGround;
       bool              mStuckToGround;            ///< Selection is stuck to the ground
       AlignmentType     mTerrainSnapAlignment;     ///< How does the stickied object align to the terrain
+      bool              mTerrainSnapOffsetZ;       ///< Allows the use of an offset to avoid z-fighting with flat objects on a flat terrain.
+      F32               mOffsetZValue;             ///< Value of the Z offset (note: this shouldnt be changed once set)
 
       bool              mSoftSnap;                 ///< Allow soft snapping all of the time
       bool              mSoftSnapActivated;        ///< Soft snap has been activated by the user and allowed by the current rules
