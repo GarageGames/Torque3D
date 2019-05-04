@@ -92,7 +92,7 @@ ConsoleSetType(TypeStateMachineAssetPtr)
 
 StateMachineAsset::StateMachineAsset()
 {
-   mStateMachineFileName = StringTable->EmptyString();
+   mStateMachineFile = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
@@ -112,7 +112,8 @@ void StateMachineAsset::initPersistFields()
    // Call parent.
    Parent::initPersistFields();
 
-   addField("stateMachineFile", TypeString, Offset(mStateMachineFileName, StateMachineAsset), "Path to the state machine file.");
+   addProtectedField("stateMachineFile", TypeAssetLooseFilePath, Offset(mStateMachineFile, StateMachineAsset),
+      &setStateMachineFile, &getStateMachineFile, "Path to the state machine file.");
 }
 
 //------------------------------------------------------------------------------
@@ -123,9 +124,29 @@ void StateMachineAsset::copyTo(SimObject* object)
    Parent::copyTo(object);
 }
 
+void StateMachineAsset::setStateMachineFile(const char* pStateMachineFile)
+{
+   // Sanity!
+   AssertFatal(pStateMachineFile != NULL, "Cannot use a NULL state machine file.");
+
+   // Fetch image file.
+   pStateMachineFile = StringTable->insert(pStateMachineFile);
+
+   // Ignore no change,
+   if (pStateMachineFile == mStateMachineFile)
+      return;
+
+   // Update.
+   mStateMachineFile = getOwned() ? expandAssetFilePath(pStateMachineFile) : StringTable->insert(pStateMachineFile);
+
+   // Refresh the asset.
+   refreshAsset();
+}
+
+
 DefineEngineMethod(StateMachineAsset, notifyAssetChanged, void, (),,"")
 {
-   ResourceManager::get().getChangedSignal().trigger(object->getStateMachineFileName());
+   ResourceManager::get().getChangedSignal().trigger(object->getStateMachineFile());
 }
 
 //-----------------------------------------------------------------------------

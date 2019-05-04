@@ -46,7 +46,7 @@ class StateMachineAsset : public AssetBase
 {
    typedef AssetBase Parent;
 
-   StringTableEntry mStateMachineFileName;
+   StringTableEntry mStateMachineFile;
 
 public:
    StateMachineAsset();
@@ -59,11 +59,15 @@ public:
    /// Declare Console Object.
    DECLARE_CONOBJECT(StateMachineAsset);
 
-   StringTableEntry getStateMachineFileName() { return mStateMachineFileName; }
+   void                    setStateMachineFile(const char* pStateMachineFile);
+   inline StringTableEntry getStateMachineFile(void) const { return mStateMachineFile; };
 
 protected:
    virtual void            initializeAsset(void) {}
    virtual void            onAssetRefresh(void) {}
+
+   static bool setStateMachineFile(void *obj, const char *index, const char *data) { static_cast<StateMachineAsset*>(obj)->setStateMachineFile(data); return false; }
+   static const char* getStateMachineFile(void* obj, const char* data) { return static_cast<StateMachineAsset*>(obj)->getStateMachineFile(); }
 };
 
 DefineConsoleType(TypeStateMachineAssetPtr, StateMachineAsset)

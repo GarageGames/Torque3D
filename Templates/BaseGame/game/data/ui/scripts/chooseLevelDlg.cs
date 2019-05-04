@@ -243,7 +243,7 @@ function ChooseLevelDlg::addLevelAsset( %this, %levelAsset )
       %LevelInfoObject.delete();
    }*/
    
-   %levelName = %levelAsset.friendlyName;
+   %levelName = %levelAsset.LevelName;
    %levelDesc = %levelAsset.description;
    %levelPreview = %levelAsset.levelPreviewImage;
    

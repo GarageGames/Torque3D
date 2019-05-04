@@ -44,7 +44,7 @@ class ScriptAsset : public AssetBase
 {
    typedef AssetBase Parent;
 
-   StringTableEntry        mScriptFilePath;
+   StringTableEntry        mScriptFile;
    bool                    mIsServerSide;
 
 public:
@@ -58,9 +58,17 @@ public:
    /// Declare Console Object.
    DECLARE_CONOBJECT(ScriptAsset);
 
+   void                    setScriptFile(const char* pScriptFile);
+   inline StringTableEntry getScriptFile(void) const { return mScriptFile; };
+
+   bool execScript();
+
 protected:
-   virtual void            initializeAsset(void);
-   virtual void            onAssetRefresh(void);
+   virtual void            initializeAsset(void) {}
+   virtual void            onAssetRefresh(void) {}
+
+   static bool setScriptFile(void *obj, const char *index, const char *data) { static_cast<ScriptAsset*>(obj)->setScriptFile(data); return false; }
+   static const char* getScriptFile(void* obj, const char* data) { return static_cast<ScriptAsset*>(obj)->getScriptFile(); }
 };
 
 DefineConsoleType(TypeScriptAssetPtr, ScriptAsset)

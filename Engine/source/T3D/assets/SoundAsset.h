@@ -47,7 +47,7 @@ class SoundAsset : public AssetBase
    typedef AssetBase Parent;
 
 protected:
-   StringTableEntry        mSoundFilePath;
+   StringTableEntry        mSoundFile;
    F32                     mPitchAdjust;
    F32                     mVolumeAdjust;
 
@@ -62,11 +62,15 @@ public:
    /// Declare Console Object.
    DECLARE_CONOBJECT(SoundAsset);
 
-   StringTableEntry getSoundFilePath() { return mSoundFilePath; }
+   void                    setSoundFile(const char* pScriptFile);
+   inline StringTableEntry getSoundFile(void) const { return mSoundFile; };
 
 protected:
    virtual void            initializeAsset(void);
    virtual void            onAssetRefresh(void);
+
+   static bool setSoundFile(void *obj, const char *index, const char *data) { static_cast<SoundAsset*>(obj)->setSoundFile(data); return false; }
+   static const char* getSoundFile(void* obj, const char* data) { return static_cast<SoundAsset*>(obj)->getSoundFile(); }
 };
 
 DefineConsoleType(TypeSoundAssetPtr, SoundAsset)

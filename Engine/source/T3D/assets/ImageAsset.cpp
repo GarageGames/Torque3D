@@ -108,7 +108,9 @@ void ImageAsset::initPersistFields()
    // Call parent.
    Parent::initPersistFields();
 
-   addField("imageFile", TypeString, Offset(mImageFileName, ImageAsset), "Path to the image file.");
+   addProtectedField("imageFile", TypeAssetLooseFilePath, Offset(mImageFileName, ImageAsset),
+      &setImageFileName, &getImageFileName, "Path to the image file.");
+
    addField("useMips", TypeBool, Offset(mUseMips, ImageAsset), "Should the image use mips? (Currently unused).");
    addField("isHDRImage", TypeBool, Offset(mIsHDRImage, ImageAsset), "Is the image in an HDR format? (Currently unused)");
 }
@@ -153,4 +155,23 @@ void ImageAsset::initializeAsset()
 void ImageAsset::onAssetRefresh()
 {
    loadImage();
+}
+
+void ImageAsset::setImageFileName(const char* pScriptFile)
+{
+   // Sanity!
+   AssertFatal(pScriptFile != NULL, "Cannot use a NULL image file.");
+
+   // Fetch image file.
+   pScriptFile = StringTable->insert(pScriptFile);
+
+   // Ignore no change,
+   if (pScriptFile == mImageFileName)
+      return;
+
+   // Update.
+   mImageFileName = getOwned() ? expandAssetFilePath(pScriptFile) : StringTable->insert(pScriptFile);
+
+   // Refresh the asset.
+   refreshAsset();
 }

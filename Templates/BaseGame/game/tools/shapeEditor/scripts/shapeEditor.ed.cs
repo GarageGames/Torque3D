@@ -613,7 +613,7 @@ function ShapeEdPropWindow::update_onShapeSelectionChanged( %this )
    ShapeEdThreadWindow.onAddThread();        // add thread 0
    
    //Now, fetch any animation assets if we're utilizing a shape asset
-   if(ShapeEditorPlugin.selectedAssetId !$= "")
+   if(ShapeEditorPlugin.selectedAssetDef !$= "")
    {
       %animationAssetCount = ShapeEditorPlugin.selectedAssetDef.getAnimationCount();
       

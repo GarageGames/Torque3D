@@ -60,6 +60,10 @@ mAssetInitialized(false)
 {
    // Generate an asset definition.
    mpAssetDefinition = new AssetDefinition();
+
+   mInternalName = StringTable->EmptyString();
+   mClassName = StringTable->EmptyString();
+   mSuperClassName = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------

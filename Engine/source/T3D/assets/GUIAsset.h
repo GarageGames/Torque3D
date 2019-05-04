@@ -46,8 +46,8 @@ class GUIAsset : public AssetBase
 {
    typedef AssetBase Parent;
 
-   StringTableEntry mScriptFilePath;
-   StringTableEntry mGUIFilePath;
+   StringTableEntry mScriptFile;
+   StringTableEntry mGUIFile;
 
 public:
    GUIAsset();
@@ -60,9 +60,19 @@ public:
    /// Declare Console Object.
    DECLARE_CONOBJECT(GUIAsset);
 
+   void                    setGUIFile(const char* pScriptFile);
+   inline StringTableEntry getGUIFile(void) const { return mGUIFile; };
+   void                    setScriptFile(const char* pScriptFile);
+   inline StringTableEntry getScriptFile(void) const { return mScriptFile; };
+
 protected:
    virtual void            initializeAsset(void);
    virtual void            onAssetRefresh(void);
+
+   static bool setGUIFile(void *obj, const char *index, const char *data) { static_cast<GUIAsset*>(obj)->setGUIFile(data); return false; }
+   static const char* getGUIFile(void* obj, const char* data) { return static_cast<GUIAsset*>(obj)->getGUIFile(); }
+   static bool setScriptFile(void *obj, const char *index, const char *data) { static_cast<GUIAsset*>(obj)->setScriptFile(data); return false; }
+   static const char* getScriptFile(void* obj, const char* data) { return static_cast<GUIAsset*>(obj)->getScriptFile(); }
 };
 
 DefineConsoleType(TypeGUIAssetPtr, GUIAsset)
