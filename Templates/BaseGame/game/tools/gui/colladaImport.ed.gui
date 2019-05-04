@@ -35,7 +35,7 @@
       HorizSizing = "center";
       VertSizing = "center";
       position = "254 136";
-      Extent = "516 447";
+      Extent = "516 477";
       MinExtent = "8 8";
       canSave = "1";
       Visible = "1";
@@ -51,7 +51,7 @@
          HorizSizing = "width";
          VertSizing = "height";
          position = "8 24";
-         Extent = "238 417";
+         Extent = "238 437";
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
@@ -127,7 +127,7 @@
          HorizSizing = "width";
          VertSizing = "height";
          position = "254 24";
-         Extent = "254 417";
+         Extent = "254 437";
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
@@ -426,7 +426,7 @@
             HorizSizing = "right";
             VertSizing = "bottom";
             position = "0 68";
-            Extent = "254 153";
+            Extent = "254 173";
             MinExtent = "8 8";
             canSave = "1";
             Visible = "1";
@@ -763,13 +763,63 @@
                internalName = "neverImportMesh";
                canSaveDynamicFields = "0";
             };
+            new GuiTextCtrl() {
+               text = "Ignore Materials";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextRightProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "13 150";
+               Extent = "72 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl() {
+               historySize = "0";
+               password = "0";
+               tabComplete = "0";
+               sinkAllKeyEvents = "0";
+               passwordMask = "*";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextEditProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "97 150";
+               Extent = "148 18";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               AltCommand = "ColladaImportTreeView.refresh(\"nodes\");";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               internalName = "neverImportMat";
+               canSaveDynamicFields = "0";
+            };
          };
          new GuiBitmapBorderCtrl() {
             isContainer = "1";
             Profile = "ToolsGuiGroupBorderProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
-            position = "0 226";
+            position = "0 246";
             Extent = "254 105";
             MinExtent = "8 8";
             canSave = "1";
@@ -966,7 +1016,7 @@
             Profile = "ToolsGuiGroupBorderProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
-            position = "0 338";
+            position = "0 358";
             Extent = "254 24";
             MinExtent = "8 8";
             canSave = "1";
@@ -1006,7 +1056,7 @@
             Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
-            position = "11 368";
+            position = "11 388";
             Extent = "86 22";
             MinExtent = "8 2";
             canSave = "1";
@@ -1025,7 +1075,7 @@
             Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
-            position = "11 395";
+            position = "11 415";
             Extent = "86 22";
             MinExtent = "8 2";
             canSave = "1";
@@ -1044,7 +1094,7 @@
             Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
-            position = "159 368";
+            position = "159 388";
             Extent = "86 22";
             MinExtent = "8 2";
             canSave = "1";
@@ -1064,7 +1114,7 @@
             Profile = "ToolsGuiButtonProfile";
             HorizSizing = "right";
             VertSizing = "bottom";
-            position = "159 395";
+            position = "159 415";
             Extent = "86 22";
             MinExtent = "8 2";
             canSave = "1";
@@ -1276,6 +1326,7 @@ function ColladaImportDlg::showDialog(%this, %shapePath, %cmd)
       %this-->neverImport.setText(strreplace(%this.constructor.neverImport, "\t", ";"));
       %this-->alwaysImportMesh.setText(strreplace(%this.constructor.alwaysImportMesh, "\t", ";"));
       %this-->neverImportMesh.setText(strreplace(%this.constructor.neverImportMesh, "\t", ";"));
+      %this-->neverImportMat.setText(strreplace(%this.constructor.neverImportMat, "\t", ";"));
       %this-->ignoreNodeScale.setStateOn(%this.constructor.ignoreNodeScale);
       %this-->adjustCenter.setStateOn(%this.constructor.adjustCenter);
       %this-->adjustFloor.setStateOn(%this.constructor.adjustFloor);
@@ -1285,13 +1336,14 @@ function ColladaImportDlg::showDialog(%this, %shapePath, %cmd)
    else
    {
       // Default settings
-      %this-->lodType.setText("DetectDTS");
+      %this-->lodType.setText("TrailingNumber");
       %this-->singleDetailSize.setText("2");
       %this-->materialPrefix.setText("");
       %this-->alwaysImport.setText("");
-      %this-->neverImport.setText("");
+      %this-->neverImport.setText($TSShapeConstructor::neverImport);
       %this-->alwaysImportMesh.setText("");
-      %this-->neverImportMesh.setText("");
+      %this-->neverImportMesh.setText($TSShapeConstructor::neverImportMesh);
+      %this-->neverImportMat.setText($TSShapeConstructor::neverImportMat);
       %this-->ignoreNodeScale.setStateOn(0);
       %this-->adjustCenter.setStateOn(0);
       %this-->adjustFloor.setStateOn(0);
@@ -1418,6 +1470,7 @@ function ColladaImportTreeView::refresh(%this, %what)
       %this._neverImport = strreplace(ColladaImportDlg-->neverImport.getText(), ";", "\t");
       %this._alwaysImportMesh = strreplace(ColladaImportDlg-->alwaysImportMesh.getText(), ";", "\t");
       %this._neverImportMesh = strreplace(ColladaImportDlg-->neverImportMesh.getText(), ";", "\t");
+      %this._neverImportMat = strreplace(ColladaImportDlg-->neverImportMat.getText(), ";", "\t");
       %this.refreshNode(%this.getChild(%shapeRoot));
    }
 
@@ -1527,6 +1580,7 @@ function ColladaImportDlg::onOK(%this)
        (%this-->neverImport.getText() !$= "")         ||
        (%this-->alwaysImportMesh.getText() !$= "")    ||
        (%this-->neverImportMesh.getText() !$= "")     ||
+       (%this-->neverImportMat.getText() !$= "")      ||
        (%this-->ignoreNodeScale.getValue() != 0)      ||
        (%this-->adjustCenter.getValue() != 0)         ||
        (%this-->adjustFloor.getValue() != 0)          ||
@@ -1560,6 +1614,7 @@ function ColladaImportDlg::onOK(%this)
       %this.constructor.neverImport = strreplace(%this-->neverImport.getText(), ";", "\t");
       %this.constructor.alwaysImportMesh = strreplace(%this-->alwaysImportMesh.getText(), ";", "\t");
       %this.constructor.neverImportMesh = strreplace(%this-->neverImportMesh.getText(), ";", "\t");
+      %this.constructor.neverImportMat = strreplace(%this-->neverImportMat.getText(), ";", "\t");
       %this.constructor.ignoreNodeScale = %this-->ignoreNodeScale.getValue();
       %this.constructor.adjustCenter = %this-->adjustCenter.getValue();
       %this.constructor.adjustFloor = %this-->adjustFloor.getValue();
