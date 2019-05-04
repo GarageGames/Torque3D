@@ -244,6 +244,8 @@ bool VolumetricFog::onAdd()
    mSpeed.set(mSpeed1.x, mSpeed1.y, mSpeed2.x, mSpeed2.y);
    mInvScale = (1.0f / getMax(getMax(mObjScale.x, mObjScale.y), mObjScale.z));
 
+   VFRTM->IncFogObjects();
+
    if (isClientObject())
    {
       conn = GameConnection::getConnectionToServer();
@@ -270,8 +272,6 @@ bool VolumetricFog::onAdd()
       InitTexture();
       return setupRenderer();
    }
-
-   VFRTM->IncFogObjects();
    
    return true;
 }
@@ -288,7 +288,7 @@ void VolumetricFog::onRemove()
             mGlowing = 0;
             glowFX->disable();
          }
-         _leaveFog(static_cast<ShapeBase*>(conn->getControlObject()));
+         _leaveFog(dynamic_cast<ShapeBase*>(conn->getControlObject()));
       }
       VolumetricFogRTManager::getVolumetricFogRTMResizeSignal().remove(this, &VolumetricFog::handleResize);
       GuiCanvas::getCanvasSizeChangeSignal().remove(this, &VolumetricFog::handleCanvasResize);
@@ -694,7 +694,9 @@ void VolumetricFog::processTick(const Move* move)
    }
    if (mCounter == 3)
    {
-      ShapeBase* control = static_cast<ShapeBase*>(conn->getControlObject());
+      ShapeBase* control = dynamic_cast<ShapeBase*>(conn->getControlObject());
+      if (!control)
+         return;
       MatrixF xfm;
       control->getRenderEyeTransform(&xfm);
       Point3F pos = xfm.getPosition();
@@ -966,9 +968,8 @@ void VolumetricFog::prepRenderImage(SceneRenderState *state)
    
    PROFILE_SCOPE(VolumetricFog_prepRenderImage);
 
-   // Time critical therefore static_cast
-   ShapeBase* control = static_cast<ShapeBase*>(conn->getControlObject());
-   if (control->getWaterCoverage() >= 0.9f && !mIgnoreWater)
+   ShapeBase* control = dynamic_cast<ShapeBase*>(conn->getControlObject());
+   if (!control || (control->getWaterCoverage() >= 0.9f && !mIgnoreWater))
       return;
 
    camPos = state->getCameraPosition();
