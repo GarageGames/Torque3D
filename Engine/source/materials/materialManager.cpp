@@ -32,6 +32,7 @@
 #include "console/consoleTypes.h"
 #include "console/engineAPI.h"
 
+#include "gui/controls/guiTreeViewCtrl.h"
 
 MODULE_BEGIN( MaterialManager )
 
@@ -399,6 +400,36 @@ void MaterialManager::dumpMaterialInstances( BaseMaterialDefinition *target ) co
    Con::printf( "---------------------- Dump complete ----------------------");
 }
 
+void MaterialManager::getMaterialInstances(BaseMaterialDefinition* target, GuiTreeViewCtrl* materailInstanceTree)
+{
+   if (!mMatInstanceList.size())
+      return;
+
+   if (!target)
+   {
+      Con::errorf("Can't form a list without a specific MaterialDefinition");
+      return;
+   }
+
+   if (!materailInstanceTree)
+   {
+      Con::errorf("Requires a valid GuiTreeViewCtrl object to populate data into!");
+      return;
+   }
+
+   U32 matItem = materailInstanceTree->insertItem(0, target->getName());
+
+   for (U32 i = 0; i < mMatInstanceList.size(); i++)
+   {
+      BaseMatInstance* inst = mMatInstanceList[i];
+
+      if (target && inst->getMaterial() != target)
+         continue;
+
+      inst->getShaderInfo(materailInstanceTree, matItem);
+   }
+}
+
 void MaterialManager::_track( MatInstance *matInstance )
 {
    mMatInstanceList.push_back( matInstance );
@@ -486,6 +517,16 @@ DefineEngineFunction( dumpMaterialInstances, void, (), ,
    "@ingroup Materials")
 {
    MATMGR->dumpMaterialInstances();
+}
+
+DefineEngineFunction(getMaterialInstances, void, (BaseMaterialDefinition* target, GuiTreeViewCtrl* tree), (nullAsType<BaseMaterialDefinition*>(), nullAsType<GuiTreeViewCtrl*>()),
+   "@brief Dumps a formatted list of currently allocated material instances to the console.\n\n"
+   "@ingroup Materials")
+{
+   if (target == nullptr || tree == nullptr)
+      return;
+
+   MATMGR->getMaterialInstances(target, tree);
 }
 
 DefineEngineFunction( getMapEntry, const char*, (const char * texName), ,

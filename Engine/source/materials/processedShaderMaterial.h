@@ -37,7 +37,6 @@ class ShaderMaterialParameterHandle;
 class ShaderFeatureConstHandles;
 class CustomMaterial;
 
-
 class ShaderConstHandles
 {
 public:
@@ -136,6 +135,7 @@ public:
    virtual void setBuffers(GFXVertexBufferHandleBase* vertBuffer, GFXPrimitiveBufferHandle* primBuffer); 
    virtual bool stepInstance();
    virtual void dumpMaterialInfo();
+   virtual void getMaterialInfo(GuiTreeViewCtrl* tree, U32 item);
    virtual MaterialParameters* allocMaterialParameters();    
    virtual MaterialParameters* getDefaultMaterialParameters() { return mDefaultParameters; }   
    virtual MaterialParameterHandle* getMaterialParameterHandle(const String& name);

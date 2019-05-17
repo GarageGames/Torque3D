@@ -37,6 +37,7 @@
 
 class SimSet;
 class MatInstance;
+class GuiTreeViewCtrl;
 
 class MaterialManager : public ManagedSingleton<MaterialManager>
 {
@@ -96,6 +97,8 @@ public:
 #endif
 
    void dumpMaterialInstances( BaseMaterialDefinition *target = NULL ) const;
+
+   void getMaterialInstances(BaseMaterialDefinition* target, GuiTreeViewCtrl* tree);
 
    void updateTime();
    F32 getTotalTime() const { return mAccumTime; }

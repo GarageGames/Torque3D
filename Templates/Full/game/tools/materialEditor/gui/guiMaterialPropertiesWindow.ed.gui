@@ -3615,7 +3615,7 @@
             isContainer = "0";
             HorizSizing = "left";
             VertSizing = "bottom";
-            position = "86 1";
+            position = "66 1";
             Extent = "16 16";
             MinExtent = "8 2";
             canSave = "1";
@@ -3636,7 +3636,7 @@
             Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "left";
             VertSizing = "bottom";
-            position = "106 1";
+            position = "86 1";
             Extent = "16 16";
             MinExtent = "8 2";
             canSave = "1";
@@ -3658,7 +3658,7 @@
             Profile = "ToolsGuiDefaultProfile";
             HorizSizing = "left";
             VertSizing = "bottom";
-            position = "123 1";
+            position = "106 1";
             Extent = "16 16";
             MinExtent = "8 2";
             canSave = "1";
@@ -3671,6 +3671,27 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             bitmap = "tools/gui/images/save-icon";
+         };
+         new GuiBitmapButtonCtrl() {
+            canSaveDynamicFields = "0";
+            Enabled = "1";
+            isContainer = "0";
+            Profile = "ToolsGuiDefaultProfile";
+            HorizSizing = "left";
+            VertSizing = "bottom";
+            position = "126 1";
+            Extent = "16 16";
+            MinExtent = "8 2";
+            canSave = "1";
+            Visible = "1";
+            Command = "MaterialEditorGui.lookupMaterialInstances();";
+            hovertime = "1000";
+            groupNum = "-1";
+            text ="";
+            tooltip = "Lookup Material Instances";
+            buttonType = "PushButton";
+            useMouseEvents = "0";
+            bitmap = "tools/gui/images/visible";
          };
          new GuiBitmapCtrl(){
             position = "147 1";

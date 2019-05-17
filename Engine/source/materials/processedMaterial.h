@@ -46,7 +46,7 @@ class SceneRenderState;
 class GFXVertexBufferHandleBase;
 class GFXPrimitiveBufferHandle;
 class MatrixSet;
-
+class GuiTreeViewCtrl;
 
 /// This contains the common data needed to render a pass.
 struct RenderPassData
@@ -217,6 +217,8 @@ public:
 
    /// Dump shader info, or FF texture info?
    virtual void dumpMaterialInfo() { }
+
+   virtual void getMaterialInfo(GuiTreeViewCtrl* tree, U32 item) {}
 
    /// Returns the source material.
    Material* getMaterial() const { return mMaterial; }

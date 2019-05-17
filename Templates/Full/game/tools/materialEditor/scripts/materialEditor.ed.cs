@@ -2117,6 +2117,32 @@ function MaterialEditorGui::refreshMaterial(%this)
 }
 
 //==============================================================================
+// Looking up material instances/getting mat info 
+function MaterialEditorGui::lookupMaterialInstances( %this )
+{
+   if( MaterialEditorGui.currentMaterial.getName() $= "" )
+   {
+      MessageBoxOK("Cannot perform operation", "Unable to look up a material with a blank name" );
+      return;   
+   }
+   
+   MaterialInstanceViewTree.clear();
+   MaterialInstanceViewTree.setFilterChildren(false);
+   MaterialInstanceViewTree.setItemFilterException(1, true);
+   
+   MaterialEditorGui.currentMaterial.getMaterialInstances(MaterialInstanceViewTree);
+   
+   if(MaterialInstanceFilter.Text !$= "\c2Filter...")
+   {
+      MaterialInstanceViewTree.setFilterText(MaterialInstanceFilter.Text);
+   }
+   
+   MaterialInstanceViewTree.buildVisibleTree(true);
+   
+   Canvas.pushDialog(MaterialInstanceViewCtrl);
+}
+
+//==============================================================================
 // Switching and Changing Materials
 
 function MaterialEditorGui::switchMaterial( %this, %material )
