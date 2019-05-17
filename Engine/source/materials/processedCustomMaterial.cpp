@@ -245,7 +245,7 @@ bool ProcessedCustomMaterial::init( const FeatureSet &features,
       return false;
    }
 
-   rpd->shaderHandles.init( rpd->shader, mCustomMaterial );      
+   rpd->shaderHandles.init( rpd->shader, mCustomMaterial->mCustomShaderFeatures, mCustomMaterial );
    _initMaterialParameters();
    mDefaultParameters = allocMaterialParameters();
    setMaterialParameters( mDefaultParameters, 0 );

@@ -473,6 +473,12 @@ void MatInstance::setNodeTransforms(const MatrixF *address, const U32 numTransfo
    mProcessedMaterial->setNodeTransforms(address, numTransforms, getCurPass());
 }
 
+void MatInstance::setCustomShaderData(Vector<CustomShaderBindingData> &shaderData)
+{
+	PROFILE_SCOPE(MatInstance_setCustomShaderData);
+	mProcessedMaterial->setCustomShaderData(shaderData, getCurPass());
+}
+
 void MatInstance::setSceneInfo(SceneRenderState * state, const SceneData& sgData)
 {
    PROFILE_SCOPE(MatInstance_setSceneInfo);

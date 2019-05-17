@@ -31,6 +31,10 @@
 #include "gfx/gfxDevice.h"
 #endif
 
+#ifndef _BASEMATINSTANCE_H_
+#include "materials/baseMatInstance.h"
+#endif
+
 class SceneRenderState;
 class GFXCubemap;
 class Frustum;
@@ -115,10 +119,10 @@ protected:
    /// Count of matrices in the mNodeTransforms list
    U32 mNodeTransformCount;
 
+   //Custom Shader data
+   Vector<CustomShaderBindingData> mCustomShaderData;
+
 public:
-
-   
-
    TSRenderState();
    TSRenderState( const TSRenderState &state );
 
@@ -164,6 +168,15 @@ public:
    ///@see mAccuTex
    void setAccuTex( GFXTextureObject* query ) { mAccuTex = query; }
    GFXTextureObject* getAccuTex() const { return mAccuTex; }
+
+   void addCustomShaderBinding(CustomShaderBindingData data)
+   {
+	   mCustomShaderData.push_back(data);
+   }
+   Vector<CustomShaderBindingData> getCustomShaderBinding() const 
+   { 
+	   return mCustomShaderData; 
+   }
 
    ///@ see mNodeTransforms, mNodeTransformCount
    void setNodeTransforms(MatrixF *list, U32 count) { mNodeTransforms = list; mNodeTransformCount = count; }

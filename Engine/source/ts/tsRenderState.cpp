@@ -52,6 +52,7 @@ TSRenderState::TSRenderState( const TSRenderState &state )
       mLightQuery( state.mLightQuery ),
       mAccuTex( state.mAccuTex ),
       mNodeTransforms( state.mNodeTransforms ),
-      mNodeTransformCount( state.mNodeTransformCount )
+      mNodeTransformCount( state.mNodeTransformCount ),
+	  mCustomShaderData( state.mCustomShaderData )
 {
 }

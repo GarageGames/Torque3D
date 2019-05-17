@@ -182,6 +182,12 @@ void RenderMeshMgr::render(SceneRenderState * state)
                mat->setNodeTransforms(passRI->mNodeTransforms, passRI->mNodeTransformCount);
             }
 
+			//push along any overriden fields that are instance-specific as well
+			if (passRI->mCustomShaderData.size() > 0)
+			{
+				mat->setCustomShaderData(passRI->mCustomShaderData);
+			}
+
             setupSGData( passRI, sgData );
             mat->setSceneInfo( state, sgData );
 

@@ -34,7 +34,7 @@
 
 class GFXTexHandle;
 class GFXCubemap;
-
+class CustomShaderBindingData;
 
 struct SceneData
 {
@@ -94,6 +94,8 @@ struct SceneData
    /// code down to the material for use by shader 
    /// features.
    void *materialHint;
+
+   Vector<CustomShaderBindingData*> customShaderData;
 
    /// Constructor.
    SceneData() 
