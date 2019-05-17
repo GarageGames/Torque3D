@@ -80,7 +80,8 @@ GuiConvexEditorCtrl::GuiConvexEditorCtrl()
    mHasCopied( false ),
    mLastUndo( NULL ),
    mUndoManager( NULL ),
-   mCtrlDown( false )
+   mCtrlDown( false ),
+   mGridSnap(false)
 {   
 	mMaterialName = StringTable->insert("Grid512_OrangeLines_Mat");
 }
@@ -630,10 +631,44 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
          submitUndo( ModifyShape, mConvexSEL );
       }      
 
-      if ( mGizmo->getMode() == ScaleMode )
+      if ( mGizmo->getMode() == ScaleMode &&  !(event.modifier & SI_CTRL))
       {
          scaleFace( mConvexSEL, mFaceSEL, mGizmo->getScale() );
       }
+
+	  else if ( mGizmo->getMode() == ScaleMode &&  (event.modifier & SI_CTRL) )
+      {
+          Point3F scale = mGizmo->getDeltaScale();
+
+	     F32 scalar = 1;
+		  mConvexSEL->mSurfaceUVs[mFaceSEL].scale += (Point2F(scale.x, scale.y) * scalar);
+
+        if (mConvexSEL->mSurfaceUVs[mFaceSEL].scale.x < 0.01)
+           mConvexSEL->mSurfaceUVs[mFaceSEL].scale.x = 0.01;
+
+        if (mConvexSEL->mSurfaceUVs[mFaceSEL].scale.y < 0.01)
+           mConvexSEL->mSurfaceUVs[mFaceSEL].scale.y = 0.01;
+
+        if (mConvexSEL->mSurfaceUVs[mFaceSEL].scale.x > 100)
+           mConvexSEL->mSurfaceUVs[mFaceSEL].scale.x = 100;
+
+        if (mConvexSEL->mSurfaceUVs[mFaceSEL].scale.y > 100)
+           mConvexSEL->mSurfaceUVs[mFaceSEL].scale.y = 100;
+
+        Point2F test = mConvexSEL->mSurfaceUVs[mFaceSEL].scale;
+		  mConvexSEL->setMaskBits( ConvexShape::UpdateMask );
+
+		  updateShape( mConvexSEL, mFaceSEL );
+     }
+	  /*else if ( mGizmo->getMode() == MoveMode && event.modifier & SI_CTRL ) {
+		  Point3F scale = mGizmo->getOffset();
+
+          F32 scalar = 0.8;
+		  mConvexSEL->mSurfaceTextures[mFaceSEL].offset += (Point2F(-scale.x, scale.z) * scalar);
+		  mConvexSEL->setMaskBits( ConvexShape::UpdateMask );
+
+		  updateShape( mConvexSEL, mFaceSEL );
+	  }*/
       else
       {
          // Why does this have to be so ugly.
@@ -661,6 +696,20 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
             
             // Clear out floating point errors.
             cleanMatrix( surfMat );
+
+            if (mGizmo->getSelection() == Gizmo::Axis_Z)
+            {
+               MatrixF curSurfMat = mConvexSEL->mSurfaces[mFaceSEL];
+               EulerF curSufRot = curSurfMat.toEuler();
+
+               EulerF newSufRot = surfMat.toEuler();
+
+               float zRot = mRadToDeg(newSufRot.z - curSufRot.z);
+
+               float curZRot = mConvexSEL->mSurfaceUVs[mFaceSEL].zRot;
+
+               mConvexSEL->mSurfaceUVs[mFaceSEL].zRot += zRot;
+            }
 
             mConvexSEL->mSurfaces[mFaceSEL] = surfMat;
 
@@ -699,7 +748,28 @@ void GuiConvexEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
 
    if ( mGizmo->getMode() == MoveMode )
    {
-      mConvexSEL->setPosition( mGizmo->getPosition() );
+      //mConvexSEL->setPosition( mGizmo->getPosition() );
+
+      //MatrixF mat = mGizmo->getTransform();
+      Point3F wPos = mGizmo->getPosition();
+      //mat.getColumn(3, &wPos);
+
+      // adjust
+      //wPos += offset;
+
+      if (mGridSnap && mGridPlaneSize != 0.f)
+      {
+         if (mGizmo->getSelection() == Gizmo::Selection::Axis_X || mGizmo->getSelection() == Gizmo::Selection::Plane_XY || mGizmo->getSelection() == Gizmo::Selection::Plane_XZ)
+            wPos.x -= mFmod(wPos.x, mGridPlaneSize);
+
+         if (mGizmo->getSelection() == Gizmo::Selection::Axis_Y || mGizmo->getSelection() == Gizmo::Selection::Plane_XY || mGizmo->getSelection() == Gizmo::Selection::Plane_YZ)
+            wPos.y -= mFmod(wPos.y, mGridPlaneSize);
+
+         if (mGizmo->getSelection() == Gizmo::Selection::Axis_Z || mGizmo->getSelection() == Gizmo::Selection::Plane_XZ || mGizmo->getSelection() == Gizmo::Selection::Plane_YZ)
+            wPos.z -= mFmod(wPos.z, mGridPlaneSize);
+      }
+
+      mConvexSEL->setPosition(wPos);
    }
    else if ( mGizmo->getMode() == RotateMode )
    {   
@@ -845,8 +915,9 @@ void GuiConvexEditorCtrl::updateGizmo()
 
    if ( mFaceSEL != -1 && mode == MoveMode )
    {
-      if ( mCtrlDown )      
-         flags &= ~( GizmoProfile::CanTranslateX | GizmoProfile::CanTranslateY | GizmoProfile::PlanarHandlesOn );      
+      if ( mCtrlDown )  
+         //hijacking the CTRL modifier for texture offsetting control
+         flags &= ~GizmoProfile::CanScaleZ;
       else      
          flags |= ( GizmoProfile::CanTranslateX | GizmoProfile::CanTranslateY | GizmoProfile::PlanarHandlesOn );      
    }
@@ -1201,13 +1272,51 @@ void GuiConvexEditorCtrl::translateFace( ConvexShape *shape, S32 faceId, const P
 
    AssertFatal( shape->mSurfaces[ face.id ].isAffine(), "ConvexShapeEditor - surface not affine." );
 
+   Point3F modDisplace = Point3F(displace.x, displace.y, displace.z);
+
+   //snapping
+   if (mGridSnap && mGridPlaneSize != 0)
+   {
+      Point3F faceCenter = Point3F::Zero;
+
+      for (S32 i = 0; i < face.points.size(); i++)
+      {
+         Point3F &pnt = pointList[face.points[i]];
+         faceCenter += pnt;
+      }
+
+      faceCenter /= face.points.size();
+
+      // Transform displacement into object space.    
+      MatrixF objToWorld(shape->getWorldTransform());
+      objToWorld.scale(shape->getScale());
+      objToWorld.inverse();
+
+      objToWorld.mulP(faceCenter);
+
+      modDisplace = faceCenter + displace;
+      Point3F fMod = Point3F::Zero;
+
+      if (!mIsZero(displace.x))
+         fMod.x = mFmod(modDisplace.x - (displace.x > 0 ? mGridPlaneSize : -mGridPlaneSize), mGridPlaneSize);
+
+      if (!mIsZero(displace.y))
+         fMod.y = mFmod(modDisplace.y - (displace.y > 0 ? mGridPlaneSize : -mGridPlaneSize), mGridPlaneSize);
+
+      if (!mIsZero(displace.z))
+         fMod.z = mFmod(modDisplace.z - (displace.z > 0 ? mGridPlaneSize : -mGridPlaneSize), mGridPlaneSize);
+
+      modDisplace -= fMod;
+      modDisplace -= faceCenter;
+   }
+
    // Transform displacement into object space.    
    MatrixF worldToObj( shape->getTransform() );
    worldToObj.scale( shape->getScale() );
    worldToObj.inverse();
 
    Point3F displaceOS;
-   worldToObj.mulV( displace, &displaceOS );
+   worldToObj.mulV(modDisplace, &displaceOS);
 
    for ( S32 i = 0; i < face.points.size(); i++ )
    {                  
@@ -1774,6 +1883,281 @@ bool GuiConvexEditorCtrl::getEdgesTouchingPoint( ConvexShape *shape, S32 faceId,
    }
 
    return !edgeIdxList.empty();
+}
+
+Point2F GuiConvexEditorCtrl::getSelectedFaceUVOffset()
+{
+   if (mFaceSEL == -1 || mConvexSEL == NULL)
+      return Point2F(0, 0);
+
+   return mConvexSEL->mSurfaceUVs[mFaceSEL].offset;
+}
+
+Point2F GuiConvexEditorCtrl::getSelectedFaceUVScale()
+{
+   if (mFaceSEL == -1 || mConvexSEL == NULL)
+      return Point2F(0, 0);
+
+   return mConvexSEL->mSurfaceUVs[mFaceSEL].scale;
+}
+
+const char* GuiConvexEditorCtrl::getSelectedFaceMaterial()
+{
+   if (mFaceSEL == -1 || mConvexSEL == NULL)
+      return "";
+
+   if (mConvexSEL->mSurfaceUVs[mFaceSEL].matID == 0)
+   {
+      return mConvexSEL->mMaterialName;
+   }
+   else
+   {
+      return mConvexSEL->mSurfaceTextures[mConvexSEL->mSurfaceUVs[mFaceSEL].matID - 1].materialName;
+   }
+}
+
+bool GuiConvexEditorCtrl::getSelectedFaceHorzFlip()
+{
+   if (mFaceSEL == -1 || mConvexSEL == NULL)
+      return false;
+
+   return mConvexSEL->mSurfaceUVs[mFaceSEL].horzFlip;
+}
+
+bool GuiConvexEditorCtrl::getSelectedFaceVertFlip()
+{
+   if (mFaceSEL == -1 || mConvexSEL == NULL)
+      return false;
+
+   return mConvexSEL->mSurfaceUVs[mFaceSEL].vertFlip;
+}
+
+float GuiConvexEditorCtrl::getSelectedFaceZRot()
+{
+   if (mFaceSEL == -1 || mConvexSEL == NULL)
+      return false;
+
+   return mConvexSEL->mSurfaceUVs[mFaceSEL].zRot;
+}
+
+void GuiConvexEditorCtrl::setSelectedFaceUVOffset(Point2F offset)
+{
+   if (mFaceSEL == -1 || mConvexSEL == NULL)
+      return;
+
+   mConvexSEL->mSurfaceUVs[mFaceSEL].offset = offset;
+
+   mConvexSEL->setMaskBits(ConvexShape::UpdateMask);
+}
+
+void GuiConvexEditorCtrl::setSelectedFaceUVScale(Point2F scale)
+{
+   if (mFaceSEL == -1 || mConvexSEL == NULL)
+      return;
+
+   mConvexSEL->mSurfaceUVs[mFaceSEL].scale = scale;
+
+   mConvexSEL->setMaskBits(ConvexShape::UpdateMask);
+}
+
+void GuiConvexEditorCtrl::setSelectedFaceMaterial(const char* materialName)
+{
+   if (mFaceSEL == -1 || mConvexSEL == NULL)
+      return;
+
+   if (mConvexSEL->mSurfaceUVs.size() < mFaceSEL)
+      return;
+
+   //first, see if the mat already exists in our list
+   bool found = false;
+   U32 oldmatID = mConvexSEL->mSurfaceUVs[mFaceSEL].matID;
+
+   if (dStrcmp(materialName, mConvexSEL->getMaterialName().c_str()))
+   {
+      for (U32 i = 0; i < mConvexSEL->mSurfaceTextures.size(); i++)
+      {
+         if (!dStrcmp(mConvexSEL->mSurfaceTextures[i].materialName, materialName))
+         {
+            //found a match
+            mConvexSEL->mSurfaceUVs[mFaceSEL].matID = i + 1;
+            found = true;
+         }
+      }
+
+      if (!found)
+      {
+         //add a new one
+         ConvexShape::surfaceMaterial newMat;
+         newMat.materialName = materialName;
+
+         mConvexSEL->mSurfaceTextures.push_back(newMat);
+
+         mConvexSEL->mSurfaceUVs[mFaceSEL].matID = mConvexSEL->mSurfaceTextures.size();
+      }
+   }
+   else
+   {
+      mConvexSEL->mSurfaceUVs[mFaceSEL].matID = 0;
+   }
+
+   //run through and find out if there are any other faces still using the old mat texture
+   if (oldmatID != 0)
+   {
+      S32 curMatCount = mConvexSEL->mSurfaceTextures.size();
+
+      bool used = false;
+      for (U32 i = 0; i < mConvexSEL->mSurfaceUVs.size(); i++)
+      {
+         if (mConvexSEL->mSurfaceUVs[i].matID == oldmatID)
+         {
+            used = true;
+            break;
+         }
+      }
+
+      if (!used)
+      {
+         //that was the last reference, so let's update the listings on the shape
+         if (mConvexSEL->mSurfaceTextures[oldmatID - 1].materialInst)
+            SAFE_DELETE(mConvexSEL->mSurfaceTextures[oldmatID - 1].materialInst);
+
+         mConvexSEL->mSurfaceTextures.erase(oldmatID-1);
+
+         for (U32 i = 0; i < mConvexSEL->mSurfaceUVs.size(); i++)
+         {
+            if (mConvexSEL->mSurfaceUVs[i].matID > oldmatID)
+               mConvexSEL->mSurfaceUVs[i].matID--;
+         }
+      }
+   }
+
+   //mConvexSEL->mSurfaceUVs[mFaceSEL].materialName = materialName;
+
+   mConvexSEL->setMaskBits(ConvexShape::UpdateMask);
+}
+
+void GuiConvexEditorCtrl::setSelectedFaceHorzFlip(bool flipped)
+{
+   if (mFaceSEL == -1 || mConvexSEL == NULL)
+      return;
+
+   mConvexSEL->mSurfaceUVs[mFaceSEL].horzFlip = flipped;
+
+   mConvexSEL->setMaskBits(ConvexShape::UpdateMask);
+}
+
+void GuiConvexEditorCtrl::setSelectedFaceVertFlip(bool flipped)
+{
+   if (mFaceSEL == -1 || mConvexSEL == NULL)
+      return;
+
+   mConvexSEL->mSurfaceUVs[mFaceSEL].vertFlip = flipped;
+
+   mConvexSEL->setMaskBits(ConvexShape::UpdateMask);
+}
+
+void GuiConvexEditorCtrl::setSelectedFaceZRot(float degrees)
+{
+   if (mFaceSEL == -1 || mConvexSEL == NULL)
+      return;
+
+   F32 oldRot = mDegToRad(mConvexSEL->mSurfaceUVs[mFaceSEL].zRot);
+   mConvexSEL->mSurfaceUVs[mFaceSEL].zRot = degrees;
+
+   EulerF curEul = mConvexSEL->mSurfaces[mFaceSEL].toEuler();
+
+   MatrixF oldRotMat = MatrixF(EulerF(0, 0, -oldRot));
+
+   mConvexSEL->mSurfaces[mFaceSEL].mul(oldRotMat);
+
+   MatrixF newRotMat = MatrixF(EulerF(0, 0, mDegToRad(mConvexSEL->mSurfaceUVs[mFaceSEL].zRot)));
+
+   mConvexSEL->mSurfaces[mFaceSEL].mul(newRotMat);
+
+   //Point3F curPos = mConvexSEL->mSurfaces[mFaceSEL].getPosition();
+
+   //we roll back our existing modified rotation before setting the new one, just to keep it consistent
+   //const MatrixF &gMat = MatrixF(EulerF(curEul.x, curEul.y, curEul.z - oldRot + mDegToRad(mConvexSEL->mSurfaceUVs[mFaceSEL].zRot)), curPos);
+
+   //mConvexSEL->mSurfaces[mFaceSEL] = MatrixF(EulerF(curEul.x, curEul.y, mDegToRad(mConvexSEL->mSurfaceUVs[mFaceSEL].zRot)), curPos);
+
+   /*MatrixF surfMat;
+   surfMat.mul(mConvexSEL->mWorldToObj, gMat);
+
+   MatrixF worldToObj(mConvexSEL->getTransform());
+   worldToObj.scale(mConvexSEL->getScale());
+   worldToObj.inverse();
+
+   Point3F newPos;
+   newPos = gMat.getPosition();
+
+   worldToObj.mulP(newPos);
+   surfMat.setPosition(newPos);
+
+   // Clear out floating point errors.
+   cleanMatrix(surfMat);
+
+   mConvexSEL->mSurfaces[mFaceSEL] = surfMat;*/
+
+   updateShape(mConvexSEL, mFaceSEL);
+
+   mConvexSEL->setMaskBits(ConvexShape::UpdateMask);
+
+   /*
+   const MatrixF &gMat = mGizmo->getTransform();
+   MatrixF surfMat;
+   surfMat.mul( mConvexSEL->mWorldToObj, gMat );
+
+   MatrixF worldToObj ( mConvexSEL->getTransform() );
+   worldToObj.scale( mConvexSEL->getScale() );
+   worldToObj.inverse();
+
+   Point3F newPos;
+   newPos = gMat.getPosition();
+
+   worldToObj.mulP( newPos );
+   surfMat.setPosition( newPos );
+
+   // Clear out floating point errors.
+   cleanMatrix( surfMat );
+
+   if (mGizmo->getSelection() == Gizmo::Axis_Z)
+   {
+   MatrixF curSurfMat = mConvexSEL->mSurfaces[mFaceSEL];
+   EulerF curSufRot = curSurfMat.toEuler();
+
+   EulerF newSufRot = surfMat.toEuler();
+
+   float zRot = mRadToDeg(newSufRot.z - curSufRot.z);
+
+   float curZRot = mConvexSEL->mSurfaceTextures[mFaceSEL].zRot;
+
+   mConvexSEL->mSurfaceTextures[mFaceSEL].zRot += zRot;
+   }
+
+   mConvexSEL->mSurfaces[mFaceSEL] = surfMat;
+
+   updateShape( mConvexSEL, mFaceSEL );
+   */
+}
+
+void GuiConvexEditorCtrl::toggleGridSnapping()
+{
+   if (mGridSnap)
+      mGridSnap = false;
+   else
+      mGridSnap = true;
+}
+
+void GuiConvexEditorCtrl::updateShape()
+{
+   if (mConvexSEL)
+      mConvexSEL->inspectPostApply();
+}
+
+void GuiConvexEditorCtrl::setGridSnapSize(float gridSize)
+{
+   mGridPlaneSize = gridSize;
 }
 
 void GuiConvexEditorUndoAction::undo()
@@ -2513,4 +2897,189 @@ if (convex)
 DefineEngineMethod( GuiConvexEditorCtrl, splitSelectedFace, void, (), , "" )
 {
    object->splitSelectedFace();
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, getSelectedFaceUVOffset, Point2F, (), ,
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   //return Point2F(0, 0);
+   return object->getSelectedFaceUVOffset();
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, getSelectedFaceUVScale, Point2F, (), ,
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   //return Point2F(0, 0);
+   return object->getSelectedFaceUVScale();
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, setSelectedFaceUVOffset, void, ( Point2F offset ), ( Point2F(0,0) ),
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   //return Point2F(0, 0);
+   return object->setSelectedFaceUVOffset(offset);
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, setSelectedFaceUVScale, void, (Point2F scale), (Point2F(0, 0)),
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   //return Point2F(0, 0);
+   return object->setSelectedFaceUVScale(scale);
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, setSelectedFaceMaterial, void, (const char* materialName), (""),
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   //return Point2F(0, 0);
+   if (!dStrcmp(materialName, ""))
+      return;
+
+   object->setSelectedFaceMaterial(materialName);
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, getSelectedFaceMaterial, const char*, (), ,
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   return object->getSelectedFaceMaterial();
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, setSelectedFaceHorzFlip, void, (bool flipped), (false),
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   object->setSelectedFaceHorzFlip(flipped);
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, setSelectedFaceVertFlip, void, (bool flipped), (false),
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   object->setSelectedFaceVertFlip(flipped);
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, getSelectedFaceHorzFlip, bool, (), ,
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   return object->getSelectedFaceHorzFlip();
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, getSelectedFaceVertFlip, bool, (), ,
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   return object->getSelectedFaceVertFlip();
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, setSelectedFaceZRot, void, (float degrees), (0.0),
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   object->setSelectedFaceZRot(degrees);
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, getSelectedFaceZRot, float, (), ,
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   return object->getSelectedFaceZRot();
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, toggleGridSnapping, void, (),,
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   object->toggleGridSnapping();
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, setGridSnapSize, void, (float gridSize), (1.0),
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   object->setGridSnapSize(gridSize);
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, getGridSnapSize, float, (),,
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   return object->getGridSnapSize();
+}
+
+DefineEngineMethod(GuiConvexEditorCtrl, updateShape, void, (),,
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   //return Point2F(0, 0);
+   return object->updateShape();
 }
