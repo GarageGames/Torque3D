@@ -253,6 +253,9 @@ class Camera: public ShapeBase
       DECLARE_DESCRIPTION( "Represents a position, direction and field of view to render a scene from." );
       static F32 getMovementSpeed() { return smMovementSpeed; }
       bool isCamera() const { return true; }
+
+      //Not yet implemented
+      GFXTexHandle getCameraRenderTarget() { return GFXTexHandle(); }
 };
 
 typedef Camera::CameraMotionMode CameraMotionMode;
