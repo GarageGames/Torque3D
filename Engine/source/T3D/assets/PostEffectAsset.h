@@ -56,13 +56,18 @@ public:
    static void initPersistFields();
    virtual void copyTo(SimObject* object);
 
-   virtual void initializeAsset();
+   void                    setScriptFile(const char* pScriptFile);
+   inline StringTableEntry getScriptFile(void) const { return mScriptFile; };
 
    /// Declare Console Object.
    DECLARE_CONOBJECT(PostEffectAsset);
 
 protected:
-   virtual void            onAssetRefresh(void) {}
+   virtual void initializeAsset();
+   virtual void onAssetRefresh(void);
+
+   static bool setScriptFile(void *obj, const char *index, const char *data) { static_cast<PostEffectAsset*>(obj)->setScriptFile(data); return false; }
+   static const char* getScriptFile(void* obj, const char* data) { return static_cast<PostEffectAsset*>(obj)->getScriptFile(); }
 };
 
 DefineConsoleType(TypePostEffectAssetPtr, PostEffectAsset)

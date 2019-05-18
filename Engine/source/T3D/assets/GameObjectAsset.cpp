@@ -92,9 +92,9 @@ ConsoleSetType(TypeGameObjectAssetPtr)
 
 GameObjectAsset::GameObjectAsset()
 {
-   mGameObjectName = StringTable->lookup("");
-   mScriptFilePath = StringTable->lookup("");
-   mTAMLFilePath = StringTable->lookup("");
+   mGameObjectName = StringTable->EmptyString();
+   mScriptFile = StringTable->EmptyString();
+   mTAMLFile = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
@@ -115,8 +115,11 @@ void GameObjectAsset::initPersistFields()
    Parent::initPersistFields();
 
    addField("gameObjectName", TypeString, Offset(mGameObjectName, GameObjectAsset), "Name of the game object. Defines the created object's class.");
-   addField("scriptFilePath", TypeString, Offset(mScriptFilePath, GameObjectAsset), "Path to the script file for the GameObject's script code.");
-   addField("TAMLFilePath", TypeString, Offset(mTAMLFilePath, GameObjectAsset), "Path to the taml file for the GameObject's heirarchy.");
+
+   addProtectedField("scriptFile", TypeAssetLooseFilePath, Offset(mScriptFile, GameObjectAsset),
+      &setScriptFile, &getScriptFile, "Path to the script file for the GameObject's script code.");
+   addProtectedField("TAMLFile", TypeAssetLooseFilePath, Offset(mTAMLFile, GameObjectAsset),
+      &setTAMLFile, &getTAMLFile, "Path to the taml file for the GameObject's heirarchy.");
 }
 
 //------------------------------------------------------------------------------
@@ -129,14 +132,98 @@ void GameObjectAsset::copyTo(SimObject* object)
 
 void GameObjectAsset::initializeAsset()
 {
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
+   //Ensure we have an expanded filepath
+   mScriptFile = expandAssetFilePath(mScriptFile);
+
+   if (Platform::isFile(mScriptFile))
+      Con::executeFile(mScriptFile, false, false);
 }
 
 void GameObjectAsset::onAssetRefresh()
 {
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
+   //Ensure we have an expanded filepath
+   mScriptFile = expandAssetFilePath(mScriptFile);
+
+   if (Platform::isFile(mScriptFile))
+      Con::executeFile(mScriptFile, false, false);
+}
+
+void GameObjectAsset::setScriptFile(const char* pScriptFile)
+{
+   // Sanity!
+   AssertFatal(pScriptFile != NULL, "Cannot use a NULL script file.");
+
+   // Fetch image file.
+   pScriptFile = StringTable->insert(pScriptFile);
+
+   // Ignore no change,
+   if (pScriptFile == mScriptFile)
+      return;
+
+   // Update.
+   mScriptFile = getOwned() ? expandAssetFilePath(pScriptFile) : StringTable->insert(pScriptFile);
+
+   // Refresh the asset.
+   refreshAsset();
+}
+
+
+void GameObjectAsset::setTAMLFile(const char* pTAMLFile)
+{
+   // Sanity!
+   AssertFatal(pTAMLFile != NULL, "Cannot use a NULL TAML file.");
+
+   // Fetch image file.
+   pTAMLFile = StringTable->insert(pTAMLFile);
+
+   // Ignore no change,
+   if (pTAMLFile == mScriptFile)
+      return;
+
+   // Update.
+   mTAMLFile = getOwned() ? expandAssetFilePath(pTAMLFile) : StringTable->insert(pTAMLFile);
+
+   // Refresh the asset.
+   refreshAsset();
+}
+
+
+const char* GameObjectAsset::create()
+{
+   if (!Platform::isFile(mTAMLFile))
+      return "";
+
+   // Set the format mode.
+   Taml taml;
+
+   // Yes, so set it.
+   taml.setFormatMode(Taml::getFormatModeEnum("xml"));
+
+   // Turn-off auto-formatting.
+   taml.setAutoFormat(false);
+
+   // Read object.
+   SimObject* pSimObject = taml.read(mTAMLFile);
+
+   // Did we find the object?
+   if (pSimObject == NULL)
+   {
+      // No, so warn.
+      Con::warnf("GameObjectAsset::create() - Could not read object from file '%s'.", mTAMLFile);
+      return "";
+   }
+
+   //Flag it so we know where it came from
+   pSimObject->setDataField("GameObject", nullptr, getAssetId());
+
+   return pSimObject->getIdString();
+}
+
+DefineEngineMethod(GameObjectAsset, createObject, const char*, (),,
+   "Creates an instance of the given GameObject given the asset definition.\n"
+   "@return The GameObject entity created from the asset.")
+{
+   return object->create();
 }
 
 //-----------------------------------------------------------------------------
@@ -160,35 +247,50 @@ void GuiInspectorTypeGameObjectAssetPtr::consoleInit()
 
 GuiControl* GuiInspectorTypeGameObjectAssetPtr::constructEditControl()
 {
-   // Create base filename edit controls
-   GuiControl *retCtrl = Parent::constructEditControl();
-   if (retCtrl == NULL)
-      return retCtrl;
+   // Create "Open in ShapeEditor" button
+   mGameObjectEditButton = new GuiButtonCtrl();
 
    // Change filespec
    char szBuffer[512];
-   dSprintf(szBuffer, sizeof(szBuffer), "AssetBrowser.showDialog(\"GameObjectAsset\", \"AssetBrowser.changeAsset\", %d, %s);",
-      mInspector->getComponentGroupTargetId(), mCaption);
-   mBrowseButton->setField("Command", szBuffer);
+   dSprintf(szBuffer, sizeof(szBuffer), "%d.onClick(%s);", this->getId(), mCaption);
+   mGameObjectEditButton->setField("Command", szBuffer);
 
-   // Create "Open in ShapeEditor" button
-   mSMEdButton = new GuiBitmapButtonCtrl();
+   mGameObjectEditButton->setDataField(StringTable->insert("Profile"), NULL, "GuiButtonProfile");
+   mGameObjectEditButton->setDataField(StringTable->insert("tooltipprofile"), NULL, "GuiToolTipProfile");
+   mGameObjectEditButton->setDataField(StringTable->insert("hovertime"), NULL, "1000");
 
-   dSprintf(szBuffer, sizeof(szBuffer), "echo(\"Game Object Editor not implemented yet!\");", retCtrl->getId());
-   mSMEdButton->setField("Command", szBuffer);
+   const char* assetId = getData();
 
-   char bitmapName[512] = "tools/worldEditor/images/toolbar/shape-editor";
-   mSMEdButton->setBitmap(bitmapName);
+   if (assetId == "")
+   {
+      mGameObjectEditButton->setText("Create Game Object");
 
-   mSMEdButton->setDataField(StringTable->insert("Profile"), NULL, "GuiButtonProfile");
-   mSMEdButton->setDataField(StringTable->insert("tooltipprofile"), NULL, "GuiToolTipProfile");
-   mSMEdButton->setDataField(StringTable->insert("hovertime"), NULL, "1000");
-   mSMEdButton->setDataField(StringTable->insert("tooltip"), NULL, "Open this file in the State Machine Editor");
+      mGameObjectEditButton->setDataField(StringTable->insert("tooltip"), NULL, "Convert this object into a reusable Game Object asset.");
+   }
+   else
+   {
+      GameObjectAsset* goAsset = AssetDatabase.acquireAsset< GameObjectAsset>(assetId);
 
-   mSMEdButton->registerObject();
-   addObject(mSMEdButton);
+      if (goAsset)
+      {
+         mGameObjectEditButton->setText("Edit Game Object");
 
-   return retCtrl;
+         mGameObjectEditButton->setDataField(StringTable->insert("tooltip"), NULL, "Edit this object instance or Game Object asset.");
+      }
+      else
+      {
+         mGameObjectEditButton->setText("Create Game Object");
+
+         mGameObjectEditButton->setDataField(StringTable->insert("tooltip"), NULL, "Convert this object into a reusable Game Object asset.");
+      }
+   }
+
+   //mGameObjectEditButton->registerObject();
+   _registerEditControl(mGameObjectEditButton);
+
+   addObject(mGameObjectEditButton);
+
+   return mGameObjectEditButton;
 }
 
 bool GuiInspectorTypeGameObjectAssetPtr::updateRects()
@@ -199,19 +301,12 @@ bool GuiInspectorTypeGameObjectAssetPtr::updateRects()
    Point2I fieldPos = getPosition();
 
    mCaptionRect.set(0, 0, fieldExtent.x - dividerPos - dividerMargin, fieldExtent.y);
-   mEditCtrlRect.set(fieldExtent.x - dividerPos + dividerMargin, 1, dividerPos - dividerMargin - 34, fieldExtent.y);
+   mEditCtrlRect.set(fieldExtent.x - dividerPos + dividerMargin, 1, dividerPos - dividerMargin, fieldExtent.y);
 
    bool resized = mEdit->resize(mEditCtrlRect.point, mEditCtrlRect.extent);
-   if (mBrowseButton != NULL)
+   if (mGameObjectEditButton != NULL)
    {
-      mBrowseRect.set(fieldExtent.x - 32, 2, 14, fieldExtent.y - 4);
-      resized |= mBrowseButton->resize(mBrowseRect.point, mBrowseRect.extent);
-   }
-
-   if (mSMEdButton != NULL)
-   {
-      RectI shapeEdRect(fieldExtent.x - 16, 2, 14, fieldExtent.y - 4);
-      resized |= mSMEdButton->resize(shapeEdRect.point, shapeEdRect.extent);
+      resized |= mGameObjectEditButton->resize(mEditCtrlRect.point, mEditCtrlRect.extent);
    }
 
    return resized;

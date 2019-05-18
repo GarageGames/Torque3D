@@ -105,10 +105,6 @@ ShapeAnimationAsset::ShapeAnimationAsset() :
 
 ShapeAnimationAsset::~ShapeAnimationAsset()
 {
-   // If the asset manager does not own the asset then we own the
-   // asset definition so delete it.
-   if (!getOwned())
-      delete mpAssetDefinition;
 }
 
 //-----------------------------------------------------------------------------
@@ -118,7 +114,9 @@ void ShapeAnimationAsset::initPersistFields()
    // Call parent.
    Parent::initPersistFields();
 
-   addField("animationFile", TypeFilename, Offset(mFileName, ShapeAnimationAsset), "Path to the file name containing the animation");
+   addProtectedField("animationFile", TypeAssetLooseFilePath, Offset(mFileName, ShapeAnimationAsset),
+      &setAnimationFile, &getAnimationFile, "Path to the file name containing the animation");
+
    addField("animationName", TypeString, Offset(mAnimationName, ShapeAnimationAsset), "Name of the animation");
 
    addField("isEmbedded", TypeBool, Offset(mIsEmbedded, ShapeAnimationAsset), "If true, this animation asset just referrs to an embedded animation of a regular shape mesh. If false, it is a self-contained animation file");
@@ -172,4 +170,38 @@ void ShapeAnimationAsset::initializeAsset(void)
 void ShapeAnimationAsset::onAssetRefresh(void)
 {
 
+}
+
+void ShapeAnimationAsset::setAnimationFile(const char* pAnimationFile)
+{
+   // Sanity!
+   AssertFatal(pAnimationFile != NULL, "Cannot use a NULL animation file.");
+
+   // Fetch image file.
+   pAnimationFile = StringTable->insert(pAnimationFile);
+
+   // Ignore no change,
+   if (pAnimationFile == mFileName)
+      return;
+
+   // Update.
+   mFileName = getOwned() ? expandAssetFilePath(pAnimationFile) : StringTable->insert(pAnimationFile);
+
+   // Refresh the asset.
+   refreshAsset();
+}
+
+S32 ShapeAnimationAsset::getAnimationCount()
+{ 
+   if (mSourceShape == nullptr)
+      return 0;
+
+   return mSourceShape->sequences.size(); 
+}
+
+DefineEngineMethod(ShapeAnimationAsset, getAnimationCount, S32, (), ,
+   "Gets the number of animations for this shape asset.\n"
+   "@return Animation count.\n")
+{
+   return object->getAnimationCount();
 }

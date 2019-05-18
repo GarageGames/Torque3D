@@ -57,7 +57,7 @@ class MaterialAsset : public AssetBase
 
    String                  mShaderGraphFile;
    String                  mScriptFile;
-   String                  mMatDefinitionName;
+   StringTableEntry        mMatDefinitionName;
 
 public:
    MaterialAsset();
@@ -67,15 +67,22 @@ public:
    static void initPersistFields();
    virtual void copyTo(SimObject* object);
 
-   virtual void initializeAsset();
-   virtual void onAssetRefresh(void);
-
    void compileShader();
 
-   String getMaterialDefinitionName() { return mMatDefinitionName; }
+   StringTableEntry getMaterialDefinitionName() { return mMatDefinitionName; }
+
+   void                    setScriptFile(const char* pScriptFile);
+   inline StringTableEntry getScriptFile(void) const { return mScriptFile; };
 
    /// Declare Console Object.
    DECLARE_CONOBJECT(MaterialAsset);
+
+protected:
+   virtual void initializeAsset();
+   virtual void onAssetRefresh(void);
+
+   static bool setScriptFile(void *obj, const char *index, const char *data) { static_cast<MaterialAsset*>(obj)->setScriptFile(data); return false; }
+   static const char* getScriptFile(void* obj, const char* data) { return static_cast<MaterialAsset*>(obj)->getScriptFile(); }
 };
 
 DefineConsoleType(TypeMaterialAssetPtr, MaterialAsset)
@@ -83,18 +90,21 @@ DefineConsoleType(TypeMaterialAssetPtr, MaterialAsset)
 //-----------------------------------------------------------------------------
 // TypeAssetId GuiInspectorField Class
 //-----------------------------------------------------------------------------
-class GuiInspectorTypeMaterialAssetPtr : public GuiInspectorTypeFileName
+class GuiInspectorTypeMaterialAssetPtr : public GuiInspectorField
 {
-   typedef GuiInspectorTypeFileName Parent;
+   typedef GuiInspectorField Parent;
 public:
 
-   GuiBitmapButtonCtrl  *mSMEdButton;
+   GuiControl*       mMatEdContainer;
+   GuiBitmapButtonCtrl  *mMatPreviewButton;
+   GuiTextEditCtrl *mMatAssetIdTxt;
 
    DECLARE_CONOBJECT(GuiInspectorTypeMaterialAssetPtr);
    static void consoleInit();
 
    virtual GuiControl* constructEditControl();
    virtual bool updateRects();
+   void setMaterialAsset(String assetId);
 };
 
 #endif // _ASSET_BASE_H_

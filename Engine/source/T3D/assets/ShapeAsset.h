@@ -95,16 +95,40 @@ public:
    Resource<TSShape> getShapeResource() { return mShape; }
 
    void SplitSequencePathAndName(String& srcPath, String& srcName);
-   String getShapeFilename() { return mFileName; }
+   StringTableEntry getShapeFilename() { return mFileName; }
    
    U32 getShapeFilenameHash() { return _StringTable::hashString(mFileName); }
+
+   Vector<AssetPtr<MaterialAsset>> getMaterialAssets() { return mMaterialAssets; }
+
+   inline AssetPtr<MaterialAsset> getMaterialAsset(U32 matId) 
+   { 
+      if(matId >= mMaterialAssets.size()) 
+          return nullptr; 
+      else 
+         return mMaterialAssets[matId]; 
+   }
+
+   void clearMaterialAssets() { mMaterialAssets.clear(); }
+
+   void addMaterialAssets(AssetPtr<MaterialAsset> matPtr) { mMaterialAssets.push_back(matPtr); }
 
    S32 getMaterialCount() { return mMaterialAssets.size(); }
    S32 getAnimationCount() { return mAnimationAssets.size(); }
    ShapeAnimationAsset* getAnimation(S32 index);
 
+   void _onResourceChanged(const Torque::Path &path);
+
+   Signal< void(ShapeAsset*) > onShapeChanged;
+
+   void                    setShapeFile(const char* pScriptFile);
+   inline StringTableEntry getShapeFile(void) const { return mFileName; };
+
 protected:
    virtual void            onAssetRefresh(void);
+
+   static bool setShapeFile(void *obj, const char *index, const char *data) { static_cast<ShapeAsset*>(obj)->setShapeFile(data); return false; }
+   static const char* getShapeFile(void* obj, const char* data) { return static_cast<ShapeAsset*>(obj)->getShapeFile(); }
 };
 
 DefineConsoleType(TypeShapeAssetPtr, S32)

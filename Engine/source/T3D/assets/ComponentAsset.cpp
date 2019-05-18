@@ -124,7 +124,8 @@ void ComponentAsset::initPersistFields()
    addField("componentType", TypeString, Offset(mComponentType, ComponentAsset), "The category of the component for organizing in the editor.");
    addField("description", TypeString, Offset(mDescription, ComponentAsset), "Simple description of the component.");
 
-   addField("scriptFile", TypeString, Offset(mScriptFile, ComponentAsset), "A script file with additional scripted functionality for this component.");
+   addProtectedField("scriptFile", TypeAssetLooseFilePath, Offset(mScriptFile, ComponentAsset),
+      &setScriptFile, &getScriptFile, "A script file with additional scripted functionality for this component.");
 }
 
 //------------------------------------------------------------------------------
@@ -137,12 +138,35 @@ void ComponentAsset::copyTo(SimObject* object)
 
 void ComponentAsset::initializeAsset()
 {
+   mScriptFile = expandAssetFilePath(mScriptFile);
+
    if(Platform::isFile(mScriptFile))
       Con::executeFile(mScriptFile, false, false);
 }
 
 void ComponentAsset::onAssetRefresh()
 {
+   mScriptFile = expandAssetFilePath(mScriptFile);
+
    if (Platform::isFile(mScriptFile))
       Con::executeFile(mScriptFile, false, false);
+}
+
+void ComponentAsset::setScriptFile(const char* pScriptFile)
+{
+   // Sanity!
+   AssertFatal(pScriptFile != NULL, "Cannot use a NULL script file.");
+
+   // Fetch image file.
+   pScriptFile = StringTable->insert(pScriptFile);
+
+   // Ignore no change,
+   if (pScriptFile == mScriptFile)
+      return;
+
+   // Update.
+   mScriptFile = getOwned() ? expandAssetFilePath(pScriptFile) : StringTable->insert(pScriptFile);
+
+   // Refresh the asset.
+   refreshAsset();
 }

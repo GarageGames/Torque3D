@@ -1,18 +1,34 @@
 <AssetImportConfigs>
     <Config Name="TestConfig">
         <Mesh ImportMesh="1" DoUpAxisOverride="0" UpAxisOverride="Z_AXIS" DoScaleOverride="0" ScaleOverride="1" IgnoreNodeScale="0" AdjustCenter="0" AdjustFloor="1" CollapseSubmeshes="0" LODType="TrailingNumber" ImportedNodes="" IgnoreNodes="" ImportMeshes="" IgnoreMeshes="" />
-        <Materials ImportMaterials="1" CreateComposites="1" UseDiffuseSuffixOnOriginImg="1" UseExistingMaterials="1" />
+        <Materials ImportMaterials="1" IgnoreMaterials="" CreateComposites="1" UseDiffuseSuffixOnOriginImg="1" UseExistingMaterials="1" />
         <Animations ImportAnimations="1" SeparateAnimations="1" SeparateAnimationPrefix="" />
         <Collisions GenerateCollisions="1" GenCollisionType="CollisionMesh" CollisionMeshPrefix="Col" GenerateLOSCollisions="1" GenLOSCollisionType="CollisionMesh" LOSCollisionMeshPrefix="LOS" />
-        <Images ImageType="N/A" DiffuseTypeSuffixes="_ALBEDO,_DIFFUSE,_ALB,_DIF,_COLOR,_COL" NormalTypeSuffixes="_NORMAL,_NORM" SpecularTypeSuffixes="_SPECULAR,_SPEC" MetalnessTypeSuffixes="_METAL,_MET,_METALNESS,_METALLIC" RoughnessTypeSuffixes="_ROUGH,_ROUGHNESS" SmoothnessTypeSuffixes="_SMOOTH,_SMOOTHNESS" AOTypeSuffixes="_AO,_AMBIENT,_AMBIENTOCCLUSION" CompositeTypeSuffixes="_COMP,_COMPOSITE" TextureFilteringMode="Bilinear" UseMips="1" IsHDR="0" Scaling="1" Compressed="0" GenerateMaterialOnImport="1" PopulateMaterialMaps="1" />
+        <Images ImageType="GUI" DiffuseTypeSuffixes="_ALBEDO,_DIFFUSE,_ALB,_DIF,_Base_Color,_COLOR,_COL" NormalTypeSuffixes="_NORMAL,_NORM" SpecularTypeSuffixes="_SPECULAR,_SPEC" MetalnessTypeSuffixes="_METAL,_MET,_METALNESS,_METALLIC" RoughnessTypeSuffixes="_ROUGH,_ROUGHNESS" SmoothnessTypeSuffixes="_SMOOTH,_SMOOTHNESS" AOTypeSuffixes="_AO,_AMBIENT,_AMBIENTOCCLUSION,_Ambient_Occlusion" CompositeTypeSuffixes="_COMP,_COMPOSITE" TextureFilteringMode="Bilinear" UseMips="1" IsHDR="0" Scaling="1" Compressed="0" GenerateMaterialOnImport="1" PopulateMaterialMaps="1" />
         <Sounds VolumeAdjust="1" PitchAdjust="1" Compressed="0" />
     </Config>
     <Config Name="SecondTest">
         <Mesh ImportMesh="1" DoUpAxisOverride="0" UpAxisOverride="Z_AXIS" DoScaleOverride="0" ScaleOverride="1" IgnoreNodeScale="0" AdjustCenter="0" AdjustFloor="0" CollapseSubmeshes="0" LODType="TrailingNumber" ImportedNodes="" IgnoreNodes="" ImportMeshes="" IgnoreMeshes="" />
-        <Materials ImportMaterials="1" CreateComposites="1" UseDiffuseSuffixOnOriginImg="" UseExistingMaterials="" />
+        <Materials ImportMaterials="1" IgnoreMaterials="" CreateComposites="1" UseDiffuseSuffixOnOriginImg="" UseExistingMaterials="" />
         <Animations ImportAnimations="1" SeparateAnimations="1" SeparateAnimationPrefix="" />
         <Collisions GenerateCollisions="1" GenCollisionType="CollisionMesh" CollisionMeshPrefix="Col" GenerateLOSCollisions="1" GenLOSCollisionType="CollisionMesh" LOSCollisionMeshPrefix="LOS" />
         <Images ImageType="N/A" DiffuseTypeSuffixes="_ALBEDO,_DIFFUSE,_ALB,_DIF,_COLOR,_COL" NormalTypeSuffixes="_NORMAL,_NORM" SpecularTypeSuffixes="_SPECULAR,_SPEC" MetalnessTypeSuffixes="_METAL,_MET,_METALNESS,_METALLIC" RoughnessTypeSuffixes="_ROUGH,_ROUGHNESS" SmoothnessTypeSuffixes="_SMOOTH,_SMOOTHNESS" AOTypeSuffixes="_AO,_AMBIENT,_AMBIENTOCCLUSION" CompositeTypeSuffixes="_COMP,_COMPOSITE" TextureFilteringMode="Bilinear" UseMips="1" IsHDR="0" Scaling="1" Compressed="0" GenerateMaterialOnImport="" PopulateMaterialMaps="" />
+        <Sounds VolumeAdjust="1" PitchAdjust="1" Compressed="0" />
+    </Config>
+    <Config Name="GUI_Image_Import">
+        <Mesh ImportMesh="0" DoUpAxisOverride="0" UpAxisOverride="Z_AXIS" DoScaleOverride="0" ScaleOverride="1" IgnoreNodeScale="0" AdjustCenter="0" AdjustFloor="0" CollapseSubmeshes="0" LODType="TrailingNumber" ImportedNodes="" IgnoreNodes="" ImportMeshes="" IgnoreMeshes="" />
+        <Materials ImportMaterials="0" IgnoreMaterials="" CreateComposites="1" UseDiffuseSuffixOnOriginImg="1" UseExistingMaterials="1" />
+        <Animations ImportAnimations="0" SeparateAnimations="1" SeparateAnimationPrefix="" />
+        <Collisions GenerateCollisions="0" GenCollisionType="CollisionMesh" CollisionMeshPrefix="Col" GenerateLOSCollisions="1" GenLOSCollisionType="CollisionMesh" LOSCollisionMeshPrefix="LOS" />
+        <Images ImageType="GUI" DiffuseTypeSuffixes="_ALBEDO;_DIFFUSE;_ALB;_DIF;_COLOR;_COL;_BASECOLOR;_BASE_COLOR" NormalTypeSuffixes="_NORMAL;_NORM" SpecularTypeSuffixes="_SPECULAR;_SPEC" MetalnessTypeSuffixes="_METAL;_MET;_METALNESS;_METALLIC" RoughnessTypeSuffixes="_ROUGH;_ROUGHNESS" SmoothnessTypeSuffixes="_SMOOTH;_SMOOTHNESS" AOTypeSuffixes="_AO;_AMBIENT;_AMBIENTOCCLUSION" CompositeTypeSuffixes="_COMP;_COMPOSITE" TextureFilteringMode="Bilinear" UseMips="1" IsHDR="0" Scaling="1" Compressed="0" GenerateMaterialOnImport="0" PopulateMaterialMaps="0" />
+        <Sounds VolumeAdjust="1" PitchAdjust="1" Compressed="0" />
+    </Config>
+    <Config Name="CogflictsMesh">
+        <Mesh ImportMesh="1" DoUpAxisOverride="0" UpAxisOverride="Z_AXIS" DoScaleOverride="0" ScaleOverride="1" IgnoreNodeScale="0" AdjustCenter="0" AdjustFloor="0" CollapseSubmeshes="0" LODType="TrailingNumber" ImportedNodes="" IgnoreNodes="" ImportMeshes="" IgnoreMeshes="" />
+        <Materials ImportMaterials="1" IgnoreMaterials="ColorEffect*;" CreateComposites="1" UseDiffuseSuffixOnOriginImg="1" UseExistingMaterials="1" />
+        <Animations ImportAnimations="1" SeparateAnimations="1" SeparateAnimationPrefix="" />
+        <Collisions GenerateCollisions="1" GenCollisionType="CollisionMesh" CollisionMeshPrefix="Col" GenerateLOSCollisions="1" GenLOSCollisionType="CollisionMesh" LOSCollisionMeshPrefix="LOS" />
+        <Images ImageType="N/A" DiffuseTypeSuffixes="_ALBEDO;_DIFFUSE;_ALB;_DIF;_COLOR;_COL;_BASECOLOR;_BASE_COLOR;_Al" NormalTypeSuffixes="_NORMAL;_NORM;_N" SpecularTypeSuffixes="_SPECULAR;_SPEC" MetalnessTypeSuffixes="_METAL;_MET;_METALNESS;_METALLIC" RoughnessTypeSuffixes="_ROUGH;_ROUGHNESS" SmoothnessTypeSuffixes="_SMOOTH;_SMOOTHNESS" AOTypeSuffixes="_AO;_AMBIENT;_AMBIENTOCCLUSION" CompositeTypeSuffixes="_COMP;_COMPOSITE;_C" TextureFilteringMode="Bilinear" UseMips="1" IsHDR="0" Scaling="1" Compressed="0" GenerateMaterialOnImport="1" PopulateMaterialMaps="1" />
         <Sounds VolumeAdjust="1" PitchAdjust="1" Compressed="0" />
     </Config>
 </AssetImportConfigs>

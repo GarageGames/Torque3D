@@ -287,6 +287,30 @@ new GuiControlProfile( ToolsGuiTextEditProfile )
    category = "Tools";
 };
 
+if( !isObject( ToolsGuiTextEditErrorProfile ) )
+new GuiControlProfile( ToolsGuiTextEditErrorProfile )
+{
+   opaque = true;
+   bitmap = "./images/textEditFrame";
+   hasBitmapArray = true; 
+   border = -2; // fix to display textEdit img
+   //borderWidth = "1";  // fix to display textEdit img
+   //borderColor = "100 100 100";
+   fillColor = "242 241 240 0";
+   fillColorHL = "255 255 255";
+   fontColor = "0 0 0";
+   fontColorHL = "255 0 0";
+   fontColorSEL = "98 100 137";
+   fontColorNA = "200 200 200";
+   textOffset = "4 2";
+   autoSizeWidth = false;
+   autoSizeHeight = true;
+   justify = "left";
+   tab = true;
+   canKeyFocus = true;   
+   category = "Tools";
+};
+
 if( !isObject( ToolsGuiTextEditCenterProfile ) )
 new GuiControlProfile (ToolsGuiTextEditCenterProfile)
 {

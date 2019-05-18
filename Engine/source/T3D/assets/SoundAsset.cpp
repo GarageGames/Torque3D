@@ -92,7 +92,7 @@ ConsoleSetType(TypeSoundAssetPtr)
 
 SoundAsset::SoundAsset()
 {
-   mSoundFilePath = StringTable->EmptyString();
+   mSoundFile = StringTable->EmptyString();
 
    mPitchAdjust = 0;
    mVolumeAdjust = 0;
@@ -117,7 +117,8 @@ void SoundAsset::initPersistFields()
    // Call parent.
    Parent::initPersistFields();
 
-   addField("soundFilePath", TypeFilename, Offset(mSoundFilePath, SoundAsset), "Path to the sound file.");
+   addProtectedField("soundFile", TypeAssetLooseFilePath, Offset(mSoundFile, SoundAsset),
+      &setSoundFile, &getSoundFile, "Path to the sound file.");
 
    addField("pitchAdjust", TypeF32, Offset(mPitchAdjust, SoundAsset), "Adjustment of the pitch value");
    addField("volumeAdjust", TypeF32, Offset(mVolumeAdjust, SoundAsset), "Adjustment to the volume.");
@@ -138,4 +139,23 @@ void SoundAsset::initializeAsset(void)
 void SoundAsset::onAssetRefresh(void)
 {
 
+}
+
+void SoundAsset::setSoundFile(const char* pSoundFile)
+{
+   // Sanity!
+   AssertFatal(pSoundFile != NULL, "Cannot use a NULL shape file.");
+
+   // Fetch image file.
+   pSoundFile = StringTable->insert(pSoundFile);
+
+   // Ignore no change,
+   if (pSoundFile == mSoundFile)
+      return;
+
+   // Update.
+   mSoundFile = getOwned() ? expandAssetFilePath(pSoundFile) : StringTable->insert(pSoundFile);
+
+   // Refresh the asset.
+   refreshAsset();
 }
