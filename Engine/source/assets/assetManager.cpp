@@ -70,6 +70,9 @@
 #ifndef MATERIALASSET_H
 #include "T3D/assets/MaterialAsset.h"
 #endif
+#ifndef GAME_OBJECT_ASSET_H
+#include "T3D/assets/GameObjectAsset.h"
+#endif
 
 // Script bindings.
 #include "assetManager_ScriptBinding.h"
@@ -272,10 +275,16 @@ bool AssetManager::loadModuleAutoLoadAssets(ModuleDefinition* pModuleDefinition)
             {
                assetBase = mTaml.read<MaterialAsset>(assetDef->mAssetBaseFilePath);
             }
+            else if (assetDef->mAssetType == StringTable->insert("GameObjectAsset"))
+            {
+               assetBase = mTaml.read<GameObjectAsset>(assetDef->mAssetBaseFilePath);
+            }
 
             //load the asset now if valid
             if (assetBase)
-               addPrivateAsset(assetBase);
+            {
+               assetBase->setOwned(this, assetDef);
+            }
          }
       }
    }

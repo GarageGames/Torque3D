@@ -86,6 +86,7 @@ ConsoleSetType(TypeShapeAssetPtr)
 
 ShapeAsset::ShapeAsset()
 {
+   mFileName = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
@@ -129,6 +130,10 @@ void ShapeAsset::initializeAsset()
 
    ResourceManager::get().getChangedSignal().notify(this, &ShapeAsset::_onResourceChanged);
 
+   //Ensure our path is expando'd if it isn't already
+   if (!Platform::isFullPath(mFileName))
+      mFileName = getOwned() ? expandAssetFilePath(mFileName) : mFileName;
+
    loadShape();
 }
 
@@ -144,8 +149,7 @@ void ShapeAsset::setShapeFile(const char* pShapeFile)
    if (pShapeFile == mFileName)
       return;
 
-   // Update.
-   mFileName = getOwned() ? expandAssetFilePath(pShapeFile) : StringTable->insert(pShapeFile);
+   mFileName = pShapeFile;
 
    // Refresh the asset.
    refreshAsset();
@@ -155,6 +159,8 @@ void ShapeAsset::_onResourceChanged(const Torque::Path &path)
 {
    if (path != Torque::Path(mFileName) )
       return;
+
+   refreshAsset();
 
    loadShape();
 }
@@ -268,8 +274,12 @@ void ShapeAsset::copyTo(SimObject* object)
 
 void ShapeAsset::onAssetRefresh(void)
 {
-   if (dStrcmp(mFileName, "") == 0)
+   if (mFileName == StringTable->EmptyString())
       return;
+
+   // Update.
+   if(!Platform::isFullPath(mFileName))
+      mFileName = getOwned() ? expandAssetFilePath(mFileName) : mFileName;
 
    loadShape();
 }

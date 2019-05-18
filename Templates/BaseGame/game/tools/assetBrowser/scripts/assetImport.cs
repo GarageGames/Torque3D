@@ -71,6 +71,9 @@ function AssetBrowser::onBeginDropFiles( %this )
    %this.importAssetUnprocessedListArray.empty();
    %this.importAssetFinalListArray.empty();
    
+   //prep the import control
+   Canvas.pushDialog(AssetImportCtrl);
+   AssetImportCtrl.setHidden(true);
    ImportAssetTree.clear();
    AssetBrowser.unprocessedAssetsCount = 0;
 }
@@ -270,7 +273,7 @@ function AssetBrowser::onEndDropFiles( %this )
       return;
    
    //we have assets to import, so go ahead and display the window for that now
-   Canvas.pushDialog(AssetImportCtrl);
+   AssetImportCtrl.setHidden(false);
    ImportAssetWindow.visible = true;
    //ImportAssetWindow.validateAssets();
    ImportAssetWindow.refresh();

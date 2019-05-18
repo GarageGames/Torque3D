@@ -56,7 +56,7 @@ class MaterialAsset : public AssetBase
    typedef AssetBase Parent;
 
    String                  mShaderGraphFile;
-   String                  mScriptFile;
+   StringTableEntry        mScriptFile;
    StringTableEntry        mMatDefinitionName;
 
 public:

@@ -90,8 +90,8 @@ ConsoleSetType(TypeMaterialAssetPtr)
 MaterialAsset::MaterialAsset()
 {
    mShaderGraphFile = "";
-   mScriptFile = "";
-   mMatDefinitionName = "";
+   mScriptFile = StringTable->EmptyString();
+   mMatDefinitionName = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
@@ -111,7 +111,7 @@ void MaterialAsset::initPersistFields()
    addProtectedField("scriptFile", TypeAssetLooseFilePath, Offset(mScriptFile, MaterialAsset),
       &setScriptFile, &getScriptFile, "Path to the file containing the material definition.");
 
-   addField("materialDefinitionName", TypeRealString, Offset(mMatDefinitionName, MaterialAsset), "Name of the material definition this asset is for.");
+   addField("materialDefinitionName", TypeString, Offset(mMatDefinitionName, MaterialAsset), "Name of the material definition this asset is for.");
 }
 
 void MaterialAsset::initializeAsset()
