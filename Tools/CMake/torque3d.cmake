@@ -149,6 +149,8 @@ endif()
 
 if(WIN32)
 	option(TORQUE_D3D11 "Allow Direct3D 11 render" ON)
+
+	addDef(TORQUE_D3D11)
 endif()
 
 option(TORQUE_DEDICATED "Torque dedicated" OFF)
@@ -313,7 +315,6 @@ addPath("${srcDir}/scene")
 addPath("${srcDir}/scene/culling")
 addPath("${srcDir}/scene/zones")
 addPath("${srcDir}/scene/mixin")
-addPath("${srcDir}/shaderGen")
 addPath("${srcDir}/terrain")
 addPath("${srcDir}/environment")
 addPath("${srcDir}/forest")

@@ -27,16 +27,24 @@
 #include "console/simObject.h"
 #endif
 
+#ifdef TORQUE_D3D11
 class CustomFeatureHLSL;
+#endif
+#ifdef TORQUE_OPENGL
 class CustomFeatureGLSL;
+#endif
 
 class CustomShaderFeatureData : public SimObject
 {
 	typedef SimObject Parent;
 
 public:
+#ifdef TORQUE_D3D11
 	CustomFeatureHLSL* mFeatureHLSL;
+#endif
+#ifdef TORQUE_OPENGL
    CustomFeatureGLSL* mFeatureGLSL;
+#endif
 
 	Vector<StringTableEntry> mAddedShaderConstants;
 
