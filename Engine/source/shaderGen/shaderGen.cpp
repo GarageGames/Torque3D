@@ -31,8 +31,12 @@
 #include "core/memVolume.h"
 #include "core/module.h"
 
+#ifdef TORQUE_D3D11
 #include "shaderGen/HLSL/customFeatureHLSL.h"
+#endif
+#ifdef TORQUE_OPENGL
 #include "shaderGen/GLSL/customFeatureGLSL.h"
+#endif
 
 MODULE_BEGIN( ShaderGen )
 
@@ -291,6 +295,7 @@ void ShaderGen::_processVertFeatures( Vector<GFXShaderMacro> &macros, bool macro
    {
 	   for (U32 i = 0; i < mCustomFeaturesData.size(); ++i)
 	   {
+#ifdef TORQUE_D3D11
          if (GFX->getAdapterType() == GFXAdapterType::Direct3D11)
          {
             mCustomFeaturesData[i]->mFeatureHLSL->processVert(mComponents, mFeatureData);
@@ -304,7 +309,9 @@ void ShaderGen::_processVertFeatures( Vector<GFXShaderMacro> &macros, bool macro
             mCustomFeaturesData[i]->mFeatureHLSL->reset();
             mOutput->addStatement(new GenOp("   \r\n"));
          }
-         else if (GFX->getAdapterType() == GFXAdapterType::OpenGL)
+#endif
+#ifdef TORQUE_OPENGL
+         if (GFX->getAdapterType() == GFXAdapterType::OpenGL)
          {
             mCustomFeaturesData[i]->mFeatureGLSL->processVert(mComponents, mFeatureData);
 
@@ -317,6 +324,7 @@ void ShaderGen::_processVertFeatures( Vector<GFXShaderMacro> &macros, bool macro
             mCustomFeaturesData[i]->mFeatureGLSL->reset();
             mOutput->addStatement(new GenOp("   \r\n"));
          }
+#endif
 	   }
    }
 
@@ -365,6 +373,7 @@ void ShaderGen::_processPixFeatures( Vector<GFXShaderMacro> &macros, bool macros
    {
 	   for (U32 i = 0; i < mCustomFeaturesData.size(); ++i)
 	   {
+#ifdef TORQUE_D3D11
          if (GFX->getAdapterType() == GFXAdapterType::Direct3D11)
          {
             mCustomFeaturesData[i]->mFeatureHLSL->processPix(mComponents, mFeatureData);
@@ -378,7 +387,9 @@ void ShaderGen::_processPixFeatures( Vector<GFXShaderMacro> &macros, bool macros
             mCustomFeaturesData[i]->mFeatureHLSL->reset();
             mOutput->addStatement(new GenOp("   \r\n"));
          }
-         else if (GFX->getAdapterType() == GFXAdapterType::OpenGL)
+#endif
+#ifdef TORQUE_OPENGL
+         if (GFX->getAdapterType() == GFXAdapterType::OpenGL)
          {
             mCustomFeaturesData[i]->mFeatureGLSL->processPix(mComponents, mFeatureData);
 
@@ -391,6 +402,7 @@ void ShaderGen::_processPixFeatures( Vector<GFXShaderMacro> &macros, bool macros
             mCustomFeaturesData[i]->mFeatureGLSL->reset();
             mOutput->addStatement(new GenOp("   \r\n"));
          }
+#endif
 	   }
    }
    
