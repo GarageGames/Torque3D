@@ -196,10 +196,16 @@ static String getValueForType(const EngineTypeInfo* type, void* addr)
       PRIMTYPE(F32);
       PRIMTYPE(F64);
 
+      if (TYPE< const UTF8* >() == type)
+      {
+		  const UTF8* val = *((const UTF8**)(addr));
+         value = String(val);
+      }
+
       //TODO: for now we store string literals in ASCII; needs to be sorted out
       if (TYPE< String >() == type)
       {
-         const char* val = ADDRESS_TO_TYPE(const char*);
+		  const UTF8* val = *((const UTF8**)(addr));
          value = String(val);
       }
 
@@ -294,10 +300,10 @@ static String getValueForType(const EngineTypeInfo* type, void* addr)
 
 //-----------------------------------------------------------------------------
 
-static String getDefaultArgumentValue(const EngineFunctionInfo* function, const EngineTypeInfo* type, U32 offset)
+static String getDefaultArgumentValue(const EngineFunctionInfo* function, const EngineTypeInfo* type, U32 idx)
 {
-   const EngineFunctionDefaultArguments* defaultArgs = function->getDefaultArguments();
-   return getValueForType(type, *(void**)(defaultArgs->getArgs() + offset));
+	const EngineFunctionDefaultArguments* defaultArgs = function->getDefaultArguments();
+   return getValueForType(type, (void*)(defaultArgs->getArgs() + defaultArgs->mOffsets[idx])); 
 }
 
 //-----------------------------------------------------------------------------
@@ -343,16 +349,18 @@ static void exportFunction(const EngineFunctionInfo* function, SimXMLDocument* x
 
       if (i >= firstDefaultArg)
       {
-         String defaultValue = getDefaultArgumentValue(function, type, argFrameOffset);
+         String defaultValue = getDefaultArgumentValue(function, type, i);
          xml->setAttribute("defaultValue", defaultValue);
       }
+
+	  xml->setAttribute("offset", String::ToString(function->getOffset(i)));
 
       xml->popElement();
 
       //if (type->getTypeKind() == EngineTypeKindStruct)
       //   argFrameOffset += type->getInstanceSize();
       //else
-         argFrameOffset += sizeof(void*);// type->getValueSize();
+	  argFrameOffset += type->getValueSize(); // sizeof(void*);// type->getValueSize();
 
 #ifdef _PACK_BUG_WORKAROUNDS
       if (argFrameOffset % 4 > 0)

@@ -22,6 +22,151 @@
 
 #ifndef _FIXEDTUPLE_H_
 #define _FIXEDTUPLE_H_
+
+template <size_t I, typename T, typename ...TailTs>
+struct BlockTupleIndexedHelper
+{
+	static const int getSize()
+	{
+		return sizeof(T) + BlockTupleIndexedHelper<I-1, TailTs...>::getSize();
+	}
+
+	static const int getOffset()
+	{
+		return sizeof(T) + BlockTupleIndexedHelper<I-1, TailTs...>::getOffset();
+	}
+
+	using type = T;
+};
+
+template <typename T, typename ...TailTs>
+struct BlockTupleIndexedHelper<0, T, TailTs...>
+{
+	static const int getSize()
+	{
+		return sizeof(T);
+	}
+
+	static const int getOffset()
+	{
+		return 0;
+	}
+
+	using type = T;
+};
+
+template <typename T, typename ...TailTs>
+struct BlockTupleHelper
+{
+	const static int getSize()
+	{
+		return sizeof(T) + BlockTupleHelper<TailTs...>::getSize();
+	}
+
+	const static size_t size = sizeof(T) + BlockTupleHelper<TailTs...>::size;
+};
+
+template<typename T>
+struct BlockTupleHelper<T>
+{
+	const static int getSize()
+	{
+		return sizeof(T);
+	}
+
+	const static size_t size = sizeof(T);
+};
+
+template< typename T >
+struct BlockTuple
+{
+};
+
+template<typename R, typename ...ArgTs>
+struct BlockTuple< R(ArgTs...) >
+{
+	char data[BlockTupleHelper<ArgTs...>::size];
+private:
+	using SelfType = BlockTuple< void(ArgTs...) >;
+
+	template<size_t ...> struct Seq {};
+	template<size_t N, size_t ...S> struct Gens : Gens<N - 1, N - 1, S...> {};
+
+	template<size_t ...I> struct Gens<0, I...> { typedef Seq<I...> type; };
+
+	using SeqType = typename Gens<sizeof...(ArgTs)>::type;
+
+	//typename EngineTypeTraits<Type>::ArgumentToValue(StoreType);
+public:
+
+	template<size_t I>
+	static typename BlockTupleIndexedHelper<I, ArgTs...>::type& get(BlockTuple<R(ArgTs ...)>& tuple)
+	{
+		return *reinterpret_cast<typename BlockTupleIndexedHelper<I, ArgTs...>::type*>(
+			((size_t)& tuple.data)
+			+ BlockTupleIndexedHelper<I, ArgTs...>::getOffset()
+		);
+	}
+
+	BlockTuple(char data[BlockTupleHelper<ArgTs...>::size])
+	{
+		dMemmove(this->data, data, BlockTupleHelper<ArgTs...>::size);
+	}
+};
+
+template< typename T, typename ...TailTs >
+struct InheritanceTuple : InheritanceTuple<TailTs...>
+{
+	T foo;
+};
+
+template< typename T >
+struct InheritanceTuple<T>
+{
+	T foo;
+};
+
+template< typename T >
+struct _InheritanceTuple {};
+
+template< typename R, typename ...ArgTs >
+struct _InheritanceTuple<R(ArgTs...)> : InheritanceTuple<ArgTs...> {};
+
+
+/*
+template<typename R, typename ...ArgTs>
+struct InheritanceTuple< R(ArgTs...) >
+{
+	char data[BlockTupleHelper<ArgTs...>::size];
+private:
+	using SelfType = BlockTuple< void(ArgTs...) >;
+
+	template<size_t ...> struct Seq {};
+	template<size_t N, size_t ...S> struct Gens : Gens<N - 1, N - 1, S...> {};
+
+	template<size_t ...I> struct Gens<0, I...> { typedef Seq<I...> type; };
+
+	using SeqType = typename Gens<sizeof...(ArgTs)>::type;
+
+	//typename EngineTypeTraits<Type>::ArgumentToValue(StoreType);
+public:
+
+	template<size_t I>
+	static typename BlockTupleIndexedHelper<I, ArgTs...>::type& get(BlockTuple<R(ArgTs ...)>& tuple)
+	{
+		return *reinterpret_cast<typename BlockTupleIndexedHelper<I, ArgTs...>::type*>(
+			((size_t)& tuple.data)
+			+ BlockTupleIndexedHelper<I, ArgTs...>::getOffset()
+		);
+	}
+
+	BlockTuple(char data[BlockTupleHelper<ArgTs...>::size])
+	{
+		dMemmove(this->data, data, BlockTupleHelper<ArgTs...>::size);
+	}
+};
+*/
+
 /// @name Fixed-layout tuple definition
 /// These structs and templates serve as a way to pass arguments from external 
 /// applications and into the T3D console system.
@@ -50,6 +195,8 @@ struct fixed_tuple<T, Ts...>
    fixed_tuple(U&& u, Us&&...tail) :
       first(::std::forward<U>(u)),
       rest(::std::forward<Us>(tail)...) {}
+
+
 };
 
 template <typename T>
@@ -95,6 +242,18 @@ struct fixed_tuple_accessor
    {
       return fixed_tuple_accessor<i - 1>::get(t.rest);
    }
+
+   template <class... Ts>
+   static inline typename fixed_tuple_element<i, fixed_tuple<Ts...> >::type * getRef(fixed_tuple<Ts...> & t)
+   {
+      return fixed_tuple_accessor<i - 1>::getRef(t.rest);
+   }
+
+   template <class... Ts>
+   static inline const typename fixed_tuple_element<i, fixed_tuple<Ts...> >::type * getRef(const fixed_tuple<Ts...> & t)
+   {
+      return fixed_tuple_accessor<i - 1>::getRef(t.rest);
+   }
 };
 
 template <>
@@ -110,6 +269,17 @@ struct fixed_tuple_accessor<0>
    static inline const typename fixed_tuple_element<0, fixed_tuple<Ts...> >::type & get(const fixed_tuple<Ts...> & t)
    {
       return t.first;
+   }
+   template <class... Ts>
+   static inline typename fixed_tuple_element<0, fixed_tuple<Ts...> >::type * getRef(fixed_tuple<Ts...> & t)
+   {
+      return &t.first;
+   }
+
+   template <class... Ts>
+   static inline const typename fixed_tuple_element<0, fixed_tuple<Ts...> >::type * getRef(const fixed_tuple<Ts...> & t)
+   {
+      return &t.first;
    }
 };
 
