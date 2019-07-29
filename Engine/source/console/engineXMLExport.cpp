@@ -58,9 +58,9 @@ static const char* getDocString(const EngineExport* exportInfo)
 }
 
 template< typename T >
-inline T getArgValue(const EngineFunctionDefaultArguments* defaultArgs, U32 offset)
+inline T getArgValue(const EngineFunctionDefaultArguments* defaultArgs, U32 idx)
 {
-   return **(const T**)(defaultArgs->getArgs() + offset);
+   return *(const T*)(defaultArgs->mFirst + defaultArgs->mOffsets[idx]);
    //return *reinterpret_cast< const T* >(defaultArgs->getArgs() + offset);
 }
 
@@ -303,7 +303,7 @@ static String getValueForType(const EngineTypeInfo* type, void* addr)
 static String getDefaultArgumentValue(const EngineFunctionInfo* function, const EngineTypeInfo* type, U32 idx)
 {
 	const EngineFunctionDefaultArguments* defaultArgs = function->getDefaultArguments();
-   return getValueForType(type, (void*)(defaultArgs->getArgs() + defaultArgs->mOffsets[idx])); 
+   return getValueForType(type, (void*)(defaultArgs->mFirst + defaultArgs->mOffsets[idx]));
 }
 
 //-----------------------------------------------------------------------------
@@ -331,9 +331,6 @@ static void exportFunction(const EngineFunctionInfo* function, SimXMLDocument* x
    Vector< String > argumentNames = parseFunctionArgumentNames(function);
    const U32 numArgumentNames = argumentNames.size();
 
-   // Accumulated offset in function argument frame vector.
-   U32 argFrameOffset = 0;
-
    for (U32 i = 0; i < numArguments; ++i)
    {
       xml->pushNewElement("EngineFunctionArgument");
@@ -353,19 +350,13 @@ static void exportFunction(const EngineFunctionInfo* function, SimXMLDocument* x
          xml->setAttribute("defaultValue", defaultValue);
       }
 
-	  xml->setAttribute("offset", String::ToString(function->getOffset(i)));
+      // A bit hacky, default arguments have all offsets.
+      if (function->getDefaultArguments() != NULL)
+      {
+         xml->setAttribute("offset", String::ToString(function->getDefaultArguments()->mOffsets[i]));
+      }
 
       xml->popElement();
-
-      //if (type->getTypeKind() == EngineTypeKindStruct)
-      //   argFrameOffset += type->getInstanceSize();
-      //else
-	  argFrameOffset += type->getValueSize(); // sizeof(void*);// type->getValueSize();
-
-#ifdef _PACK_BUG_WORKAROUNDS
-      if (argFrameOffset % 4 > 0)
-         argFrameOffset += 4 - (argFrameOffset % 4);
-#endif
    }
 
    xml->popElement();

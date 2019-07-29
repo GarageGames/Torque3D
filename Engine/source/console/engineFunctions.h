@@ -30,10 +30,10 @@
 #endif
 
 #ifndef _ENGINEEXPORTS_H_
-   #include "console/engineExports.h"
+#include "console/engineExports.h"
 #endif
 #ifndef _ENGINETYPEINFO_H_
-   #include "console/engineTypeInfo.h"
+#include "console/engineTypeInfo.h"
 #endif
 
 
@@ -42,117 +42,99 @@
 
 
 #ifdef TORQUE_COMPILER_VISUALC
-   #define TORQUE_API extern "C" __declspec( dllexport )
+#define TORQUE_API extern "C" __declspec( dllexport )
 #elif defined( TORQUE_COMPILER_GCC )
-   #define TORQUE_API extern "C" __attribute__( ( visibility( "default" ) ) )
+#define TORQUE_API extern "C" __attribute__( ( visibility( "default" ) ) )
 #else
-   #error Unsupported compiler.
+#error Unsupported compiler.
 #endif
 
 
-// #pragma pack is bugged in GCC in that the packing in place at the template instantiation
-// sites rather than their definition sites is used.  Enable workarounds.
-#ifdef TORQUE_COMPILER_GCC
-   #define _PACK_BUG_WORKAROUNDS
-#endif
-
-
-
-/// Structure storing the default argument values for a function invocation
-/// frame.
 struct EngineFunctionDefaultArguments
 {
-   /// Number of default arguments for the function call frame.
-   ///
-   /// @warn This is @b NOT the size of the memory block returned by getArgs() and also
-   ///   not the number of elements it contains.
    U32 mNumDefaultArgs;
-   
-   /// Return a pointer to the variable-sized array of default argument values.
-   ///
-   /// @warn The arguments must be stored @b IMMEDIATELY after #mNumDefaultArgs.
-   /// @warn This is a @b FULL frame and not just the default arguments, i.e. it starts with the
-   ///   first argument that the function takes and ends with the last argument it takes.
-   /// @warn If the compiler's #pragma pack is buggy, the elements in this structure are allowed
-   ///   to be 4-byte aligned rather than byte-aligned as they should be.
-   const U8* getArgs() const
-   {
-      return ( const U8* ) &( mNumDefaultArgs ) + sizeof( mNumDefaultArgs );
-   }
+   U32* mOffsets;
+   U8* mFirst;
 };
 
-
-// Need byte-aligned packing for the default argument structures.
-#ifdef _WIN64
-#pragma pack( push, 8 )
-#else
-#pragma pack( push, 1 )
-#endif
-   
-
-// Structure encapsulating default arguments to an engine API function.
 template< typename T >
 struct _EngineFunctionDefaultArguments {};
 
-template<typename ...ArgTs>
-struct _EngineFunctionDefaultArguments< void(ArgTs...) > : public EngineFunctionDefaultArguments
+template<typename R, typename ...ArgTs>
+struct _EngineFunctionDefaultArguments< R(ArgTs...) > : EngineFunctionDefaultArguments
 {
-   template<typename T> using DefVST = typename EngineTypeTraits<T>::DefaultArgumentValueStoreType;
-   fixed_tuple<DefVST<ArgTs>*  ...> mArgPointers;
-   fixed_tuple<DefVST<ArgTs>  ...> mFixedArgs;
-   std::tuple<DefVST<ArgTs>  ...> mArgs;
 private:
-   using SelfType = _EngineFunctionDefaultArguments< void(ArgTs...) >;
-   
+   template<typename T> using DefVST = typename EngineTypeTraits<T>::DefaultArgumentValueStoreType;
+   using SelfType = _EngineFunctionDefaultArguments< R(ArgTs...) >;
+   typedef fixed_tuple<DefVST<ArgTs>...> TupleType;
+
+public:
+   TupleType mData;
+
+private:
    template<size_t ...> struct Seq {};
    template<size_t N, size_t ...S> struct Gens : Gens<N-1, N-1, S...> {};
-   
+
    template<size_t ...I> struct Gens<0, I...>{ typedef Seq<I...> type; };
-   
+
    template<typename ...TailTs, size_t ...I>
-   static void copyHelper(std::tuple<DefVST<ArgTs> ...> &args, std::tuple<DefVST<TailTs> ...> &defaultArgs, Seq<I...>)  {
+   static void copyHelper(std::tuple<DefVST<ArgTs>...>& args, std::tuple<DefVST<TailTs> ...>& defaultArgs, Seq<I...>) {
       std::tie(std::get<I + (sizeof...(ArgTs) - sizeof...(TailTs))>(args)...) = defaultArgs;
    }
-   
+
 #if defined(_MSC_VER) && (_MSC_VER >= 1910)
    template<typename ...TailTs>
    struct DodgyVCHelper
    {
-      using type = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), decltype(mArgs)>::type;
+      using type = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), std::tuple<DefVST<ArgTs>...>>::type;
    };
 
    template<typename ...TailTs> using MaybeSelfEnabled = typename DodgyVCHelper<TailTs...>::type;
 #else
    template<typename ...TailTs> using MaybeSelfEnabled = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), decltype(mArgs)>::type;
 #endif
-   
+
    template<typename ...TailTs> static MaybeSelfEnabled<TailTs...> tailInit(TailTs ...tail) {
+   static MaybeSelfEnabled<TailTs...> tailInit(TailTs ...tail) {
       std::tuple<DefVST<ArgTs>...> argsT;
       std::tuple<DefVST<TailTs>...> tailT = std::make_tuple(tail...);
       SelfType::copyHelper<TailTs...>(argsT, tailT, typename Gens<sizeof...(TailTs)>::type());
       return argsT;
    };
-   
-public:
-   template<typename ...TailTs> _EngineFunctionDefaultArguments(TailTs ...tail)
-   : EngineFunctionDefaultArguments({sizeof...(TailTs)}), mArgs(SelfType::tailInit(tail...))
+
+   template<size_t I = 0>
+   typename std::enable_if<I == sizeof...(ArgTs)>::type initOffsetsHelper()
+   { }
+
+   template<size_t I = 0>
+   typename std::enable_if < I < sizeof...(ArgTs)>::type initOffsetsHelper()
    {
-      fixed_tuple_mutator<void(DefVST<ArgTs>...), void(DefVST<ArgTs>...)>::copy(mArgs, mFixedArgs);
-      fixed_tuple_mutator<void(DefVST<ArgTs>...), void(DefVST<ArgTs>*...)>::copyPtrs(mArgs, mArgPointers);
+      mOffsets[I] = fixed_tuple_accessor<I>::getOffset(mData);
+      initOffsetsHelper<I + 1>(); 
+   }
+
+public:
+   template<typename ...TailTs>
+   _EngineFunctionDefaultArguments(TailTs... tail)
+      : EngineFunctionDefaultArguments()
+   {
+      mNumDefaultArgs = sizeof...(TailTs);
+      mOffsets = new U32[sizeof...(ArgTs)];
+      initOffsetsHelper();
+      std::tuple<DefVST<ArgTs>...> tmpTup = SelfType::tailInit(tail...);
+      fixed_tuple_mutator<void(DefVST<ArgTs>...), void(DefVST<ArgTs>...)>::copy(tmpTup, mData);
+      mFirst = (U8*)& mData;
    }
 };
-
-#pragma pack( pop )
-
 
 // Helper to allow flags argument to DEFINE_FUNCTION to be empty.
 struct _EngineFunctionFlags
 {
    U32 val;
    _EngineFunctionFlags()
-      : val( 0 ) {}
-   _EngineFunctionFlags( U32 val )
-      : val( val ) {}
+      : val(0) {}
+   _EngineFunctionFlags(U32 val)
+      : val(val) {}
    operator U32() const { return val; }
 };
 
@@ -162,7 +144,7 @@ enum EngineFunctionFlags
 {
    /// Function is a callback into the control layer.  If this flag is not set,
    /// the function is a call-in.
-   EngineFunctionCallout = BIT( 0 ),
+   EngineFunctionCallout = BIT(0),
 };
 
 
@@ -217,85 +199,85 @@ enum EngineFunctionFlags
 ///
 class EngineFunctionInfo : public EngineExport
 {
-   public:
-   
-      DECLARE_CLASS( EngineFunctionInfo, EngineExport );
-   
-   protected:
-   
-      /// A combination of EngineFunctionFlags.
-      BitSet32 mFunctionFlags;
-      
-      /// The type of the function.
-      const EngineTypeInfo* mFunctionType;
-         
-      /// Default values for the function arguments.
-      const EngineFunctionDefaultArguments* mDefaultArgumentValues;
-            
-      /// Name of the DLL symbol denoting the address of the exported entity.
-      const char* mBindingName;
-      
-      /// Full function prototype string.  Useful for quick printing and most importantly,
-      /// this will be the only place containing information about the argument names.
-      const char* mPrototypeString;
-      
-      /// Address of either the function implementation or the variable taking the address
-      /// of a call-out.
-      void* mAddress;
-      
-      /// Next function in the global link chain of engine functions.
-      EngineFunctionInfo* mNextFunction;
-      
-      /// First function in the global link chain of engine functions.
-      static EngineFunctionInfo* smFirstFunction;
-      
-   public:
-   
-      ///
-      EngineFunctionInfo(  const char* name,
-                           EngineExportScope* scope,
-                           const char* docString,
-                           const char* protoypeString,
-                           const char* bindingName,
-                           const EngineTypeInfo* functionType,
-                           const EngineFunctionDefaultArguments* defaultArgs,
-                           void* address,
-                           U32 flags );
-      
-      /// Return the name of the function.
-      const char* getFunctionName() const { return getExportName(); }
-      
-      /// Return the function's full prototype string including the return type, function name,
-      /// and argument list.
-      const char* getPrototypeString() const { return mPrototypeString; }
-      
-      /// Return the DLL export symbol name.
-      const char* getBindingName() const { return mBindingName; }
-      
-      /// Test whether this is a callout function.
-      bool isCallout() const { return mFunctionFlags.test( EngineFunctionCallout ); }
-      
-      /// Test whether the function is variadic, i.e. takes a variable number of arguments.
-      bool isVariadic() const { return mFunctionType->isVariadic(); }
-         
-      /// Return the type of this function.
-      const EngineTypeInfo* getFunctionType() const { return mFunctionType; }
-      
-      /// Return the return type of the function.
-      const EngineTypeInfo* getReturnType() const { return getFunctionType()->getArgumentTypeTable()->getReturnType(); }
-      
-      /// Return the number of arguments that this function takes.  If the function is variadic,
-      /// this is the number of fixed arguments.
-      U32 getNumArguments() const { return getFunctionType()->getArgumentTypeTable()->getNumArguments(); }
-      
-      ///
-      const EngineTypeInfo* getArgumentType( U32 index ) const { return ( *( getFunctionType()->getArgumentTypeTable() ) )[ index ]; }
-      
-      /// Return the vector storing the default argument values.
-      const EngineFunctionDefaultArguments* getDefaultArguments() const { return mDefaultArgumentValues; }
-      
-      /// Reset all callout function pointers back to NULL.  This deactivates all callbacks.
-      static void resetAllCallouts();
+public:
+
+   DECLARE_CLASS(EngineFunctionInfo, EngineExport);
+
+protected:
+
+   /// A combination of EngineFunctionFlags.
+   BitSet32 mFunctionFlags;
+
+   /// The type of the function.
+   const EngineTypeInfo* mFunctionType;
+
+   /// Default values for the function arguments.
+   const EngineFunctionDefaultArguments* mDefaultArgumentValues;
+
+   /// Name of the DLL symbol denoting the address of the exported entity.
+   const char* mBindingName;
+
+   /// Full function prototype string.  Useful for quick printing and most importantly,
+   /// this will be the only place containing information about the argument names.
+   const char* mPrototypeString;
+
+   /// Address of either the function implementation or the variable taking the address
+   /// of a call-out.
+   void* mAddress;
+
+   /// Next function in the global link chain of engine functions.
+   EngineFunctionInfo* mNextFunction;
+
+   /// First function in the global link chain of engine functions.
+   static EngineFunctionInfo* smFirstFunction;
+
+public:
+
+   ///
+   EngineFunctionInfo(const char* name,
+      EngineExportScope* scope,
+      const char* docString,
+      const char* protoypeString,
+      const char* bindingName,
+      const EngineTypeInfo* functionType,
+      const EngineFunctionDefaultArguments* defaultArgs,
+      void* address,
+      U32 flags);
+
+   /// Return the name of the function.
+   const char* getFunctionName() const { return getExportName(); }
+
+   /// Return the function's full prototype string including the return type, function name,
+   /// and argument list.
+   const char* getPrototypeString() const { return mPrototypeString; }
+
+   /// Return the DLL export symbol name.
+   const char* getBindingName() const { return mBindingName; }
+
+   /// Test whether this is a callout function.
+   bool isCallout() const { return mFunctionFlags.test(EngineFunctionCallout); }
+
+   /// Test whether the function is variadic, i.e. takes a variable number of arguments.
+   bool isVariadic() const { return mFunctionType->isVariadic(); }
+
+   /// Return the type of this function.
+   const EngineTypeInfo* getFunctionType() const { return mFunctionType; }
+
+   /// Return the return type of the function.
+   const EngineTypeInfo* getReturnType() const { return getFunctionType()->getArgumentTypeTable()->getReturnType(); }
+
+   /// Return the number of arguments that this function takes.  If the function is variadic,
+   /// this is the number of fixed arguments.
+   U32 getNumArguments() const { return getFunctionType()->getArgumentTypeTable()->getNumArguments(); }
+
+   ///
+   const EngineTypeInfo* getArgumentType(U32 index) const { return (*(getFunctionType()->getArgumentTypeTable()))[index]; }
+
+   /// Return the vector storing the default argument values.
+   const EngineFunctionDefaultArguments* getDefaultArguments() const { return mDefaultArgumentValues; }
+
+   /// Reset all callout function pointers back to NULL.  This deactivates all callbacks.
+   static void resetAllCallouts();
 };
 
 
@@ -326,8 +308,8 @@ class EngineFunctionInfo : public EngineExport
       );                                                                                                 \
    } }                                                                                                   \
    TORQUE_API returnType bindingName args
-   
-   
+
+
 ///
 ///
 /// Not all control layers may be able to access data variables in a DLL so this macro exposes
@@ -350,6 +332,6 @@ class EngineFunctionInfo : public EngineExport
          EngineFunctionCallout | EngineFunctionFlags( flags )                                            \
       );                                                                                                 \
    }
-   
+
 
 #endif // !_ENGINEFUNCTIONS_H_

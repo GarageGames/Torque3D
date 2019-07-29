@@ -130,9 +130,9 @@ END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( EaseF,
    EaseF, MathTypes,
    "" )
-   FIELD(dir, dir, 1, "inout, in, out")
-   FIELD(type, type, 1, "linear, etc...")
-   { "param", "optional params", 2, TYPE<F32>(), (U32)FIELDOFFSET( param ) },
+   FIELD(mDir, mDir, 1, "inout, in, out")
+   FIELD(mType, mType, 1, "linear, etc...")
+   { "mParam", "optional params", 2, TYPE<F32>(), (U32)FIELDOFFSET(mParam) },
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT(RotationF,
    RotationF, MathTypes,

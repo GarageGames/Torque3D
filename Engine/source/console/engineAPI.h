@@ -350,10 +350,9 @@ template< typename R, typename ...ArgTs >
 struct _EngineTrampoline< R( ArgTs ... ) >
 {
    template<typename T> using AVT = typename EngineTypeTraits<T>::ArgumentValueType;
-   typedef std::tuple<AVT<ArgTs> ...> Args;
-   std::tuple<AVT<ArgTs> ...> argT;
-   typedef fixed_tuple<AVT<ArgTs> ...> FixedArgs;
-   fixed_tuple<AVT<ArgTs> ...> fixedArgT;
+   typedef fixed_tuple<ArgTs ...> Params;
+   typedef fixed_tuple<AVT<ArgTs> ...> Args;
+   Args argT;
 };
 
 template< typename T >
@@ -371,38 +370,28 @@ struct _EngineFunctionTrampoline< R(ArgTs...) > : public _EngineFunctionTrampoli
 {
 private:
    using Super = _EngineFunctionTrampolineBase< R(ArgTs...) >;
+   using ParamsType = typename Super::Params;
    using ArgsType = typename Super::Args;
-   using FixedArgsType = typename Super::FixedArgs;
+   using SelfType = _EngineFunctionTrampoline< R(ArgTs...) >;
    template<typename T> using ToValue = typename _EngineTypeTraits<T>::ArgumentToValue;
    
    template<size_t ...> struct Seq {};
    template<size_t N, size_t ...S> struct Gens : Gens<N-1, N-1, S...> {};
    template<size_t ...I> struct Gens<0, I...>{ typedef Seq<I...> type; };
    
-   template<size_t ...I>
-   static R dispatchHelper(typename Super::FunctionType fn, const ArgsType& args, Seq<I...>)  {
-      return R( fn(std::get<I>(args) ...) );
-   }
-   
    template<size_t I>
-   static typename fixed_tuple_element<I, fixed_tuple<ArgTs...>>::type get_and_to_type(const FixedArgsType& args) {
+   static typename fixed_tuple_element<I, fixed_tuple<ArgTs...>>::type getAndToType(const ArgsType& args)  {
       return typename EngineTypeTraits<typename fixed_tuple_element<I, fixed_tuple<ArgTs...>>::type>::ArgumentToValue(fixed_tuple_accessor<I>::get(args));
    }
-
+   
    template<size_t ...I>
-   static R dispatchHelper(typename Super::FunctionType fn, const FixedArgsType& args, Seq<I...>)  {
-      return R( fn(get_and_to_type<I>(args) ...) );
-      //return R( fn(fixed_tuple_accessor<I>::get(args) ...) );
+   static R dispatchHelper(typename Super::FunctionType fn, const ArgsType& args, Seq<I...>)  {
+      return R( fn(SelfType::template getAndToType<I>(args) ...) );
    }
 
    using SeqType = typename Gens<sizeof...(ArgTs)>::type;
 public:
    static R jmp(typename Super::FunctionType fn, const ArgsType& args )
-   {
-      return dispatchHelper(fn, args, SeqType());
-   }
-
-   static R jmp(typename Super::FunctionType fn, const FixedArgsType& args )
    {
       return dispatchHelper(fn, args, SeqType());
    }
@@ -422,43 +411,28 @@ struct _EngineMethodTrampoline< Frame, R(ArgTs ...) > : public _EngineMethodTram
    using FunctionType = R( typename Frame::ObjectType*, ArgTs ...);
 private:
    using Super = _EngineMethodTrampolineBase< R(ArgTs ...) >;
-   using ArgsType = typename _EngineFunctionTrampolineBase< R(ArgTs ...) >::Args;
-   using FixedArgsType = typename Super::FixedArgs;
+   using ParamsType = typename Super::Params;
+   using ArgsType = Super::Args;
+   using SelfType = _EngineMethodTrampoline< Frame, R(ArgTs ...) >;
    
    template<size_t ...> struct Seq {};
    template<size_t N, size_t ...S> struct Gens : Gens<N-1, N-1, S...> {};
    template<size_t ...I> struct Gens<0, I...>{ typedef Seq<I...> type; };
+
+   template<size_t I>
+   static typename fixed_tuple_element<I, fixed_tuple<ArgTs...>>::type getAndToType(const ArgsType& args) {
+      return typename EngineTypeTraits<typename fixed_tuple_element<I, fixed_tuple<ArgTs...>>::type>::ArgumentToValue(fixed_tuple_accessor<I>::get(args));
+   }
    
    template<size_t ...I>
    static R dispatchHelper(Frame f, const ArgsType& args, Seq<I...>)  {
-      return R( f._exec(std::get<I>(args) ...) );
-   }
-
-
-   template<size_t I>
-   static typename fixed_tuple_element<I, fixed_tuple<ArgTs...>>::type get_and_to_type(const FixedArgsType& args) {
-      return typename EngineTypeTraits<typename fixed_tuple_element<I, fixed_tuple<ArgTs...>>::type>::ArgumentToValue(fixed_tuple_accessor<I>::get(args));
-   }
-
-   template<size_t ...I>
-   static R dispatchHelper(Frame f, const FixedArgsType& args, Seq<I...>)  {
-      return R(f._exec(get_and_to_type<I>(args) ...));
-      //return R( f._exec(fixed_tuple_accessor<I>::get(args) ...) );
+      return R( f._exec(SelfType::template getAndToType<I>(args) ...) );
    }
    
    using SeqType = typename Gens<sizeof...(ArgTs)>::type;
 public:
    static R jmp( typename Frame::ObjectType* object, const ArgsType& args )
    {
-      
-      Frame f;
-      f.object = object;
-      return dispatchHelper(f, args, SeqType());
-   }
-
-   static R jmp( typename Frame::ObjectType* object, const FixedArgsType& args )
-   {
-      
       Frame f;
       f.object = object;
       return dispatchHelper(f, args, SeqType());
@@ -597,7 +571,7 @@ namespace engineAPI{
             {
                return EngineUnmarshallData< IthArgType<index> >()( argv[ startArgc + index ] );
             } else {
-               return std::get<index + method_offset>(defaultArgs.mArgs);
+               return fixed_tuple_accessor<index + method_offset>::get(defaultArgs.mData);
             }
          }
          
@@ -729,7 +703,7 @@ public:
 #define DefineEngineFunction( name, returnType, args, defaultArgs, usage )                                                       \
    static inline returnType _fn ## name ## impl args;                                                                            \
    TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn ## name                                                         \
-      ( _EngineFunctionTrampoline< returnType args >::FixedArgs a )                                                              \
+      ( _EngineFunctionTrampoline< returnType args >::Args a )                                                              \
    {                                                                                                                             \
       _CHECK_ENGINE_INITIALIZED( name, returnType );                                                                             \
       return EngineTypeTraits< returnType >::ReturnValue(                                                                        \
@@ -783,7 +757,7 @@ public:
 
 #define _DefineMethodTrampoline( className, name, returnType, args ) \
    TORQUE_API EngineTypeTraits< returnType >::ReturnValueType \
-      fn ## className ## _ ## name ( className* object, _EngineMethodTrampoline< _ ## className ## name ## frame, returnType args >::FixedArgs a )\
+      fn ## className ## _ ## name ( className* object, _EngineMethodTrampoline< _ ## className ## name ## frame, returnType args >::Args a )\
    {                                                                                                                                            \
       _CHECK_ENGINE_INITIALIZED( className::name, returnType );                                                                                 \
       return EngineTypeTraits< returnType >::ReturnValue(                                                                                       \
@@ -866,7 +840,7 @@ public:
 #define DefineEngineStaticMethod( className, name, returnType, args, defaultArgs, usage )                                              \
    static inline returnType _fn ## className ## name ## impl args;                                                                     \
    TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn ## className ## _ ## name                                             \
-      ( _EngineFunctionTrampoline< returnType args >::FixedArgs a )                                                                    \
+      ( _EngineFunctionTrampoline< returnType args >::Args a )                                                                    \
    {                                                                                                                                   \
       _CHECK_ENGINE_INITIALIZED( className::name, returnType );                                                                        \
       return EngineTypeTraits< returnType >::ReturnValue(                                                                              \
@@ -976,7 +950,7 @@ public:
 #define DefineNewEngineFunction( name, returnType, args, defaultArgs, usage )                                                    \
    static inline returnType _fn ## name ## impl args;                                                                            \
    TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn ## name                                                         \
-      ( _EngineFunctionTrampoline< returnType args >::FixedArgs a )                                                              \
+      ( _EngineFunctionTrampoline< returnType args >::Args a )                                                              \
    {                                                                                                                             \
       _CHECK_ENGINE_INITIALIZED( name, returnType );                                                                             \
       return EngineTypeTraits< returnType >::ReturnValue(                                                                        \
@@ -1023,7 +997,7 @@ public:
 #define DefineNewEngineStaticMethod( className, name, returnType, args, defaultArgs, usage )                                           \
    static inline returnType _fn ## className ## name ## impl args;                                                                     \
    TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn ## className ## _ ## name                                             \
-      ( _EngineFunctionTrampoline< returnType args >::FixedArgs a )                                                                    \
+      ( _EngineFunctionTrampoline< returnType args >::Args a )                                                                    \
    {                                                                                                                                   \
       _CHECK_ENGINE_INITIALIZED( className::name, returnType );                                                                        \
       return EngineTypeTraits< returnType >::ReturnValue(                                                                              \

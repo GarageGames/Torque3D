@@ -22,6 +22,27 @@
 
 #ifndef _FIXEDTUPLE_H_
 #define _FIXEDTUPLE_H_
+#include "engineTypes.h"
+
+template <size_t I, typename ...Ts>
+struct StdTupleIndexedHelper
+{
+   static const int getSize(std::tuple<Ts...>& tuple)
+   {
+      int size = sizeof(std::tuple_element<I, std::tuple<Ts>>(tuple));
+      if (I != 0)
+      {
+         size += StdTupleIndexedHelper<I - 1, Ts...>::getSize();
+      }
+      return size;
+   }
+
+   static const int getOffset(std::tuple<Ts...>& tuple)
+   {
+      return (int)((size_t)&std::get<I>(tuple)) - ((size_t)&tuple);
+   }
+};
+
 
 template <size_t I, typename T, typename ...TailTs>
 struct BlockTupleIndexedHelper
@@ -96,11 +117,19 @@ private:
 
 	using SeqType = typename Gens<sizeof...(ArgTs)>::type;
 
-	//typename EngineTypeTraits<Type>::ArgumentToValue(StoreType);
 public:
 
 	template<size_t I>
 	static typename BlockTupleIndexedHelper<I, ArgTs...>::type& get(BlockTuple<R(ArgTs ...)>& tuple)
+	{
+		return *reinterpret_cast<typename BlockTupleIndexedHelper<I, ArgTs...>::type*>(
+			((size_t)& tuple.data)
+			+ BlockTupleIndexedHelper<I, ArgTs...>::getOffset()
+		);
+	}
+
+	template<size_t I, typename HeadT, typename  ...TailTs>
+	static typename BlockTupleIndexedHelper<I, HeadT, TailTs...>::type& set(BlockTuple<R(ArgTs ...)>& tuple, HeadT head, TailTs... tail)
 	{
 		return *reinterpret_cast<typename BlockTupleIndexedHelper<I, ArgTs...>::type*>(
 			((size_t)& tuple.data)
@@ -114,17 +143,58 @@ public:
 	}
 };
 
+template <typename ...Ts>
+struct InheritanceTuple;
+
 template< typename T, typename ...TailTs >
-struct InheritanceTuple : InheritanceTuple<TailTs...>
+struct InheritanceTuple<T, TailTs...> : InheritanceTuple<TailTs...>
 {
-	T foo;
+	T data;
+
+   using SelfType = InheritanceTuple<T, TailTs...>;
+   using SuperType = InheritanceTuple<TailTs...>;
+
+   template<size_t I, typename ...Ts>
+   typename std::tuple_element<I, std::tuple<Ts...> >::type& get(InheritanceTuple<Ts...>& tuple)
+   {
+      if (I == 0)
+      {
+         return data;
+      }
+      return SuperType::get<I - 1>();
+   }
+
+   template<size_t I, typename ...Ts>
+   typename std::tuple_element<I, std::tuple<Ts...> >::type& get(const InheritanceTuple<Ts...>& tuple)
+   {
+      if (I == 0)
+      {
+         return data;
+      }
+      return SuperType::get<I - 1>();
+   }
 };
 
 template< typename T >
 struct InheritanceTuple<T>
 {
-	T foo;
+	T data;
+
+   template<size_t I, typename ...Ts>
+   typename std::tuple_element<I, std::tuple<Ts...> >::type& get(InheritanceTuple<Ts...>& tuple)
+   {
+      return data;
+   }
+
+   template<size_t I, typename ...Ts>
+   typename std::tuple_element<I, std::tuple<Ts...> >::type& get(const InheritanceTuple<Ts...>& tuple)
+   {
+      return data;
+   }
 };
+
+template <>
+struct InheritanceTuple<> {};
 
 template< typename T >
 struct _InheritanceTuple {};
@@ -132,6 +202,25 @@ struct _InheritanceTuple {};
 template< typename R, typename ...ArgTs >
 struct _InheritanceTuple<R(ArgTs...)> : InheritanceTuple<ArgTs...> {};
 
+template < ::std::size_t i>
+struct InheritanceTupleAccessor
+{
+   template <class... Ts>
+   static inline typename std::tuple_element<i, std::tuple<Ts...> >::type& get(InheritanceTuple<Ts...>& t)
+   {
+      return InheritanceTupleAccessor<i - 1>::get(t.rest);
+   }
+};
+
+template <>
+struct InheritanceTupleAccessor<0>
+{
+   template <class... Ts>
+   static inline typename std::tuple_element<0, std::tuple<Ts...> >::type& get(InheritanceTuple<Ts...>& t)
+   {
+      return t.data;
+   }
+};
 
 /*
 template<typename R, typename ...ArgTs>
@@ -254,6 +343,18 @@ struct fixed_tuple_accessor
    {
       return fixed_tuple_accessor<i - 1>::getRef(t.rest);
    }
+
+   template <class... Ts>
+   static inline U32 getOffset(fixed_tuple<Ts...> & t)
+   {
+      return (int)((size_t)fixed_tuple_accessor<i>::getRef(t)) - ((size_t)& t);
+   }
+
+   template <class... Ts>
+   static inline const U32 getOffset(const fixed_tuple<Ts...> & t)
+   {
+      return (int)((size_t)fixed_tuple_accessor<i>::getRef(t)) - ((size_t)& t);
+   }
 };
 
 template <>
@@ -280,6 +381,17 @@ struct fixed_tuple_accessor<0>
    static inline const typename fixed_tuple_element<0, fixed_tuple<Ts...> >::type * getRef(const fixed_tuple<Ts...> & t)
    {
       return &t.first;
+   }
+   template <class... Ts>
+   static inline U32 getOffset(fixed_tuple<Ts...> & t)
+   {
+      return (int)((size_t)& t.first) - ((size_t)& t);
+   }
+
+   template <class... Ts>
+   static inline const U32 getOffset(const fixed_tuple<Ts...> & t)
+   {
+      return (int)((size_t)& t.first) - ((size_t)& t);
    }
 };
 

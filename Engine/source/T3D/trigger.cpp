@@ -235,9 +235,9 @@ bool Trigger::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
 DECLARE_STRUCT( Polyhedron );
 IMPLEMENT_STRUCT( Polyhedron, Polyhedron,,
    "" )
-   FIELD(pointList, pointList, 1, "")
-   FIELD(planeList, planeList, 1, "")
-   FIELD(edgeList, edgeList, 1, "")
+   FIELD(mPointList, mPointList, 1, "")
+   FIELD(mPlaneList, mPlaneList, 1, "")
+   FIELD(mEdgeList, mEdgeList, 1, "")
 END_IMPLEMENT_STRUCT;
 ConsoleType(floatList, TypeTriggerPolyhedron, Polyhedron, "")
 
