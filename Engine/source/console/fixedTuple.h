@@ -347,13 +347,13 @@ struct fixed_tuple_accessor
    template <class... Ts>
    static inline U32 getOffset(fixed_tuple<Ts...> & t)
    {
-      return (int)((size_t)fixed_tuple_accessor<i>::getRef(t)) - ((size_t)& t);
+      return (U32)((size_t)fixed_tuple_accessor<i>::getRef(t)) - ((size_t)& t);
    }
 
    template <class... Ts>
    static inline const U32 getOffset(const fixed_tuple<Ts...> & t)
    {
-      return (int)((size_t)fixed_tuple_accessor<i>::getRef(t)) - ((size_t)& t);
+      return (U32)((size_t)fixed_tuple_accessor<i>::getRef(t)) - ((size_t)& t);
    }
 };
 

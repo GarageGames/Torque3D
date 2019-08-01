@@ -40,6 +40,7 @@
 
 // Script bindings.
 #include "moduleManager_ScriptBinding.h"
+#include "cinterface/cinterface.h"
 
 //-----------------------------------------------------------------------------
 
@@ -811,21 +812,19 @@ bool ModuleManager::loadModuleExplicit( const char* pModuleId, const U32 version
             const bool scriptFileExecuted = dAtob( Con::executef("exec", pLoadReadyModuleDefinition->getModuleScriptFilePath() ) );
 
             // Did we execute the script file?
-            if ( scriptFileExecuted )
-            {
-                // Yes, so is the create method available?
-                if ( pScopeSet->isMethod( pLoadReadyModuleDefinition->getCreateFunction() ) )
-                {
-                    // Yes, so call the create method.
-                    Con::executef( pScopeSet, pLoadReadyModuleDefinition->getCreateFunction() );
-                }
-            }
-            else
+            if ( !scriptFileExecuted )
             {
                 // No, so warn.
                 Con::errorf( "Module Manager: Cannot load explicit module Id '%s' at version Id '%d' as it failed to have the script file '%s' loaded.",
                     pLoadReadyModuleDefinition->getModuleId(), pLoadReadyModuleDefinition->getVersionId(), pLoadReadyModuleDefinition->getModuleScriptFilePath() );
             }
+        }
+
+        // Is the create method available?
+        if (pScopeSet->isMethod(pLoadReadyModuleDefinition->getCreateFunction()))
+        {
+           // Yes, so call the create method.
+           Con::executef(pScopeSet, pLoadReadyModuleDefinition->getCreateFunction());
         }
 
         // Raise notifications.
