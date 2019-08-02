@@ -253,13 +253,13 @@ DefineEngineMethod(afxEffectGroupData, reset, void, (),,
   object->reloadReset();
 }
 
-DefineEngineMethod(afxEffectGroupData, addEffect, void, (afxEffectBaseData* effect),,
-                   "Adds an effect (wrapper or group) to an effect-group.\n\n"
+DefineEngineMethod(afxEffectGroupData, pushEffect, void, (afxEffectBaseData* effect),,
+                   "Pushes an effect (wrapper or group) to an effect-group.\n\n"
                    "@ingroup AFX")
 {
   if (!effect) 
   {
-    Con::errorf("afxEffectGroupData::addEffect() -- missing afxEffectWrapperData.");
+    Con::errorf("afxEffectGroupData::pushEffect() -- missing afxEffectWrapperData.");
     return;
   }
   

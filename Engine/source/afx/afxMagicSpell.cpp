@@ -460,14 +460,14 @@ DefineEngineMethod(afxMagicSpellData, reset, void, (),,
   object->reloadReset();
 }
 
-DefineEngineMethod(afxMagicSpellData, addCastingEffect, void, (afxEffectBaseData* effect),,
-                   "Adds an effect (wrapper or group) to a spell's casting phase.\n\n"
+DefineEngineMethod(afxMagicSpellData, pushCastingEffect, void, (afxEffectBaseData* effect),,
+                   "Pushes an effect (wrapper or group) to a spell's casting phase.\n\n"
                    "@ingroup AFX")
 {
   if (!effect)
   {
     Con::errorf(ConsoleLogEntry::General,
-                "afxMagicSpellData::addCastingEffect() -- "
+                "afxMagicSpellData::pushCastingEffect() -- "
                 "missing afxEffectWrapperData.");
     return;
   }
@@ -475,15 +475,15 @@ DefineEngineMethod(afxMagicSpellData, addCastingEffect, void, (afxEffectBaseData
   object->mCasting_fx_list.push_back(effect);
 }
 
-DefineEngineMethod(afxMagicSpellData, addLaunchEffect, void, (afxEffectBaseData* effect),,
-                   "Adds an effect (wrapper or group) to a spell's launch phase.\n\n"
+DefineEngineMethod(afxMagicSpellData, pushLaunchEffect, void, (afxEffectBaseData* effect),,
+                   "Pushes an effect (wrapper or group) to a spell's launch phase.\n\n"
                    "@ingroup AFX")
 
 {
   if (!effect)
   {
     Con::errorf(ConsoleLogEntry::General,
-                "afxMagicSpellData::addLaunchEffect() -- "
+                "afxMagicSpellData::pushLaunchEffect() -- "
                 "failed to find afxEffectWrapperData.");
     return;
   }
@@ -491,15 +491,15 @@ DefineEngineMethod(afxMagicSpellData, addLaunchEffect, void, (afxEffectBaseData*
   object->mLaunch_fx_list.push_back(effect);
 }
 
-DefineEngineMethod(afxMagicSpellData, addDeliveryEffect, void, (afxEffectBaseData* effect),,
-                   "Adds an effect (wrapper or group) to a spell's delivery phase.\n\n"
+DefineEngineMethod(afxMagicSpellData, pushDeliveryEffect, void, (afxEffectBaseData* effect),,
+                   "Pushes an effect (wrapper or group) to a spell's delivery phase.\n\n"
                    "@ingroup AFX")
 
 {
   if (!effect)
   {
     Con::errorf(ConsoleLogEntry::General,
-                "afxMagicSpellData::addDeliveryEffect() -- "
+                "afxMagicSpellData::pushDeliveryEffect() -- "
                 "missing afxEffectWrapperData.");
     return;
   }
@@ -507,15 +507,15 @@ DefineEngineMethod(afxMagicSpellData, addDeliveryEffect, void, (afxEffectBaseDat
   object->mDelivery_fx_list.push_back(effect);
 }
 
-DefineEngineMethod(afxMagicSpellData, addImpactEffect, void, (afxEffectBaseData* effect),,
-                   "Adds an effect (wrapper or group) to a spell's impact phase.\n\n"
+DefineEngineMethod(afxMagicSpellData, pushImpactEffect, void, (afxEffectBaseData* effect),,
+                   "Pushes an effect (wrapper or group) to a spell's impact phase.\n\n"
                    "@ingroup AFX")
 
 {
   if (!effect)
   {
     Con::errorf(ConsoleLogEntry::General,
-                "afxMagicSpellData::addImpactEffect() -- "
+                "afxMagicSpellData::pushImpactEffect() -- "
                 "missing afxEffectWrapperData.");
     return;
   }
@@ -523,15 +523,15 @@ DefineEngineMethod(afxMagicSpellData, addImpactEffect, void, (afxEffectBaseData*
   object->mImpact_fx_list.push_back(effect);
 }
 
-DefineEngineMethod(afxMagicSpellData, addLingerEffect, void, (afxEffectBaseData* effect),,
-                   "Adds an effect (wrapper or group) to a spell's linger phase.\n\n"
+DefineEngineMethod(afxMagicSpellData, pushLingerEffect, void, (afxEffectBaseData* effect),,
+                   "Pushes an effect (wrapper or group) to a spell's linger phase.\n\n"
                    "@ingroup AFX")
 
 {
   if (!effect)
   {
     Con::errorf(ConsoleLogEntry::General,
-                "afxMagicSpellData::addLingerEffect() -- "
+                "afxMagicSpellData::pushLingerEffect() -- "
                 "missing afxEffectWrapperData.");
     return;
   }
