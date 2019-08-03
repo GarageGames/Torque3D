@@ -379,7 +379,7 @@ void PostEffect::initPersistFields()
    addField( "allowReflectPass", TypeBool, Offset( mAllowReflectPass, PostEffect ), 
       "Is this effect processed during reflection render passes." );
 
-   addProtectedField( "isEnabled", TypeBool, Offset( mEnabled, PostEffect),
+   addProtectedField( "enabled", TypeBool, Offset( mEnabled, PostEffect),
       &PostEffect::_setIsEnabled, &defaultProtectedGetFn,
       "Is the effect on." );
 
