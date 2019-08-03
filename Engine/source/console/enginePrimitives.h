@@ -27,6 +27,8 @@
    #include "console/engineTypes.h"
 #endif
 
+#include "math/mPlane.h"
+#include "math/mPolyhedron.h"
 
 /// @file
 /// Definitions for the core primitive types used in the
@@ -37,6 +39,8 @@
 DECLARE_PRIMITIVE_R( bool );
 DECLARE_PRIMITIVE_R(S8);
 DECLARE_PRIMITIVE_R(U8);
+DECLARE_PRIMITIVE_R(S16);
+DECLARE_PRIMITIVE_R(U16);
 DECLARE_PRIMITIVE_R(S32);
 DECLARE_PRIMITIVE_R(U32);
 DECLARE_PRIMITIVE_R(F32);
@@ -45,6 +49,15 @@ DECLARE_PRIMITIVE_R(U64);
 DECLARE_PRIMITIVE_R(S64);
 DECLARE_PRIMITIVE_R(void*);
 
+DECLARE_PRIMITIVE_R(bool*);
+DECLARE_PRIMITIVE_R(U8*);
+DECLARE_PRIMITIVE_R(S32*);
+DECLARE_PRIMITIVE_R(U32*);
+DECLARE_PRIMITIVE_R(F32*);
+DECLARE_PRIMITIVE_R(Point3F*);
+DECLARE_PRIMITIVE_R(PlaneF*);
+DECLARE_PRIMITIVE_R(PolyhedronData::Edge*);
+DECLARE_PRIMITIVE_R(const char**);
 
 //FIXME: this allows String to be used as a struct field type
 
@@ -79,5 +92,13 @@ struct EngineTypeTraits< String > : public _EnginePrimitiveTypeTraits< String >
 template<> struct EngineTypeTraits< const UTF16* > : public EngineTypeTraits< String > {};
 template<> inline const EngineTypeInfo* TYPE< const UTF16* >() { return TYPE< String >(); }
 inline const EngineTypeInfo* TYPE( const UTF16*& ) { return TYPE< String >(); }
+
+//FIXME: this allows const char* to be used as a struct field type
+
+// Temp support for allowing const char* to remain in the API functions as long as we
+// still have the console system around.  When that is purged, these definitions should
+// be deleted and all const char* uses be replaced with String.
+template<> struct EngineTypeTraits< const char* > : public EngineTypeTraits< String > {};
+template<> inline const EngineTypeInfo* TYPE< const char* >() { return TYPE< String >(); }
 
 #endif // !_ENGINEPRIMITIVES_H_

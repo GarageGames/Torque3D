@@ -104,20 +104,6 @@ namespace engineAPI {
    extern bool gIsInitialized;
 }
 
-
-//FIXME: this allows const char* to be used as a struct field type
-
-// Temp support for allowing const char* to remain in the API functions as long as we
-// still have the console system around.  When that is purged, these definitions should
-// be deleted and all const char* uses be replaced with String.
-template<> struct EngineTypeTraits< const char* > : public EngineTypeTraits< String > {};
-template<> inline const EngineTypeInfo* TYPE< const char* >() { return TYPE< String >(); }
-
-
-
-
-
-
 /// @name Marshalling
 ///
 /// Functions for converting to/from string-based data representations.

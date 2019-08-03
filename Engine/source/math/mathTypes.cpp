@@ -88,30 +88,59 @@ END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( RectI,
    RectI, MathTypes,
    "" )
+
+   FIELD( point,  point,  1, "The XY coordinate of the Rect." )
+   FIELD( extent, extent, 1, "The width and height of the Rect." )
+
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( RectF,
    RectF, MathTypes,
    "" )
+
+   FIELD( point,  point,  1, "The XY coordinate of the Rect.")
+   FIELD( extent, extent, 1, "The width and height of the Rect.")
+
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( MatrixF,
    MatrixF, MathTypes,
    "" )
+
+   MatrixFEngineExport::getMatrixField(),
+
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( AngAxisF,
    AngAxisF, MathTypes,
    "" )
+
+   FIELD( axis,  axis,  1, "")
+   FIELD( angle, angle, 1, "")
+
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( TransformF,
    TransformF, MathTypes,
    "" )
+
+   FIELD(mPosition,    position,    1, "")
+   FIELD(mOrientation, orientation, 1, "")
+   FIELD(mHasRotation, hasRotation, 1, "")
+
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( Box3F,
    Box3F, MathTypes,
    "" )
+
+   FIELD(minExtents, minExtents, 1, "Minimum extents of box")
+   FIELD(maxExtents, maxExtents, 1, "Maximum extents of box")
+
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( EaseF,
    EaseF, MathTypes,
    "" )
+
+   FIELD(mDir, dir, 1, "inout, in, out")
+   FIELD(mType, type, 1, "linear, etc...")
+   FIELD_AS(F32, mParam, type, 2, "optional params")
+
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT(RotationF,
    RotationF, MathTypes,
