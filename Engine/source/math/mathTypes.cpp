@@ -139,7 +139,7 @@ IMPLEMENT_STRUCT( EaseF,
 
    FIELD(mDir, dir, 1, "inout, in, out")
    FIELD(mType, type, 1, "linear, etc...")
-   FIELD_AS(F32, mParam, type, 2, "optional params")
+   FIELD_AS(F32, mParam, param, 2, "optional params")
 
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT(RotationF,
