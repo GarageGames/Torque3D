@@ -62,7 +62,7 @@ DECLARE_PRIMITIVE_R(const char**);
 //FIXME: this allows String to be used as a struct field type
 
 // String is special in the way its data is exchanged through the API.  Through
-// calls, strings are passed as plain, null-terminated UTF-16 character strings.
+// calls, strings are passed as plain, null-terminated UTF-8 character strings.
 // In addition, strings passed back as return values from engine API functions
 // are considered to be owned by the API layer itself.  The rule here is that such
 // a string is only valid until the next API call is made.  Usually, control layers
@@ -71,20 +71,19 @@ _DECLARE_TYPE_R(String);
 template<>
 struct EngineTypeTraits< String > : public _EnginePrimitiveTypeTraits< String >
 {
-   typedef const UTF16* ArgumentValueType;
-   typedef const UTF16* ReturnValueType;
+   typedef const UTF8* ArgumentValueType;
+   typedef const UTF8* ReturnValueType;
 
    //FIXME: this needs to be sorted out; for now, we store default value literals in ASCII
    typedef const char* DefaultArgumentValueStoreType;
    
-   static const UTF16* ReturnValue( const String& str )
+   static const UTF8* ReturnValue( const String& str )
    {
       static String sTemp;      
       sTemp = str;
-      return sTemp.utf16();
+      return sTemp.utf8();
    }
 };
-
 
 // For struct fields, String cannot be used directly but "const UTF16*" must be used
 // instead.  Make sure this works with the template machinery by redirecting the type
@@ -93,12 +92,20 @@ template<> struct EngineTypeTraits< const UTF16* > : public EngineTypeTraits< St
 template<> inline const EngineTypeInfo* TYPE< const UTF16* >() { return TYPE< String >(); }
 inline const EngineTypeInfo* TYPE( const UTF16*& ) { return TYPE< String >(); }
 
-//FIXME: this allows const char* to be used as a struct field type
-
 // Temp support for allowing const char* to remain in the API functions as long as we
 // still have the console system around.  When that is purged, these definitions should
 // be deleted and all const char* uses be replaced with String.
-template<> struct EngineTypeTraits< const char* > : public EngineTypeTraits< String > {};
-template<> inline const EngineTypeInfo* TYPE< const char* >() { return TYPE< String >(); }
+_DECLARE_TYPE_R(const UTF8*);
+template<>
+struct EngineTypeTraits< const UTF8* > : public _EnginePrimitiveTypeTraits< const UTF8* >
+{
+   static const UTF8* ReturnValue(const String& str)
+   {
+      static String sTemp;
+      sTemp = str;
+      return sTemp.utf8();
+   }
+};
+
 
 #endif // !_ENGINEPRIMITIVES_H_

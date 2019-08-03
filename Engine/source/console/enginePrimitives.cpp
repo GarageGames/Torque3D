@@ -34,6 +34,7 @@ IMPLEMENT_PRIMITIVE( U32,           uint,,      "32bit unsigned integer." );
 IMPLEMENT_PRIMITIVE( F32,           float,,     "32bit single-precision floating-point." );
 IMPLEMENT_PRIMITIVE( F64,           double,,    "64bit double-precision floating-point." );
 IMPLEMENT_PRIMITIVE( String,        string,,    "Null-terminated UTF-16 Unicode string." );
+IMPLEMENT_PRIMITIVE( const UTF8*,   cstring,,   "Null-terminated UTF-8 Unicode string.");
 IMPLEMENT_PRIMITIVE( void*,         ptr,,       "Opaque pointer." );
 
 // Define pointer types for vectors.
