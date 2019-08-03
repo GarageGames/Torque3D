@@ -30,6 +30,9 @@
    #include "core/util/refBase.h"
 #endif
 
+#ifndef _ENGINEOBJECT_H_
+   #include "console/engineObject.h"
+#endif
 
 /// @file
 /// Persistent IDs for SimObjects.
@@ -40,12 +43,27 @@ template< typename, typename > class HashTable;
 
 
 /// A globally unique persistent ID for a SimObject.
-class SimPersistID : public StrongRefBase
+class SimPersistID : public EngineObject
 {
    public:
+      DECLARE_CLASS(SimPersistID, EngineObject);
    
       typedef void Parent;
       friend class SimObject;
+
+      ///
+      SimPersistID();
+
+      /// Construct a new persistent ID for "object" by generating a fresh
+      /// unique identifier.
+      SimPersistID(SimObject* object);
+
+      /// Construct a persistent ID stub for the given unique identifier.
+      /// The stub remains not bound to any object until it is resolved.
+      SimPersistID(const Torque::UUID& uuid);
+
+      ///
+      ~SimPersistID();
       
    protected:
    
@@ -60,17 +78,6 @@ class SimPersistID : public StrongRefBase
       
       /// Table of persistent object IDs.
       static LookupTableType* smLookupTable;
-
-      /// Construct a new persistent ID for "object" by generating a fresh
-      /// unique identifier.
-      SimPersistID( SimObject* object );
-      
-      /// Construct a persistent ID stub for the given unique identifier.
-      /// The stub remains not bound to any object until it is resolved.
-      SimPersistID( const Torque::UUID& uuid );
-      
-      ///
-      ~SimPersistID();
       
       /// Bind this unresolved PID to the given object.
       void resolve( SimObject* object );
