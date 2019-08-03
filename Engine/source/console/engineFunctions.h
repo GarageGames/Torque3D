@@ -94,22 +94,21 @@ struct EngineFunctionDefaultArguments
 template< typename T >
 struct _EngineFunctionDefaultArguments {};
 
-template<typename ...ArgTs>
-struct _EngineFunctionDefaultArguments< void(ArgTs...) > : public EngineFunctionDefaultArguments
+template<typename R, typename ...ArgTs>
+struct _EngineFunctionDefaultArguments< R(ArgTs...) > : public EngineFunctionDefaultArguments
 {
    template<typename T> using DefVST = typename EngineTypeTraits<T>::DefaultArgumentValueStoreType;
-   fixed_tuple<DefVST<ArgTs>  ...> mFixedArgs;
-   std::tuple<DefVST<ArgTs>  ...> mArgs;
+   using SelfType = _EngineFunctionDefaultArguments< R(ArgTs...) >;
+   fixed_tuple<DefVST<ArgTs>...> mArgs;
+
 private:
-   using SelfType = _EngineFunctionDefaultArguments< void(ArgTs...) >;
-   
    template<size_t ...> struct Seq {};
    template<size_t N, size_t ...S> struct Gens : Gens<N-1, N-1, S...> {};
    
    template<size_t ...I> struct Gens<0, I...>{ typedef Seq<I...> type; };
    
    template<typename ...TailTs, size_t ...I>
-   static void copyHelper(std::tuple<DefVST<ArgTs> ...> &args, std::tuple<DefVST<TailTs> ...> &defaultArgs, Seq<I...>)  {
+   static void copyHelper(std::tuple<DefVST<ArgTs> ...> &args, std::tuple<DefVST<TailTs> ...> &defaultArgs, Seq<I...>) {
       std::tie(std::get<I + (sizeof...(ArgTs) - sizeof...(TailTs))>(args)...) = defaultArgs;
    }
    
@@ -117,7 +116,7 @@ private:
    template<typename ...TailTs>
    struct DodgyVCHelper
    {
-      using type = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), decltype(mArgs)>::type;
+      using type = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), std::tuple<DefVST<ArgTs>...>>::type;
    };
 
    template<typename ...TailTs> using MaybeSelfEnabled = typename DodgyVCHelper<TailTs...>::type;
@@ -128,15 +127,16 @@ private:
    template<typename ...TailTs> static MaybeSelfEnabled<TailTs...> tailInit(TailTs ...tail) {
       std::tuple<DefVST<ArgTs>...> argsT;
       std::tuple<DefVST<TailTs>...> tailT = std::make_tuple(tail...);
-      SelfType::copyHelper<TailTs...>(argsT, tailT, typename Gens<sizeof...(TailTs)>::type());
+      SelfType::template copyHelper<TailTs...>(argsT, tailT, typename Gens<sizeof...(TailTs)>::type());
       return argsT;
    };
    
 public:
    template<typename ...TailTs> _EngineFunctionDefaultArguments(TailTs ...tail)
-   : EngineFunctionDefaultArguments({sizeof...(TailTs)}), mArgs(SelfType::tailInit(tail...))
+   : EngineFunctionDefaultArguments({sizeof...(TailTs)})
    {
-      fixed_tuple_mutator<void(DefVST<ArgTs>...), void(DefVST<ArgTs>...)>::copy(mArgs, mFixedArgs);
+      std::tuple<DefVST<ArgTs>...> tmpTup = SelfType::tailInit(tail...);
+      fixed_tuple_mutator<void(DefVST<ArgTs>...), void(DefVST<ArgTs>...)>::copy(tmpTup, mArgs);
    }
 };
 
