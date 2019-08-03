@@ -22,6 +22,9 @@
 
 #ifndef _FIXEDTUPLE_H_
 #define _FIXEDTUPLE_H_
+
+#include "engineTypes.h"
+
 /// @name Fixed-layout tuple definition
 /// These structs and templates serve as a way to pass arguments from external 
 /// applications and into the T3D console system.
@@ -112,6 +115,21 @@ struct fixed_tuple_accessor<0>
       return t.first;
    }
 };
+
+#pragma warning( push )
+#pragma warning( disable : 4267 )
+template <size_t I, class... Ts>
+static U32 fixed_tuple_offset(fixed_tuple<Ts...>& t)
+{
+   return (U32)((size_t)& fixed_tuple_accessor<I>::get(t)) - ((size_t)& t);
+}
+
+template <size_t I, class... Ts>
+static U32 fixed_tuple_offset(const fixed_tuple<Ts...>& t)
+{
+   return (U32)((size_t)& fixed_tuple_accessor<I>::get(t)) - ((size_t)& t);
+}
+#pragma warning(pop)
 
 template< typename T1, typename T2 >
 struct fixed_tuple_mutator {};

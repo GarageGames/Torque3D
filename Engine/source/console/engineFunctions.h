@@ -67,18 +67,9 @@ struct EngineFunctionDefaultArguments
    /// @warn This is @b NOT the size of the memory block returned by getArgs() and also
    ///   not the number of elements it contains.
    U32 mNumDefaultArgs;
-   
-   /// Return a pointer to the variable-sized array of default argument values.
-   ///
-   /// @warn The arguments must be stored @b IMMEDIATELY after #mNumDefaultArgs.
-   /// @warn This is a @b FULL frame and not just the default arguments, i.e. it starts with the
-   ///   first argument that the function takes and ends with the last argument it takes.
-   /// @warn If the compiler's #pragma pack is buggy, the elements in this structure are allowed
-   ///   to be 4-byte aligned rather than byte-aligned as they should be.
-   const U8* getArgs() const
-   {
-      return ( const U8* ) &( mNumDefaultArgs ) + sizeof( mNumDefaultArgs );
-   }
+
+   U32* mOffsets;
+   U8* mFirst;
 };
 
 
@@ -130,13 +121,29 @@ private:
       SelfType::template copyHelper<TailTs...>(argsT, tailT, typename Gens<sizeof...(TailTs)>::type());
       return argsT;
    };
+
+   template<size_t I = 0>
+   typename std::enable_if<I == sizeof...(ArgTs)>::type initOffsetsHelper()
+   { }
+
+   template<size_t I = 0>
+   typename std::enable_if < I < sizeof...(ArgTs)>::type initOffsetsHelper()
+   {
+      mOffsets[I] = fixed_tuple_offset<I>(mArgs);
+      initOffsetsHelper<I + 1>();
+   }
    
 public:
    template<typename ...TailTs> _EngineFunctionDefaultArguments(TailTs ...tail)
-   : EngineFunctionDefaultArguments({sizeof...(TailTs)})
+   : EngineFunctionDefaultArguments()
    {
       std::tuple<DefVST<ArgTs>...> tmpTup = SelfType::tailInit(tail...);
       fixed_tuple_mutator<void(DefVST<ArgTs>...), void(DefVST<ArgTs>...)>::copy(tmpTup, mArgs);
+
+      mNumDefaultArgs = sizeof...(TailTs);
+      mOffsets = new U32[sizeof...(ArgTs)];
+      initOffsetsHelper();
+      mFirst = (U8*)& mArgs;
    }
 };
 
