@@ -28,16 +28,6 @@ DefineNewEngineMethod(SimObject, RegisterObject, bool, (),,"")
    return object->registerObject();
 }
 
-DefineNewEngineMethod(SimObject, GetField, String, (String fieldName, String arrayIndex),, "")
-{
-   return object->getDataField(StringTable->insert(fieldName), StringTable->insert(arrayIndex));
-}
-
-DefineNewEngineMethod(SimObject, SetField, void, (String fieldName, String arrayIndex, String value),, "")
-{
-   object->setDataField(StringTable->insert(fieldName), StringTable->insert(arrayIndex), StringTable->insert(value));
-}
-
 DefineNewEngineMethod(SimObject, CopyFrom, void, (SimObject* parent),, "")
 {
    if (parent)
