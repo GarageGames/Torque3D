@@ -565,7 +565,7 @@ DefineEngineMethod(UndoManager, getNextRedoName, const char *, (),, "UndoManager
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( UndoManager, pushCompound, const char*, ( String name ), ("\"\""), "( string name=\"\" ) - Push a CompoundUndoAction onto the compound stack for assembly." )
+DefineEngineMethod( UndoManager, pushCompound, const char*, ( String name ), (""), "( string name=\"\" ) - Push a CompoundUndoAction onto the compound stack for assembly." )
 {
       
    CompoundUndoAction* action = object->pushCompound( name );
