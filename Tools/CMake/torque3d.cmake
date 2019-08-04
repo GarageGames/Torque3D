@@ -61,8 +61,8 @@ mark_as_advanced(TORQUE_BASIC_LIGHTING)
 option(TORQUE_SFX_DirectX "DirectX Sound" OFF)
 mark_as_advanced(TORQUE_SFX_DirectX)
 option(TORQUE_SFX_OPENAL "OpenAL Sound" ON)
-#windows uses openal-soft
-if(WIN32)
+
+if(TORQUE_SFX_OPENAL)
     #disable a few things that are not required
     set(ALSOFT_TESTS OFF CACHE BOOL "Build and install test programs" FORCE)
     set(ALSOFT_UTILS OFF CACHE BOOL "Build and install utility programs" FORCE)
@@ -74,9 +74,7 @@ if(WIN32)
     set(ALSOFT_AMBDEC_PRESETS OFF CACHE BOOL "Install AmbDec presets" FORCE)
     
     add_subdirectory( ${libDir}/openal-soft ${CMAKE_CURRENT_BINARY_DIR}/openal-soft)
-endif()
 
-if(TORQUE_SFX_OPENAL)
     #Hide some unnecessary fields as advanced
     mark_as_advanced(ALSOFT_AMBDEC_PRESETS)
     mark_as_advanced(ALSOFT_BACKEND_DSOUND)
@@ -379,16 +377,11 @@ endif()
 # OpenAL
 if(TORQUE_SFX_OPENAL AND NOT TORQUE_DEDICATED)
     addPath("${srcDir}/sfx/openal")
+    addInclude("${libDir}/openal-soft/include")
     if(WIN32)
-	     addPath("${srcDir}/sfx/openal/win32")
-		 addInclude("${libDir}/openal-soft/include")
-    endif()
-	  if(UNIX AND NOT APPLE)
-		   addPath("${srcDir}/sfx/openal/linux")
-	  endif()
-    if(APPLE)
-       addPath("${srcDir}/sfx/openal/mac")
-       addFramework("OpenAL")
+       addPath("${srcDir}/sfx/openal/win32")		 
+    elseif(UNIX)
+       addPath("${srcDir}/sfx/openal/posix")
     endif()
 endif()
 
