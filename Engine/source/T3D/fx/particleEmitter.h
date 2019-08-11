@@ -269,7 +269,7 @@ class ParticleEmitter : public GameBase
    // code to expose the necessary members and methods.
    void update( U32 ms );
 protected:
-   inline void updateKeyData( Particle *part );
+   void updateKeyData( Particle *part );
  
 
   private:
