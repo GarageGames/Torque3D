@@ -132,7 +132,14 @@ bool VolumetricFogRTManager::Init()
       Con::errorf("VolumetricFogRTManager allready initialized!!");
       return true;
    }
-   
+
+   if (GFX->getAdapterType() == NullDevice)
+   {
+      mIsInitialized = true;
+      Con::errorf("VolumetricFogRTManager - Dedicated server");
+      return true;
+   }
+
    GuiCanvas* cv = dynamic_cast<GuiCanvas*>(Sim::findObject("Canvas"));
    if (cv == NULL)
    {

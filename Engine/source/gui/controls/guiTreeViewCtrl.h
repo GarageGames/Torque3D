@@ -554,6 +554,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       S32 findItemByName(const char *name);
       S32 findItemByValue(const char *name);
       S32 findItemByObjectId(S32 iObjId);
+      S32 getItemObject(S32 itemId);
 
       void sortTree( bool caseSensitive, bool traverseHierarchy, bool parentsFirst );
 
