@@ -1,0 +1,429 @@
+<?xml version='1.0' encoding='utf-8'?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+    <asset>
+        <contributor>
+            <author />
+            <authoring_tool>Torque 3D 2011 Interior Exporter</authoring_tool>
+            <comments />
+        </contributor>
+        <created>15/05/2013 2:11:02 AM</created>
+        <modified>15/05/2013 2:11:02 AM</modified>
+        <revision />
+        <title />
+        <subject />
+        <keywords />
+        <unit meter="1.000000" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images>
+        <image id="DESERT_BRICK_VERTICAL_TRIM-Diffuse" name="DESERT_BRICK_VERTICAL_TRIM-Diffuse">
+            <init_from>DESERT_BRICK_VERTICAL_TRIM.jpg</init_from>
+        </image>
+    </library_images>
+    <library_materials>
+        <material id="DESERT_BRICK_VERTICAL_TRIM" name="DESERT_BRICK_VERTICAL_TRIM">
+            <instance_effect url="#DESERT_BRICK_VERTICAL_TRIM-fx" />
+        </material>
+    </library_materials>
+    <library_effects>
+        <effect id="DESERT_BRICK_VERTICAL_TRIM-fx" name="DESERT_BRICK_VERTICAL_TRIM-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_VERTICAL_TRIM-Surface"><surface type="2D"><init_from>DESERT_BRICK_VERTICAL_TRIM-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_VERTICAL_TRIM-Sampler"><sampler2D><source>DESERT_BRICK_VERTICAL_TRIM-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_VERTICAL_TRIM-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_geometries>
+        <geometry id="bridge_structure_ladder_climb_frame-lib" name="bridge_structure_ladder_climb_frameMesh">
+            <mesh>
+                <source id="bridge_structure_ladder_climb_frame-Position">
+                    <float_array count="210" id="bridge_structure_ladder_climb_frame-Position-array">
+                        -1.3446 1.7862 -2.4458
+                        -1.5986 1.7862 -2.4458
+                        -1.3445 1.9321 -2.4458
+                        -1.5986 1.9321 -2.4458
+                        -1.5986 1.9321 -2.6171
+                        -1.3445 1.9321 -2.6171
+                        -1.3445 1.7862 -2.6171
+                        -1.5986 1.7862 -2.6171
+                        -1.3446 3.7695 -2.4377
+                        -1.5986 3.7695 -2.4377
+                        -1.3445 3.9153 -2.4377
+                        -1.5986 3.9153 -2.4377
+                        -1.5986 3.9153 -2.6171
+                        -1.3445 3.9153 -2.6171
+                        -1.3445 3.7695 -2.6171
+                        -1.5986 3.7695 -2.6171
+                        -1.0151 -0.3152 2.6171
+                        -1.3445 -0.3152 2.6171
+                        -1.0151 -0.1694 2.6171
+                        -1.3445 -0.1694 2.6171
+                        -1.3445 -0.1694 2.2776
+                        -1.0151 -0.1694 2.2776
+                        -1.0151 -0.3152 2.2776
+                        -1.3445 -0.3152 2.2776
+                        -0.7636 -0.3152 2.6171
+                        -1.0176 -0.3152 2.6171
+                        -0.7636 -0.1694 2.6171
+                        -1.0176 -0.1694 2.6171
+                        -1.0176 -0.1694 2.4132
+                        -0.7636 -0.1694 2.4132
+                        -0.7636 -0.3152 2.4132
+                        -1.0176 -0.3152 2.4132
+                        -1.0151 -0.3152 2.1358
+                        -1.3445 -0.3152 2.1358
+                        -1.0151 -0.3152 2.2816
+                        -1.3445 -0.3152 2.2816
+                        -1.3445 3.9153 2.2816
+                        -1.0151 3.9153 2.2816
+                        -1.0151 3.9153 2.1358
+                        -1.3445 3.9153 2.1358
+                        -0.7636 -2.3405 2.6171
+                        -1.0176 -2.3405 2.6171
+                        -0.7636 -2.1947 2.6171
+                        -1.0176 -2.1947 2.6171
+                        -1.0176 -2.1947 2.4132
+                        -0.7636 -2.1947 2.4132
+                        -0.7636 -2.3405 2.4132
+                        -1.0176 -2.3405 2.4132
+                        -1.0151 -2.3405 2.6171
+                        -1.3445 -2.3405 2.6171
+                        -1.0151 -2.1947 2.6171
+                        -1.3445 -2.1947 2.6171
+                        -1.3445 -2.1947 0.8877
+                        -1.0151 -2.1947 0.8877
+                        -1.0151 -2.3405 0.8877
+                        -1.3445 -2.3405 0.8877
+                        -1.0151 -2.3405 0.7419
+                        -1.3445 -2.3405 0.7419
+                        -1.3445 1.9321 0.8877
+                        -0.9799 1.9321 0.8877
+                        -0.9799 1.9321 0.7419
+                        -1.3445 1.9321 0.7419
+                        -1.0151 1.9321 -2.6171
+                        -1.0151 1.7862 -2.6171
+                        -0.9799 1.7862 0.7419
+                        -1.3445 1.7862 0.7419
+                        -1.0151 3.9153 -2.6171
+                        -1.0151 3.7695 -2.6171
+                        -1.0151 3.7695 2.1358
+                        -1.3445 3.7695 2.1358
+                    </float_array>
+                    <technique_common>
+                        <accessor count="70" source="#bridge_structure_ladder_climb_frame-Position-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="bridge_structure_ladder_climb_frame-Normal">
+                    <float_array count="24" id="bridge_structure_ladder_climb_frame-Normal-array">
+                        0.0000 0.0000 1.0000
+                        0.0000 1.0000 -0.0000
+                        -0.0000 -1.0000 -0.0000
+                        -0.0000 -0.0000 -1.0000
+                        -1.0000 -0.0000 -0.0000
+                        1.0000 0.0000 0.0000
+                        1.0000 -0.0082 -0.0000
+                        0.9999 -0.0000 -0.0105
+                    </float_array>
+                    <technique_common>
+                        <accessor count="8" source="#bridge_structure_ladder_climb_frame-Normal-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="bridge_structure_ladder_climb_frame-UV0">
+                    <float_array count="268" id="bridge_structure_ladder_climb_frame-UV0-array">
+                        0.4468 -1.2497
+                        0.4462 -1.5045
+                        0.3344 -1.2490
+                        0.3338 -1.5039
+                        1.4438 -2.2461
+                        1.4438 -2.0011
+                        1.6729 -2.2461
+                        1.6729 -2.0011
+                        1.6730 -1.7522
+                        1.4438 -1.7523
+                        1.6730 -1.5002
+                        1.4438 -1.5002
+                        0.4461 -1.0024
+                        0.4461 -1.2469
+                        0.3344 -1.0021
+                        0.3343 -1.2466
+                        1.6730 -1.5001
+                        1.6730 -1.2536
+                        1.4438 -1.2538
+                        0.3285 -1.7500
+                        0.5543 -1.7500
+                        0.3285 -2.0000
+                        0.5543 -2.0000
+                        1.2162 -2.2461
+                        1.2162 -1.9949
+                        1.6729 -1.9949
+                        1.2161 -1.9955
+                        1.2162 -1.7495
+                        1.6730 -1.7489
+                        1.6730 -1.7490
+                        1.6730 -1.5046
+                        1.2162 -1.5051
+                        1.6730 -1.5042
+                        1.6730 -1.2563
+                        1.2162 -1.2572
+                        0.2244 -0.7496
+                        0.2238 -0.9960
+                        0.1110 -0.7479
+                        0.1104 -0.9943
+                        1.4315 -2.2460
+                        1.4315 -1.9949
+                        1.4314 -1.9955
+                        1.4315 -1.7495
+                        1.4315 -1.5051
+                        0.4477 -0.7524
+                        0.4471 -0.9967
+                        0.3374 -0.7508
+                        0.3368 -0.9951
+                        0.6719 -0.7501
+                        0.6719 -1.0003
+                        0.5522 -0.7502
+                        0.5523 -1.0004
+                        -4.3411 -2.2460
+                        -4.3411 -1.9949
+                        1.6669 -2.2460
+                        1.6669 -1.9949
+                        -4.3412 -1.9955
+                        -4.3411 -1.7495
+                        1.6670 -1.7489
+                        1.6670 -1.7490
+                        1.6670 -1.5046
+                        -4.3411 -1.5051
+                        0.4448 -1.0002
+                        0.4445 -1.2505
+                        0.3365 -0.9997
+                        0.3362 -1.2501
+                        1.6670 -1.5042
+                        1.6670 -1.2563
+                        -4.3411 -1.2572
+                        0.6713 -1.0051
+                        0.6712 -1.2506
+                        0.5557 -1.0056
+                        0.5556 -1.2511
+                        -0.7755 -2.2461
+                        -0.7755 -1.9949
+                        -0.7756 -1.9955
+                        -0.7755 -1.7494
+                        -0.7755 -1.5051
+                        -0.7755 -1.2572
+                        0.6741 -1.0030
+                        0.6735 -1.2457
+                        0.5553 -1.0023
+                        0.5547 -1.2450
+                        -3.9993 -2.2805
+                        -3.9993 -1.9985
+                        1.6789 -2.2533
+                        1.6789 -1.9985
+                        -3.9994 -1.9991
+                        -3.9993 -1.7494
+                        1.6790 -1.7488
+                        1.6790 -1.7250
+                        1.6790 -1.5010
+                        -3.9993 -1.5015
+                        0.4474 -1.0001
+                        0.4475 -1.2504
+                        0.3353 -1.0001
+                        0.3354 -1.2504
+                        1.6790 -1.5006
+                        1.6790 -1.2491
+                        -3.9993 -1.2500
+                        -2.3299 -2.2218
+                        -2.3299 -1.9949
+                        1.7750 -2.2460
+                        1.7750 -1.9949
+                        -2.3300 -1.9955
+                        -2.3299 -1.7495
+                        1.7750 -1.7489
+                        1.7751 -1.7751
+                        1.7751 -1.5046
+                        -2.3299 -1.5051
+                        0.4449 -0.7521
+                        0.4449 -0.9994
+                        0.3362 -0.7522
+                        0.3362 -0.9995
+                        1.7751 -1.5042
+                        1.7751 -1.2563
+                        -2.3299 -1.2572
+                        -3.9991 -2.2510
+                        -3.9991 -1.9962
+                        1.6691 -2.2510
+                        1.6691 -1.9962
+                        -3.9992 -1.9968
+                        -3.9991 -1.7472
+                        1.6692 -1.7466
+                        1.6692 -1.7467
+                        1.6692 -1.4988
+                        -3.9991 -1.4993
+                        0.4453 -1.0015
+                        0.4454 -1.2471
+                        0.3344 -1.0019
+                        0.3345 -1.2475
+                        1.6692 -1.4984
+                        1.6692 -1.2469
+                        -3.9991 -1.2478
+</float_array>
+                    <technique_common>
+                        <accessor count="134" source="#bridge_structure_ladder_climb_frame-UV0-array" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="bridge_structure_ladder_climb_frame-Vertex">
+                    <input semantic="POSITION" source="#bridge_structure_ladder_climb_frame-Position" />
+                </vertices>
+                <triangles count="104" material="DESERT_BRICK_VERTICAL_TRIM">
+                    <input offset="0" semantic="VERTEX" source="#bridge_structure_ladder_climb_frame-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#bridge_structure_ladder_climb_frame-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#bridge_structure_ladder_climb_frame-UV0" />
+                    <p>
+                        3 0 3 1 0 1 0 0 0
+                        2 0 2 3 0 3 0 0 0
+                        2 1 7 5 1 5 4 1 4
+                        3 1 6 2 1 7 4 1 4
+                        7 2 11 6 2 9 0 2 8
+                        1 2 10 7 2 11 0 2 8
+                        7 3 15 4 3 13 5 3 12
+                        6 3 14 7 3 15 5 3 12
+                        4 4 18 7 4 11 1 4 16
+                        3 4 17 4 4 18 1 4 16
+                        11 0 3 9 0 1 8 0 0
+                        10 0 2 11 0 3 8 0 0
+                        10 1 7 13 1 5 12 1 4
+                        11 1 6 10 1 7 12 1 4
+                        15 2 11 14 2 9 8 2 8
+                        9 2 10 15 2 11 8 2 8
+                        15 3 15 12 3 13 13 3 12
+                        14 3 14 15 3 15 13 3 12
+                        12 4 18 15 4 11 9 4 16
+                        11 4 17 12 4 18 9 4 16
+                        19 0 22 17 0 20 16 0 19
+                        18 0 21 19 0 22 16 0 19
+                        18 1 25 21 1 24 20 1 23
+                        19 1 6 18 1 25 20 1 23
+                        16 5 28 22 5 27 21 5 26
+                        18 5 25 16 5 28 21 5 26
+                        23 2 31 22 2 27 16 2 29
+                        17 2 30 23 2 31 16 2 29
+                        20 4 34 23 4 31 17 4 32
+                        19 4 33 20 4 34 17 4 32
+                        27 0 38 25 0 36 24 0 35
+                        26 0 37 27 0 38 24 0 35
+                        26 1 25 29 1 40 28 1 39
+                        27 1 6 26 1 25 28 1 39
+                        24 5 28 30 5 42 29 5 41
+                        26 5 25 24 5 28 29 5 41
+                        31 2 43 30 2 42 24 2 29
+                        25 2 30 31 2 43 24 2 29
+                        31 3 47 28 3 45 29 3 44
+                        30 3 46 31 3 47 29 3 44
+                        35 2 51 33 2 49 32 2 48
+                        34 2 50 35 2 51 32 2 48
+                        34 0 55 37 0 53 36 0 52
+                        35 0 54 34 0 55 36 0 52
+                        32 5 58 38 5 57 37 5 56
+                        34 5 55 32 5 58 37 5 56
+                        39 3 61 38 3 57 32 3 59
+                        33 3 60 39 3 61 32 3 59
+                        39 1 65 36 1 63 37 1 62
+                        38 1 64 39 1 65 37 1 62
+                        36 4 68 39 4 61 33 4 66
+                        35 4 67 36 4 68 33 4 66
+                        43 0 38 41 0 36 40 0 35
+                        42 0 37 43 0 38 40 0 35
+                        42 1 25 45 1 40 44 1 39
+                        43 1 6 42 1 25 44 1 39
+                        40 5 28 46 5 42 45 5 41
+                        42 5 25 40 5 28 45 5 41
+                        47 2 43 46 2 42 40 2 29
+                        41 2 30 47 2 43 40 2 29
+                        47 3 47 44 3 45 45 3 44
+                        46 3 46 47 3 47 45 3 44
+                        51 0 72 49 0 70 48 0 69
+                        50 0 71 51 0 72 48 0 69
+                        50 1 25 53 1 74 52 1 73
+                        51 1 6 50 1 25 52 1 73
+                        48 5 28 54 5 76 53 5 75
+                        50 5 25 48 5 28 53 5 75
+                        55 2 77 54 2 76 48 2 29
+                        49 2 30 55 2 77 48 2 29
+                        52 4 78 55 4 77 49 4 32
+                        51 4 33 52 4 78 49 4 32
+                        55 2 82 57 2 80 56 2 79
+                        54 2 81 55 2 82 56 2 79
+                        54 0 86 59 0 84 58 0 83
+                        55 0 85 54 0 86 58 0 83
+                        56 6 89 60 6 88 59 6 87
+                        54 6 86 56 6 89 59 6 87
+                        61 3 92 60 3 88 56 3 90
+                        57 3 91 61 3 92 56 3 90
+                        61 1 96 58 1 94 59 1 93
+                        60 1 95 61 1 96 59 1 93
+                        58 4 99 61 4 92 57 4 97
+                        55 4 98 58 4 99 57 4 97
+                        60 1 103 62 1 101 5 1 100
+                        61 1 102 60 1 103 5 1 100
+                        64 7 106 63 7 105 62 7 104
+                        60 7 103 64 7 106 62 7 104
+                        6 2 109 63 2 105 64 2 107
+                        65 2 108 6 2 109 64 2 107
+                        6 3 113 5 3 111 62 3 110
+                        63 3 112 6 3 113 62 3 110
+                        5 4 116 6 4 109 65 4 114
+                        61 4 115 5 4 116 65 4 114
+                        38 1 120 66 1 118 13 1 117
+                        39 1 119 38 1 120 13 1 117
+                        68 5 123 67 5 122 66 5 121
+                        38 5 120 68 5 123 66 5 121
+                        14 2 126 67 2 122 68 2 124
+                        69 2 125 14 2 126 68 2 124
+                        14 3 130 13 3 128 66 3 127
+                        67 3 129 14 3 130 66 3 127
+                        13 4 133 14 4 126 69 4 131
+                        39 4 132 13 4 133 69 4 131
+                    </p>
+                </triangles>
+            </mesh>
+        </geometry>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="bridge_structure_ladder_climb_frame" name="bridge_structure_ladder_climb_frame">
+                <instance_geometry url="#bridge_structure_ladder_climb_frame-lib">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="DESERT_BRICK_VERTICAL_TRIM" target="#DESERT_BRICK_VERTICAL_TRIM" />
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>

@@ -1,0 +1,356 @@
+<?xml version='1.0' encoding='utf-8'?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+    <asset>
+        <contributor>
+            <author />
+            <authoring_tool>Torque 3D 2011 Interior Exporter</authoring_tool>
+            <comments />
+        </contributor>
+        <created>15/05/2013 2:11:02 AM</created>
+        <modified>15/05/2013 2:11:02 AM</modified>
+        <revision />
+        <title />
+        <subject />
+        <keywords />
+        <unit meter="1.000000" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images>
+        <image id="DESERT_BRICK_VERTICAL_TRIM-Diffuse" name="DESERT_BRICK_VERTICAL_TRIM-Diffuse">
+            <init_from>DESERT_BRICK_VERTICAL_TRIM.jpg</init_from>
+        </image>
+        <image id="DESERT_BRICK_SQUARE-Diffuse" name="DESERT_BRICK_SQUARE-Diffuse">
+            <init_from>DESERT_BRICK_SQUARE.jpg</init_from>
+        </image>
+    </library_images>
+    <library_materials>
+        <material id="DESERT_BRICK_VERTICAL_TRIM" name="DESERT_BRICK_VERTICAL_TRIM">
+            <instance_effect url="#DESERT_BRICK_VERTICAL_TRIM-fx" />
+        </material>
+        <material id="DESERT_BRICK_SQUARE" name="DESERT_BRICK_SQUARE">
+            <instance_effect url="#DESERT_BRICK_SQUARE-fx" />
+        </material>
+    </library_materials>
+    <library_effects>
+        <effect id="DESERT_BRICK_VERTICAL_TRIM-fx" name="DESERT_BRICK_VERTICAL_TRIM-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_VERTICAL_TRIM-Surface"><surface type="2D"><init_from>DESERT_BRICK_VERTICAL_TRIM-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_VERTICAL_TRIM-Sampler"><sampler2D><source>DESERT_BRICK_VERTICAL_TRIM-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_VERTICAL_TRIM-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="DESERT_BRICK_SQUARE-fx" name="DESERT_BRICK_SQUARE-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_SQUARE-Surface"><surface type="2D"><init_from>DESERT_BRICK_SQUARE-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_SQUARE-Sampler"><sampler2D><source>DESERT_BRICK_SQUARE-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_SQUARE-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_geometries>
+        <geometry id="bridge_structure_lower_level_addon-lib" name="bridge_structure_lower_level_addonMesh">
+            <mesh>
+                <source id="bridge_structure_lower_level_addon-Position">
+                    <float_array count="168" id="bridge_structure_lower_level_addon-Position-array">
+                        6.8233 2.9347 0.7778
+                        6.8233 2.1927 0.7778
+                        -6.7865 2.9347 0.7778
+                        -6.7865 2.1927 0.7778
+                        6.8233 2.1927 -0.0000
+                        6.8233 2.9347 -0.0000
+                        -6.7865 2.1927 -0.0000
+                        -6.7865 2.9347 -0.0000
+                        -6.7865 -0.9322 0.0000
+                        -6.7865 -0.9322 0.7778
+                        6.8233 -0.9322 0.0000
+                        6.8233 -0.9322 0.7778
+                        4.9114 -0.9322 0.0000
+                        4.9114 2.1927 0.0000
+                        0.4105 1.6289 0.0000
+                        0.4105 -0.9322 0.0000
+                        4.1693 1.6289 0.0000
+                        4.1694 -0.9322 0.0000
+                        -4.0903 1.6289 0.0000
+                        -4.0903 -0.9322 0.0000
+                        -0.3315 1.6289 0.0000
+                        -0.3315 -0.9322 0.0000
+                        -6.7865 1.6289 0.0000
+                        -4.8323 1.6289 0.0000
+                        -4.8323 -0.9322 0.0000
+                        4.9114 1.6289 0.0000
+                        6.8233 2.9163 -0.0000
+                        7.5653 2.9163 -0.0000
+                        6.8233 2.9163 0.7778
+                        7.5653 2.9163 0.7778
+                        7.5653 -0.9322 0.7778
+                        7.5653 -0.9322 -0.0000
+                        -7.5284 2.9163 -0.0000
+                        -6.7864 2.9163 -0.0000
+                        -7.5284 2.9163 0.7778
+                        -6.7864 2.9163 0.7778
+                        -7.5284 -0.9322 0.7778
+                        -7.5284 -0.9322 -0.0000
+                        4.1694 0.9219 -0.4845
+                        4.9114 0.9219 -0.4845
+                        4.9114 -3.6335 -0.0000
+                        4.1694 -3.6335 -0.0000
+                        4.1694 -2.9266 -0.4845
+                        4.9114 -2.9266 -0.4845
+                        -0.3315 0.9219 -0.4845
+                        0.4105 0.9219 -0.4845
+                        0.4105 -3.6335 -0.0000
+                        -0.3315 -3.6335 -0.0000
+                        -0.3315 -2.9266 -0.4845
+                        0.4105 -2.9266 -0.4845
+                        -4.8323 0.9219 -0.4845
+                        -4.0903 0.9219 -0.4845
+                        -4.0903 -3.6335 -0.0000
+                        -4.8323 -3.6335 -0.0000
+                        -4.8323 -2.9266 -0.4845
+                        -4.0903 -2.9266 -0.4845
+                    </float_array>
+                    <technique_common>
+                        <accessor count="56" source="#bridge_structure_lower_level_addon-Position-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="bridge_structure_lower_level_addon-Normal">
+                    <float_array count="30" id="bridge_structure_lower_level_addon-Normal-array">
+                        0.0000 0.0000 1.0000
+                        -0.0000 -0.0000 -1.0000
+                        0.0000 1.0000 0.0000
+                        -0.0000 -1.0000 -0.0000
+                        1.0000 0.0000 0.0000
+                        -1.0000 -0.0000 -0.0000
+                        0.0000 0.2961 -0.9551
+                        0.0000 0.5653 -0.8249
+                        -0.0000 -0.2961 -0.9552
+                        -0.0000 -0.5653 -0.8249
+                    </float_array>
+                    <technique_common>
+                        <accessor count="10" source="#bridge_structure_lower_level_addon-Normal-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="bridge_structure_lower_level_addon-UV0">
+                    <float_array count="136" id="bridge_structure_lower_level_addon-UV0-array">
+                        -13.4423 -2.2518
+                        -13.4423 -1.9978
+                        -9.1144 -2.2518
+                        -9.1144 -1.9978
+                        -13.4423 -1.7494
+                        -13.4423 -1.5022
+                        -9.1144 -1.7490
+                        -9.1144 -1.5018
+                        -9.1144 -1.5013
+                        -9.1144 -1.2506
+                        -13.4423 -1.2515
+                        1.5005 2.5010
+                        1.7505 2.5010
+                        1.5005 -3.2442
+                        1.7505 -3.2442
+                        3.7485 -3.2435
+                        2.2498 -3.2431
+                        3.7503 2.4996
+                        2.2515 2.5000
+                        2.2500 -2.4363
+                        3.7488 -2.4367
+                        3.4790 -0.5373
+                        2.2506 -0.5370
+                        3.4785 -2.1235
+                        2.2501 -2.1232
+                        3.4795 1.3620
+                        2.2512 1.3623
+                        3.4790 -0.2242
+                        2.2507 -0.2239
+                        3.4799 2.4997
+                        3.4796 1.6751
+                        2.2513 1.6754
+                        3.4784 -2.4366
+                        0.3285 -1.7500
+                        0.5543 -1.7500
+                        0.3285 -2.0000
+                        0.5543 -2.0000
+                        -1.3305 -2.2518
+                        -1.3305 -1.9978
+                        -0.1121 -2.2518
+                        -0.1121 -1.9978
+                        -1.3305 -1.7495
+                        -1.3305 -1.5022
+                        -0.1121 -1.7490
+                        -0.1121 -1.5018
+                        0.3285 -1.2500
+                        0.5543 -1.2500
+                        0.3285 -1.5000
+                        0.5543 -1.5000
+                        -1.3305 -1.2515
+                        -0.1121 -1.5013
+                        -0.1121 -1.2506
+                        -1.3305 -1.9984
+                        -0.1121 -1.7488
+                        -1.4032 -2.2518
+                        -1.4032 -1.9978
+                        -0.7031 -2.2518
+                        -0.7032 -1.9978
+                        -1.4257 -1.9986
+                        -1.2282 -1.7494
+                        -0.0394 -1.9978
+                        -0.2144 -1.7488
+                        -0.2353 -1.7490
+                        -0.2248 -1.5018
+                        -1.2178 -1.5022
+                        -0.2203 -1.5016
+                        -0.0393 -1.2506
+                        -1.4032 -1.2515
+</float_array>
+                    <technique_common>
+                        <accessor count="68" source="#bridge_structure_lower_level_addon-UV0-array" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="bridge_structure_lower_level_addon-Vertex">
+                    <input semantic="POSITION" source="#bridge_structure_lower_level_addon-Position" />
+                </vertices>
+                <triangles count="62" material="DESERT_BRICK_VERTICAL_TRIM">
+                    <input offset="0" semantic="VERTEX" source="#bridge_structure_lower_level_addon-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#bridge_structure_lower_level_addon-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#bridge_structure_lower_level_addon-UV0" />
+                    <p>
+                        3 0 3 1 0 1 0 0 0
+                        2 0 2 3 0 3 0 0 0
+                        7 1 7 5 1 5 4 1 4
+                        6 1 6 7 1 7 4 1 4
+                        0 2 10 5 2 5 7 2 8
+                        2 2 9 0 2 10 7 2 8
+                        29 2 36 27 2 34 26 2 33
+                        28 2 35 29 2 36 26 2 33
+                        28 0 40 11 0 38 30 0 37
+                        29 0 39 28 0 40 30 0 37
+                        27 1 44 31 1 42 10 1 41
+                        26 1 43 27 1 44 10 1 41
+                        31 3 48 30 3 46 11 3 45
+                        10 3 47 31 3 48 11 3 45
+                        29 4 51 30 4 49 31 4 42
+                        27 4 50 29 4 51 31 4 42
+                        35 2 36 33 2 34 32 2 33
+                        34 2 35 35 2 36 32 2 33
+                        34 0 40 36 0 38 9 0 37
+                        35 0 39 34 0 40 9 0 37
+                        32 5 53 37 5 41 36 5 52
+                        34 5 40 32 5 53 36 5 52
+                        33 1 44 8 1 42 37 1 41
+                        32 1 43 33 1 44 37 1 41
+                        8 3 48 9 3 46 36 3 45
+                        37 3 47 8 3 48 36 3 45
+                        25 7 36 39 6 34 38 6 33
+                        16 7 35 25 7 36 38 6 33
+                        17 0 57 41 0 55 40 0 54
+                        12 0 56 17 0 57 40 0 54
+                        38 5 61 42 5 59 41 5 58
+                        16 5 60 38 5 61 41 5 58
+                        43 8 64 42 8 59 38 6 62
+                        39 6 63 43 8 64 38 6 62
+                        43 8 48 40 9 46 41 9 45
+                        42 8 47 43 8 48 41 9 45
+                        40 4 67 43 4 64 39 4 65
+                        25 4 66 40 4 67 39 4 65
+                        14 7 36 45 6 34 44 6 33
+                        20 7 35 14 7 36 44 6 33
+                        21 0 57 47 0 55 46 0 54
+                        15 0 56 21 0 57 46 0 54
+                        44 5 61 48 5 59 47 5 58
+                        20 5 60 44 5 61 47 5 58
+                        49 8 64 48 8 59 44 6 62
+                        45 6 63 49 8 64 44 6 62
+                        49 8 48 46 9 46 47 9 45
+                        48 8 47 49 8 48 47 9 45
+                        46 4 67 49 4 64 45 4 65
+                        14 4 66 46 4 67 45 4 65
+                        18 7 36 51 6 34 50 6 33
+                        23 7 35 18 7 36 50 6 33
+                        24 0 57 53 0 55 52 0 54
+                        19 0 56 24 0 57 52 0 54
+                        50 5 61 54 5 59 53 5 58
+                        23 5 60 50 5 61 53 5 58
+                        55 8 64 54 8 59 50 6 62
+                        51 6 63 55 8 64 50 6 62
+                        55 8 48 52 9 46 53 9 45
+                        54 8 47 55 8 48 53 9 45
+                        52 4 67 55 4 64 51 4 65
+                        18 4 66 52 4 67 51 4 65
+                    </p>
+                </triangles>
+                <triangles count="14" material="DESERT_BRICK_SQUARE">
+                    <input offset="0" semantic="VERTEX" source="#bridge_structure_lower_level_addon-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#bridge_structure_lower_level_addon-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#bridge_structure_lower_level_addon-UV0" />
+                    <p>
+                        11 3 14 9 3 12 8 3 11
+                        10 3 13 11 3 14 8 3 11
+                        9 0 18 11 0 16 1 0 15
+                        3 0 17 9 0 18 1 0 15
+                        13 1 20 4 1 15 10 1 16
+                        12 1 19 13 1 20 10 1 16
+                        17 1 24 15 1 22 14 1 21
+                        16 1 23 17 1 24 14 1 21
+                        21 1 28 19 1 26 18 1 25
+                        20 1 27 21 1 28 18 1 25
+                        24 1 31 8 1 18 22 1 29
+                        23 1 30 24 1 31 22 1 29
+                        22 1 29 6 1 17 13 1 20
+                        25 1 32 22 1 29 13 1 20
+                    </p>
+                </triangles>
+            </mesh>
+        </geometry>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="bridge_structure_lower_level_addon" name="bridge_structure_lower_level_addon">
+                <instance_geometry url="#bridge_structure_lower_level_addon-lib">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="DESERT_BRICK_VERTICAL_TRIM" target="#DESERT_BRICK_VERTICAL_TRIM" />
+                            <instance_material symbol="DESERT_BRICK_SQUARE" target="#DESERT_BRICK_SQUARE" />
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>

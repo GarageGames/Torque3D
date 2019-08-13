@@ -1,0 +1,8 @@
+<LevelAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="Desert_World"
+    FriendlyName="Desert World"
+    LevelFile="data/ActionAdventure/levels/desert_world.mis"
+    Description="Desert World"
+    VersionId="1" />

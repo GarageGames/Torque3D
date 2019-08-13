@@ -1,0 +1,15 @@
+<ModuleDefinition
+	ModuleId="ActionAdventure"
+	VersionId="1"
+	Description="Starter module for Action Adventure game."
+	ScriptFile="ActionAdventure.cs"
+	CreateFunction="create"
+	DestroyFunction="destroy"
+	Group="Game"
+    Dependencies="UI=1">
+	<DeclaredAssets
+        canSave="true"
+        canSaveDynamicFields="true"
+        Extension="asset.taml"
+        Recurse="true" />
+</ModuleDefinition>
