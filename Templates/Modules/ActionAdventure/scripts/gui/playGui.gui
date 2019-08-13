@@ -1,0 +1,39 @@
+new GameTSCtrl(PlayGui) {
+   isContainer = "1";
+   profile = "GuiContentProfile";
+   horizSizing = "right";
+   vertSizing = "bottom";
+   position = "0 0";
+   extent = "1024 768";
+   minExtent = "8 8";
+   canSave = "1";
+   visible = "1";
+   margin = "0 0 0 0";
+   padding = "0 0 0 0";
+   anchorTop = "1";
+   anchorBottom = "0";
+   anchorLeft = "1";
+   anchorRight = "0";
+   cameraZRot = "0";
+   forceFOV = "0";
+   enabled = "1";
+   helpTag = "0";
+   noCursor = "1";
+
+   new GuiBitmapCtrl(LagIcon) {
+      bitmap = "data/ui/art/lagIcon.png";
+      wrap = "0";
+      isContainer = "0";
+      Profile = "GuiDefaultProfile";
+      HorizSizing = "right";
+      VertSizing = "bottom";
+      position = "572 3";
+      Extent = "32 32";
+      MinExtent = "8 8";
+      canSave = "1";
+      Visible = "0";
+      tooltipprofile = "GuiToolTipProfile";
+      hovertime = "1000";
+      canSaveDynamicFields = "0";
+   };
+};

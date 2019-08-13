@@ -1,0 +1,471 @@
+<?xml version='1.0' encoding='utf-8'?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+    <asset>
+        <contributor>
+            <author />
+            <authoring_tool>Torque 3D 2011 Interior Exporter</authoring_tool>
+            <comments />
+        </contributor>
+        <created>15/05/2013 2:11:02 AM</created>
+        <modified>15/05/2013 2:11:02 AM</modified>
+        <revision />
+        <title />
+        <subject />
+        <keywords />
+        <unit meter="1.000000" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images>
+        <image id="DESERT_PILLAR_BODY-Diffuse" name="DESERT_PILLAR_BODY-Diffuse">
+            <init_from>DESERT_PILLAR_BODY.jpg</init_from>
+        </image>
+        <image id="DESERT_BRICK_ORNAMENT_ZAG-Diffuse" name="DESERT_BRICK_ORNAMENT_ZAG-Diffuse">
+            <init_from>DESERT_BRICK_ORNAMENT_ZAG.jpg</init_from>
+        </image>
+        <image id="DESERT_BRICK_SQUARE-Diffuse" name="DESERT_BRICK_SQUARE-Diffuse">
+            <init_from>DESERT_BRICK_SQUARE.jpg</init_from>
+        </image>
+    </library_images>
+    <library_materials>
+        <material id="DESERT_PILLAR_BODY" name="DESERT_PILLAR_BODY">
+            <instance_effect url="#DESERT_PILLAR_BODY-fx" />
+        </material>
+        <material id="DESERT_BRICK_ORNAMENT_ZAG" name="DESERT_BRICK_ORNAMENT_ZAG">
+            <instance_effect url="#DESERT_BRICK_ORNAMENT_ZAG-fx" />
+        </material>
+        <material id="DESERT_BRICK_SQUARE" name="DESERT_BRICK_SQUARE">
+            <instance_effect url="#DESERT_BRICK_SQUARE-fx" />
+        </material>
+    </library_materials>
+    <library_effects>
+        <effect id="DESERT_PILLAR_BODY-fx" name="DESERT_PILLAR_BODY-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_PILLAR_BODY-Surface"><surface type="2D"><init_from>DESERT_PILLAR_BODY-Diffuse</init_from></surface></newparam><newparam sid="DESERT_PILLAR_BODY-Sampler"><sampler2D><source>DESERT_PILLAR_BODY-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_PILLAR_BODY-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="DESERT_BRICK_ORNAMENT_ZAG-fx" name="DESERT_BRICK_ORNAMENT_ZAG-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_ORNAMENT_ZAG-Surface"><surface type="2D"><init_from>DESERT_BRICK_ORNAMENT_ZAG-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_ORNAMENT_ZAG-Sampler"><sampler2D><source>DESERT_BRICK_ORNAMENT_ZAG-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_ORNAMENT_ZAG-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="DESERT_BRICK_SQUARE-fx" name="DESERT_BRICK_SQUARE-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_SQUARE-Surface"><surface type="2D"><init_from>DESERT_BRICK_SQUARE-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_SQUARE-Sampler"><sampler2D><source>DESERT_BRICK_SQUARE-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_SQUARE-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_geometries>
+        <geometry id="bridge_structure_broken_pillar_top-lib" name="bridge_structure_broken_pillar_topMesh">
+            <mesh>
+                <source id="bridge_structure_broken_pillar_top-Position">
+                    <float_array count="252" id="bridge_structure_broken_pillar_top-Position-array">
+                        2.4120 -2.5220 0.7820
+                        2.4120 -2.5220 0.3043
+                        -2.4682 -2.5220 0.7820
+                        -2.4682 -2.5220 0.3043
+                        2.4120 2.5525 0.7820
+                        2.4120 2.5525 0.3043
+                        -2.4682 2.5525 0.7820
+                        -2.4682 2.5525 0.3043
+                        2.4120 -2.5220 -2.2509
+                        2.4120 -2.5220 -2.7286
+                        -2.4682 -2.5220 -2.2509
+                        -2.4682 -2.5220 -2.7286
+                        2.4120 2.5525 -2.2509
+                        2.4120 2.5525 -2.7286
+                        -2.4682 2.5525 -2.2509
+                        -2.4682 2.5525 -2.7286
+                        2.0122 -2.1466 0.3043
+                        2.0122 -2.1466 -2.2509
+                        -2.0685 -2.1466 0.3043
+                        -2.0685 -2.1466 -2.2509
+                        2.0122 2.1771 0.3043
+                        2.0122 2.1771 -2.2509
+                        -2.0685 2.1771 0.3043
+                        -2.0685 2.1771 -2.2509
+                        -3.4470 -2.4192 2.7286
+                        -3.4470 -2.4192 2.4678
+                        -3.4470 2.4192 2.7286
+                        -3.4470 2.4192 2.4678
+                        -3.2157 2.4192 2.4678
+                        -3.2157 -2.4192 2.4678
+                        -3.2157 -2.4192 2.7286
+                        -3.2157 2.4192 2.7286
+                        -3.0755 2.1908 2.4678
+                        -1.6284 2.1908 0.7820
+                        -1.6284 2.1908 2.4678
+                        -3.0755 -2.1423 2.4678
+                        -1.6284 -2.1423 0.7820
+                        -1.6284 -2.1423 2.4678
+                        3.0315 -2.1423 2.4678
+                        1.5844 -2.1423 0.7819
+                        1.5844 -2.1423 2.4678
+                        3.0315 2.1909 2.4678
+                        1.5844 2.1909 0.7819
+                        1.5844 2.1909 2.4678
+                        -3.2157 2.6673 2.7286
+                        -3.2157 2.6673 2.4678
+                        3.2172 2.6673 2.7286
+                        3.2172 2.6673 2.4678
+                        3.2172 -2.6673 2.7286
+                        3.2172 -2.6673 2.4678
+                        -3.2157 -2.6673 2.7286
+                        -3.2157 -2.6673 2.4678
+                        3.4471 2.4192 2.7286
+                        3.4471 2.4192 2.4678
+                        3.4471 -2.4191 2.7286
+                        3.4471 -2.4191 2.4678
+                        3.2172 2.4192 2.4678
+                        3.2172 -2.4191 2.4678
+                        3.2172 -2.4191 2.7286
+                        3.2172 2.4192 2.7286
+                        3.4472 -2.4192 2.7286
+                        3.4472 -2.4192 2.4678
+                        3.2173 -2.6673 2.7286
+                        3.2173 -2.6673 2.4678
+                        3.2173 -2.4192 2.4678
+                        3.2173 -2.4192 2.7286
+                        -3.2156 -2.6673 2.4678
+                        -3.4469 -2.4192 2.4678
+                        -3.2156 -2.6673 2.7286
+                        -3.4469 -2.4192 2.7286
+                        -3.2156 -2.4192 2.4678
+                        -3.2156 -2.4192 2.7286
+                        3.2173 2.6672 2.4678
+                        3.4472 2.4191 2.4678
+                        3.2173 2.6672 2.7286
+                        3.4472 2.4191 2.7286
+                        3.2173 2.4191 2.4678
+                        3.2173 2.4191 2.7286
+                        -3.4469 2.4191 2.7286
+                        -3.4469 2.4191 2.4678
+                        -3.2156 2.6672 2.7286
+                        -3.2156 2.6672 2.4678
+                        -3.2156 2.4191 2.4678
+                        -3.2156 2.4191 2.7286
+                    </float_array>
+                    <technique_common>
+                        <accessor count="84" source="#bridge_structure_broken_pillar_top-Position-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="bridge_structure_broken_pillar_top-Normal">
+                    <float_array count="36" id="bridge_structure_broken_pillar_top-Normal-array">
+                        0.0000 -1.0000 0.0000
+                        1.0000 0.0000 0.0000
+                        0.0000 1.0000 0.0000
+                        -1.0000 -0.0000 -0.0000
+                        0.0000 0.0000 -1.0000
+                        0.0000 0.0000 1.0000
+                        -0.7588 0.0000 -0.6513
+                        0.7588 0.0000 -0.6513
+                        0.7335 -0.6797 0.0000
+                        -0.7314 -0.6820 0.0000
+                        0.7335 0.6797 0.0000
+                        -0.7314 0.6820 0.0000
+                    </float_array>
+                    <technique_common>
+                        <accessor count="12" source="#bridge_structure_broken_pillar_top-Normal-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="bridge_structure_broken_pillar_top-UV0">
+                    <float_array count="232" id="bridge_structure_broken_pillar_top-UV0-array">
+                        0.0020 -1.4525
+                        0.0554 -1.4525
+                        0.0020 -1.9981
+                        0.0554 -1.9981
+                        0.9446 -1.0288
+                        0.9980 -1.0288
+                        0.9446 -1.4485
+                        0.9980 -1.4485
+                        0.1160 -1.9981
+                        0.0626 -1.9981
+                        0.1160 -1.4525
+                        0.0626 -1.4525
+                        0.9385 -1.4485
+                        0.8851 -1.4485
+                        0.9385 -1.0288
+                        0.8851 -1.0288
+                        0.5427 -1.9981
+                        0.1230 -1.9981
+                        0.5427 -1.4525
+                        0.1230 -1.4525
+                        0.5498 -1.4525
+                        0.9695 -1.4525
+                        0.5498 -1.9981
+                        0.9695 -1.9981
+                        -0.3720 -1.2447
+                        -0.3186 -1.2447
+                        -0.3720 -1.7903
+                        -0.3186 -1.7903
+                        0.5706 -0.8211
+                        0.6240 -0.8211
+                        0.5706 -1.2407
+                        0.6240 -1.2407
+                        -0.2580 -1.7903
+                        -0.3114 -1.7903
+                        -0.2580 -1.2447
+                        -0.3114 -1.2447
+                        0.5645 -1.2407
+                        0.5111 -1.2407
+                        0.5645 -0.8211
+                        0.5111 -0.8211
+                        0.1687 -1.7903
+                        -0.3206 -1.7903
+                        0.1687 -1.2447
+                        -0.3206 -1.2447
+                        0.1759 -1.2447
+                        0.5955 -1.2447
+                        0.1759 -1.7903
+                        0.5955 -1.7903
+                        1.2549 -1.0008
+                        1.2549 -1.9993
+                        0.5027 -1.0008
+                        0.5027 -1.9993
+                        2.0052 -1.0007
+                        2.0053 -1.9992
+                        -0.2480 -1.0007
+                        -0.2480 -1.9992
+                        -1.0032 -1.0007
+                        -1.0032 -1.9992
+                        -1.7079 1.4547
+                        -1.7079 1.3871
+                        -2.7921 1.4547
+                        -2.7921 1.3871
+                        0.7305 0.3469
+                        0.7305 -0.3821
+                        0.7653 0.3469
+                        0.7653 -0.3821
+                        -0.4987 -0.5073
+                        0.0047 -0.9986
+                        -0.4987 -0.9986
+                        -1.9934 -2.4974
+                        -1.5016 -2.4974
+                        -1.9934 -2.9976
+                        -1.5016 -2.9976
+                        -0.4987 -2.4849
+                        0.0047 -1.9936
+                        -0.4987 -1.9936
+                        2.7028 1.4547
+                        2.7028 1.3871
+                        1.1463 1.4548
+                        1.1463 1.3872
+                        -0.0801 1.4548
+                        -0.0801 1.3872
+                        -1.6366 1.4547
+                        -1.6366 1.3871
+                        0.7653 0.3843
+                        0.7653 -0.4194
+                        1.7345 0.3843
+                        1.7345 -0.4194
+                        1.0752 1.4548
+                        1.0752 1.3872
+                        -0.0090 1.4548
+                        -0.0090 1.3872
+                        1.7343 0.3469
+                        1.7343 -0.3821
+                        1.7692 0.3469
+                        1.7692 -0.3821
+                        -0.4978 -0.9986
+                        -0.4978 -1.9936
+                        -0.0090 1.3875
+                        -0.0803 1.4548
+                        -0.0803 1.3875
+                        1.7343 -0.4194
+                        -1.6363 1.3874
+                        -1.7076 1.3874
+                        -1.6363 1.4547
+                        -1.7076 1.4547
+                        0.7657 -0.3821
+                        0.7308 -0.3821
+                        0.7657 -0.4194
+                        1.1465 1.3875
+                        1.0752 1.3875
+                        1.1465 1.4548
+                        1.7343 0.3843
+                        2.7738 1.4548
+                        2.7738 1.3875
+                        2.7029 1.3875
+</float_array>
+                    <technique_common>
+                        <accessor count="116" source="#bridge_structure_broken_pillar_top-UV0-array" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="bridge_structure_broken_pillar_top-Vertex">
+                    <input semantic="POSITION" source="#bridge_structure_broken_pillar_top-Position" />
+                </vertices>
+                <triangles count="60" material="DESERT_PILLAR_BODY">
+                    <input offset="0" semantic="VERTEX" source="#bridge_structure_broken_pillar_top-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#bridge_structure_broken_pillar_top-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#bridge_structure_broken_pillar_top-UV0" />
+                    <p>
+                        3 0 3 1 0 1 0 0 0
+                        2 0 2 3 0 3 0 0 0
+                        1 1 7 5 1 5 4 1 4
+                        0 1 6 1 1 7 4 1 4
+                        5 2 11 7 2 9 6 2 8
+                        4 2 10 5 2 11 6 2 8
+                        7 3 15 3 3 13 2 3 12
+                        6 3 14 7 3 15 2 3 12
+                        7 4 19 5 4 17 1 4 16
+                        3 4 18 7 4 19 1 4 16
+                        2 5 23 0 5 21 4 5 20
+                        6 5 22 2 5 23 4 5 20
+                        11 0 27 9 0 25 8 0 24
+                        10 0 26 11 0 27 8 0 24
+                        9 1 31 13 1 29 12 1 28
+                        8 1 30 9 1 31 12 1 28
+                        13 2 35 15 2 33 14 2 32
+                        12 2 34 13 2 35 14 2 32
+                        15 3 39 11 3 37 10 3 36
+                        14 3 38 15 3 39 10 3 36
+                        15 4 43 13 4 41 9 4 40
+                        11 4 42 15 4 43 9 4 40
+                        10 5 47 8 5 45 12 5 44
+                        14 5 46 10 5 47 12 5 44
+                        27 3 61 25 3 59 24 3 58
+                        26 3 60 27 3 61 24 3 58
+                        29 4 65 25 4 63 27 4 62
+                        28 4 64 29 4 65 27 4 62
+                        31 5 64 26 5 62 24 5 63
+                        30 5 65 31 5 64 24 5 63
+                        47 2 79 45 2 77 44 2 76
+                        46 2 78 47 2 79 44 2 76
+                        51 0 83 49 0 81 48 0 80
+                        50 0 82 51 0 83 48 0 80
+                        49 4 87 51 4 85 45 4 84
+                        47 4 86 49 4 87 45 4 84
+                        46 5 86 44 5 84 50 5 85
+                        48 5 87 46 5 86 50 5 85
+                        55 1 91 53 1 89 52 1 88
+                        54 1 90 55 1 91 52 1 88
+                        55 4 95 57 4 93 56 4 92
+                        53 4 94 55 4 95 56 4 92
+                        52 5 94 59 5 92 58 5 93
+                        54 5 95 52 5 94 58 5 93
+                        63 8 100 61 8 98 60 8 90
+                        62 8 99 63 8 100 60 8 90
+                        63 4 101 64 4 93 61 4 95
+                        65 5 93 62 5 101 60 5 95
+                        69 9 105 67 9 103 66 9 102
+                        68 9 104 69 9 105 66 9 102
+                        66 4 108 67 4 107 70 4 106
+                        71 5 106 69 5 107 68 5 108
+                        75 10 88 73 10 110 72 10 109
+                        74 10 111 75 10 88 72 10 109
+                        72 4 112 73 4 94 76 4 92
+                        77 5 92 75 5 94 74 5 112
+                        81 11 115 79 11 114 78 11 113
+                        80 11 76 81 11 115 78 11 113
+                        81 4 84 82 4 64 79 4 62
+                        83 5 64 80 5 84 78 5 62
+                    </p>
+                </triangles>
+                <triangles count="8" material="DESERT_BRICK_ORNAMENT_ZAG">
+                    <input offset="0" semantic="VERTEX" source="#bridge_structure_broken_pillar_top-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#bridge_structure_broken_pillar_top-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#bridge_structure_broken_pillar_top-UV0" />
+                    <p>
+                        19 0 51 17 0 49 16 0 48
+                        18 0 50 19 0 51 16 0 48
+                        17 1 49 21 1 53 20 1 52
+                        16 1 48 17 1 49 20 1 52
+                        21 2 57 23 2 55 22 2 54
+                        20 2 56 21 2 57 22 2 54
+                        23 3 55 19 3 51 18 3 50
+                        22 3 54 23 3 55 18 3 50
+                    </p>
+                </triangles>
+                <triangles count="12" material="DESERT_BRICK_SQUARE">
+                    <input offset="0" semantic="VERTEX" source="#bridge_structure_broken_pillar_top-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#bridge_structure_broken_pillar_top-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#bridge_structure_broken_pillar_top-UV0" />
+                    <p>
+                        34 2 68 33 2 67 32 2 66
+                        33 6 72 36 6 70 35 6 69
+                        32 6 71 33 6 72 35 6 69
+                        35 0 66 36 0 67 37 0 68
+                        40 0 75 39 0 74 38 0 73
+                        39 7 72 42 7 70 41 7 69
+                        38 7 71 39 7 72 41 7 69
+                        41 2 73 42 2 74 43 2 75
+                        42 2 74 33 2 67 34 2 96
+                        43 2 97 42 2 74 34 2 96
+                        36 0 67 39 0 74 40 0 97
+                        37 0 96 36 0 67 40 0 97
+                    </p>
+                </triangles>
+            </mesh>
+        </geometry>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="bridge_structure_broken_pillar_top" name="bridge_structure_broken_pillar_top">
+                <instance_geometry url="#bridge_structure_broken_pillar_top-lib">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="DESERT_PILLAR_BODY" target="#DESERT_PILLAR_BODY" />
+                            <instance_material symbol="DESERT_BRICK_ORNAMENT_ZAG" target="#DESERT_BRICK_ORNAMENT_ZAG" />
+                            <instance_material symbol="DESERT_BRICK_SQUARE" target="#DESERT_BRICK_SQUARE" />
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>
