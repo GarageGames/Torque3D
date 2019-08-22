@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -487,12 +487,12 @@ KMSDRM_MoveCursor(SDL_Cursor * cursor)
        That's why we move the cursor graphic ONLY. */
     if (mouse != NULL && mouse->cur_cursor != NULL && mouse->cur_cursor->driverdata != NULL) {
         curdata = (KMSDRM_CursorData *) mouse->cur_cursor->driverdata;
-	drm_fd = KMSDRM_gbm_device_get_fd(KMSDRM_gbm_bo_get_device(curdata->bo));
-	ret = KMSDRM_drmModeMoveCursor(drm_fd, curdata->crtc_id, mouse->x, mouse->y);
+        drm_fd = KMSDRM_gbm_device_get_fd(KMSDRM_gbm_bo_get_device(curdata->bo));
+        ret = KMSDRM_drmModeMoveCursor(drm_fd, curdata->crtc_id, mouse->x, mouse->y);
 
-	if (ret) {
-	    SDL_SetError("drmModeMoveCursor() failed.");
-	}
+        if (ret) {
+            SDL_SetError("drmModeMoveCursor() failed.");
+        }
     }
 }
 

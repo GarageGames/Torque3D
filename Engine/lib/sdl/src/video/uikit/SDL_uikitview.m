@@ -1,6 +1,6 @@
  /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -39,8 +39,8 @@ extern int SDL_AppleTVRemoteOpenedAsJoystick;
 @implementation SDL_uikitview {
     SDL_Window *sdlwindow;
 
-    SDL_TouchID touchId;
-    UITouch * __weak firstFingerDown;
+    SDL_TouchID directTouchId;
+    SDL_TouchID indirectTouchId;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -68,12 +68,13 @@ extern int SDL_AppleTVRemoteOpenedAsJoystick;
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         self.autoresizesSubviews = YES;
 
+        directTouchId = 1;
+        indirectTouchId = 2;
+
 #if !TARGET_OS_TV
         self.multipleTouchEnabled = YES;
+        SDL_AddTouch(directTouchId, SDL_TOUCH_DEVICE_DIRECT, "");
 #endif
-
-        touchId = 1;
-        SDL_AddTouch(touchId, "");
     }
 
     return self;
@@ -135,6 +136,30 @@ extern int SDL_AppleTVRemoteOpenedAsJoystick;
     sdlwindow = window;
 }
 
+- (SDL_TouchDeviceType)touchTypeForTouch:(UITouch *)touch
+{
+#ifdef __IPHONE_9_0
+    if ([touch respondsToSelector:@selector((type))]) {
+        if (touch.type == UITouchTypeIndirect) {
+            return SDL_TOUCH_DEVICE_INDIRECT_RELATIVE;
+        }
+    }
+#endif
+
+    return SDL_TOUCH_DEVICE_DIRECT;
+}
+
+- (SDL_TouchID)touchIdForType:(SDL_TouchDeviceType)type
+{
+    switch (type) {
+        case SDL_TOUCH_DEVICE_DIRECT:
+        default:
+            return directTouchId;
+        case SDL_TOUCH_DEVICE_INDIRECT_RELATIVE:
+            return indirectTouchId;
+    }
+}
+
 - (CGPoint)touchLocation:(UITouch *)touch shouldNormalize:(BOOL)normalize
 {
     CGPoint point = [touch locationInView:self];
@@ -162,20 +187,15 @@ extern int SDL_AppleTVRemoteOpenedAsJoystick;
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     for (UITouch *touch in touches) {
+        SDL_TouchDeviceType touchType = [self touchTypeForTouch:touch];
+        SDL_TouchID touchId = [self touchIdForType:touchType];
         float pressure = [self pressureForTouch:touch];
 
-        if (!firstFingerDown) {
-            CGPoint locationInView = [self touchLocation:touch shouldNormalize:NO];
-            int clicks = (int) touch.tapCount;
-
-            /* send mouse moved event */
-            SDL_SendMouseMotion(sdlwindow, SDL_TOUCH_MOUSEID, 0, locationInView.x, locationInView.y);
-
-            /* send mouse down event */
-            SDL_SendMouseButtonClicks(sdlwindow, SDL_TOUCH_MOUSEID, SDL_PRESSED, SDL_BUTTON_LEFT, clicks);
-
-            firstFingerDown = touch;
+        if (SDL_AddTouch(touchId, touchType, "") < 0) {
+            continue;
         }
+
+        /* FIXME, need to send: int clicks = (int) touch.tapCount; ? */
 
         CGPoint locationInView = [self touchLocation:touch shouldNormalize:YES];
         SDL_SendTouch(touchId, (SDL_FingerID)((size_t)touch),
@@ -186,14 +206,15 @@ extern int SDL_AppleTVRemoteOpenedAsJoystick;
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     for (UITouch *touch in touches) {
+        SDL_TouchDeviceType touchType = [self touchTypeForTouch:touch];
+        SDL_TouchID touchId = [self touchIdForType:touchType];
         float pressure = [self pressureForTouch:touch];
 
-        if (touch == firstFingerDown) {
-            /* send mouse up */
-            int clicks = (int) touch.tapCount;
-            SDL_SendMouseButtonClicks(sdlwindow, SDL_TOUCH_MOUSEID, SDL_RELEASED, SDL_BUTTON_LEFT, clicks);
-            firstFingerDown = nil;
+        if (SDL_AddTouch(touchId, touchType, "") < 0) {
+            continue;
         }
+
+        /* FIXME, need to send: int clicks = (int) touch.tapCount; ? */
 
         CGPoint locationInView = [self touchLocation:touch shouldNormalize:YES];
         SDL_SendTouch(touchId, (SDL_FingerID)((size_t)touch),
@@ -209,13 +230,12 @@ extern int SDL_AppleTVRemoteOpenedAsJoystick;
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
     for (UITouch *touch in touches) {
+        SDL_TouchDeviceType touchType = [self touchTypeForTouch:touch];
+        SDL_TouchID touchId = [self touchIdForType:touchType];
         float pressure = [self pressureForTouch:touch];
 
-        if (touch == firstFingerDown) {
-            CGPoint locationInView = [self touchLocation:touch shouldNormalize:NO];
-
-            /* send moved event */
-            SDL_SendMouseMotion(sdlwindow, SDL_TOUCH_MOUSEID, 0, locationInView.x, locationInView.y);
+        if (SDL_AddTouch(touchId, touchType, "") < 0) {
+            continue;
         }
 
         CGPoint locationInView = [self touchLocation:touch shouldNormalize:YES];
@@ -252,34 +272,34 @@ extern int SDL_AppleTVRemoteOpenedAsJoystick;
 
 - (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
 {
-	if (!SDL_AppleTVRemoteOpenedAsJoystick) {
-    	for (UIPress *press in presses) {
-        	SDL_Scancode scancode = [self scancodeFromPressType:press.type];
-        	SDL_SendKeyboardKey(SDL_PRESSED, scancode);
-    	}
-	}
+    if (!SDL_AppleTVRemoteOpenedAsJoystick) {
+        for (UIPress *press in presses) {
+            SDL_Scancode scancode = [self scancodeFromPressType:press.type];
+            SDL_SendKeyboardKey(SDL_PRESSED, scancode);
+        }
+    }
     [super pressesBegan:presses withEvent:event];
 }
 
 - (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
 {
-	if (!SDL_AppleTVRemoteOpenedAsJoystick) {
-		for (UIPress *press in presses) {
-			SDL_Scancode scancode = [self scancodeFromPressType:press.type];
-			SDL_SendKeyboardKey(SDL_RELEASED, scancode);
-		}
-	}
+    if (!SDL_AppleTVRemoteOpenedAsJoystick) {
+        for (UIPress *press in presses) {
+            SDL_Scancode scancode = [self scancodeFromPressType:press.type];
+            SDL_SendKeyboardKey(SDL_RELEASED, scancode);
+        }
+    }
     [super pressesEnded:presses withEvent:event];
 }
 
 - (void)pressesCancelled:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
 {
-	if (!SDL_AppleTVRemoteOpenedAsJoystick) {
-		for (UIPress *press in presses) {
-			SDL_Scancode scancode = [self scancodeFromPressType:press.type];
-			SDL_SendKeyboardKey(SDL_RELEASED, scancode);
-		}
-	}
+    if (!SDL_AppleTVRemoteOpenedAsJoystick) {
+        for (UIPress *press in presses) {
+            SDL_Scancode scancode = [self scancodeFromPressType:press.type];
+            SDL_SendKeyboardKey(SDL_RELEASED, scancode);
+        }
+    }
     [super pressesCancelled:presses withEvent:event];
 }
 

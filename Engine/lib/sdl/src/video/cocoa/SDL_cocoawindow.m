@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -54,6 +54,9 @@
 
 #define FULLSCREEN_MASK (SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_FULLSCREEN)
 
+#ifndef MAC_OS_X_VERSION_10_12
+#define NSEventModifierFlagCapsLock NSAlphaShiftKeyMask
+#endif
 
 @interface SDLWindow : NSWindow <NSDraggingDestination>
 /* These are needed for borderless/fullscreen windows */
@@ -224,6 +227,16 @@ static void ConvertNSRect(NSScreen *screen, BOOL fullscreen, NSRect *r)
 static void
 ScheduleContextUpdates(SDL_WindowData *data)
 {
+    if (!data || !data->nscontexts) {
+        return;
+    }
+
+    /* We still support OpenGL as long as Apple offers it, deprecated or not, so disable deprecation warnings about it. */
+    #ifdef __clang__
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    #endif
+
     NSOpenGLContext *currentContext = [NSOpenGLContext currentContext];
     NSMutableArray *contexts = data->nscontexts;
     @synchronized (contexts) {
@@ -235,13 +248,17 @@ ScheduleContextUpdates(SDL_WindowData *data)
             }
         }
     }
+
+    #ifdef __clang__
+    #pragma clang diagnostic pop
+    #endif
 }
 
 /* !!! FIXME: this should use a hint callback. */
 static int
 GetHintCtrlClickEmulateRightClick()
 {
-	return SDL_GetHintBoolean(SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK, SDL_FALSE);
+    return SDL_GetHintBoolean(SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK, SDL_FALSE);
 }
 
 static NSUInteger
@@ -618,7 +635,7 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
         y = (int)(window->h - point.y);
 
         if (x >= 0 && x < window->w && y >= 0 && y < window->h) {
-            SDL_SendMouseMotion(window, 0, 0, x, y);
+            SDL_SendMouseMotion(window, mouse->mouseID, 0, x, y);
         }
     }
 
@@ -835,14 +852,31 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
     }
 }
 
-
-/* We'll respond to key events by doing nothing so we don't beep.
+/* We'll respond to key events by mostly doing nothing so we don't beep.
  * We could handle key messages here, but we lose some in the NSApp dispatch,
  * where they get converted to action messages, etc.
  */
 - (void)flagsChanged:(NSEvent *)theEvent
 {
     /*Cocoa_HandleKeyEvent(SDL_GetVideoDevice(), theEvent);*/
+
+    /* Catch capslock in here as a special case:
+       https://developer.apple.com/library/archive/qa/qa1519/_index.html
+       Note that technote's check of keyCode doesn't work. At least on the
+       10.15 beta, capslock comes through here as keycode 255, but it's safe
+       to send duplicate key events; SDL filters them out quickly in
+       SDL_SendKeyboardKey(). */
+
+    /* Also note that SDL_SendKeyboardKey expects all capslock events to be
+       keypresses; it won't toggle the mod state if you send a keyrelease.  */
+    const SDL_bool osenabled = ([theEvent modifierFlags] & NSEventModifierFlagCapsLock) ? SDL_TRUE : SDL_FALSE;
+    const SDL_bool sdlenabled = (SDL_GetModState() & KMOD_CAPS) ? SDL_TRUE : SDL_FALSE;
+    if (!osenabled && sdlenabled) {
+        SDL_ToggleModState(KMOD_CAPS, SDL_FALSE);
+        SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_CAPSLOCK);
+    } else if (osenabled && !sdlenabled) {
+        SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_CAPSLOCK);
+    }
 }
 - (void)keyDown:(NSEvent *)theEvent
 {
@@ -889,6 +923,12 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
+    const SDL_Mouse *mouse = SDL_GetMouse();
+    if (!mouse) {
+        return;
+    }
+
+    const SDL_MouseID mouseID = mouse->mouseID;
     int button;
     int clicks;
 
@@ -908,7 +948,7 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
     switch ([theEvent buttonNumber]) {
     case 0:
         if (([theEvent modifierFlags] & NSEventModifierFlagControl) &&
-		    GetHintCtrlClickEmulateRightClick()) {
+            GetHintCtrlClickEmulateRightClick()) {
             wasCtrlLeft = YES;
             button = SDL_BUTTON_RIGHT;
         } else {
@@ -928,7 +968,8 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
     }
 
     clicks = (int) [theEvent clickCount];
-    SDL_SendMouseButtonClicks(_data->window, 0, SDL_PRESSED, button, clicks);
+
+    SDL_SendMouseButtonClicks(_data->window, mouseID, SDL_PRESSED, button, clicks);
 }
 
 - (void)rightMouseDown:(NSEvent *)theEvent
@@ -943,6 +984,12 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
+    const SDL_Mouse *mouse = SDL_GetMouse();
+    if (!mouse) {
+        return;
+    }
+
+    const SDL_MouseID mouseID = mouse->mouseID;
     int button;
     int clicks;
 
@@ -972,7 +1019,8 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
     }
 
     clicks = (int) [theEvent clickCount];
-    SDL_SendMouseButtonClicks(_data->window, 0, SDL_RELEASED, button, clicks);
+
+    SDL_SendMouseButtonClicks(_data->window, mouseID, SDL_RELEASED, button, clicks);
 }
 
 - (void)rightMouseUp:(NSEvent *)theEvent
@@ -988,6 +1036,11 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
 - (void)mouseMoved:(NSEvent *)theEvent
 {
     SDL_Mouse *mouse = SDL_GetMouse();
+    if (!mouse) {
+        return;
+    }
+
+    const SDL_MouseID mouseID = mouse->mouseID;
     SDL_Window *window = _data->window;
     NSPoint point;
     int x, y;
@@ -1035,7 +1088,8 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
 #endif
         }
     }
-    SDL_SendMouseMotion(window, 0, 0, x, y);
+
+    SDL_SendMouseMotion(window, mouseID, 0, x, y);
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent
@@ -1060,7 +1114,12 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
 
 - (void)touchesBeganWithEvent:(NSEvent *) theEvent
 {
+    /* probably a MacBook trackpad; make this look like a synthesized event.
+       This is backwards from reality, but better matches user expectations. */
+    const BOOL istrackpad = ([theEvent subtype] == NSEventSubtypeMouseEvent);
+
     NSSet *touches = [theEvent touchesMatchingPhase:NSTouchPhaseAny inView:nil];
+    const SDL_TouchID touchID = istrackpad ? SDL_MOUSE_TOUCHID : (SDL_TouchID)(intptr_t)[[touches anyObject] device];
     int existingTouchCount = 0;
 
     for (NSTouch* touch in touches) {
@@ -1069,7 +1128,6 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
         }
     }
     if (existingTouchCount == 0) {
-        SDL_TouchID touchID = (SDL_TouchID)(intptr_t)[[touches anyObject] device];
         int numFingers = SDL_GetNumTouchFingers(touchID);
         DLog("Reset Lost Fingers: %d", numFingers);
         for (--numFingers; numFingers >= 0; --numFingers) {
@@ -1101,9 +1159,23 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
 {
     NSSet *touches = [theEvent touchesMatchingPhase:phase inView:nil];
 
+    /* probably a MacBook trackpad; make this look like a synthesized event.
+       This is backwards from reality, but better matches user expectations. */
+    const BOOL istrackpad = ([theEvent subtype] == NSEventSubtypeMouseEvent);
+
     for (NSTouch *touch in touches) {
-        const SDL_TouchID touchId = (SDL_TouchID)(intptr_t)[touch device];
-        if (SDL_AddTouch(touchId, "") < 0) {
+        const SDL_TouchID touchId = istrackpad ? SDL_MOUSE_TOUCHID : (SDL_TouchID)(intptr_t)[touch device];
+        SDL_TouchDeviceType devtype = SDL_TOUCH_DEVICE_INDIRECT_ABSOLUTE;
+
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 101202 /* Added in the 10.12.2 SDK. */
+        if ([touch respondsToSelector:@selector(type)]) {
+            if ([touch type] == NSTouchTypeDirect) {
+                devtype = SDL_TOUCH_DEVICE_DIRECT;
+            }
+        }
+#endif
+
+        if (SDL_AddTouch(touchId, devtype, "") < 0) {
             return;
         }
 
@@ -1143,14 +1215,18 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
 - (BOOL)mouseDownCanMoveWindow;
 - (void)drawRect:(NSRect)dirtyRect;
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent;
+- (BOOL)wantsUpdateLayer;
+- (void)updateLayer;
 @end
 
 @implementation SDLView
+
 - (void)setSDLWindow:(SDL_Window*)window
 {
     _sdlWindow = window;
 }
 
+/* this is used on older macOS revisions. 10.8 and later use updateLayer. */
 - (void)drawRect:(NSRect)dirtyRect
 {
     /* Force the graphics context to clear to black so we don't get a flash of
@@ -1158,6 +1234,21 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
        only gets called for window creation and other extraordinary events. */
     [[NSColor blackColor] setFill];
     NSRectFill(dirtyRect);
+    SDL_SendWindowEvent(_sdlWindow, SDL_WINDOWEVENT_EXPOSED, 0, 0);
+}
+
+-(BOOL) wantsUpdateLayer
+{
+    return YES;
+}
+
+-(void) updateLayer
+{
+    /* Force the graphics context to clear to black so we don't get a flash of
+       white until the app is ready to draw. In practice on modern macOS, this
+       only gets called for window creation and other extraordinary events. */
+    self.layer.backgroundColor = CGColorGetConstantColor(kCGColorBlack);
+    ScheduleContextUpdates((SDL_WindowData *) _sdlWindow->driverdata);
     SDL_SendWindowEvent(_sdlWindow, SDL_WINDOWEVENT_EXPOSED, 0, 0);
 }
 
@@ -1215,6 +1306,11 @@ SetupWindowData(_THIS, SDL_Window * window, NSWindow *nswindow, SDL_bool created
     data->created = created;
     data->videodata = videodata;
     data->nscontexts = [[NSMutableArray alloc] init];
+
+    /* Only store this for windows created by us since the content view might
+     * get replaced from under us otherwise, and we only need it when the
+     * window is guaranteed to be created by us (OpenGL contexts). */
+    data->sdlContentView = created ? [nswindow contentView] : nil;
 
     /* Create an event listener for the window */
     data->listener = [[Cocoa_WindowListener alloc] init];
@@ -1323,6 +1419,13 @@ Cocoa_CreateWindow(_THIS, SDL_Window * window)
         return SDL_SetError("%s", [[e reason] UTF8String]);
     }
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 101200 /* Added in the 10.12.0 SDK. */
+    /* By default, don't allow users to make our window tabbed in 10.12 or later */
+    if ([nswindow respondsToSelector:@selector(setTabbingMode:)]) {
+        [nswindow setTabbingMode:NSWindowTabbingModeDisallowed];
+    }
+#endif
+
     if (videodata->allow_spaces) {
         SDL_assert(floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6);
         SDL_assert([nswindow respondsToSelector:@selector(toggleFullScreen:)]);
@@ -1338,11 +1441,20 @@ Cocoa_CreateWindow(_THIS, SDL_Window * window)
     SDLView *contentView = [[SDLView alloc] initWithFrame:rect];
     [contentView setSDLWindow:window];
 
+    /* We still support OpenGL as long as Apple offers it, deprecated or not, so disable deprecation warnings about it. */
+    #ifdef __clang__
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    #endif
     if (window->flags & SDL_WINDOW_ALLOW_HIGHDPI) {
         if ([contentView respondsToSelector:@selector(setWantsBestResolutionOpenGLSurface:)]) {
             [contentView setWantsBestResolutionOpenGLSurface:YES];
         }
     }
+    #ifdef __clang__
+    #pragma clang diagnostic pop
+    #endif
+
 #if SDL_VIDEO_OPENGL_ES2
 #if SDL_VIDEO_OPENGL_EGL
     if ((window->flags & SDL_WINDOW_OPENGL) &&
@@ -1353,9 +1465,6 @@ Cocoa_CreateWindow(_THIS, SDL_Window * window)
 #endif /* SDL_VIDEO_OPENGL_ES2 */
     [nswindow setContentView:contentView];
     [contentView release];
-
-    /* Allow files and folders to be dragged onto the window by users */
-    [nswindow registerForDraggedTypes:[NSArray arrayWithObject:(NSString *)kUTTypeFileURL]];
 
     if (SetupWindowData(_this, window, nswindow, SDL_TRUE) < 0) {
         [nswindow release];
@@ -1778,6 +1887,8 @@ Cocoa_DestroyWindow(_THIS, SDL_Window * window)
         [data->listener close];
         [data->listener release];
         if (data->created) {
+            /* Release the content view to avoid further updateLayer callbacks */
+            [data->nswindow setContentView:nil];
             [data->nswindow close];
         }
 
@@ -1862,6 +1973,17 @@ int
 Cocoa_SetWindowHitTest(SDL_Window * window, SDL_bool enabled)
 {
     return 0;  /* just succeed, the real work is done elsewhere. */
+}
+
+void
+Cocoa_AcceptDragAndDrop(SDL_Window * window, SDL_bool accept)
+{
+    SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
+    if (accept) {
+        [data->nswindow registerForDraggedTypes:[NSArray arrayWithObject:(NSString *)kUTTypeFileURL]];
+    } else {
+        [data->nswindow unregisterDraggedTypes];
+    }
 }
 
 int

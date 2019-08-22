@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,11 +26,22 @@
 
 #include <stdio.h>
 
-#define VIDEO_USAGE \
-"[--video driver] [--renderer driver] [--gldebug] [--info all|video|modes|render|event] [--log all|error|system|audio|video|render|input] [--display N] [--fullscreen | --fullscreen-desktop | --windows N] [--title title] [--icon icon.bmp] [--center | --position X,Y] [--geometry WxH] [--min-geometry WxH] [--max-geometry WxH] [--logical WxH] [--scale N] [--depth N] [--refresh R] [--vsync] [--noframe] [--resize] [--minimize] [--maximize] [--grab] [--allow-highdpi]"
+static const char *video_usage[] = {
+    "[--video driver]", "[--renderer driver]", "[--gldebug]",
+    "[--info all|video|modes|render|event]",
+    "[--log all|error|system|audio|video|render|input]", "[--display N]",
+    "[--fullscreen | --fullscreen-desktop | --windows N]", "[--title title]",
+    "[--icon icon.bmp]", "[--center | --position X,Y]", "[--geometry WxH]",
+    "[--min-geometry WxH]", "[--max-geometry WxH]", "[--logical WxH]",
+    "[--scale N]", "[--depth N]", "[--refresh R]", "[--vsync]", "[--noframe]",
+    "[--resize]", "[--minimize]", "[--maximize]", "[--grab]",
+    "[--allow-highdpi]"
+};
 
-#define AUDIO_USAGE \
-"[--rate N] [--format U8|S8|U16|U16LE|U16BE|S16|S16LE|S16BE] [--channels N] [--samples N]"
+static const char *audio_usage[] = {
+    "[--rate N]", "[--format U8|S8|U16|U16LE|U16BE|S16|S16LE|S16BE]",
+    "[--channels N]", "[--samples N]"
+};
 
 static void SDL_snprintfcat(SDL_OUT_Z_CAP(maxlen) char *text, size_t maxlen, SDL_PRINTF_FORMAT_STRING const char *fmt, ... )
 {
@@ -474,19 +485,46 @@ SDLTest_CommonArg(SDLTest_CommonState * state, int index)
     return 0;
 }
 
-const char *
-SDLTest_CommonUsage(SDLTest_CommonState * state)
+void
+SDLTest_CommonLogUsage(SDLTest_CommonState * state, const char *argv0, const char **options)
 {
-    switch (state->flags & (SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
-    case SDL_INIT_VIDEO:
-        return "[--trackmem] " VIDEO_USAGE;
-    case SDL_INIT_AUDIO:
-        return "[--trackmem] " AUDIO_USAGE;
-    case (SDL_INIT_VIDEO | SDL_INIT_AUDIO):
-        return "[--trackmem] " VIDEO_USAGE " " AUDIO_USAGE;
-    default:
-        return "[--trackmem]";
+    int i;
+
+    SDL_Log("USAGE: %s", argv0);
+    SDL_Log("    %s", "[--trackmem]");
+
+    if (state->flags & SDL_INIT_VIDEO) {
+        for (i = 0; i < SDL_arraysize(video_usage); i++) {
+            SDL_Log("    %s", video_usage[i]);
+        }
     }
+
+    if (state->flags & SDL_INIT_AUDIO) {
+        for (i = 0; i < SDL_arraysize(audio_usage); i++) {
+            SDL_Log("    %s", audio_usage[i]);
+        }
+    }
+
+    if (options) {
+        for (i = 0; options[i] != NULL; i++) {
+            SDL_Log("    %s", options[i]);
+        }
+    }
+}
+
+SDL_bool
+SDLTest_CommonDefaultArgs(SDLTest_CommonState *state, const int argc, char **argv)
+{
+    int i = 1;
+    while (i < argc) {
+        const int consumed = SDLTest_CommonArg(state, i);
+        if (consumed == 0) {
+            SDLTest_CommonLogUsage(state, argv[0], NULL);
+            return SDL_FALSE;
+        }
+        i += consumed;
+    }
+    return SDL_TRUE;
 }
 
 static void
@@ -999,7 +1037,7 @@ SDLTest_CommonInit(SDLTest_CommonState * state)
                 }
                 if (state->logical_w && state->logical_h) {
                     SDL_RenderSetLogicalSize(state->renderers[i], state->logical_w, state->logical_h);
-                } else if (state->scale) {
+                } else if (state->scale != 0.) {
                     SDL_RenderSetScale(state->renderers[i], state->scale, state->scale);
                 }
                 if (state->verbose & VERBOSE_RENDER) {
@@ -1046,6 +1084,22 @@ SDLTest_CommonInit(SDLTest_CommonState * state)
     }
 
     return SDL_TRUE;
+}
+
+static const char *
+DisplayOrientationName(int orientation)
+{
+    switch (orientation)
+    {
+#define CASE(X) case SDL_ORIENTATION_##X: return #X
+        CASE(UNKNOWN);
+        CASE(LANDSCAPE);
+        CASE(LANDSCAPE_FLIPPED);
+        CASE(PORTRAIT);
+        CASE(PORTRAIT_FLIPPED);
+#undef CASE
+default: return "???";
+    }
 }
 
 static const char *
@@ -1102,6 +1156,17 @@ SDLTest_PrintEvent(SDL_Event * event)
     }
 
     switch (event->type) {
+    case SDL_DISPLAYEVENT:
+        switch (event->display.event) {
+        case SDL_DISPLAYEVENT_ORIENTATION:
+            SDL_Log("SDL EVENT: Display %d changed orientation to %s", event->display.display, DisplayOrientationName(event->display.data1));
+            break;
+        default:
+            SDL_Log("SDL EVENT: Display %d got unknown event 0x%4.4x",
+                    event->display.display, event->display.event);
+            break;
+        }
+        break;
     case SDL_WINDOWEVENT:
         switch (event->window.event) {
         case SDL_WINDOWEVENT_SHOWN:
@@ -1349,7 +1414,18 @@ SDLTest_PrintEvent(SDL_Event * event)
     case SDL_APP_DIDENTERFOREGROUND:
         SDL_Log("SDL EVENT: App entered the foreground");
         break;
-
+    case SDL_DROPBEGIN:
+        SDL_Log("SDL EVENT: Drag and drop beginning");
+        break;
+    case SDL_DROPFILE:
+        SDL_Log("SDL EVENT: Drag and drop file: '%s'", event->drop.file);
+        break;
+    case SDL_DROPTEXT:
+        SDL_Log("SDL EVENT: Drag and drop text: '%s'", event->drop.file);
+        break;
+    case SDL_DROPCOMPLETE:
+        SDL_Log("SDL EVENT: Drag and drop ending");
+        break;
     case SDL_QUIT:
         SDL_Log("SDL EVENT: Quit requested");
         break;
@@ -1743,6 +1819,11 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
         break;
     case SDL_MOUSEMOTION:
         lastEvent = event->motion;
+        break;
+
+    case SDL_DROPFILE:
+    case SDL_DROPTEXT:
+        SDL_free(event->drop.file);
         break;
     }
 }

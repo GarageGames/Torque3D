@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -55,7 +55,6 @@ UIKit_WaitUntilMessageBoxClosed(const SDL_MessageBoxData *messageboxdata, int *c
 static BOOL
 UIKit_ShowMessageBoxAlertController(const SDL_MessageBoxData *messageboxdata, int *buttonid)
 {
-#ifdef __IPHONE_8_0
     int i;
     int __block clickedindex = messageboxdata->numbuttons;
     const SDL_MessageBoxButtonData *buttons = messageboxdata->buttons;
@@ -109,23 +108,10 @@ UIKit_ShowMessageBoxAlertController(const SDL_MessageBoxData *messageboxdata, in
         alertwindow.hidden = YES;
     }
 
-    /* Force the main SDL window to re-evaluate home indicator state */
-    SDL_Window *focus = SDL_GetFocusWindow();
-    if (focus) {
-        SDL_WindowData *data = (__bridge SDL_WindowData *) focus->driverdata;
-        if (data != nil) {
-            if (@available(iOS 11.0, *)) {
-                [data.viewcontroller performSelectorOnMainThread:@selector(setNeedsUpdateOfHomeIndicatorAutoHidden) withObject:nil waitUntilDone:NO];
-                [data.viewcontroller performSelectorOnMainThread:@selector(setNeedsUpdateOfScreenEdgesDeferringSystemGestures) withObject:nil waitUntilDone:NO];
-            }
-        }
-    }
+    UIKit_ForceUpdateHomeIndicator();
 
     *buttonid = messageboxdata->buttons[clickedindex].buttonid;
     return YES;
-#else
-    return NO;
-#endif /* __IPHONE_8_0 */
 }
 
 /* UIAlertView is deprecated in iOS 8+ in favor of UIAlertController. */

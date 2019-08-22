@@ -44,7 +44,9 @@ SDLTEST_OBJECTS = @SDLTEST_OBJECTS@
 
 WAYLAND_SCANNER = @WAYLAND_SCANNER@
 
-SRC_DIST = *.txt acinclude Android.mk autogen.sh android-project build-scripts cmake cmake_uninstall.cmake.in configure configure.in debian docs include Makefile.* sdl2-config.cmake.in sdl2-config.in sdl2.m4 sdl2.pc.in SDL2.spec.in SDL2Config.cmake src test VisualC.html VisualC VisualC-WinRT Xcode Xcode-iOS
+INSTALL_SDL2_CONFIG = @INSTALL_SDL2_CONFIG@
+
+SRC_DIST = *.txt acinclude Android.mk autogen.sh android-project build-scripts cmake cmake_uninstall.cmake.in configure configure.ac debian docs include Makefile.* sdl2-config.cmake.in sdl2-config.in sdl2.m4 sdl2.pc.in SDL2.spec.in SDL2Config.cmake src test VisualC.html VisualC VisualC-WinRT Xcode Xcode-iOS wayland-protocols
 GEN_DIST = SDL2.spec
 
 ifneq ($V,1)
@@ -101,6 +103,7 @@ HDRS = \
 	SDL_render.h \
 	SDL_rwops.h \
 	SDL_scancode.h \
+	SDL_sensor.h \
 	SDL_shape.h \
 	SDL_stdinc.h \
 	SDL_surface.h \
@@ -124,9 +127,9 @@ LT_RELEASE  = @LT_RELEASE@
 LT_REVISION = @LT_REVISION@
 LT_LDFLAGS  = -no-undefined -rpath $(libdir) -release $(LT_RELEASE) -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
-all: $(srcdir)/configure Makefile $(objects) $(objects)/$(TARGET) $(objects)/$(SDLMAIN_TARGET) $(objects)/$(SDLTEST_TARGET)
+all: $(srcdir)/configure Makefile $(objects)/$(TARGET) $(objects)/$(SDLMAIN_TARGET) $(objects)/$(SDLTEST_TARGET)
 
-$(srcdir)/configure: $(srcdir)/configure.in
+$(srcdir)/configure: $(srcdir)/configure.ac
 	@echo "Warning, configure is out of date, please re-run autogen.sh"
 
 Makefile: $(srcdir)/Makefile.in
@@ -134,8 +137,9 @@ Makefile: $(srcdir)/Makefile.in
 
 Makefile.in:;
 
-$(objects):
-	$(SHELL) $(auxdir)/mkinstalldirs $@
+$(objects)/.created:
+	$(SHELL) $(auxdir)/mkinstalldirs $(objects)
+	touch $@
 
 update-revision:
 	$(SHELL) $(auxdir)/updaterev.sh
@@ -153,8 +157,11 @@ $(objects)/$(SDLTEST_TARGET): $(SDLTEST_OBJECTS)
 
 install: all install-bin install-hdrs install-lib install-data
 install-bin:
+ifeq ($(INSTALL_SDL2_CONFIG),TRUE)
 	$(SHELL) $(auxdir)/mkinstalldirs $(DESTDIR)$(bindir)
 	$(INSTALL) -m 755 sdl2-config $(DESTDIR)$(bindir)/sdl2-config
+endif
+
 install-hdrs: update-revision
 	$(SHELL) $(auxdir)/mkinstalldirs $(DESTDIR)$(includedir)/SDL2
 	for file in $(HDRS) $(SDLTEST_HDRS); do \
@@ -177,8 +184,10 @@ install-data:
 	$(INSTALL) -m 644 $(srcdir)/sdl2.m4 $(DESTDIR)$(datadir)/aclocal/sdl2.m4
 	$(SHELL) $(auxdir)/mkinstalldirs $(DESTDIR)$(libdir)/pkgconfig
 	$(INSTALL) -m 644 sdl2.pc $(DESTDIR)$(libdir)/pkgconfig
+ifeq ($(INSTALL_SDL2_CONFIG),TRUE)
 	$(SHELL) $(auxdir)/mkinstalldirs $(DESTDIR)$(libdir)/cmake/SDL2
 	$(INSTALL) -m 644 sdl2-config.cmake $(DESTDIR)$(libdir)/cmake/SDL2
+endif
 
 uninstall: uninstall-bin uninstall-hdrs uninstall-lib uninstall-data
 uninstall-bin:

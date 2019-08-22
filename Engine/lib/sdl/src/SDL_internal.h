@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -34,6 +34,10 @@
 #else
 #define SDL_VARIABLE_LENGTH_ARRAY
 #endif
+
+#define SDL_MAX_SMALL_ALLOC_STACKSIZE 128
+#define SDL_small_alloc(type, count, pisstack) ( (*(pisstack) = ((sizeof(type)*(count)) < SDL_MAX_SMALL_ALLOC_STACKSIZE)), (*(pisstack) ? SDL_stack_alloc(type, count) : (type*)SDL_malloc(sizeof(type)*(count))) )
+#define SDL_small_free(ptr, isstack) if ((isstack)) { SDL_stack_free(ptr); } else { SDL_free(ptr); }
 
 #include "dynapi/SDL_dynapi.h"
 

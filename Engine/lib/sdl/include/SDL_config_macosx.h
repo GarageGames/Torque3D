@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -102,6 +102,8 @@
 #define HAVE_COPYSIGNF  1
 #define HAVE_COS    1
 #define HAVE_COSF   1
+#define HAVE_EXP    1
+#define HAVE_EXPF   1
 #define HAVE_FABS   1
 #define HAVE_FABSF  1
 #define HAVE_FLOOR  1
@@ -135,7 +137,11 @@
 
 /* Enable various input drivers */
 #define SDL_JOYSTICK_IOKIT  1
+#define SDL_JOYSTICK_HIDAPI  1
 #define SDL_HAPTIC_IOKIT    1
+
+/* Enable the dummy sensor driver */
+#define SDL_SENSOR_DUMMY  1
 
 /* Enable various shared object loading systems */
 #define SDL_LOADSO_DLOPEN   1
@@ -212,7 +218,7 @@
 #endif
 
 /* Enable Vulkan support */
-/* Metal/MoltenVK/Vulkan only supported on 64-bit architectures with 10.11+ */
+/* Metal/Vulkan Portability only supported on 64-bit architectures with 10.11+ */
 #if TARGET_CPU_X86_64 && (MAC_OS_X_VERSION_MAX_ALLOWED >= 101100)
 #define SDL_VIDEO_VULKAN 1
 #else
