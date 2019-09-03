@@ -1,1 +1,0 @@
-your projects will go in this folder
