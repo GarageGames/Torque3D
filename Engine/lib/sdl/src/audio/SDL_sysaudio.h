@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -71,7 +71,6 @@ typedef struct SDL_AudioDriverImpl
     void (*BeginLoopIteration)(_THIS);  /* Called by audio thread at top of loop */
     void (*WaitDevice) (_THIS);
     void (*PlayDevice) (_THIS);
-    int (*GetPendingBytes) (_THIS);
     Uint8 *(*GetDeviceBuf) (_THIS);
     int (*CaptureFromDevice) (_THIS, void *buffer, int buflen);
     void (*FlushCapture) (_THIS);
@@ -98,8 +97,10 @@ typedef struct SDL_AudioDriverImpl
 typedef struct SDL_AudioDeviceItem
 {
     void *handle;
+    char *name;
+    char *original_name;
+    int dupenum;
     struct SDL_AudioDeviceItem *next;
-    char name[SDL_VARIABLE_LENGTH_ARRAY];
 } SDL_AudioDeviceItem;
 
 
@@ -202,6 +203,7 @@ extern AudioBootStrap COREAUDIO_bootstrap;
 extern AudioBootStrap DISKAUDIO_bootstrap;
 extern AudioBootStrap DUMMYAUDIO_bootstrap;
 extern AudioBootStrap FUSIONSOUND_bootstrap;
+extern AudioBootStrap openslES_bootstrap;
 extern AudioBootStrap ANDROIDAUDIO_bootstrap;
 extern AudioBootStrap PSPAUDIO_bootstrap;
 extern AudioBootStrap EMSCRIPTENAUDIO_bootstrap;

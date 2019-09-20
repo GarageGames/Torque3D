@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -165,6 +165,7 @@ Emscripten_CreateSystemCursor(SDL_SystemCursor id)
             cursor_name = "ns-resize";
             break;
         case SDL_SYSTEM_CURSOR_SIZEALL:
+            cursor_name = "move";
             break;
         case SDL_SYSTEM_CURSOR_NO:
             cursor_name = "not-allowed";
@@ -209,7 +210,7 @@ Emscripten_ShowCursor(SDL_Cursor* cursor)
             if(curdata->system_cursor) {
                 EM_ASM_INT({
                     if (Module['canvas']) {
-                        Module['canvas'].style['cursor'] = Module['Pointer_stringify']($0);
+                        Module['canvas'].style['cursor'] = UTF8ToString($0);
                     }
                     return 0;
                 }, curdata->system_cursor);

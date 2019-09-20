@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -113,6 +113,7 @@ struct SDL_WindowData
 {
     SDL_Window *window;
     NSWindow *nswindow;
+    NSView *sdlContentView; /* nil if window is created via CreateWindowFrom */
     NSMutableArray *nscontexts;
     SDL_bool created;
     SDL_bool inWindowMove;
@@ -148,6 +149,7 @@ extern void Cocoa_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed);
 extern void Cocoa_DestroyWindow(_THIS, SDL_Window * window);
 extern SDL_bool Cocoa_GetWindowWMInfo(_THIS, SDL_Window * window, struct SDL_SysWMinfo *info);
 extern int Cocoa_SetWindowHitTest(SDL_Window *window, SDL_bool enabled);
+extern void Cocoa_AcceptDragAndDrop(SDL_Window * window, SDL_bool accept);
 
 #endif /* SDL_cocoawindow_h_ */
 

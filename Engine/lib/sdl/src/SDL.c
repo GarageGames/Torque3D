@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -33,6 +33,7 @@
 #include "events/SDL_events_c.h"
 #include "haptic/SDL_haptic_c.h"
 #include "joystick/SDL_joystick_c.h"
+#include "sensor/SDL_sensor_c.h"
 
 /* Initialization/Cleanup routines */
 #if !SDL_TIMERS_DISABLED
@@ -123,11 +124,11 @@ SDL_InitSubSystem(Uint32 flags)
     }
 
 #if SDL_VIDEO_DRIVER_WINDOWS
-	if ((flags & (SDL_INIT_HAPTIC|SDL_INIT_JOYSTICK))) {
-		if (SDL_HelperWindowCreate() < 0) {
-			return -1;
-		}
-	}
+    if ((flags & (SDL_INIT_HAPTIC|SDL_INIT_JOYSTICK))) {
+        if (SDL_HelperWindowCreate() < 0) {
+            return -1;
+        }
+    }
 #endif
 
 #if !SDL_TIMERS_DISABLED
@@ -138,10 +139,9 @@ SDL_InitSubSystem(Uint32 flags)
     if ((flags & SDL_INIT_EVENTS)) {
 #if !SDL_EVENTS_DISABLED
         if (SDL_PrivateShouldInitSubsystem(SDL_INIT_EVENTS)) {
-            if (SDL_StartEventLoop() < 0) {
+            if (SDL_EventsInit() < 0) {
                 return (-1);
             }
-            SDL_QuitInit();
         }
         SDL_PrivateSubsystemRefCountIncr(SDL_INIT_EVENTS);
 #else
@@ -232,6 +232,20 @@ SDL_InitSubSystem(Uint32 flags)
 #endif
     }
 
+    /* Initialize the sensor subsystem */
+    if ((flags & SDL_INIT_SENSOR)){
+#if !SDL_SENSOR_DISABLED
+        if (SDL_PrivateShouldInitSubsystem(SDL_INIT_SENSOR)) {
+            if (SDL_SensorInit() < 0) {
+                return (-1);
+            }
+        }
+        SDL_PrivateSubsystemRefCountIncr(SDL_INIT_SENSOR);
+#else
+        return SDL_SetError("SDL not built with sensor support");
+#endif
+    }
+
     return (0);
 }
 
@@ -245,6 +259,15 @@ void
 SDL_QuitSubSystem(Uint32 flags)
 {
     /* Shut down requested initialized subsystems */
+#if !SDL_SENSOR_DISABLED
+    if ((flags & SDL_INIT_SENSOR)) {
+        if (SDL_PrivateShouldQuitSubsystem(SDL_INIT_SENSOR)) {
+            SDL_SensorQuit();
+        }
+        SDL_PrivateSubsystemRefCountDecr(SDL_INIT_SENSOR);
+    }
+#endif
+
 #if !SDL_JOYSTICK_DISABLED
     if ((flags & SDL_INIT_GAMECONTROLLER)) {
         /* game controller implies joystick */
@@ -309,8 +332,7 @@ SDL_QuitSubSystem(Uint32 flags)
 #if !SDL_EVENTS_DISABLED
     if ((flags & SDL_INIT_EVENTS)) {
         if (SDL_PrivateShouldQuitSubsystem(SDL_INIT_EVENTS)) {
-            SDL_QuitQuit();
-            SDL_StopEventLoop();
+            SDL_EventsQuit();
         }
         SDL_PrivateSubsystemRefCountDecr(SDL_INIT_EVENTS);
     }
@@ -323,6 +345,12 @@ SDL_WasInit(Uint32 flags)
     int i;
     int num_subsystems = SDL_arraysize(SDL_SubsystemRefCount);
     Uint32 initialized = 0;
+
+    /* Fast path for checking one flag */
+    if (SDL_HasExactlyOneBitSet32(flags)) {
+        int subsystem_index = SDL_MostSignificantBitIndex32(flags);
+        return SDL_SubsystemRefCount[subsystem_index] ? flags : 0;
+    }
 
     if (!flags) {
         flags = SDL_INIT_EVERYTHING;
@@ -448,6 +476,20 @@ SDL_GetPlatform()
     return "PlayStation Portable";
 #else
     return "Unknown (see SDL_platform.h)";
+#endif
+}
+
+SDL_bool
+SDL_IsTablet()
+{
+#if __ANDROID__
+    extern SDL_bool SDL_IsAndroidTablet(void);
+    return SDL_IsAndroidTablet();
+#elif __IPHONEOS__
+    extern SDL_bool SDL_IsIPad(void);
+    return SDL_IsIPad();
+#else
+    return SDL_FALSE;
 #endif
 }
 

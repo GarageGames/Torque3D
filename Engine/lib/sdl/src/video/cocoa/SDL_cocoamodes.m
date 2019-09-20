@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -187,6 +187,7 @@ Cocoa_InitModes(_THIS)
     CGDisplayErr result;
     CGDirectDisplayID *displays;
     CGDisplayCount numDisplays;
+    SDL_bool isstack;
     int pass, i;
 
     result = CGGetOnlineDisplayList(0, NULL, &numDisplays);
@@ -194,11 +195,11 @@ Cocoa_InitModes(_THIS)
         CG_SetError("CGGetOnlineDisplayList()", result);
         return;
     }
-    displays = SDL_stack_alloc(CGDirectDisplayID, numDisplays);
+    displays = SDL_small_alloc(CGDirectDisplayID, numDisplays, &isstack);
     result = CGGetOnlineDisplayList(numDisplays, displays, &numDisplays);
     if (result != kCGErrorSuccess) {
         CG_SetError("CGGetOnlineDisplayList()", result);
-        SDL_stack_free(displays);
+        SDL_small_free(displays, isstack);
         return;
     }
 
@@ -260,7 +261,7 @@ Cocoa_InitModes(_THIS)
             SDL_free(display.name);
         }
     }
-    SDL_stack_free(displays);
+    SDL_small_free(displays, isstack);
 }}
 
 int
@@ -299,13 +300,9 @@ Cocoa_GetDisplayUsableBounds(_THIS, SDL_VideoDisplay * display, SDL_Rect * rect)
         return -1;
     }
 
-    const CGRect cgrect = CGDisplayBounds(cgdisplay);
     const NSRect frame = [screen visibleFrame];
-
-    // !!! FIXME: I assume -[NSScreen visibleFrame] is relative to the origin of the screen in question and not the whole desktop.
-    // !!! FIXME: The math vs CGDisplayBounds might be incorrect if that's not the case, though. Check this.
-    rect->x = (int)(cgrect.origin.x + frame.origin.x);
-    rect->y = (int)(cgrect.origin.y + frame.origin.y);
+    rect->x = (int)frame.origin.x;
+    rect->y = (int)(CGDisplayPixelsHigh(kCGDirectMainDisplay) - frame.origin.y - frame.size.height);
     rect->w = (int)frame.size.width;
     rect->h = (int)frame.size.height;
 

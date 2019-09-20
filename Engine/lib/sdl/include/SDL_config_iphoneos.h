@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -99,6 +99,8 @@
 #define HAVE_COPYSIGNF  1
 #define HAVE_COS    1
 #define HAVE_COSF   1
+#define HAVE_EXP    1
+#define HAVE_EXPF   1
 #define HAVE_FABS   1
 #define HAVE_FABSF  1
 #define HAVE_FLOOR  1
@@ -135,6 +137,14 @@
 
 /* Enable MFi joystick support */
 #define SDL_JOYSTICK_MFI 1
+/*#define SDL_JOYSTICK_HIDAPI 1*/
+
+#ifdef __TVOS__
+#define SDL_SENSOR_DUMMY    1
+#else
+/* Enable the CoreMotion sensor driver */
+#define SDL_SENSOR_COREMOTION   1
+#endif
 
 /* Enable Unix style SO loading */
 #define SDL_LOADSO_DLOPEN 1

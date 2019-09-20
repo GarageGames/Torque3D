@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -46,64 +46,6 @@
 
 /* Apple Metal renderer implementation */
 
-static SDL_Renderer *METAL_CreateRenderer(SDL_Window * window, Uint32 flags);
-static void METAL_WindowEvent(SDL_Renderer * renderer,
-                           const SDL_WindowEvent *event);
-static int METAL_GetOutputSize(SDL_Renderer * renderer, int *w, int *h);
-static SDL_bool METAL_SupportsBlendMode(SDL_Renderer * renderer, SDL_BlendMode blendMode);
-static int METAL_CreateTexture(SDL_Renderer * renderer, SDL_Texture * texture);
-static int METAL_UpdateTexture(SDL_Renderer * renderer, SDL_Texture * texture,
-                            const SDL_Rect * rect, const void *pixels,
-                            int pitch);
-static int METAL_UpdateTextureYUV(SDL_Renderer * renderer, SDL_Texture * texture,
-                               const SDL_Rect * rect,
-                               const Uint8 *Yplane, int Ypitch,
-                               const Uint8 *Uplane, int Upitch,
-                               const Uint8 *Vplane, int Vpitch);
-static int METAL_LockTexture(SDL_Renderer * renderer, SDL_Texture * texture,
-                          const SDL_Rect * rect, void **pixels, int *pitch);
-static void METAL_UnlockTexture(SDL_Renderer * renderer, SDL_Texture * texture);
-static int METAL_SetRenderTarget(SDL_Renderer * renderer, SDL_Texture * texture);
-static int METAL_UpdateViewport(SDL_Renderer * renderer);
-static int METAL_UpdateClipRect(SDL_Renderer * renderer);
-static int METAL_RenderClear(SDL_Renderer * renderer);
-static int METAL_RenderDrawPoints(SDL_Renderer * renderer,
-                               const SDL_FPoint * points, int count);
-static int METAL_RenderDrawLines(SDL_Renderer * renderer,
-                              const SDL_FPoint * points, int count);
-static int METAL_RenderFillRects(SDL_Renderer * renderer,
-                              const SDL_FRect * rects, int count);
-static int METAL_RenderCopy(SDL_Renderer * renderer, SDL_Texture * texture,
-                         const SDL_Rect * srcrect, const SDL_FRect * dstrect);
-static int METAL_RenderCopyEx(SDL_Renderer * renderer, SDL_Texture * texture,
-                         const SDL_Rect * srcrect, const SDL_FRect * dstrect,
-                         const double angle, const SDL_FPoint *center, const SDL_RendererFlip flip);
-static int METAL_RenderReadPixels(SDL_Renderer * renderer, const SDL_Rect * rect,
-                               Uint32 pixel_format, void * pixels, int pitch);
-static void METAL_RenderPresent(SDL_Renderer * renderer);
-static void METAL_DestroyTexture(SDL_Renderer * renderer, SDL_Texture * texture);
-static void METAL_DestroyRenderer(SDL_Renderer * renderer);
-static void *METAL_GetMetalLayer(SDL_Renderer * renderer);
-static void *METAL_GetMetalCommandEncoder(SDL_Renderer * renderer);
-
-SDL_RenderDriver METAL_RenderDriver = {
-    METAL_CreateRenderer,
-    {
-        "metal",
-        (SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE),
-        6,
-        {
-            SDL_PIXELFORMAT_ARGB8888,
-            SDL_PIXELFORMAT_ABGR8888,
-            SDL_PIXELFORMAT_YV12,
-            SDL_PIXELFORMAT_IYUV,
-            SDL_PIXELFORMAT_NV12,
-            SDL_PIXELFORMAT_NV21
-        },
-    0, 0,
-    }
-};
-
 /* macOS requires constants in a buffer to have a 256 byte alignment. */
 #ifdef __MACOSX__
 #define CONSTANT_ALIGN 256
@@ -113,13 +55,13 @@ SDL_RenderDriver METAL_RenderDriver = {
 
 #define ALIGN_CONSTANTS(size) ((size + CONSTANT_ALIGN - 1) & (~(CONSTANT_ALIGN - 1)))
 
+static const size_t CONSTANTS_OFFSET_INVALID = 0xFFFFFFFF;
 static const size_t CONSTANTS_OFFSET_IDENTITY = 0;
 static const size_t CONSTANTS_OFFSET_HALF_PIXEL_TRANSFORM = ALIGN_CONSTANTS(CONSTANTS_OFFSET_IDENTITY + sizeof(float) * 16);
 static const size_t CONSTANTS_OFFSET_DECODE_JPEG = ALIGN_CONSTANTS(CONSTANTS_OFFSET_HALF_PIXEL_TRANSFORM + sizeof(float) * 16);
 static const size_t CONSTANTS_OFFSET_DECODE_BT601 = ALIGN_CONSTANTS(CONSTANTS_OFFSET_DECODE_JPEG + sizeof(float) * 4 * 4);
 static const size_t CONSTANTS_OFFSET_DECODE_BT709 = ALIGN_CONSTANTS(CONSTANTS_OFFSET_DECODE_BT601 + sizeof(float) * 4 * 4);
-static const size_t CONSTANTS_OFFSET_CLEAR_VERTS = ALIGN_CONSTANTS(CONSTANTS_OFFSET_DECODE_BT709 + sizeof(float) * 4 * 4);
-static const size_t CONSTANTS_LENGTH = CONSTANTS_OFFSET_CLEAR_VERTS + sizeof(float) * 6;
+static const size_t CONSTANTS_LENGTH = CONSTANTS_OFFSET_DECODE_BT709 + sizeof(float) * 4 * 4;
 
 typedef enum SDL_MetalVertexFunction
 {
@@ -175,6 +117,7 @@ typedef struct METAL_ShaderPipelines
     @property (nonatomic, retain) id<MTLSamplerState> mtlsamplernearest;
     @property (nonatomic, retain) id<MTLSamplerState> mtlsamplerlinear;
     @property (nonatomic, retain) id<MTLBuffer> mtlbufconstants;
+    @property (nonatomic, retain) id<MTLBuffer> mtlbufquadindices;
     @property (nonatomic, retain) CAMetalLayer *mtllayer;
     @property (nonatomic, retain) MTLRenderPassDescriptor *mtlpassdesc;
     @property (nonatomic, assign) METAL_ShaderPipelines *activepipelines;
@@ -195,6 +138,7 @@ typedef struct METAL_ShaderPipelines
     [_mtlsamplernearest release];
     [_mtlsamplerlinear release];
     [_mtlbufconstants release];
+    [_mtlbufquadindices release];
     [_mtllayer release];
     [_mtlpassdesc release];
     [super dealloc];
@@ -210,6 +154,10 @@ typedef struct METAL_ShaderPipelines
     @property (nonatomic, assign) BOOL yuv;
     @property (nonatomic, assign) BOOL nv12;
     @property (nonatomic, assign) size_t conversionBufferOffset;
+    @property (nonatomic, assign) BOOL hasdata;
+
+    @property (nonatomic, retain) id<MTLBuffer> lockedbuffer;
+    @property (nonatomic, assign) SDL_Rect lockedrect;
 @end
 
 @implementation METAL_TextureData
@@ -457,6 +405,1096 @@ ChoosePipelineState(METAL_RenderData *data, METAL_ShaderPipelines *pipelines, SD
     return MakePipelineState(data, cache, [NSString stringWithFormat:@" (blend=custom 0x%x)", blendmode], blendmode);
 }
 
+static void
+METAL_ActivateRenderCommandEncoder(SDL_Renderer * renderer, MTLLoadAction load, MTLClearColor *clear_color)
+{
+    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
+
+    /* Our SetRenderTarget just signals that the next render operation should
+     * set up a new render pass. This is where that work happens. */
+    if (data.mtlcmdencoder == nil) {
+        id<MTLTexture> mtltexture = nil;
+
+        if (renderer->target != NULL) {
+            METAL_TextureData *texdata = (__bridge METAL_TextureData *)renderer->target->driverdata;
+            mtltexture = texdata.mtltexture;
+        } else {
+            if (data.mtlbackbuffer == nil) {
+                /* The backbuffer's contents aren't guaranteed to persist after
+                 * presenting, so we can leave it undefined when loading it. */
+                data.mtlbackbuffer = [data.mtllayer nextDrawable];
+                if (load == MTLLoadActionLoad) {
+                    load = MTLLoadActionDontCare;
+                }
+            }
+            mtltexture = data.mtlbackbuffer.texture;
+        }
+
+        SDL_assert(mtltexture);
+
+        if (load == MTLLoadActionClear) {
+            SDL_assert(clear_color != NULL);
+            data.mtlpassdesc.colorAttachments[0].clearColor = *clear_color;
+        }
+
+        data.mtlpassdesc.colorAttachments[0].loadAction = load;
+        data.mtlpassdesc.colorAttachments[0].texture = mtltexture;
+
+        data.mtlcmdbuffer = [data.mtlcmdqueue commandBuffer];
+        data.mtlcmdencoder = [data.mtlcmdbuffer renderCommandEncoderWithDescriptor:data.mtlpassdesc];
+
+        if (data.mtlbackbuffer != nil && mtltexture == data.mtlbackbuffer.texture) {
+            data.mtlcmdencoder.label = @"SDL metal renderer backbuffer";
+        } else {
+            data.mtlcmdencoder.label = @"SDL metal renderer render target";
+        }
+
+        data.activepipelines = ChooseShaderPipelines(data, mtltexture.pixelFormat);
+
+        // make sure this has a definite place in the queue. This way it will
+        //  execute reliably whether the app tries to make its own command buffers
+        //  or whatever. This means we can _always_ batch rendering commands!
+        [data.mtlcmdbuffer enqueue];
+    }
+}
+
+static void
+METAL_WindowEvent(SDL_Renderer * renderer, const SDL_WindowEvent *event)
+{
+    if (event->event == SDL_WINDOWEVENT_SHOWN ||
+        event->event == SDL_WINDOWEVENT_HIDDEN) {
+        // !!! FIXME: write me
+    }
+}
+
+static int
+METAL_GetOutputSize(SDL_Renderer * renderer, int *w, int *h)
+{ @autoreleasepool {
+    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
+    if (w) {
+        *w = (int)data.mtllayer.drawableSize.width;
+    }
+    if (h) {
+        *h = (int)data.mtllayer.drawableSize.height;
+    }
+    return 0;
+}}
+
+static SDL_bool
+METAL_SupportsBlendMode(SDL_Renderer * renderer, SDL_BlendMode blendMode)
+{
+    SDL_BlendFactor srcColorFactor = SDL_GetBlendModeSrcColorFactor(blendMode);
+    SDL_BlendFactor srcAlphaFactor = SDL_GetBlendModeSrcAlphaFactor(blendMode);
+    SDL_BlendOperation colorOperation = SDL_GetBlendModeColorOperation(blendMode);
+    SDL_BlendFactor dstColorFactor = SDL_GetBlendModeDstColorFactor(blendMode);
+    SDL_BlendFactor dstAlphaFactor = SDL_GetBlendModeDstAlphaFactor(blendMode);
+    SDL_BlendOperation alphaOperation = SDL_GetBlendModeAlphaOperation(blendMode);
+
+    if (GetBlendFactor(srcColorFactor) == invalidBlendFactor ||
+        GetBlendFactor(srcAlphaFactor) == invalidBlendFactor ||
+        GetBlendOperation(colorOperation) == invalidBlendOperation ||
+        GetBlendFactor(dstColorFactor) == invalidBlendFactor ||
+        GetBlendFactor(dstAlphaFactor) == invalidBlendFactor ||
+        GetBlendOperation(alphaOperation) == invalidBlendOperation) {
+        return SDL_FALSE;
+    }
+    return SDL_TRUE;
+}
+
+static int
+METAL_CreateTexture(SDL_Renderer * renderer, SDL_Texture * texture)
+{ @autoreleasepool {
+    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
+    MTLPixelFormat pixfmt;
+
+    switch (texture->format) {
+        case SDL_PIXELFORMAT_ABGR8888:
+            pixfmt = MTLPixelFormatRGBA8Unorm;
+            break;
+        case SDL_PIXELFORMAT_ARGB8888:
+            pixfmt = MTLPixelFormatBGRA8Unorm;
+            break;
+        case SDL_PIXELFORMAT_IYUV:
+        case SDL_PIXELFORMAT_YV12:
+        case SDL_PIXELFORMAT_NV12:
+        case SDL_PIXELFORMAT_NV21:
+            pixfmt = MTLPixelFormatR8Unorm;
+            break;
+        default:
+            return SDL_SetError("Texture format %s not supported by Metal", SDL_GetPixelFormatName(texture->format));
+    }
+
+    MTLTextureDescriptor *mtltexdesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixfmt
+                                            width:(NSUInteger)texture->w height:(NSUInteger)texture->h mipmapped:NO];
+
+    /* Not available in iOS 8. */
+    if ([mtltexdesc respondsToSelector:@selector(usage)]) {
+        if (texture->access == SDL_TEXTUREACCESS_TARGET) {
+            mtltexdesc.usage = MTLTextureUsageShaderRead | MTLTextureUsageRenderTarget;
+        } else {
+            mtltexdesc.usage = MTLTextureUsageShaderRead;
+        }
+    }
+    
+    id<MTLTexture> mtltexture = [data.mtldevice newTextureWithDescriptor:mtltexdesc];
+    if (mtltexture == nil) {
+        return SDL_SetError("Texture allocation failed");
+    }
+
+    id<MTLTexture> mtltexture_uv = nil;
+
+    BOOL yuv = (texture->format == SDL_PIXELFORMAT_IYUV) || (texture->format == SDL_PIXELFORMAT_YV12);
+    BOOL nv12 = (texture->format == SDL_PIXELFORMAT_NV12) || (texture->format == SDL_PIXELFORMAT_NV21);
+
+    if (yuv) {
+        mtltexdesc.pixelFormat = MTLPixelFormatR8Unorm;
+        mtltexdesc.width = (texture->w + 1) / 2;
+        mtltexdesc.height = (texture->h + 1) / 2;
+        mtltexdesc.textureType = MTLTextureType2DArray;
+        mtltexdesc.arrayLength = 2;
+    } else if (nv12) {
+        mtltexdesc.pixelFormat = MTLPixelFormatRG8Unorm;
+        mtltexdesc.width = (texture->w + 1) / 2;
+        mtltexdesc.height = (texture->h + 1) / 2;
+    }
+
+    if (yuv || nv12) {
+        mtltexture_uv = [data.mtldevice newTextureWithDescriptor:mtltexdesc];
+        if (mtltexture_uv == nil) {
+#if !__has_feature(objc_arc)
+            [mtltexture release];
+#endif
+            return SDL_SetError("Texture allocation failed");
+        }
+    }
+
+    METAL_TextureData *texturedata = [[METAL_TextureData alloc] init];
+    if (texture->scaleMode == SDL_ScaleModeNearest) {
+        texturedata.mtlsampler = data.mtlsamplernearest;
+    } else {
+        texturedata.mtlsampler = data.mtlsamplerlinear;
+    }
+    texturedata.mtltexture = mtltexture;
+    texturedata.mtltexture_uv = mtltexture_uv;
+
+    texturedata.yuv = yuv;
+    texturedata.nv12 = nv12;
+
+    if (yuv) {
+        texturedata.fragmentFunction = SDL_METAL_FRAGMENT_YUV;
+    } else if (texture->format == SDL_PIXELFORMAT_NV12) {
+        texturedata.fragmentFunction = SDL_METAL_FRAGMENT_NV12;
+    } else if (texture->format == SDL_PIXELFORMAT_NV21) {
+        texturedata.fragmentFunction = SDL_METAL_FRAGMENT_NV21;
+    } else {
+        texturedata.fragmentFunction = SDL_METAL_FRAGMENT_COPY;
+    }
+
+    if (yuv || nv12) {
+        size_t offset = 0;
+        SDL_YUV_CONVERSION_MODE mode = SDL_GetYUVConversionModeForResolution(texture->w, texture->h);
+        switch (mode) {
+            case SDL_YUV_CONVERSION_JPEG: offset = CONSTANTS_OFFSET_DECODE_JPEG; break;
+            case SDL_YUV_CONVERSION_BT601: offset = CONSTANTS_OFFSET_DECODE_BT601; break;
+            case SDL_YUV_CONVERSION_BT709: offset = CONSTANTS_OFFSET_DECODE_BT709; break;
+            default: offset = 0; break;
+        }
+        texturedata.conversionBufferOffset = offset;
+    }
+
+    texture->driverdata = (void*)CFBridgingRetain(texturedata);
+
+#if !__has_feature(objc_arc)
+    [texturedata release];
+    [mtltexture release];
+    [mtltexture_uv release];
+#endif
+
+    return 0;
+}}
+
+static void
+METAL_UploadTextureData(id<MTLTexture> texture, SDL_Rect rect, int slice,
+                        const void * pixels, int pitch)
+{
+    [texture replaceRegion:MTLRegionMake2D(rect.x, rect.y, rect.w, rect.h)
+               mipmapLevel:0
+                     slice:slice
+                 withBytes:pixels
+               bytesPerRow:pitch
+             bytesPerImage:0];
+}
+
+static MTLStorageMode
+METAL_GetStorageMode(id<MTLResource> resource)
+{
+    /* iOS 8 does not have this method. */
+    if ([resource respondsToSelector:@selector(storageMode)]) {
+        return resource.storageMode;
+    }
+    return MTLStorageModeShared;
+}
+
+static int
+METAL_UpdateTextureInternal(SDL_Renderer * renderer, METAL_TextureData *texturedata,
+                            id<MTLTexture> texture, SDL_Rect rect, int slice,
+                            const void * pixels, int pitch)
+{
+    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
+    SDL_Rect stagingrect = {0, 0, rect.w, rect.h};
+    MTLTextureDescriptor *desc;
+
+    /* If the texture is managed or shared and this is the first upload, we can
+     * use replaceRegion to upload to it directly. Otherwise we upload the data
+     * to a staging texture and copy that over. */
+    if (!texturedata.hasdata && METAL_GetStorageMode(texture) != MTLStorageModePrivate) {
+        METAL_UploadTextureData(texture, rect, slice, pixels, pitch);
+        return 0;
+    }
+
+    desc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:texture.pixelFormat
+                                                              width:rect.w
+                                                             height:rect.h
+                                                          mipmapped:NO];
+
+    if (desc == nil) {
+        return SDL_OutOfMemory();
+    }
+
+    /* TODO: We could have a pool of textures or a MTLHeap we allocate from,
+     * and release a staging texture back to the pool in the command buffer's
+     * completion handler. */
+    id<MTLTexture> stagingtex = [data.mtldevice newTextureWithDescriptor:desc];
+    if (stagingtex == nil) {
+        return SDL_OutOfMemory();
+    }
+
+#if !__has_feature(objc_arc)
+    [stagingtex autorelease];
+#endif
+
+    METAL_UploadTextureData(stagingtex, stagingrect, 0, pixels, pitch);
+
+    if (data.mtlcmdencoder != nil) {
+        [data.mtlcmdencoder endEncoding];
+        data.mtlcmdencoder = nil;
+    }
+
+    if (data.mtlcmdbuffer == nil) {
+        data.mtlcmdbuffer = [data.mtlcmdqueue commandBuffer];
+    }
+
+    id<MTLBlitCommandEncoder> blitcmd = [data.mtlcmdbuffer blitCommandEncoder];
+
+    [blitcmd copyFromTexture:stagingtex
+                 sourceSlice:0
+                 sourceLevel:0
+                sourceOrigin:MTLOriginMake(0, 0, 0)
+                  sourceSize:MTLSizeMake(rect.w, rect.h, 1)
+                   toTexture:texture
+            destinationSlice:slice
+            destinationLevel:0
+           destinationOrigin:MTLOriginMake(rect.x, rect.y, 0)];
+
+    [blitcmd endEncoding];
+
+    /* TODO: This isn't very efficient for the YUV formats, which call
+     * UpdateTextureInternal multiple times in a row. */
+    [data.mtlcmdbuffer commit];
+    data.mtlcmdbuffer = nil;
+
+    return 0;
+}
+
+static int
+METAL_UpdateTexture(SDL_Renderer * renderer, SDL_Texture * texture,
+                    const SDL_Rect * rect, const void *pixels, int pitch)
+{ @autoreleasepool {
+    METAL_TextureData *texturedata = (__bridge METAL_TextureData *)texture->driverdata;
+
+    if (METAL_UpdateTextureInternal(renderer, texturedata, texturedata.mtltexture, *rect, 0, pixels, pitch) < 0) {
+        return -1;
+    }
+
+    if (texturedata.yuv) {
+        int Uslice = texture->format == SDL_PIXELFORMAT_YV12 ? 1 : 0;
+        int Vslice = texture->format == SDL_PIXELFORMAT_YV12 ? 0 : 1;
+        int UVpitch = (pitch + 1) / 2;
+        SDL_Rect UVrect = {rect->x / 2, rect->y / 2, (rect->w + 1) / 2, (rect->h + 1) / 2};
+
+        /* Skip to the correct offset into the next texture */
+        pixels = (const void*)((const Uint8*)pixels + rect->h * pitch);
+        if (METAL_UpdateTextureInternal(renderer, texturedata, texturedata.mtltexture_uv, UVrect, Uslice, pixels, UVpitch) < 0) {
+            return -1;
+        }
+
+        /* Skip to the correct offset into the next texture */
+        pixels = (const void*)((const Uint8*)pixels + UVrect.h * UVpitch);
+        if (METAL_UpdateTextureInternal(renderer, texturedata, texturedata.mtltexture_uv, UVrect, Vslice, pixels, UVpitch) < 0) {
+            return -1;
+        }
+    }
+
+    if (texturedata.nv12) {
+        SDL_Rect UVrect = {rect->x / 2, rect->y / 2, (rect->w + 1) / 2, (rect->h + 1) / 2};
+        int UVpitch = 2 * ((pitch + 1) / 2);
+
+        /* Skip to the correct offset into the next texture */
+        pixels = (const void*)((const Uint8*)pixels + rect->h * pitch);
+        if (METAL_UpdateTextureInternal(renderer, texturedata, texturedata.mtltexture_uv, UVrect, 0, pixels, UVpitch) < 0) {
+            return -1;
+        }
+    }
+
+    texturedata.hasdata = YES;
+
+    return 0;
+}}
+
+static int
+METAL_UpdateTextureYUV(SDL_Renderer * renderer, SDL_Texture * texture,
+                    const SDL_Rect * rect,
+                    const Uint8 *Yplane, int Ypitch,
+                    const Uint8 *Uplane, int Upitch,
+                    const Uint8 *Vplane, int Vpitch)
+{ @autoreleasepool {
+    METAL_TextureData *texturedata = (__bridge METAL_TextureData *)texture->driverdata;
+    const int Uslice = 0;
+    const int Vslice = 1;
+    SDL_Rect UVrect = {rect->x / 2, rect->y / 2, (rect->w + 1) / 2, (rect->h + 1) / 2};
+
+    /* Bail out if we're supposed to update an empty rectangle */
+    if (rect->w <= 0 || rect->h <= 0) {
+        return 0;
+    }
+
+    if (METAL_UpdateTextureInternal(renderer, texturedata, texturedata.mtltexture, *rect, 0, Yplane, Ypitch) < 0) {
+        return -1;
+    }
+    if (METAL_UpdateTextureInternal(renderer, texturedata, texturedata.mtltexture_uv, UVrect, Uslice, Uplane, Upitch)) {
+        return -1;
+    }
+    if (METAL_UpdateTextureInternal(renderer, texturedata, texturedata.mtltexture_uv, UVrect, Vslice, Vplane, Vpitch)) {
+        return -1;
+    }
+
+    texturedata.hasdata = YES;
+
+    return 0;
+}}
+
+static int
+METAL_LockTexture(SDL_Renderer * renderer, SDL_Texture * texture,
+               const SDL_Rect * rect, void **pixels, int *pitch)
+{ @autoreleasepool {
+    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
+    METAL_TextureData *texturedata = (__bridge METAL_TextureData *)texture->driverdata;
+    int buffersize = 0;
+
+    if (rect->w <= 0 || rect->h <= 0) {
+        return SDL_SetError("Invalid rectangle dimensions for LockTexture.");
+    }
+
+    *pitch = SDL_BYTESPERPIXEL(texture->format) * rect->w;
+
+    if (texturedata.yuv || texturedata.nv12) {
+        buffersize = ((*pitch) * rect->h) + (2 * (*pitch + 1) / 2) * ((rect->h + 1) / 2);
+    } else {
+        buffersize = (*pitch) * rect->h;
+    }
+
+    texturedata.lockedrect = *rect;
+    texturedata.lockedbuffer = [data.mtldevice newBufferWithLength:buffersize options:MTLResourceStorageModeShared];
+    if (texturedata.lockedbuffer == nil) {
+        return SDL_OutOfMemory();
+    }
+
+    *pixels = [texturedata.lockedbuffer contents];
+
+    return 0;
+}}
+
+static void
+METAL_UnlockTexture(SDL_Renderer * renderer, SDL_Texture * texture)
+{ @autoreleasepool {
+    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
+    METAL_TextureData *texturedata = (__bridge METAL_TextureData *)texture->driverdata;
+    SDL_Rect rect = texturedata.lockedrect;
+    int pitch = SDL_BYTESPERPIXEL(texture->format) * rect.w;
+    SDL_Rect UVrect = {rect.x / 2, rect.y / 2, (rect.w + 1) / 2, (rect.h + 1) / 2};
+
+    if (texturedata.lockedbuffer == nil) {
+        return;
+    }
+
+    if (data.mtlcmdencoder != nil) {
+        [data.mtlcmdencoder endEncoding];
+        data.mtlcmdencoder = nil;
+    }
+
+    if (data.mtlcmdbuffer == nil) {
+        data.mtlcmdbuffer = [data.mtlcmdqueue commandBuffer];
+    }
+
+    id<MTLBlitCommandEncoder> blitcmd = [data.mtlcmdbuffer blitCommandEncoder];
+
+    [blitcmd copyFromBuffer:texturedata.lockedbuffer
+               sourceOffset:0
+          sourceBytesPerRow:pitch
+        sourceBytesPerImage:0
+                 sourceSize:MTLSizeMake(rect.w, rect.h, 1)
+                  toTexture:texturedata.mtltexture
+           destinationSlice:0
+           destinationLevel:0
+          destinationOrigin:MTLOriginMake(rect.x, rect.y, 0)];
+
+    if (texturedata.yuv) {
+        int Uslice = texture->format == SDL_PIXELFORMAT_YV12 ? 1 : 0;
+        int Vslice = texture->format == SDL_PIXELFORMAT_YV12 ? 0 : 1;
+        int UVpitch = (pitch + 1) / 2;
+
+        [blitcmd copyFromBuffer:texturedata.lockedbuffer
+                   sourceOffset:rect.h * pitch
+              sourceBytesPerRow:UVpitch
+            sourceBytesPerImage:UVpitch * UVrect.h
+                     sourceSize:MTLSizeMake(UVrect.w, UVrect.h, 1)
+                      toTexture:texturedata.mtltexture_uv
+               destinationSlice:Uslice
+               destinationLevel:0
+              destinationOrigin:MTLOriginMake(UVrect.x, UVrect.y, 0)];
+
+        [blitcmd copyFromBuffer:texturedata.lockedbuffer
+                   sourceOffset:(rect.h * pitch) + UVrect.h * UVpitch
+              sourceBytesPerRow:UVpitch
+            sourceBytesPerImage:UVpitch * UVrect.h
+                     sourceSize:MTLSizeMake(UVrect.w, UVrect.h, 1)
+                      toTexture:texturedata.mtltexture_uv
+               destinationSlice:Vslice
+               destinationLevel:0
+              destinationOrigin:MTLOriginMake(UVrect.x, UVrect.y, 0)];
+    }
+
+    if (texturedata.nv12) {
+        int UVpitch = 2 * ((pitch + 1) / 2);
+
+        [blitcmd copyFromBuffer:texturedata.lockedbuffer
+                   sourceOffset:rect.h * pitch
+              sourceBytesPerRow:UVpitch
+            sourceBytesPerImage:0
+                     sourceSize:MTLSizeMake(UVrect.w, UVrect.h, 1)
+                      toTexture:texturedata.mtltexture_uv
+               destinationSlice:0
+               destinationLevel:0
+              destinationOrigin:MTLOriginMake(UVrect.x, UVrect.y, 0)];
+    }
+
+    [blitcmd endEncoding];
+
+    [data.mtlcmdbuffer commit];
+    data.mtlcmdbuffer = nil;
+
+#if !__has_feature(objc_arc)
+    [texturedata.lockedbuffer release];
+#endif
+
+    texturedata.lockedbuffer = nil;
+    texturedata.hasdata = YES;
+}}
+
+static int
+METAL_SetRenderTarget(SDL_Renderer * renderer, SDL_Texture * texture)
+{ @autoreleasepool {
+    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
+
+    if (data.mtlcmdencoder) {
+        /* End encoding for the previous render target so we can set up a new
+         * render pass for this one. */
+        [data.mtlcmdencoder endEncoding];
+        [data.mtlcmdbuffer commit];
+
+        data.mtlcmdencoder = nil;
+        data.mtlcmdbuffer = nil;
+    }
+
+    /* We don't begin a new render pass right away - we delay it until an actual
+     * draw or clear happens. That way we can use hardware clears when possible,
+     * which are only available when beginning a new render pass. */
+    return 0;
+}}
+
+
+// normalize a value from 0.0f to len into 0.0f to 1.0f.
+static inline float
+normtex(const float _val, const float len)
+{
+    return _val / len;
+}
+
+static int
+METAL_QueueSetViewport(SDL_Renderer * renderer, SDL_RenderCommand *cmd)
+{
+    float projection[4][4];    /* Prepare an orthographic projection */
+    const int w = cmd->data.viewport.rect.w;
+    const int h = cmd->data.viewport.rect.h;
+    const size_t matrixlen = sizeof (projection);
+    float *matrix = (float *) SDL_AllocateRenderVertices(renderer, matrixlen, CONSTANT_ALIGN, &cmd->data.viewport.first);
+    if (!matrix) {
+        return -1;
+    }
+
+    SDL_memset(projection, '\0', matrixlen);
+    if (w && h) {
+        projection[0][0] = 2.0f / w;
+        projection[1][1] = -2.0f / h;
+        projection[3][0] = -1.0f;
+        projection[3][1] = 1.0f;
+        projection[3][3] = 1.0f;
+    }
+    SDL_memcpy(matrix, projection, matrixlen);
+
+    return 0;
+}
+
+static int
+METAL_QueueSetDrawColor(SDL_Renderer *renderer, SDL_RenderCommand *cmd)
+{
+    const size_t vertlen = sizeof (float) * 4;
+    float *verts = (float *) SDL_AllocateRenderVertices(renderer, vertlen, CONSTANT_ALIGN, &cmd->data.color.first);
+    if (!verts) {
+        return -1;
+    }
+    *(verts++) = ((float)cmd->data.color.r) / 255.0f;
+    *(verts++) = ((float)cmd->data.color.g) / 255.0f;
+    *(verts++) = ((float)cmd->data.color.b) / 255.0f;
+    *(verts++) = ((float)cmd->data.color.a) / 255.0f;
+    return 0;
+}
+
+static int
+METAL_QueueDrawPoints(SDL_Renderer * renderer, SDL_RenderCommand *cmd, const SDL_FPoint * points, int count)
+{
+    const size_t vertlen = (sizeof (float) * 2) * count;
+    float *verts = (float *) SDL_AllocateRenderVertices(renderer, vertlen, 0, &cmd->data.draw.first);
+    if (!verts) {
+        return -1;
+    }
+    cmd->data.draw.count = count;
+    SDL_memcpy(verts, points, vertlen);
+    return 0;
+}
+
+static int
+METAL_QueueFillRects(SDL_Renderer * renderer, SDL_RenderCommand *cmd, const SDL_FRect * rects, int count)
+{
+    const size_t vertlen = (sizeof (float) * 8) * count;
+    float *verts = (float *) SDL_AllocateRenderVertices(renderer, vertlen, 0, &cmd->data.draw.first);
+    if (!verts) {
+        return -1;
+    }
+
+    cmd->data.draw.count = count;
+
+    /* Quads in the following vertex order (matches the quad index buffer):
+     * 1---3
+     * | \ |
+     * 0---2
+     */
+    for (int i = 0; i < count; i++, rects++) {
+        if ((rects->w <= 0.0f) || (rects->h <= 0.0f)) {
+            cmd->data.draw.count--;
+        } else {
+            *(verts++) = rects->x;
+            *(verts++) = rects->y + rects->h;
+            *(verts++) = rects->x;
+            *(verts++) = rects->y;
+            *(verts++) = rects->x + rects->w;
+            *(verts++) = rects->y + rects->h;
+            *(verts++) = rects->x + rects->w;
+            *(verts++) = rects->y;
+        }
+    }
+
+    if (cmd->data.draw.count == 0) {
+        cmd->command = SDL_RENDERCMD_NO_OP;  // nothing to do, just skip this one later.
+    }
+
+    return 0;
+}
+
+static int
+METAL_QueueCopy(SDL_Renderer * renderer, SDL_RenderCommand *cmd, SDL_Texture * texture,
+                const SDL_Rect * srcrect, const SDL_FRect * dstrect)
+{
+    const float texw = (float) texture->w;
+    const float texh = (float) texture->h;
+    // !!! FIXME: use an index buffer
+    const size_t vertlen = (sizeof (float) * 16);
+    float *verts = (float *) SDL_AllocateRenderVertices(renderer, vertlen, 0, &cmd->data.draw.first);
+    if (!verts) {
+        return -1;
+    }
+
+    cmd->data.draw.count = 1;
+
+    *(verts++) = dstrect->x;
+    *(verts++) = dstrect->y + dstrect->h;
+    *(verts++) = dstrect->x;
+    *(verts++) = dstrect->y;
+    *(verts++) = dstrect->x + dstrect->w;
+    *(verts++) = dstrect->y + dstrect->h;
+    *(verts++) = dstrect->x + dstrect->w;
+    *(verts++) = dstrect->y;
+
+    *(verts++) = normtex(srcrect->x, texw);
+    *(verts++) = normtex(srcrect->y + srcrect->h, texh);
+    *(verts++) = normtex(srcrect->x, texw);
+    *(verts++) = normtex(srcrect->y, texh);
+    *(verts++) = normtex(srcrect->x + srcrect->w, texw);
+    *(verts++) = normtex(srcrect->y + srcrect->h, texh);
+    *(verts++) = normtex(srcrect->x + srcrect->w, texw);
+    *(verts++) = normtex(srcrect->y, texh);
+
+    return 0;
+}
+
+static int
+METAL_QueueCopyEx(SDL_Renderer * renderer, SDL_RenderCommand *cmd, SDL_Texture * texture,
+                  const SDL_Rect * srcquad, const SDL_FRect * dstrect,
+                  const double angle, const SDL_FPoint *center, const SDL_RendererFlip flip)
+{
+    const float texw = (float) texture->w;
+    const float texh = (float) texture->h;
+    const float rads = (float)(M_PI * (float) angle / 180.0f);
+    const float c = cosf(rads), s = sinf(rads);
+    float minu, maxu, minv, maxv;
+    const size_t vertlen = (sizeof (float) * 32);
+    float *verts;
+
+    // cheat and store this offset in (count) because it needs to be aligned in ways other fields don't and we aren't using count otherwise.
+    verts = (float *) SDL_AllocateRenderVertices(renderer, vertlen, CONSTANT_ALIGN, &cmd->data.draw.count);
+    if (!verts) {
+        return -1;
+    }
+
+    // transform matrix
+    SDL_memset(verts, '\0', sizeof (*verts) * 16);
+    verts[10] = verts[15] = 1.0f;
+    // rotation
+    verts[0] = c;
+    verts[1] = s;
+    verts[4] = -s;
+    verts[5] = c;
+
+    // translation
+    verts[12] = dstrect->x + center->x;
+    verts[13] = dstrect->y + center->y;
+
+    // rest of the vertices don't need the aggressive alignment. Pack them in.
+    verts = (float *) SDL_AllocateRenderVertices(renderer, vertlen, 0, &cmd->data.draw.first);
+    if (!verts) {
+        return -1;
+    }
+
+    minu = normtex(srcquad->x, texw);
+    maxu = normtex(srcquad->x + srcquad->w, texw);
+    minv = normtex(srcquad->y, texh);
+    maxv = normtex(srcquad->y + srcquad->h, texh);
+
+    if (flip & SDL_FLIP_HORIZONTAL) {
+        float tmp = maxu;
+        maxu = minu;
+        minu = tmp;
+    }
+    if (flip & SDL_FLIP_VERTICAL) {
+        float tmp = maxv;
+        maxv = minv;
+        minv = tmp;
+    }
+
+    // vertices
+    *(verts++) = -center->x;
+    *(verts++) = dstrect->h - center->y;
+    *(verts++) = -center->x;
+    *(verts++) = -center->y;
+    *(verts++) = dstrect->w - center->x;
+    *(verts++) = dstrect->h - center->y;
+    *(verts++) = dstrect->w - center->x;
+    *(verts++) = -center->y;
+
+    // texcoords
+    *(verts++) = minu;
+    *(verts++) = maxv;
+    *(verts++) = minu;
+    *(verts++) = minv;
+    *(verts++) = maxu;
+    *(verts++) = maxv;
+    *(verts++) = maxu;
+    *(verts++) = minv;
+
+    return 0;
+}
+
+
+typedef struct
+{
+    #if __has_feature(objc_arc)
+    __unsafe_unretained id<MTLRenderPipelineState> pipeline;
+    #else
+    id<MTLRenderPipelineState> pipeline;
+    #endif
+    size_t constants_offset;
+    SDL_Texture *texture;
+    SDL_bool cliprect_dirty;
+    SDL_bool cliprect_enabled;
+    SDL_Rect cliprect;
+    SDL_bool viewport_dirty;
+    SDL_Rect viewport;
+    size_t projection_offset;
+    SDL_bool color_dirty;
+    size_t color_offset;
+} METAL_DrawStateCache;
+
+static void
+SetDrawState(SDL_Renderer *renderer, const SDL_RenderCommand *cmd, const SDL_MetalFragmentFunction shader,
+             const size_t constants_offset, id<MTLBuffer> mtlbufvertex, METAL_DrawStateCache *statecache)
+{
+    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
+    const SDL_BlendMode blend = cmd->data.draw.blend;
+    size_t first = cmd->data.draw.first;
+    id<MTLRenderPipelineState> newpipeline;
+
+    METAL_ActivateRenderCommandEncoder(renderer, MTLLoadActionLoad, NULL);
+
+    if (statecache->viewport_dirty) {
+        MTLViewport viewport;
+        viewport.originX = statecache->viewport.x;
+        viewport.originY = statecache->viewport.y;
+        viewport.width = statecache->viewport.w;
+        viewport.height = statecache->viewport.h;
+        viewport.znear = 0.0;
+        viewport.zfar = 1.0;
+        [data.mtlcmdencoder setViewport:viewport];
+        [data.mtlcmdencoder setVertexBuffer:mtlbufvertex offset:statecache->projection_offset atIndex:2];  // projection
+        statecache->viewport_dirty = SDL_FALSE;
+    }
+
+    if (statecache->cliprect_dirty) {
+        MTLScissorRect mtlrect;
+        if (statecache->cliprect_enabled) {
+            const SDL_Rect *rect = &statecache->cliprect;
+            mtlrect.x = statecache->viewport.x + rect->x;
+            mtlrect.y = statecache->viewport.y + rect->y;
+            mtlrect.width = rect->w;
+            mtlrect.height = rect->h;
+        } else {
+            mtlrect.x = statecache->viewport.x;
+            mtlrect.y = statecache->viewport.y;
+            mtlrect.width = statecache->viewport.w;
+            mtlrect.height = statecache->viewport.h;
+        }
+        if (mtlrect.width > 0 && mtlrect.height > 0) {
+            [data.mtlcmdencoder setScissorRect:mtlrect];
+        }
+        statecache->cliprect_dirty = SDL_FALSE;
+    }
+
+    if (statecache->color_dirty) {
+        [data.mtlcmdencoder setFragmentBuffer:mtlbufvertex offset:statecache->color_offset atIndex:0];
+        statecache->color_dirty = SDL_FALSE;
+    }
+
+    newpipeline = ChoosePipelineState(data, data.activepipelines, shader, blend);
+    if (newpipeline != statecache->pipeline) {
+        [data.mtlcmdencoder setRenderPipelineState:newpipeline];
+        statecache->pipeline = newpipeline;
+    }
+
+    if (constants_offset != statecache->constants_offset) {
+        if (constants_offset != CONSTANTS_OFFSET_INVALID) {
+            [data.mtlcmdencoder setVertexBuffer:data.mtlbufconstants offset:constants_offset atIndex:3];
+        }
+        statecache->constants_offset = constants_offset;
+    }
+
+    [data.mtlcmdencoder setVertexBuffer:mtlbufvertex offset:first atIndex:0];  // position
+}
+
+static void
+SetCopyState(SDL_Renderer *renderer, const SDL_RenderCommand *cmd, const size_t constants_offset,
+             id<MTLBuffer> mtlbufvertex, METAL_DrawStateCache *statecache)
+{
+    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
+    SDL_Texture *texture = cmd->data.draw.texture;
+    METAL_TextureData *texturedata = (__bridge METAL_TextureData *)texture->driverdata;
+
+    SetDrawState(renderer, cmd, texturedata.fragmentFunction, constants_offset, mtlbufvertex, statecache);
+
+    [data.mtlcmdencoder setVertexBuffer:mtlbufvertex offset:cmd->data.draw.first+(8*sizeof (float)) atIndex:1];  // texcoords
+
+    if (texture != statecache->texture) {
+        METAL_TextureData *oldtexturedata = NULL;
+        if (statecache->texture) {
+            oldtexturedata = (__bridge METAL_TextureData *) statecache->texture->driverdata;
+        }
+        if (!oldtexturedata || (texturedata.mtlsampler != oldtexturedata.mtlsampler)) {
+            [data.mtlcmdencoder setFragmentSamplerState:texturedata.mtlsampler atIndex:0];
+        }
+
+        [data.mtlcmdencoder setFragmentTexture:texturedata.mtltexture atIndex:0];
+        if (texturedata.yuv || texturedata.nv12) {
+            [data.mtlcmdencoder setFragmentTexture:texturedata.mtltexture_uv atIndex:1];
+            [data.mtlcmdencoder setFragmentBuffer:data.mtlbufconstants offset:texturedata.conversionBufferOffset atIndex:1];
+        }
+        statecache->texture = texture;
+    }
+}
+
+static int
+METAL_RunCommandQueue(SDL_Renderer * renderer, SDL_RenderCommand *cmd, void *vertices, size_t vertsize)
+{ @autoreleasepool {
+    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
+    METAL_DrawStateCache statecache;
+    id<MTLBuffer> mtlbufvertex = nil;
+
+    statecache.pipeline = nil;
+    statecache.constants_offset = CONSTANTS_OFFSET_INVALID;
+    statecache.texture = NULL;
+    statecache.color_dirty = SDL_TRUE;
+    statecache.cliprect_dirty = SDL_TRUE;
+    statecache.viewport_dirty = SDL_TRUE;
+    statecache.projection_offset = 0;
+    statecache.color_offset = 0;
+
+    // !!! FIXME: have a ring of pre-made MTLBuffers we cycle through? How expensive is creation?
+    if (vertsize > 0) {
+        /* We can memcpy to a shared buffer from the CPU and read it from the GPU
+         * without any extra copying. It's a bit slower on macOS to read shared
+         * data from the GPU than to read managed/private data, but we avoid the
+         * cost of copying the data and the code's simpler. Apple's best
+         * practices guide recommends this approach for streamed vertex data.
+         * TODO: this buffer is also used for constants. Is performance still
+         * good for those, or should we have a managed buffer for them? */
+        mtlbufvertex = [data.mtldevice newBufferWithLength:vertsize options:MTLResourceStorageModeShared];
+        #if !__has_feature(objc_arc)
+        [mtlbufvertex autorelease];
+        #endif
+        mtlbufvertex.label = @"SDL vertex data";
+        SDL_memcpy([mtlbufvertex contents], vertices, vertsize);
+    }
+
+    // If there's a command buffer here unexpectedly (app requested one?). Commit it so we can start fresh.
+    [data.mtlcmdencoder endEncoding];
+    [data.mtlcmdbuffer commit];
+    data.mtlcmdencoder = nil;
+    data.mtlcmdbuffer = nil;
+
+    while (cmd) {
+        switch (cmd->command) {
+            case SDL_RENDERCMD_SETVIEWPORT: {
+                SDL_memcpy(&statecache.viewport, &cmd->data.viewport.rect, sizeof (statecache.viewport));
+                statecache.projection_offset = cmd->data.viewport.first;
+                statecache.viewport_dirty = SDL_TRUE;
+                break;
+            }
+
+            case SDL_RENDERCMD_SETCLIPRECT: {
+                SDL_memcpy(&statecache.cliprect, &cmd->data.cliprect.rect, sizeof (statecache.cliprect));
+                statecache.cliprect_enabled = cmd->data.cliprect.enabled;
+                statecache.cliprect_dirty = SDL_TRUE;
+                break;
+            }
+
+            case SDL_RENDERCMD_SETDRAWCOLOR: {
+                statecache.color_offset = cmd->data.color.first;
+                statecache.color_dirty = SDL_TRUE;
+                break;
+            }
+
+            case SDL_RENDERCMD_CLEAR: {
+                /* If we're already encoding a command buffer, dump it without committing it. We'd just
+                    clear all its work anyhow, and starting a new encoder will let us use a hardware clear
+                    operation via MTLLoadActionClear. */
+                if (data.mtlcmdencoder != nil) {
+                    [data.mtlcmdencoder endEncoding];
+
+                    // !!! FIXME: have to commit, or an uncommitted but enqueued buffer will prevent the frame from finishing.
+                    [data.mtlcmdbuffer commit];
+                    data.mtlcmdencoder = nil;
+                    data.mtlcmdbuffer = nil;
+                }
+
+                // force all this state to be reconfigured on next command buffer.
+                statecache.pipeline = nil;
+                statecache.constants_offset = CONSTANTS_OFFSET_INVALID;
+                statecache.texture = NULL;
+                statecache.color_dirty = SDL_TRUE;
+                statecache.cliprect_dirty = SDL_TRUE;
+                statecache.viewport_dirty = SDL_TRUE;
+
+                const Uint8 r = cmd->data.color.r;
+                const Uint8 g = cmd->data.color.g;
+                const Uint8 b = cmd->data.color.b;
+                const Uint8 a = cmd->data.color.a;
+                MTLClearColor color = MTLClearColorMake(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
+
+                // get new command encoder, set up with an initial clear operation.
+                METAL_ActivateRenderCommandEncoder(renderer, MTLLoadActionClear, &color);
+                break;
+            }
+
+            case SDL_RENDERCMD_DRAW_POINTS:
+            case SDL_RENDERCMD_DRAW_LINES: {
+                const size_t count = cmd->data.draw.count;
+                const MTLPrimitiveType primtype = (cmd->command == SDL_RENDERCMD_DRAW_POINTS) ? MTLPrimitiveTypePoint : MTLPrimitiveTypeLineStrip;
+                SetDrawState(renderer, cmd, SDL_METAL_FRAGMENT_SOLID, CONSTANTS_OFFSET_HALF_PIXEL_TRANSFORM, mtlbufvertex, &statecache);
+                [data.mtlcmdencoder drawPrimitives:primtype vertexStart:0 vertexCount:count];
+                break;
+            }
+
+            case SDL_RENDERCMD_FILL_RECTS: {
+                const size_t count = cmd->data.draw.count;
+                const size_t maxcount = UINT16_MAX / 4;
+                SetDrawState(renderer, cmd, SDL_METAL_FRAGMENT_SOLID, CONSTANTS_OFFSET_IDENTITY, mtlbufvertex, &statecache);
+                /* Our index buffer has 16 bit indices, so we can only draw 65k
+                 * vertices (16k rects) at a time. */
+                for (size_t i = 0; i < count; i += maxcount) {
+                    /* Set the vertex buffer offset for our current positions.
+                     * The vertex buffer itself was bound in SetDrawState. */
+                    [data.mtlcmdencoder setVertexBufferOffset:cmd->data.draw.first + i*sizeof(float)*8 atIndex:0];
+                    [data.mtlcmdencoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
+                                                   indexCount:SDL_min(maxcount, count - i) * 6
+                                                    indexType:MTLIndexTypeUInt16
+                                                  indexBuffer:data.mtlbufquadindices
+                                            indexBufferOffset:0];
+                }
+                break;
+            }
+
+            case SDL_RENDERCMD_COPY: {
+                SetCopyState(renderer, cmd, CONSTANTS_OFFSET_IDENTITY, mtlbufvertex, &statecache);
+                [data.mtlcmdencoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4];
+                break;
+            }
+
+            case SDL_RENDERCMD_COPY_EX: {
+                SetCopyState(renderer, cmd, CONSTANTS_OFFSET_INVALID, mtlbufvertex, &statecache);
+                [data.mtlcmdencoder setVertexBuffer:mtlbufvertex offset:cmd->data.draw.count atIndex:3];  // transform
+                [data.mtlcmdencoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4];
+                break;
+            }
+
+            case SDL_RENDERCMD_NO_OP:
+                break;
+        }
+        cmd = cmd->next;
+    }
+
+    return 0;
+}}
+
+static int
+METAL_RenderReadPixels(SDL_Renderer * renderer, const SDL_Rect * rect,
+                    Uint32 pixel_format, void * pixels, int pitch)
+{ @autoreleasepool {
+    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
+    METAL_ActivateRenderCommandEncoder(renderer, MTLLoadActionLoad, NULL);
+
+    [data.mtlcmdencoder endEncoding];
+    id<MTLTexture> mtltexture = data.mtlpassdesc.colorAttachments[0].texture;
+
+#ifdef __MACOSX__
+    /* on macOS with managed-storage textures, we need to tell the driver to
+     * update the CPU-side copy of the texture data.
+     * NOTE: Currently all of our textures are managed on macOS. We'll need some
+     * extra copying for any private textures. */
+    if (METAL_GetStorageMode(mtltexture) == MTLStorageModeManaged) {
+        id<MTLBlitCommandEncoder> blit = [data.mtlcmdbuffer blitCommandEncoder];
+        [blit synchronizeResource:mtltexture];
+        [blit endEncoding];
+    }
+#endif
+
+    /* Commit the current command buffer and wait until it's completed, to make
+     * sure the GPU has finished rendering to it by the time we read it. */
+    [data.mtlcmdbuffer commit];
+    [data.mtlcmdbuffer waitUntilCompleted];
+    data.mtlcmdencoder = nil;
+    data.mtlcmdbuffer = nil;
+
+    MTLRegion mtlregion = MTLRegionMake2D(rect->x, rect->y, rect->w, rect->h);
+
+    // we only do BGRA8 or RGBA8 at the moment, so 4 will do.
+    const int temp_pitch = rect->w * 4;
+    void *temp_pixels = SDL_malloc(temp_pitch * rect->h);
+    if (!temp_pixels) {
+        return SDL_OutOfMemory();
+    }
+
+    [mtltexture getBytes:temp_pixels bytesPerRow:temp_pitch fromRegion:mtlregion mipmapLevel:0];
+
+    const Uint32 temp_format = (mtltexture.pixelFormat == MTLPixelFormatBGRA8Unorm) ? SDL_PIXELFORMAT_ARGB8888 : SDL_PIXELFORMAT_ABGR8888;
+    const int status = SDL_ConvertPixels(rect->w, rect->h, temp_format, temp_pixels, temp_pitch, pixel_format, pixels, pitch);
+    SDL_free(temp_pixels);
+    return status;
+}}
+
+static void
+METAL_RenderPresent(SDL_Renderer * renderer)
+{ @autoreleasepool {
+    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
+
+    if (data.mtlcmdencoder != nil) {
+        [data.mtlcmdencoder endEncoding];
+    }
+    if (data.mtlbackbuffer != nil) {
+        [data.mtlcmdbuffer presentDrawable:data.mtlbackbuffer];
+    }
+    if (data.mtlcmdbuffer != nil) {
+        [data.mtlcmdbuffer commit];
+    }
+    data.mtlcmdencoder = nil;
+    data.mtlcmdbuffer = nil;
+    data.mtlbackbuffer = nil;
+}}
+
+static void
+METAL_DestroyTexture(SDL_Renderer * renderer, SDL_Texture * texture)
+{ @autoreleasepool {
+    CFBridgingRelease(texture->driverdata);
+    texture->driverdata = NULL;
+}}
+
+static void
+METAL_DestroyRenderer(SDL_Renderer * renderer)
+{ @autoreleasepool {
+    if (renderer->driverdata) {
+        METAL_RenderData *data = CFBridgingRelease(renderer->driverdata);
+
+        if (data.mtlcmdencoder != nil) {
+            [data.mtlcmdencoder endEncoding];
+        }
+
+        DestroyAllPipelines(data.allpipelines, data.pipelinescount);
+    }
+
+    SDL_free(renderer);
+}}
+
+static void *
+METAL_GetMetalLayer(SDL_Renderer * renderer)
+{ @autoreleasepool {
+    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
+    return (__bridge void*)data.mtllayer;
+}}
+
+static void *
+METAL_GetMetalCommandEncoder(SDL_Renderer * renderer)
+{ @autoreleasepool {
+    METAL_ActivateRenderCommandEncoder(renderer, MTLLoadActionLoad, NULL);
+    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
+    return (__bridge void*)data.mtlcmdencoder;
+}}
+
 static SDL_Renderer *
 METAL_CreateRenderer(SDL_Window * window, Uint32 flags)
 { @autoreleasepool {
@@ -585,14 +1623,10 @@ METAL_CreateRenderer(SDL_Window * window, Uint32 flags)
         1.0000,  1.7720,  0.0000, 0.0,        /* Bcoeff */
     };
 
-    float clearverts[6] = {0.0f, 0.0f,  0.0f, 2.0f,  2.0f, 0.0f};
-
     id<MTLBuffer> mtlbufconstantstaging = [data.mtldevice newBufferWithLength:CONSTANTS_LENGTH options:MTLResourceStorageModeShared];
-    mtlbufconstantstaging.label = @"SDL constant staging data";
-
-    id<MTLBuffer> mtlbufconstants = [data.mtldevice newBufferWithLength:CONSTANTS_LENGTH options:MTLResourceStorageModePrivate];
-    data.mtlbufconstants = mtlbufconstants;
-    data.mtlbufconstants.label = @"SDL constant data";
+    #if !__has_feature(objc_arc)
+    [mtlbufconstantstaging autorelease];
+    #endif
 
     char *constantdata = [mtlbufconstantstaging contents];
     SDL_memcpy(constantdata + CONSTANTS_OFFSET_IDENTITY, identitytransform, sizeof(identitytransform));
@@ -600,12 +1634,43 @@ METAL_CreateRenderer(SDL_Window * window, Uint32 flags)
     SDL_memcpy(constantdata + CONSTANTS_OFFSET_DECODE_JPEG, decodetransformJPEG, sizeof(decodetransformJPEG));
     SDL_memcpy(constantdata + CONSTANTS_OFFSET_DECODE_BT601, decodetransformBT601, sizeof(decodetransformBT601));
     SDL_memcpy(constantdata + CONSTANTS_OFFSET_DECODE_BT709, decodetransformBT709, sizeof(decodetransformBT709));
-    SDL_memcpy(constantdata + CONSTANTS_OFFSET_CLEAR_VERTS, clearverts, sizeof(clearverts));
+
+    int quadcount = UINT16_MAX / 4;
+    size_t indicessize = sizeof(UInt16) * quadcount * 6;
+    id<MTLBuffer> mtlbufquadindicesstaging = [data.mtldevice newBufferWithLength:indicessize options:MTLResourceStorageModeShared];
+#if !__has_feature(objc_arc)
+    [mtlbufquadindicesstaging autorelease];
+#endif
+
+    /* Quads in the following vertex order (matches the FillRects vertices):
+     * 1---3
+     * | \ |
+     * 0---2
+     */
+    UInt16 *indexdata = [mtlbufquadindicesstaging contents];
+    for (int i = 0; i < quadcount; i++) {
+        indexdata[i * 6 + 0] = i * 4 + 0;
+        indexdata[i * 6 + 1] = i * 4 + 1;
+        indexdata[i * 6 + 2] = i * 4 + 2;
+
+        indexdata[i * 6 + 3] = i * 4 + 2;
+        indexdata[i * 6 + 4] = i * 4 + 1;
+        indexdata[i * 6 + 5] = i * 4 + 3;
+    }
+
+    id<MTLBuffer> mtlbufconstants = [data.mtldevice newBufferWithLength:CONSTANTS_LENGTH options:MTLResourceStorageModePrivate];
+    data.mtlbufconstants = mtlbufconstants;
+    data.mtlbufconstants.label = @"SDL constant data";
+
+    id<MTLBuffer> mtlbufquadindices = [data.mtldevice newBufferWithLength:indicessize options:MTLResourceStorageModePrivate];
+    data.mtlbufquadindices = mtlbufquadindices;
+    data.mtlbufquadindices.label = @"SDL quad index buffer";
 
     id<MTLCommandBuffer> cmdbuffer = [data.mtlcmdqueue commandBuffer];
     id<MTLBlitCommandEncoder> blitcmd = [cmdbuffer blitCommandEncoder];
 
-    [blitcmd copyFromBuffer:mtlbufconstantstaging sourceOffset:0 toBuffer:data.mtlbufconstants destinationOffset:0 size:CONSTANTS_LENGTH];
+    [blitcmd copyFromBuffer:mtlbufconstantstaging sourceOffset:0 toBuffer:mtlbufconstants destinationOffset:0 size:CONSTANTS_LENGTH];
+    [blitcmd copyFromBuffer:mtlbufquadindicesstaging sourceOffset:0 toBuffer:mtlbufquadindices destinationOffset:0 size:indicessize];
 
     [blitcmd endEncoding];
     [cmdbuffer commit];
@@ -621,14 +1686,14 @@ METAL_CreateRenderer(SDL_Window * window, Uint32 flags)
     renderer->LockTexture = METAL_LockTexture;
     renderer->UnlockTexture = METAL_UnlockTexture;
     renderer->SetRenderTarget = METAL_SetRenderTarget;
-    renderer->UpdateViewport = METAL_UpdateViewport;
-    renderer->UpdateClipRect = METAL_UpdateClipRect;
-    renderer->RenderClear = METAL_RenderClear;
-    renderer->RenderDrawPoints = METAL_RenderDrawPoints;
-    renderer->RenderDrawLines = METAL_RenderDrawLines;
-    renderer->RenderFillRects = METAL_RenderFillRects;
-    renderer->RenderCopy = METAL_RenderCopy;
-    renderer->RenderCopyEx = METAL_RenderCopyEx;
+    renderer->QueueSetViewport = METAL_QueueSetViewport;
+    renderer->QueueSetDrawColor = METAL_QueueSetDrawColor;
+    renderer->QueueDrawPoints = METAL_QueueDrawPoints;
+    renderer->QueueDrawLines = METAL_QueueDrawPoints;  // lines and points queue the same way.
+    renderer->QueueFillRects = METAL_QueueFillRects;
+    renderer->QueueCopy = METAL_QueueCopy;
+    renderer->QueueCopyEx = METAL_QueueCopyEx;
+    renderer->RunCommandQueue = METAL_RunCommandQueue;
     renderer->RenderReadPixels = METAL_RenderReadPixels;
     renderer->RenderPresent = METAL_RenderPresent;
     renderer->DestroyTexture = METAL_DestroyTexture;
@@ -639,9 +1704,14 @@ METAL_CreateRenderer(SDL_Window * window, Uint32 flags)
     renderer->info = METAL_RenderDriver.info;
     renderer->info.flags = (SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 
+    renderer->always_batch = SDL_TRUE;
+
 #if defined(__MACOSX__) && defined(MAC_OS_X_VERSION_10_13)
     if (@available(macOS 10.13, *)) {
         data.mtllayer.displaySyncEnabled = (flags & SDL_RENDERER_PRESENTVSYNC) != 0;
+        if (data.mtllayer.displaySyncEnabled) {
+            renderer->info.flags |= SDL_RENDERER_PRESENTVSYNC;
+        }
     } else
 #endif
     {
@@ -663,9 +1733,12 @@ METAL_CreateRenderer(SDL_Window * window, Uint32 flags)
 #endif
 #else
 #ifdef __IPHONE_11_0
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability-new"
     if ([mtldevice supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily4_v1]) {
         maxtexsize = 16384;
     } else
+#pragma clang diagnostic pop
 #endif
 #ifdef __IPHONE_10_0
     if ([mtldevice supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily3_v1]) {
@@ -689,6 +1762,7 @@ METAL_CreateRenderer(SDL_Window * window, Uint32 flags)
     [mtlsamplernearest release];
     [mtlsamplerlinear release];
     [mtlbufconstants release];
+    [mtlbufquadindices release];
     [view release];
     [data release];
     [mtldevice release];
@@ -697,732 +1771,23 @@ METAL_CreateRenderer(SDL_Window * window, Uint32 flags)
     return renderer;
 }}
 
-static void
-METAL_ActivateRenderCommandEncoder(SDL_Renderer * renderer, MTLLoadAction load)
-{
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-
-    /* Our SetRenderTarget just signals that the next render operation should
-     * set up a new render pass. This is where that work happens. */
-    if (data.mtlcmdencoder == nil) {
-        id<MTLTexture> mtltexture = nil;
-
-        if (renderer->target != NULL) {
-            METAL_TextureData *texdata = (__bridge METAL_TextureData *)renderer->target->driverdata;
-            mtltexture = texdata.mtltexture;
-        } else {
-            if (data.mtlbackbuffer == nil) {
-                /* The backbuffer's contents aren't guaranteed to persist after
-                 * presenting, so we can leave it undefined when loading it. */
-                data.mtlbackbuffer = [data.mtllayer nextDrawable];
-                if (load == MTLLoadActionLoad) {
-                    load = MTLLoadActionDontCare;
-                }
-            }
-            mtltexture = data.mtlbackbuffer.texture;
-        }
-
-        SDL_assert(mtltexture);
-
-        if (load == MTLLoadActionClear) {
-            MTLClearColor color = MTLClearColorMake(renderer->r/255.0, renderer->g/255.0, renderer->b/255.0, renderer->a/255.0);
-            data.mtlpassdesc.colorAttachments[0].clearColor = color;
-        }
-
-        data.mtlpassdesc.colorAttachments[0].loadAction = load;
-        data.mtlpassdesc.colorAttachments[0].texture = mtltexture;
-
-        data.mtlcmdbuffer = [data.mtlcmdqueue commandBuffer];
-        data.mtlcmdencoder = [data.mtlcmdbuffer renderCommandEncoderWithDescriptor:data.mtlpassdesc];
-
-        if (data.mtlbackbuffer != nil && mtltexture == data.mtlbackbuffer.texture) {
-            data.mtlcmdencoder.label = @"SDL metal renderer backbuffer";
-        } else {
-            data.mtlcmdencoder.label = @"SDL metal renderer render target";
-        }
-
-        data.activepipelines = ChooseShaderPipelines(data, mtltexture.pixelFormat);
-
-        /* Make sure the viewport and clip rect are set on the new render pass. */
-        METAL_UpdateViewport(renderer);
-        METAL_UpdateClipRect(renderer);
-    }
-}
-
-static void
-METAL_WindowEvent(SDL_Renderer * renderer, const SDL_WindowEvent *event)
-{
-    if (event->event == SDL_WINDOWEVENT_SIZE_CHANGED ||
-        event->event == SDL_WINDOWEVENT_SHOWN ||
-        event->event == SDL_WINDOWEVENT_HIDDEN) {
-        // !!! FIXME: write me
-    }
-}
-
-static int
-METAL_GetOutputSize(SDL_Renderer * renderer, int *w, int *h)
-{ @autoreleasepool {
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-    if (w) {
-        *w = (int)data.mtllayer.drawableSize.width;
-    }
-    if (h) {
-        *h = (int)data.mtllayer.drawableSize.height;
-    }
-    return 0;
-}}
-
-static SDL_bool
-METAL_SupportsBlendMode(SDL_Renderer * renderer, SDL_BlendMode blendMode)
-{
-    SDL_BlendFactor srcColorFactor = SDL_GetBlendModeSrcColorFactor(blendMode);
-    SDL_BlendFactor srcAlphaFactor = SDL_GetBlendModeSrcAlphaFactor(blendMode);
-    SDL_BlendOperation colorOperation = SDL_GetBlendModeColorOperation(blendMode);
-    SDL_BlendFactor dstColorFactor = SDL_GetBlendModeDstColorFactor(blendMode);
-    SDL_BlendFactor dstAlphaFactor = SDL_GetBlendModeDstAlphaFactor(blendMode);
-    SDL_BlendOperation alphaOperation = SDL_GetBlendModeAlphaOperation(blendMode);
-
-    if (GetBlendFactor(srcColorFactor) == invalidBlendFactor ||
-        GetBlendFactor(srcAlphaFactor) == invalidBlendFactor ||
-        GetBlendOperation(colorOperation) == invalidBlendOperation ||
-        GetBlendFactor(dstColorFactor) == invalidBlendFactor ||
-        GetBlendFactor(dstAlphaFactor) == invalidBlendFactor ||
-        GetBlendOperation(alphaOperation) == invalidBlendOperation) {
-        return SDL_FALSE;
-    }
-    return SDL_TRUE;
-}
-
-static int
-METAL_CreateTexture(SDL_Renderer * renderer, SDL_Texture * texture)
-{ @autoreleasepool {
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-    MTLPixelFormat pixfmt;
-
-    switch (texture->format) {
-        case SDL_PIXELFORMAT_ABGR8888:
-            pixfmt = MTLPixelFormatRGBA8Unorm;
-            break;
-        case SDL_PIXELFORMAT_ARGB8888:
-            pixfmt = MTLPixelFormatBGRA8Unorm;
-            break;
-        case SDL_PIXELFORMAT_IYUV:
-        case SDL_PIXELFORMAT_YV12:
-        case SDL_PIXELFORMAT_NV12:
-        case SDL_PIXELFORMAT_NV21:
-            pixfmt = MTLPixelFormatR8Unorm;
-            break;
-        default:
-            return SDL_SetError("Texture format %s not supported by Metal", SDL_GetPixelFormatName(texture->format));
-    }
-
-    MTLTextureDescriptor *mtltexdesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:pixfmt
-                                            width:(NSUInteger)texture->w height:(NSUInteger)texture->h mipmapped:NO];
-
-    /* Not available in iOS 8. */
-    if ([mtltexdesc respondsToSelector:@selector(usage)]) {
-        if (texture->access == SDL_TEXTUREACCESS_TARGET) {
-            mtltexdesc.usage = MTLTextureUsageShaderRead | MTLTextureUsageRenderTarget;
-        } else {
-            mtltexdesc.usage = MTLTextureUsageShaderRead;
-        }
-    }
-    
-    id<MTLTexture> mtltexture = [data.mtldevice newTextureWithDescriptor:mtltexdesc];
-    if (mtltexture == nil) {
-        return SDL_SetError("Texture allocation failed");
-    }
-
-    id<MTLTexture> mtltexture_uv = nil;
-
-    BOOL yuv = (texture->format == SDL_PIXELFORMAT_IYUV) || (texture->format == SDL_PIXELFORMAT_YV12);
-    BOOL nv12 = (texture->format == SDL_PIXELFORMAT_NV12) || (texture->format == SDL_PIXELFORMAT_NV21);
-
-    if (yuv) {
-        mtltexdesc.pixelFormat = MTLPixelFormatR8Unorm;
-        mtltexdesc.width = (texture->w + 1) / 2;
-        mtltexdesc.height = (texture->h + 1) / 2;
-        mtltexdesc.textureType = MTLTextureType2DArray;
-        mtltexdesc.arrayLength = 2;
-        mtltexture_uv = [data.mtldevice newTextureWithDescriptor:mtltexdesc];
-    } else if (nv12) {
-        mtltexdesc.pixelFormat = MTLPixelFormatRG8Unorm;
-        mtltexdesc.width = (texture->w + 1) / 2;
-        mtltexdesc.height = (texture->h + 1) / 2;
-        mtltexture_uv = [data.mtldevice newTextureWithDescriptor:mtltexdesc];
-    }
-
-    METAL_TextureData *texturedata = [[METAL_TextureData alloc] init];
-    const char *hint = SDL_GetHint(SDL_HINT_RENDER_SCALE_QUALITY);
-    if (!hint || *hint == '0' || SDL_strcasecmp(hint, "nearest") == 0) {
-        texturedata.mtlsampler = data.mtlsamplernearest;
-    } else {
-        texturedata.mtlsampler = data.mtlsamplerlinear;
-    }
-    texturedata.mtltexture = mtltexture;
-    texturedata.mtltexture_uv = mtltexture_uv;
-
-    texturedata.yuv = yuv;
-    texturedata.nv12 = nv12;
-
-    if (yuv) {
-        texturedata.fragmentFunction = SDL_METAL_FRAGMENT_YUV;
-    } else if (texture->format == SDL_PIXELFORMAT_NV12) {
-        texturedata.fragmentFunction = SDL_METAL_FRAGMENT_NV12;
-    } else if (texture->format == SDL_PIXELFORMAT_NV21) {
-        texturedata.fragmentFunction = SDL_METAL_FRAGMENT_NV21;
-    } else {
-        texturedata.fragmentFunction = SDL_METAL_FRAGMENT_COPY;
-    }
-
-    if (yuv || nv12) {
-        size_t offset = 0;
-        SDL_YUV_CONVERSION_MODE mode = SDL_GetYUVConversionModeForResolution(texture->w, texture->h);
-        switch (mode) {
-            case SDL_YUV_CONVERSION_JPEG: offset = CONSTANTS_OFFSET_DECODE_JPEG; break;
-            case SDL_YUV_CONVERSION_BT601: offset = CONSTANTS_OFFSET_DECODE_BT601; break;
-            case SDL_YUV_CONVERSION_BT709: offset = CONSTANTS_OFFSET_DECODE_BT709; break;
-            default: offset = 0; break;
-        }
-        texturedata.conversionBufferOffset = offset;
-    }
-
-    texture->driverdata = (void*)CFBridgingRetain(texturedata);
-
-#if !__has_feature(objc_arc)
-    [texturedata release];
-    [mtltexture release];
-    [mtltexture_uv release];
-#endif
-
-    return 0;
-}}
-
-static int
-METAL_UpdateTexture(SDL_Renderer * renderer, SDL_Texture * texture,
-                 const SDL_Rect * rect, const void *pixels, int pitch)
-{ @autoreleasepool {
-    METAL_TextureData *texturedata = (__bridge METAL_TextureData *)texture->driverdata;
-
-    /* !!! FIXME: replaceRegion does not do any synchronization, so it might
-     * !!! FIXME: stomp on a previous frame's data that's currently being read
-     * !!! FIXME: by the GPU. */
-    [texturedata.mtltexture replaceRegion:MTLRegionMake2D(rect->x, rect->y, rect->w, rect->h)
-                              mipmapLevel:0
-                                withBytes:pixels
-                              bytesPerRow:pitch];
-
-    if (texturedata.yuv) {
-        int Uslice = texture->format == SDL_PIXELFORMAT_YV12 ? 1 : 0;
-        int Vslice = texture->format == SDL_PIXELFORMAT_YV12 ? 0 : 1;
-
-        /* Skip to the correct offset into the next texture */
-        pixels = (const void*)((const Uint8*)pixels + rect->h * pitch);
-        [texturedata.mtltexture_uv replaceRegion:MTLRegionMake2D(rect->x / 2, rect->y / 2, (rect->w + 1) / 2, (rect->h + 1) / 2)
-                                     mipmapLevel:0
-                                           slice:Uslice
-                                       withBytes:pixels
-                                     bytesPerRow:(pitch + 1) / 2
-                                   bytesPerImage:0];
-
-        /* Skip to the correct offset into the next texture */
-        pixels = (const void*)((const Uint8*)pixels + ((rect->h + 1) / 2) * ((pitch + 1)/2));
-        [texturedata.mtltexture_uv replaceRegion:MTLRegionMake2D(rect->x / 2, rect->y / 2, (rect->w + 1) / 2, (rect->h + 1) / 2)
-                                     mipmapLevel:0
-                                           slice:Vslice
-                                       withBytes:pixels
-                                     bytesPerRow:(pitch + 1) / 2
-                                   bytesPerImage:0];
-    }
-
-    if (texturedata.nv12) {
-        /* Skip to the correct offset into the next texture */
-        pixels = (const void*)((const Uint8*)pixels + rect->h * pitch);
-        [texturedata.mtltexture_uv replaceRegion:MTLRegionMake2D(rect->x / 2, rect->y / 2, (rect->w + 1) / 2, (rect->h + 1) / 2)
-                                     mipmapLevel:0
-                                           slice:0
-                                       withBytes:pixels
-                                     bytesPerRow:2 * ((pitch + 1) / 2)
-                                   bytesPerImage:0];
-    }
-
-    return 0;
-}}
-
-static int
-METAL_UpdateTextureYUV(SDL_Renderer * renderer, SDL_Texture * texture,
-                    const SDL_Rect * rect,
-                    const Uint8 *Yplane, int Ypitch,
-                    const Uint8 *Uplane, int Upitch,
-                    const Uint8 *Vplane, int Vpitch)
-{ @autoreleasepool {
-    METAL_TextureData *texturedata = (__bridge METAL_TextureData *)texture->driverdata;
-    int Uslice = texture->format == SDL_PIXELFORMAT_YV12 ? 1 : 0;
-    int Vslice = texture->format == SDL_PIXELFORMAT_YV12 ? 0 : 1;
-
-    /* Bail out if we're supposed to update an empty rectangle */
-    if (rect->w <= 0 || rect->h <= 0) {
-        return 0;
-    }
-
-    [texturedata.mtltexture replaceRegion:MTLRegionMake2D(rect->x, rect->y, rect->w, rect->h)
-                              mipmapLevel:0
-                                withBytes:Yplane
-                              bytesPerRow:Ypitch];
-
-    [texturedata.mtltexture_uv replaceRegion:MTLRegionMake2D(rect->x / 2, rect->y / 2, (rect->w + 1) / 2, (rect->h + 1) / 2)
-                                 mipmapLevel:0
-                                       slice:Uslice
-                                   withBytes:Uplane
-                                 bytesPerRow:Upitch
-                               bytesPerImage:0];
-
-    [texturedata.mtltexture_uv replaceRegion:MTLRegionMake2D(rect->x / 2, rect->y / 2, (rect->w + 1) / 2, (rect->h + 1) / 2)
-                                 mipmapLevel:0
-                                       slice:Vslice
-                                   withBytes:Vplane
-                                 bytesPerRow:Vpitch
-                               bytesPerImage:0];
-
-    return 0;
-}}
-
-static int
-METAL_LockTexture(SDL_Renderer * renderer, SDL_Texture * texture,
-               const SDL_Rect * rect, void **pixels, int *pitch)
-{
-    return SDL_Unsupported();   // !!! FIXME: write me
-}
-
-static void
-METAL_UnlockTexture(SDL_Renderer * renderer, SDL_Texture * texture)
-{
-    // !!! FIXME: write me
-}
-
-static int
-METAL_SetRenderTarget(SDL_Renderer * renderer, SDL_Texture * texture)
-{ @autoreleasepool {
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-
-    if (data.mtlcmdencoder) {
-        /* End encoding for the previous render target so we can set up a new
-         * render pass for this one. */
-        [data.mtlcmdencoder endEncoding];
-        [data.mtlcmdbuffer commit];
-
-        data.mtlcmdencoder = nil;
-        data.mtlcmdbuffer = nil;
-    }
-
-    /* We don't begin a new render pass right away - we delay it until an actual
-     * draw or clear happens. That way we can use hardware clears when possible,
-     * which are only available when beginning a new render pass. */
-    return 0;
-}}
-
-static int
-METAL_SetOrthographicProjection(SDL_Renderer *renderer, int w, int h)
-{ @autoreleasepool {
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-    float projection[4][4];
-
-    if (!w || !h) {
-        return 0;
-    }
-
-    /* Prepare an orthographic projection */
-    projection[0][0] = 2.0f / w;
-    projection[0][1] = 0.0f;
-    projection[0][2] = 0.0f;
-    projection[0][3] = 0.0f;
-    projection[1][0] = 0.0f;
-    projection[1][1] = -2.0f / h;
-    projection[1][2] = 0.0f;
-    projection[1][3] = 0.0f;
-    projection[2][0] = 0.0f;
-    projection[2][1] = 0.0f;
-    projection[2][2] = 0.0f;
-    projection[2][3] = 0.0f;
-    projection[3][0] = -1.0f;
-    projection[3][1] = 1.0f;
-    projection[3][2] = 0.0f;
-    projection[3][3] = 1.0f;
-
-    // !!! FIXME: This should be in a buffer...
-    [data.mtlcmdencoder setVertexBytes:projection length:sizeof(float)*16 atIndex:2];
-    return 0;
-}}
-
-static int
-METAL_UpdateViewport(SDL_Renderer * renderer)
-{ @autoreleasepool {
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-    if (data.mtlcmdencoder) {
-        MTLViewport viewport;
-        viewport.originX = renderer->viewport.x;
-        viewport.originY = renderer->viewport.y;
-        viewport.width = renderer->viewport.w;
-        viewport.height = renderer->viewport.h;
-        viewport.znear = 0.0;
-        viewport.zfar = 1.0;
-        [data.mtlcmdencoder setViewport:viewport];
-        METAL_SetOrthographicProjection(renderer, renderer->viewport.w, renderer->viewport.h);
-    }
-    return 0;
-}}
-
-static int
-METAL_UpdateClipRect(SDL_Renderer * renderer)
-{ @autoreleasepool {
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-    if (data.mtlcmdencoder) {
-        MTLScissorRect mtlrect;
-        // !!! FIXME: should this care about the viewport?
-        if (renderer->clipping_enabled) {
-            const SDL_Rect *rect = &renderer->clip_rect;
-            mtlrect.x = renderer->viewport.x + rect->x;
-            mtlrect.y = renderer->viewport.x + rect->y;
-            mtlrect.width = rect->w;
-            mtlrect.height = rect->h;
-        } else {
-            mtlrect.x = renderer->viewport.x;
-            mtlrect.y = renderer->viewport.y;
-            mtlrect.width = renderer->viewport.w;
-            mtlrect.height = renderer->viewport.h;
-        }
-        if (mtlrect.width > 0 && mtlrect.height > 0) {
-            [data.mtlcmdencoder setScissorRect:mtlrect];
-        }
-    }
-    return 0;
-}}
-
-static int
-METAL_RenderClear(SDL_Renderer * renderer)
-{ @autoreleasepool {
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-
-    /* Since we set up the render command encoder lazily when a draw is
-     * requested, we can do the fast path hardware clear if no draws have
-     * happened since the last SetRenderTarget. */
-    if (data.mtlcmdencoder == nil) {
-        METAL_ActivateRenderCommandEncoder(renderer, MTLLoadActionClear);
-    } else {
-        // !!! FIXME: render color should live in a dedicated uniform buffer.
-        const float color[4] = { ((float)renderer->r) / 255.0f, ((float)renderer->g) / 255.0f, ((float)renderer->b) / 255.0f, ((float)renderer->a) / 255.0f };
-
-        MTLViewport viewport;  // RenderClear ignores the viewport state, though, so reset that.
-        viewport.originX = viewport.originY = 0.0;
-        viewport.width = data.mtlpassdesc.colorAttachments[0].texture.width;
-        viewport.height = data.mtlpassdesc.colorAttachments[0].texture.height;
-        viewport.znear = 0.0;
-        viewport.zfar = 1.0;
-
-        // Slow path for clearing: draw a filled fullscreen triangle.
-        METAL_SetOrthographicProjection(renderer, 1, 1);
-        [data.mtlcmdencoder setViewport:viewport];
-        [data.mtlcmdencoder setRenderPipelineState:ChoosePipelineState(data, data.activepipelines, SDL_METAL_FRAGMENT_SOLID, SDL_BLENDMODE_NONE)];
-        [data.mtlcmdencoder setVertexBuffer:data.mtlbufconstants offset:CONSTANTS_OFFSET_CLEAR_VERTS atIndex:0];
-        [data.mtlcmdencoder setVertexBuffer:data.mtlbufconstants offset:CONSTANTS_OFFSET_IDENTITY atIndex:3];
-        [data.mtlcmdencoder setFragmentBytes:color length:sizeof(color) atIndex:0];
-        [data.mtlcmdencoder drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:3];
-
-        // reset the viewport for the rest of our usual drawing work...
-        viewport.originX = renderer->viewport.x;
-        viewport.originY = renderer->viewport.y;
-        viewport.width = renderer->viewport.w;
-        viewport.height = renderer->viewport.h;
-        viewport.znear = 0.0;
-        viewport.zfar = 1.0;
-        [data.mtlcmdencoder setViewport:viewport];
-        METAL_SetOrthographicProjection(renderer, renderer->viewport.w, renderer->viewport.h);
-    }
-
-    return 0;
-}}
-
-// normalize a value from 0.0f to len into 0.0f to 1.0f.
-static inline float
-normtex(const float _val, const float len)
-{
-    return _val / len;
-}
-
-static int
-DrawVerts(SDL_Renderer * renderer, const SDL_FPoint * points, int count,
-          const MTLPrimitiveType primtype)
-{ @autoreleasepool {
-    METAL_ActivateRenderCommandEncoder(renderer, MTLLoadActionLoad);
-
-    const size_t vertlen = (sizeof (float) * 2) * count;
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-
-    // !!! FIXME: render color should live in a dedicated uniform buffer.
-    const float color[4] = { ((float)renderer->r) / 255.0f, ((float)renderer->g) / 255.0f, ((float)renderer->b) / 255.0f, ((float)renderer->a) / 255.0f };
-
-    [data.mtlcmdencoder setRenderPipelineState:ChoosePipelineState(data, data.activepipelines, SDL_METAL_FRAGMENT_SOLID, renderer->blendMode)];
-    [data.mtlcmdencoder setFragmentBytes:color length:sizeof(color) atIndex:0];
-
-    [data.mtlcmdencoder setVertexBytes:points length:vertlen atIndex:0];
-    [data.mtlcmdencoder setVertexBuffer:data.mtlbufconstants offset:CONSTANTS_OFFSET_HALF_PIXEL_TRANSFORM atIndex:3];
-    [data.mtlcmdencoder drawPrimitives:primtype vertexStart:0 vertexCount:count];
-
-    return 0;
-}}
-
-static int
-METAL_RenderDrawPoints(SDL_Renderer * renderer, const SDL_FPoint * points, int count)
-{
-    return DrawVerts(renderer, points, count, MTLPrimitiveTypePoint);
-}
-
-static int
-METAL_RenderDrawLines(SDL_Renderer * renderer, const SDL_FPoint * points, int count)
-{
-    return DrawVerts(renderer, points, count, MTLPrimitiveTypeLineStrip);
-}
-
-static int
-METAL_RenderFillRects(SDL_Renderer * renderer, const SDL_FRect * rects, int count)
-{ @autoreleasepool {
-    METAL_ActivateRenderCommandEncoder(renderer, MTLLoadActionLoad);
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-
-    // !!! FIXME: render color should live in a dedicated uniform buffer.
-    const float color[4] = { ((float)renderer->r) / 255.0f, ((float)renderer->g) / 255.0f, ((float)renderer->b) / 255.0f, ((float)renderer->a) / 255.0f };
-
-    [data.mtlcmdencoder setRenderPipelineState:ChoosePipelineState(data, data.activepipelines, SDL_METAL_FRAGMENT_SOLID, renderer->blendMode)];
-    [data.mtlcmdencoder setFragmentBytes:color length:sizeof(color) atIndex:0];
-    [data.mtlcmdencoder setVertexBuffer:data.mtlbufconstants offset:CONSTANTS_OFFSET_IDENTITY atIndex:3];
-
-    for (int i = 0; i < count; i++, rects++) {
-        if ((rects->w <= 0.0f) || (rects->h <= 0.0f)) continue;
-
-        const float verts[] = {
-            rects->x, rects->y + rects->h,
-            rects->x, rects->y,
-            rects->x + rects->w, rects->y + rects->h,
-            rects->x + rects->w, rects->y
-        };
-
-        [data.mtlcmdencoder setVertexBytes:verts length:sizeof(verts) atIndex:0];
-        [data.mtlcmdencoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4];
-    }
-
-    return 0;
-}}
-
-static void
-METAL_SetupRenderCopy(METAL_RenderData *data, SDL_Texture *texture, METAL_TextureData *texturedata)
-{
-    float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    if (texture->modMode) {
-        color[0] = ((float)texture->r) / 255.0f;
-        color[1] = ((float)texture->g) / 255.0f;
-        color[2] = ((float)texture->b) / 255.0f;
-        color[3] = ((float)texture->a) / 255.0f;
-    }
-
-    [data.mtlcmdencoder setRenderPipelineState:ChoosePipelineState(data, data.activepipelines, texturedata.fragmentFunction, texture->blendMode)];
-    [data.mtlcmdencoder setFragmentBytes:color length:sizeof(color) atIndex:0];
-    [data.mtlcmdencoder setFragmentSamplerState:texturedata.mtlsampler atIndex:0];
-
-    [data.mtlcmdencoder setFragmentTexture:texturedata.mtltexture atIndex:0];
-
-    if (texturedata.yuv || texturedata.nv12) {
-        [data.mtlcmdencoder setFragmentTexture:texturedata.mtltexture_uv atIndex:1];
-        [data.mtlcmdencoder setFragmentBuffer:data.mtlbufconstants offset:texturedata.conversionBufferOffset atIndex:1];
-    }
-}
-
-static int
-METAL_RenderCopy(SDL_Renderer * renderer, SDL_Texture * texture,
-              const SDL_Rect * srcrect, const SDL_FRect * dstrect)
-{ @autoreleasepool {
-    METAL_ActivateRenderCommandEncoder(renderer, MTLLoadActionLoad);
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-    METAL_TextureData *texturedata = (__bridge METAL_TextureData *)texture->driverdata;
-    const float texw = (float) texturedata.mtltexture.width;
-    const float texh = (float) texturedata.mtltexture.height;
-
-    METAL_SetupRenderCopy(data, texture, texturedata);
-
-    const float xy[] = {
-        dstrect->x, dstrect->y + dstrect->h,
-        dstrect->x, dstrect->y,
-        dstrect->x + dstrect->w, dstrect->y + dstrect->h,
-        dstrect->x + dstrect->w, dstrect->y
-    };
-
-    const float uv[] = {
-        normtex(srcrect->x, texw), normtex(srcrect->y + srcrect->h, texh),
-        normtex(srcrect->x, texw), normtex(srcrect->y, texh),
-        normtex(srcrect->x + srcrect->w, texw), normtex(srcrect->y + srcrect->h, texh),
-        normtex(srcrect->x + srcrect->w, texw), normtex(srcrect->y, texh)
-    };
-
-    [data.mtlcmdencoder setVertexBytes:xy length:sizeof(xy) atIndex:0];
-    [data.mtlcmdencoder setVertexBytes:uv length:sizeof(uv) atIndex:1];
-    [data.mtlcmdencoder setVertexBuffer:data.mtlbufconstants offset:CONSTANTS_OFFSET_IDENTITY atIndex:3];
-    [data.mtlcmdencoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4];
-
-    return 0;
-}}
-
-static int
-METAL_RenderCopyEx(SDL_Renderer * renderer, SDL_Texture * texture,
-              const SDL_Rect * srcrect, const SDL_FRect * dstrect,
-              const double angle, const SDL_FPoint *center, const SDL_RendererFlip flip)
-{ @autoreleasepool {
-    METAL_ActivateRenderCommandEncoder(renderer, MTLLoadActionLoad);
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-    METAL_TextureData *texturedata = (__bridge METAL_TextureData *)texture->driverdata;
-    const float texw = (float) texturedata.mtltexture.width;
-    const float texh = (float) texturedata.mtltexture.height;
-    float transform[16];
-    float minu, maxu, minv, maxv;
-
-    METAL_SetupRenderCopy(data, texture, texturedata);
-
-    minu = normtex(srcrect->x, texw);
-    maxu = normtex(srcrect->x + srcrect->w, texw);
-    minv = normtex(srcrect->y, texh);
-    maxv = normtex(srcrect->y + srcrect->h, texh);
-
-    if (flip & SDL_FLIP_HORIZONTAL) {
-        float tmp = maxu;
-        maxu = minu;
-        minu = tmp;
-    }
-    if (flip & SDL_FLIP_VERTICAL) {
-        float tmp = maxv;
-        maxv = minv;
-        minv = tmp;
-    }
-
-    const float uv[] = {
-        minu, maxv,
-        minu, minv,
-        maxu, maxv,
-        maxu, minv
-    };
-
-    const float xy[] = {
-        -center->x, dstrect->h - center->y,
-        -center->x, -center->y,
-        dstrect->w - center->x, dstrect->h - center->y,
-        dstrect->w - center->x, -center->y
-    };
-
+SDL_RenderDriver METAL_RenderDriver = {
+    METAL_CreateRenderer,
     {
-        float rads = (float)(M_PI * (float) angle / 180.0f);
-        float c = cosf(rads), s = sinf(rads);
-        SDL_memset(transform, 0, sizeof(transform));
-
-        transform[10] = transform[15] = 1.0f;
-
-        /* Rotation */
-        transform[0]  = c;
-        transform[1]  = s;
-        transform[4]  = -s;
-        transform[5]  = c;
-
-        /* Translation */
-        transform[12] = dstrect->x + center->x;
-        transform[13] = dstrect->y + center->y;
+        "metal",
+        (SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE),
+        6,
+        {
+            SDL_PIXELFORMAT_ARGB8888,
+            SDL_PIXELFORMAT_ABGR8888,
+            SDL_PIXELFORMAT_YV12,
+            SDL_PIXELFORMAT_IYUV,
+            SDL_PIXELFORMAT_NV12,
+            SDL_PIXELFORMAT_NV21
+        },
+    0, 0,
     }
-
-    [data.mtlcmdencoder setVertexBytes:xy length:sizeof(xy) atIndex:0];
-    [data.mtlcmdencoder setVertexBytes:uv length:sizeof(uv) atIndex:1];
-    [data.mtlcmdencoder setVertexBytes:transform length:sizeof(transform) atIndex:3];
-    [data.mtlcmdencoder drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4];
-
-    return 0;
-}}
-
-static int
-METAL_RenderReadPixels(SDL_Renderer * renderer, const SDL_Rect * rect,
-                    Uint32 pixel_format, void * pixels, int pitch)
-{ @autoreleasepool {
-    METAL_ActivateRenderCommandEncoder(renderer, MTLLoadActionLoad);
-
-    // !!! FIXME: this probably needs to commit the current command buffer, and probably waitUntilCompleted
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-    id<MTLTexture> mtltexture = data.mtlpassdesc.colorAttachments[0].texture;
-    MTLRegion mtlregion = MTLRegionMake2D(rect->x, rect->y, rect->w, rect->h);
-
-    // we only do BGRA8 or RGBA8 at the moment, so 4 will do.
-    const int temp_pitch = rect->w * 4;
-    void *temp_pixels = SDL_malloc(temp_pitch * rect->h);
-    if (!temp_pixels) {
-        return SDL_OutOfMemory();
-    }
-
-    [mtltexture getBytes:temp_pixels bytesPerRow:temp_pitch fromRegion:mtlregion mipmapLevel:0];
-
-    const Uint32 temp_format = (mtltexture.pixelFormat == MTLPixelFormatBGRA8Unorm) ? SDL_PIXELFORMAT_ARGB8888 : SDL_PIXELFORMAT_ABGR8888;
-    const int status = SDL_ConvertPixels(rect->w, rect->h, temp_format, temp_pixels, temp_pitch, pixel_format, pixels, pitch);
-    SDL_free(temp_pixels);
-    return status;
-}}
-
-static void
-METAL_RenderPresent(SDL_Renderer * renderer)
-{ @autoreleasepool {
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-
-    if (data.mtlcmdencoder != nil) {
-        [data.mtlcmdencoder endEncoding];
-    }
-    if (data.mtlbackbuffer != nil) {
-        [data.mtlcmdbuffer presentDrawable:data.mtlbackbuffer];
-    }
-    if (data.mtlcmdbuffer != nil) {
-        [data.mtlcmdbuffer commit];
-    }
-    data.mtlcmdencoder = nil;
-    data.mtlcmdbuffer = nil;
-    data.mtlbackbuffer = nil;
-}}
-
-static void
-METAL_DestroyTexture(SDL_Renderer * renderer, SDL_Texture * texture)
-{ @autoreleasepool {
-    CFBridgingRelease(texture->driverdata);
-    texture->driverdata = NULL;
-}}
-
-static void
-METAL_DestroyRenderer(SDL_Renderer * renderer)
-{ @autoreleasepool {
-    if (renderer->driverdata) {
-        METAL_RenderData *data = CFBridgingRelease(renderer->driverdata);
-
-        if (data.mtlcmdencoder != nil) {
-            [data.mtlcmdencoder endEncoding];
-        }
-
-        DestroyAllPipelines(data.allpipelines, data.pipelinescount);
-    }
-
-    SDL_free(renderer);
-}}
-
-static void *
-METAL_GetMetalLayer(SDL_Renderer * renderer)
-{ @autoreleasepool {
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-    return (__bridge void*)data.mtllayer;
-}}
-
-static void *
-METAL_GetMetalCommandEncoder(SDL_Renderer * renderer)
-{ @autoreleasepool {
-    METAL_ActivateRenderCommandEncoder(renderer, MTLLoadActionLoad);
-    METAL_RenderData *data = (__bridge METAL_RenderData *) renderer->driverdata;
-    return (__bridge void*)data.mtlcmdencoder;
-}}
+};
 
 #endif /* SDL_VIDEO_RENDER_METAL && !SDL_RENDER_DISABLED */
 

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -62,6 +62,7 @@ typedef struct SDL_WindowData
     struct gbm_surface *gs;
     struct gbm_bo *current_bo;
     struct gbm_bo *next_bo;
+    struct gbm_bo *crtc_bo;
     SDL_bool waiting_for_flip;
     SDL_bool crtc_ready;
     SDL_bool double_buffer;

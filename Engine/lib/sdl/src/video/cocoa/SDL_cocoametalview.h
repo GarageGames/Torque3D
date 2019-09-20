@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -39,15 +39,15 @@
 
 #define METALVIEW_TAG 255
 
-@interface SDL_cocoametalview : NSView {
-    NSInteger _tag;
-}
+@interface SDL_cocoametalview : NSView
 
 - (instancetype)initWithFrame:(NSRect)frame
-                        scale:(CGFloat)scale;
+                      highDPI:(BOOL)highDPI;
 
 /* Override superclass tag so this class can set it. */
 @property (assign, readonly) NSInteger tag;
+
+@property (nonatomic) BOOL highDPI;
 
 @end
 

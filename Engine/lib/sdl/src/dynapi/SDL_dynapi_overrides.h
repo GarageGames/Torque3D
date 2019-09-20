@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -669,3 +669,58 @@
 #define SDL_WinRTGetDeviceFamily SDL_WinRTGetDeviceFamily_REAL
 #define SDL_log10 SDL_log10_REAL
 #define SDL_log10f SDL_log10f_REAL
+#define SDL_GameControllerMappingForDeviceIndex SDL_GameControllerMappingForDeviceIndex_REAL
+#define SDL_LinuxSetThreadPriority SDL_LinuxSetThreadPriority_REAL
+#define SDL_HasAVX512F SDL_HasAVX512F_REAL
+#define SDL_IsChromebook SDL_IsChromebook_REAL
+#define SDL_IsDeXMode SDL_IsDeXMode_REAL
+#define SDL_AndroidBackButton SDL_AndroidBackButton_REAL
+#define SDL_exp SDL_exp_REAL
+#define SDL_expf SDL_expf_REAL
+#define SDL_wcsdup SDL_wcsdup_REAL
+#define SDL_GameControllerRumble SDL_GameControllerRumble_REAL
+#define SDL_JoystickRumble SDL_JoystickRumble_REAL
+#define SDL_NumSensors SDL_NumSensors_REAL
+#define SDL_SensorGetDeviceName SDL_SensorGetDeviceName_REAL
+#define SDL_SensorGetDeviceType SDL_SensorGetDeviceType_REAL
+#define SDL_SensorGetDeviceNonPortableType SDL_SensorGetDeviceNonPortableType_REAL
+#define SDL_SensorGetDeviceInstanceID SDL_SensorGetDeviceInstanceID_REAL
+#define SDL_SensorOpen SDL_SensorOpen_REAL
+#define SDL_SensorFromInstanceID SDL_SensorFromInstanceID_REAL
+#define SDL_SensorGetName SDL_SensorGetName_REAL
+#define SDL_SensorGetType SDL_SensorGetType_REAL
+#define SDL_SensorGetNonPortableType SDL_SensorGetNonPortableType_REAL
+#define SDL_SensorGetInstanceID SDL_SensorGetInstanceID_REAL
+#define SDL_SensorGetData SDL_SensorGetData_REAL
+#define SDL_SensorClose SDL_SensorClose_REAL
+#define SDL_SensorUpdate SDL_SensorUpdate_REAL
+#define SDL_IsTablet SDL_IsTablet_REAL
+#define SDL_GetDisplayOrientation SDL_GetDisplayOrientation_REAL
+#define SDL_HasColorKey SDL_HasColorKey_REAL
+#define SDL_CreateThreadWithStackSize SDL_CreateThreadWithStackSize_REAL
+#define SDL_JoystickGetDevicePlayerIndex SDL_JoystickGetDevicePlayerIndex_REAL
+#define SDL_JoystickGetPlayerIndex SDL_JoystickGetPlayerIndex_REAL
+#define SDL_GameControllerGetPlayerIndex SDL_GameControllerGetPlayerIndex_REAL
+#define SDL_RenderFlush SDL_RenderFlush_REAL
+#define SDL_RenderDrawPointF SDL_RenderDrawPointF_REAL
+#define SDL_RenderDrawPointsF SDL_RenderDrawPointsF_REAL
+#define SDL_RenderDrawLineF SDL_RenderDrawLineF_REAL
+#define SDL_RenderDrawLinesF SDL_RenderDrawLinesF_REAL
+#define SDL_RenderDrawRectF SDL_RenderDrawRectF_REAL
+#define SDL_RenderDrawRectsF SDL_RenderDrawRectsF_REAL
+#define SDL_RenderFillRectF SDL_RenderFillRectF_REAL
+#define SDL_RenderFillRectsF SDL_RenderFillRectsF_REAL
+#define SDL_RenderCopyF SDL_RenderCopyF_REAL
+#define SDL_RenderCopyExF SDL_RenderCopyExF_REAL
+#define SDL_GetTouchDeviceType SDL_GetTouchDeviceType_REAL
+#define SDL_UIKitRunApp SDL_UIKitRunApp_REAL
+#define SDL_SIMDGetAlignment SDL_SIMDGetAlignment_REAL
+#define SDL_SIMDAlloc SDL_SIMDAlloc_REAL
+#define SDL_SIMDFree SDL_SIMDFree_REAL
+#define SDL_RWsize SDL_RWsize_REAL
+#define SDL_RWseek SDL_RWseek_REAL
+#define SDL_RWtell SDL_RWtell_REAL
+#define SDL_RWread SDL_RWread_REAL
+#define SDL_RWwrite SDL_RWwrite_REAL
+#define SDL_RWclose SDL_RWclose_REAL
+#define SDL_LoadFile SDL_LoadFile_REAL

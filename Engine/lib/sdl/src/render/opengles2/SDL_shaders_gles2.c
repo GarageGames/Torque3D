@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -30,20 +30,24 @@
 /*************************************************************************************************
  * Vertex/fragment shader source                                                                 *
  *************************************************************************************************/
-
+/* Notes on a_angle:
+   * It is a vector containing sin and cos for rotation matrix
+   * To get correct rotation for most cases when a_angle is disabled cos
+     value is decremented by 1.0 to get proper output with 0.0 which is
+     default value
+*/
 static const Uint8 GLES2_VertexSrc_Default_[] = " \
     uniform mat4 u_projection; \
     attribute vec2 a_position; \
     attribute vec2 a_texCoord; \
-    attribute float a_angle; \
+    attribute vec2 a_angle; \
     attribute vec2 a_center; \
     varying vec2 v_texCoord; \
     \
     void main() \
     { \
-        float angle = radians(a_angle); \
-        float c = cos(angle); \
-        float s = sin(angle); \
+        float s = a_angle[0]; \
+        float c = a_angle[1] + 1.0; \
         mat2 rotationMatrix = mat2(c, -s, s, c); \
         vec2 position = rotationMatrix * (a_position - a_center) + a_center; \
         v_texCoord = a_texCoord; \
@@ -65,13 +69,13 @@ static const Uint8 GLES2_FragmentSrc_SolidSrc_[] = " \
 static const Uint8 GLES2_FragmentSrc_TextureABGRSrc_[] = " \
     precision mediump float; \
     uniform sampler2D u_texture; \
-    uniform vec4 u_modulation; \
+    uniform vec4 u_color; \
     varying vec2 v_texCoord; \
     \
     void main() \
     { \
         gl_FragColor = texture2D(u_texture, v_texCoord); \
-        gl_FragColor *= u_modulation; \
+        gl_FragColor *= u_color; \
     } \
 ";
 
@@ -79,7 +83,7 @@ static const Uint8 GLES2_FragmentSrc_TextureABGRSrc_[] = " \
 static const Uint8 GLES2_FragmentSrc_TextureARGBSrc_[] = " \
     precision mediump float; \
     uniform sampler2D u_texture; \
-    uniform vec4 u_modulation; \
+    uniform vec4 u_color; \
     varying vec2 v_texCoord; \
     \
     void main() \
@@ -88,7 +92,7 @@ static const Uint8 GLES2_FragmentSrc_TextureARGBSrc_[] = " \
         gl_FragColor = abgr; \
         gl_FragColor.r = abgr.b; \
         gl_FragColor.b = abgr.r; \
-        gl_FragColor *= u_modulation; \
+        gl_FragColor *= u_color; \
     } \
 ";
 
@@ -96,7 +100,7 @@ static const Uint8 GLES2_FragmentSrc_TextureARGBSrc_[] = " \
 static const Uint8 GLES2_FragmentSrc_TextureRGBSrc_[] = " \
     precision mediump float; \
     uniform sampler2D u_texture; \
-    uniform vec4 u_modulation; \
+    uniform vec4 u_color; \
     varying vec2 v_texCoord; \
     \
     void main() \
@@ -106,7 +110,7 @@ static const Uint8 GLES2_FragmentSrc_TextureRGBSrc_[] = " \
         gl_FragColor.r = abgr.b; \
         gl_FragColor.b = abgr.r; \
         gl_FragColor.a = 1.0; \
-        gl_FragColor *= u_modulation; \
+        gl_FragColor *= u_color; \
     } \
 ";
 
@@ -114,7 +118,7 @@ static const Uint8 GLES2_FragmentSrc_TextureRGBSrc_[] = " \
 static const Uint8 GLES2_FragmentSrc_TextureBGRSrc_[] = " \
     precision mediump float; \
     uniform sampler2D u_texture; \
-    uniform vec4 u_modulation; \
+    uniform vec4 u_color; \
     varying vec2 v_texCoord; \
     \
     void main() \
@@ -122,7 +126,7 @@ static const Uint8 GLES2_FragmentSrc_TextureBGRSrc_[] = " \
         vec4 abgr = texture2D(u_texture, v_texCoord); \
         gl_FragColor = abgr; \
         gl_FragColor.a = 1.0; \
-        gl_FragColor *= u_modulation; \
+        gl_FragColor *= u_color; \
     } \
 ";
 
@@ -159,7 +163,7 @@ static const Uint8 GLES2_FragmentSrc_TextureBGRSrc_[] = " \
 "uniform sampler2D u_texture;\n"                                \
 "uniform sampler2D u_texture_u;\n"                              \
 "uniform sampler2D u_texture_v;\n"                              \
-"uniform vec4 u_modulation;\n"                                  \
+"uniform vec4 u_color;\n"                                  \
 "varying vec2 v_texCoord;\n"                                    \
 "\n"                                                            \
 
@@ -181,7 +185,7 @@ static const Uint8 GLES2_FragmentSrc_TextureBGRSrc_[] = " \
 "\n"                                                            \
 "    // That was easy. :) \n"                                   \
 "    gl_FragColor = vec4(rgb, 1);\n"                            \
-"    gl_FragColor *= u_modulation;\n"                           \
+"    gl_FragColor *= u_color;\n"                           \
 "}"                                                             \
 
 #define NV12_SHADER_BODY                                        \
@@ -201,7 +205,7 @@ static const Uint8 GLES2_FragmentSrc_TextureBGRSrc_[] = " \
 "\n"                                                            \
 "    // That was easy. :) \n"                                   \
 "    gl_FragColor = vec4(rgb, 1);\n"                            \
-"    gl_FragColor *= u_modulation;\n"                           \
+"    gl_FragColor *= u_color;\n"                           \
 "}"                                                             \
 
 #define NV21_SHADER_BODY                                        \
@@ -221,7 +225,7 @@ static const Uint8 GLES2_FragmentSrc_TextureBGRSrc_[] = " \
 "\n"                                                            \
 "    // That was easy. :) \n"                                   \
 "    gl_FragColor = vec4(rgb, 1);\n"                            \
-"    gl_FragColor *= u_modulation;\n"                           \
+"    gl_FragColor *= u_color;\n"                           \
 "}"                                                             \
 
 /* YUV to ABGR conversion */
@@ -280,13 +284,13 @@ static const Uint8 GLES2_FragmentSrc_TextureExternalOESSrc_[] = " \
     #extension GL_OES_EGL_image_external : require\n\
     precision mediump float; \
     uniform samplerExternalOES u_texture; \
-    uniform vec4 u_modulation; \
+    uniform vec4 u_color; \
     varying vec2 v_texCoord; \
     \
     void main() \
     { \
         gl_FragColor = texture2D(u_texture, v_texCoord); \
-        gl_FragColor *= u_modulation; \
+        gl_FragColor *= u_color; \
     } \
 ";
 

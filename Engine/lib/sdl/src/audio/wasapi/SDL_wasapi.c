@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -161,21 +161,6 @@ WASAPI_DetectDevices(void)
     WASAPI_EnumerateEndpoints();
 }
 
-static int
-WASAPI_GetPendingBytes(_THIS)
-{
-    UINT32 frames = 0;
-
-    /* it's okay to fail here; we'll deal with failures in the audio thread. */
-    /* FIXME: need a lock around checking this->hidden->client */
-    if (this->hidden->client != NULL) {  /* definitely activated? */
-        if (FAILED(IAudioClient_GetCurrentPadding(this->hidden->client, &frames))) {
-            return 0;  /* oh well. */
-        }
-    }
-    return ((int) frames) * this->hidden->framesize;
-}
-
 static SDL_INLINE SDL_bool
 WasapiFailed(_THIS, const HRESULT err)
 {
@@ -327,8 +312,8 @@ static void
 WASAPI_WaitDevice(_THIS)
 {
     while (RecoverWasapiIfLost(this) && this->hidden->client && this->hidden->event) {
-        /*SDL_Log("WAITDEVICE");*/
-        if (WaitForSingleObjectEx(this->hidden->event, INFINITE, FALSE) == WAIT_OBJECT_0) {
+        DWORD waitResult = WaitForSingleObjectEx(this->hidden->event, 200, FALSE);
+        if (waitResult == WAIT_OBJECT_0) {
             const UINT32 maxpadding = this->spec.samples;
             UINT32 padding = 0;
             if (!WasapiFailed(this, IAudioClient_GetCurrentPadding(this->hidden->client, &padding))) {
@@ -337,7 +322,7 @@ WASAPI_WaitDevice(_THIS)
                     break;
                 }
             }
-        } else {
+        } else if (waitResult != WAIT_TIMEOUT) {
             /*SDL_Log("WASAPI FAILED EVENT!");*/
             IAudioClient_Stop(this->hidden->client);
             SDL_OpenedAudioDeviceDisconnected(this);
@@ -725,6 +710,12 @@ WASAPI_ThreadDeinit(_THIS)
     WASAPI_PlatformThreadDeinit(this);
 }
 
+void
+WASAPI_BeginLoopIteration(_THIS)
+{
+	/* no-op. */
+}
+
 static void
 WASAPI_Deinitialize(void)
 {
@@ -759,7 +750,6 @@ WASAPI_Init(SDL_AudioDriverImpl * impl)
     impl->OpenDevice = WASAPI_OpenDevice;
     impl->PlayDevice = WASAPI_PlayDevice;
     impl->WaitDevice = WASAPI_WaitDevice;
-    impl->GetPendingBytes = WASAPI_GetPendingBytes;
     impl->GetDeviceBuf = WASAPI_GetDeviceBuf;
     impl->CaptureFromDevice = WASAPI_CaptureFromDevice;
     impl->FlushCapture = WASAPI_FlushCapture;
