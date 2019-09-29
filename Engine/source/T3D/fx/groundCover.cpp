@@ -316,8 +316,7 @@ U32 GroundCoverCell::renderShapes(  const TSRenderState &rdata,
       camVector = inst.point - state->getDiffuseCameraPosition();
       dist = getMax( camVector.len(), 0.01f );
 
-      worldMat.set( EulerF(0, 0, inst.rotation), inst.point );
-
+      worldMat.set( EulerF(inst.normal.x, inst.normal.y, inst.rotation), inst.point );
       // TSShapeInstance::render() uses the 
       // world matrix for the RenderInst.
       worldMat.scale( inst.size );
@@ -423,6 +422,7 @@ U32 GroundCover::smStatRenderedBillboards = 0;
 U32 GroundCover::smStatRenderedBatches = 0;
 U32 GroundCover::smStatRenderedShapes = 0;
 F32 GroundCover::smDensityScale = 1.0f;
+F32 GroundCover::smFadeScale = 1.0f;
 
 ConsoleDocClass( GroundCover,
    "@brief Covers the ground in a field of objects (IE: Grass, Flowers, etc)."
@@ -494,7 +494,14 @@ GroundCover::GroundCover()
 
       mWindScale[i] = 1.0f;
 
+	  mMinSlope[i] = 0.0f;
       mMaxSlope[i] = 0.0f;
+
+	  mConformToNormal[i] = false;
+	  mMinRotX[i] = 0.0f;
+	  mMaxRotX[i] = 0.0f;
+	  mMinRotY[i] = 0.0f;
+	  mMaxRotY[i] = 0.0f;
 
       mMinElevation[i] = -99999.0f;
       mMaxElevation[i] = 99999.0f;
@@ -566,7 +573,15 @@ void GroundCover::initPersistFields()
 
          addField( "windScale",     TypeF32,       Offset( mWindScale, GroundCover ), MAX_COVERTYPES,       "The wind effect scale." );
 
+		 addField( "minSlope",      TypeF32,       Offset(mMinSlope, GroundCover), MAX_COVERTYPES,          "The minimum slope angle in degrees for placement.");
+
          addField( "maxSlope",      TypeF32,       Offset( mMaxSlope, GroundCover ), MAX_COVERTYPES,        "The maximum slope angle in degrees for placement." );
+
+		 addField("conformToNormal",TypeBool,      Offset(mConformToNormal, GroundCover), MAX_COVERTYPES,   "Use the terrain's slope for angle");
+		 addField("minRotX",        TypeF32,       Offset(mMinRotX, GroundCover), MAX_COVERTYPES,           "minumum amount of rotation along the X axis to add");
+		 addField("maxRotX",        TypeF32,       Offset(mMaxRotX, GroundCover), MAX_COVERTYPES,           "maximum amount of rotation along the X axis to add");
+		 addField("minRotY",        TypeF32,       Offset(mMinRotY, GroundCover), MAX_COVERTYPES,           "minumum amount of rotation along the Y axis to add");
+		 addField("maxRotY",        TypeF32,       Offset(mMaxRotY, GroundCover), MAX_COVERTYPES,           "maximum amount of rotation along the Y axis to add");
 
          addField( "minElevation",  TypeF32,       Offset( mMinElevation, GroundCover ), MAX_COVERTYPES,    "The minimum world space elevation for placement." );
 
@@ -612,6 +627,8 @@ void GroundCover::initPersistFields()
 void GroundCover::consoleInit()
 {     
    Con::addVariable( "$pref::GroundCover::densityScale", TypeF32, &smDensityScale, "A global LOD scalar which can reduce the overall density of placed GroundCover.\n" 
+	   "@ingroup Foliage\n");
+   Con::addVariable("$pref::GroundCover::fadeScale", TypeF32, &smFadeScale, "A global fade scalar which can reduce the overall rendered distance of placed GroundCover.\n"
 	   "@ingroup Foliage\n");
 
    Con::addVariable( "$GroundCover::renderedCells", TypeS32, &smStatRenderedCells, "Stat for number of rendered cells.\n"
@@ -720,7 +737,13 @@ U32 GroundCover::packUpdate( NetConnection *connection, U32 mask, BitStream *str
          stream->write( mSizeExponent[i] );
          stream->write( mWindScale[i] );
          
+         stream->write( mMinSlope[i] );
          stream->write( mMaxSlope[i] );
+		 stream->writeFlag(mConformToNormal[i]);
+		 stream->write(mMinRotX[i]);
+		 stream->write(mMaxRotX[i]);
+		 stream->write(mMinRotY[i]);
+		 stream->write(mMaxRotY[i]);
          
          stream->write( mMinElevation[i] );
          stream->write( mMaxElevation[i] );     
@@ -785,7 +808,13 @@ void GroundCover::unpackUpdate( NetConnection *connection, BitStream *stream )
          stream->read( &mSizeExponent[i] );
          stream->read( &mWindScale[i] );
 
+         stream->read( &mMinSlope[i] );
          stream->read( &mMaxSlope[i] );
+		 mConformToNormal[i] = stream->readFlag();
+		 stream->read(&mMinRotX[i]);
+		 stream->read(&mMaxRotX[i]);
+		 stream->read(&mMinRotY[i]);
+		 stream->read(&mMaxRotY[i]);
 
          stream->read( &mMinElevation[i] );
          stream->read( &mMaxElevation[i] );     
@@ -1137,7 +1166,14 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
       F32 flipBB = -1.0f;
 
       // Precompute a few other type specific values.
+	  const bool typeConformToNormal = mConformToNormal[type];
+	  const F32 typeMinRotX = (mMaxRotX[type] > mMinRotX[type]) ? mMinRotX[type] : mMaxRotX[type];
+	  const F32 typeMaxRotX = (mMaxRotX[type] > mMinRotX[type]) ? mMaxRotX[type] : mMinRotX[type];
+	  const F32 typeMinRotY = (mMaxRotY[type] > mMinRotY[type]) ? mMinRotY[type] : mMaxRotY[type];
+	  const F32 typeMaxRotY = (mMaxRotY[type] > mMinRotY[type]) ? mMaxRotY[type] : mMinRotY[type];
+	  
       const F32 typeSizeRange = mSizeMax[type] - mSizeMin[type];
+	  const F32 typeMinSlope = mMinSlope[type];
       const F32 typeMaxSlope = mMaxSlope[type];
       const F32 typeMaxElevation = mMaxElevation[type];
       const F32 typeMinElevation = mMinElevation[type];
@@ -1248,11 +1284,22 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
                continue;
          }
 
+		 if (!mIsZero(typeMinSlope))
+		 {
+			 if (mAcos(normal.z) < mDegToRad(typeMinSlope))
+				 continue;
+		 }
          point.set( cp.x, cp.y, h );
          p.point = point;
          p.rotation = rotation;
          p.normal = normal;
-
+		 if (!typeConformToNormal)
+		 {
+			 p.normal.y = 0;
+			 p.normal.x = 0;
+		 }
+		 p.normal.x += rand.randF(typeMinRotX, typeMaxRotX);
+		 p.normal.y += rand.randF(typeMinRotY, typeMaxRotY);
          // Grab the terrain lightmap color at this position.
          //
          // TODO: Can't we remove this test?  The terrain 
@@ -1557,7 +1604,8 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
       F32 screenScale = state->getWorldToScreenScale().y / state->getViewport().extent.y;
 
       // Set the far distance for billboards.
-      mCuller.setFarDist( mRadius * screenScale );
+	  F32 radius = mRadius * smFadeScale;
+      mCuller.setFarDist(radius * screenScale );
 
       F32 cullScale = 1.0f;
       if ( state->isReflectPass() )
@@ -1566,7 +1614,7 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
       // Setup our shader const data.
       // Must be done prior to submitting our render instance.
 
-      mShaderConstData.fadeInfo.set( mFadeRadius * cullScale * screenScale, mRadius * cullScale * screenScale );    
+      mShaderConstData.fadeInfo.set( mFadeRadius * smFadeScale * cullScale * screenScale, radius * cullScale * screenScale );
 
       const F32 simTime = Sim::getCurrentTime() * 0.001f;
 
@@ -1644,7 +1692,7 @@ void GroundCover::prepRenderImage( SceneRenderState *state )
       rdata.setLightQuery( &query );
 
       // TODO: Add a special fade out for DTS?
-      mCuller.setFarDist( mShapeCullRadius );
+      mCuller.setFarDist( mShapeCullRadius*smFadeScale);
 
       for ( S32 i = 0; i < mCellGrid.size(); i++ )
       {

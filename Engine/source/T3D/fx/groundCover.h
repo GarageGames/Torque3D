@@ -54,7 +54,7 @@ class MaterialParameterHandle;
 
 
 ///
-#define MAX_COVERTYPES 8
+#define MAX_COVERTYPES 32
 
 
 GFXDeclareVertexFormat( GCVertex )
@@ -151,6 +151,13 @@ public:
    /// Returns the current quality scale... see above.
    static F32 getQualityScale() { return smDensityScale; }
 
+   /// Sets the global ground cover fade scalar which controls
+   /// the percentage of the maximum designed distance to display cover.
+   /// Returns the actual value set.
+   static F32 setFadeScale(F32 scale) { return smFadeScale = mClampF(scale, 0.0f, 1.0f); }
+
+   /// Returns the current fade scale... see above.
+   static F32 getFadeScale() { return smFadeScale; }
 protected:      
 
    enum MaskBits 
@@ -255,6 +262,7 @@ protected:
    /// down.  It scales both rendering cost and placement
    /// CPU performance.
    static F32 smDensityScale;   
+   static F32 smFadeScale;
 
    String mMaterialName;
    Material *mMaterial;
@@ -283,7 +291,17 @@ protected:
    F32 mWindScale[MAX_COVERTYPES];
 
    /// The maximum slope angle in degrees for placement.
+   F32 mMinSlope[MAX_COVERTYPES];
+
+   /// The maximum slope angle in degrees for placement.
    F32 mMaxSlope[MAX_COVERTYPES];
+
+   /// conform the x/y rotations to gorund normal
+   bool mConformToNormal[MAX_COVERTYPES];
+   F32 mMinRotX[MAX_COVERTYPES];
+   F32 mMaxRotX[MAX_COVERTYPES];
+   F32 mMinRotY[MAX_COVERTYPES];
+   F32 mMaxRotY[MAX_COVERTYPES];
 
    /// The minimum world space elevation for placement.
    F32 mMinElevation[MAX_COVERTYPES];
