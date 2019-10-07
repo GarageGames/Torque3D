@@ -403,7 +403,7 @@ private:
 
    template<size_t I>
    static typename fixed_tuple_element<I, fixed_tuple<ArgTs...>>::type getAndToType(const ArgsType& args) {
-      return typename EngineTypeTraits<typename fixed_tuple_element<I, fixed_tuple<ArgTs...>>::type>::ArgumentToValue(fixed_tuple_accessor<I>::get(args));
+      return EngineTypeTraits<typename fixed_tuple_element<I, fixed_tuple<ArgTs...>>::type>::ArgumentToValue(fixed_tuple_accessor<I>::get(args));
    }
 
    template<size_t ...I>
