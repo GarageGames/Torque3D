@@ -112,7 +112,7 @@ private:
 
    template<typename ...TailTs> using MaybeSelfEnabled = typename DodgyVCHelper<TailTs...>::type;
 #else
-   template<typename ...TailTs> using MaybeSelfEnabled = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), decltype(mArgs)>::type;
+   template<typename ...TailTs> using MaybeSelfEnabled = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), std::tuple<DefVST<ArgTs>...>>::type;
 #endif
    
    template<typename ...TailTs> static MaybeSelfEnabled<TailTs...> tailInit(TailTs ...tail) {
