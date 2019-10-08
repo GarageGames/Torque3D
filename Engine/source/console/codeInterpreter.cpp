@@ -2079,7 +2079,7 @@ OPCodeReturn CodeInterpreter::op_callfunc(U32 &ip)
          mNSEntry = Namespace::global()->lookup(fnName);
 
       StringStackWrapper args(mCallArgc, mCallArgv);
-      cRetRes = CInterface::GetCInterface().CallFunction(fnNamespace, fnName, args.argv, args.argc, &cFunctionRes);
+      cRetRes = CInterface::CallFunction(fnNamespace, fnName, args.argv + 1, args.argc - 1, &cFunctionRes);
    }
    else if (callType == FuncCallExprNode::MethodCall)
    {
@@ -2112,7 +2112,7 @@ OPCodeReturn CodeInterpreter::op_callfunc(U32 &ip)
          mNSEntry = NULL;
 
       StringStackWrapper args(mCallArgc, mCallArgv);
-      cRetRes = CInterface::GetCInterface().CallMethod(gEvalState.thisObject, fnName, args.argv, args.argc, &cFunctionRes);
+      cRetRes = CInterface::CallMethod(gEvalState.thisObject, fnName, args.argv + 2, args.argc - 2, &cFunctionRes);
    }
    else // it's a ParentCall
    {
