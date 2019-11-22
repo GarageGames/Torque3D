@@ -3178,7 +3178,7 @@ DefineEngineMethod( SimObject, getDebugInfo, ArrayObject*, (),,
    ArrayObject* array = new ArrayObject();
    array->registerObject();
 
-   array->push_back( "C++|Address", String::ToString( "0x%x", object ) );
+   array->push_back( "C++|Address", String::ToString( "%p", object ) );
    array->push_back( "C++|Size", String::ToString( object->getClassRep()->getSizeof() ) );
    array->push_back( "Object|Description", object->describeSelf() );
    array->push_back( "Object|FileName", object->getFilename() );
