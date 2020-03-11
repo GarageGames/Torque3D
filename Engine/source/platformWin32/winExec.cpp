@@ -136,7 +136,7 @@ void ExecuteThread::run(void *arg /* = 0 */)
 // Console Functions
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( shellExecute, bool, (const char * executable, const char * args, const char * directory), ("", ""), "(string executable, string args, string directory)"
+DefineEngineFunction( shellExecute, bool, (const char * executable, const char * args, const char * directory), ("", ""), "(string executable, string args, string directory)"
 				"@brief Launches an outside executable or batch file\n\n"
 				"@param executable Name of the executable or batch file\n"
 				"@param args Optional list of arguments, in string format, to pass to the executable\n"

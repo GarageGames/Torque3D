@@ -158,7 +158,7 @@ class SceneManager
       /// @name Lighting
       /// @{
 
-      typedef InterpolatedChangeProperty< ColorF > AmbientLightInterpolator;
+      typedef InterpolatedChangeProperty< LinearColorF > AmbientLightInterpolator;
 
       /// Light manager that is active for the scene.
       LightManager* mLightManager;
@@ -271,7 +271,7 @@ class SceneManager
       bool setLightManager( const char *lmName );
 
       /// Return the current global ambient light color.
-      const ColorF& getAmbientLightColor() const { return mAmbientLightColor.getCurrentValue(); }
+      const LinearColorF& getAmbientLightColor() const { return mAmbientLightColor.getCurrentValue(); }
 
       /// Set the time it takes for a new ambient light color to take full effect.
       void setAmbientLightTransitionTime( SimTime time ) { mAmbientLightColor.setTransitionTime( time ); }

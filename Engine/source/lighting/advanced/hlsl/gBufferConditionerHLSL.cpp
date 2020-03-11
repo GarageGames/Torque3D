@@ -145,7 +145,6 @@ void GBufferConditionerHLSL::processPix(  Vector<ShaderComponent*> &componentLis
       gbNormal->setName( "gbNormal" );
       gbNormal->setStructName( "IN" );
       gbNormal->setType( "float3" );
-      gbNormal->mapsToSampler = false;
       gbNormal->uniform = false;
    }
 
@@ -163,7 +162,7 @@ void GBufferConditionerHLSL::processPix(  Vector<ShaderComponent*> &componentLis
 
    LangElement *outputDecl = new DecOp( unconditionedOut );
 
-   // If we're doing prepass blending then we need 
+   // If we're doing deferred blending then we need 
    // to steal away the alpha channel before the 
    // conditioner stomps on it.
    Var *alphaVal = NULL;
@@ -174,7 +173,7 @@ void GBufferConditionerHLSL::processPix(  Vector<ShaderComponent*> &componentLis
    }
 
    // If using interlaced normals, invert the normal
-   if(fd.features[MFT_InterlacedPrePass])
+   if(fd.features[MFT_InterlacedDeferred])
    {
       // NOTE: Its safe to not call ShaderFeatureHLSL::addOutVpos() in the vertex
       // shader as for SM 3.0 nothing is needed there.
@@ -190,7 +189,7 @@ void GBufferConditionerHLSL::processPix(  Vector<ShaderComponent*> &componentLis
    meta->addStatement( new GenOp("   @ = @;", outputDecl, new GenOp( "float4(normalize(@), @)", gbNormal, depth ) ) );
    meta->addStatement( assignOutput( unconditionedOut ) );
 
-   // If we have an alpha var then we're doing prepass lerp blending.
+   // If we have an alpha var then we're doing deferred lerp blending.
    if ( alphaVal )
    {
       Var *outColor = (Var*)LangElement::find( getOutputTargetVarName( DefaultTarget ) );
@@ -222,65 +221,44 @@ Var* GBufferConditionerHLSL::printMethodHeader( MethodType methodType, const Str
       retVal = Parent::printMethodHeader( methodType, methodName, stream, meta );
    else
    {
-      const bool isDirect3D11 = GFX->getAdapterType() == Direct3D11;
       Var *methodVar = new Var;
       methodVar->setName(methodName);
       methodVar->setType("inline float4");
       DecOp *methodDecl = new DecOp(methodVar);
 
-      Var *prepassSampler = new Var;
-      prepassSampler->setName("prepassSamplerVar");
-      prepassSampler->setType("sampler2D");
-      DecOp *prepassSamplerDecl = new DecOp(prepassSampler);
+      Var *deferredSampler = new Var;
+      deferredSampler->setName("deferredSamplerVar");
+      deferredSampler->setType("SamplerState");
+      DecOp *deferredSamplerDecl = new DecOp(deferredSampler);
 
       Var *screenUV = new Var;
       screenUV->setName("screenUVVar");
       screenUV->setType("float2");
       DecOp *screenUVDecl = new DecOp(screenUV);
 
-      Var *prepassTex = NULL;
-      DecOp *prepassTexDecl = NULL;
-      if (isDirect3D11)
-      {
-         prepassSampler->setType("SamplerState");
-         prepassTex = new Var;
-         prepassTex->setName("prepassTexVar");
-         prepassTex->setType("Texture2D");
-         prepassTex->texture = true;
-         prepassTex->constNum = prepassSampler->constNum;
-         prepassTexDecl = new DecOp(prepassTex);
-      }
+      DecOp *deferredTexDecl = NULL;
+
+      Var *deferredTex = new Var;
+      deferredTex->setName("deferredTexVar");
+      deferredTex->setType("Texture2D");
+      deferredTex->texture = true;
+      deferredTex->constNum = deferredSampler->constNum;
+      deferredTexDecl = new DecOp(deferredTex);
 
       Var *bufferSample = new Var;
       bufferSample->setName("bufferSample");
       bufferSample->setType("float4");
       DecOp *bufferSampleDecl = new DecOp(bufferSample); 
 
-      if (isDirect3D11)
-         meta->addStatement(new GenOp("@(@, @, @)\r\n", methodDecl, prepassSamplerDecl, prepassTexDecl, screenUVDecl));
-      else
-         meta->addStatement( new GenOp( "@(@, @)\r\n", methodDecl, prepassSamplerDecl, screenUVDecl ) );
+      meta->addStatement(new GenOp("@(@, @, @)\r\n", methodDecl, deferredSamplerDecl, deferredTexDecl, screenUVDecl));
 
       meta->addStatement( new GenOp( "{\r\n" ) );
 
       meta->addStatement( new GenOp( "   // Sampler g-buffer\r\n" ) );
 
-#ifdef TORQUE_OS_XENON
-      meta->addStatement( new GenOp( "   @;\r\n", bufferSampleDecl ) );
-      meta->addStatement( new GenOp( "   asm { tfetch2D @, @, @, MagFilter = point, MinFilter = point, MipFilter = point };\r\n", bufferSample, screenUV, prepassSampler ) );
-#else
       // The gbuffer has no mipmaps, so use tex2dlod when 
       // possible so that the shader compiler can optimize.
-      meta->addStatement( new GenOp( "   #if TORQUE_SM >= 30\r\n" ) );
-      if (isDirect3D11)
-         meta->addStatement(new GenOp("      @ = @.SampleLevel(@, @,0);\r\n", bufferSampleDecl, prepassTex, prepassSampler, screenUV));
-      else
-         meta->addStatement(new GenOp("      @ = tex2Dlod(@, float4(@,0,0));\r\n", bufferSampleDecl, prepassSampler, screenUV));
-
-      meta->addStatement(new GenOp("   #else\r\n"));
-      meta->addStatement(new GenOp("      @ = tex2D(@, @);\r\n", bufferSampleDecl, prepassSampler, screenUV));
-      meta->addStatement(new GenOp("   #endif\r\n\r\n"));
-#endif
+      meta->addStatement(new GenOp("      @ = @.SampleLevel(@, @,0);\r\n", bufferSampleDecl, deferredTex, deferredSampler, screenUV));
 
       // We don't use this way of passing var's around, so this should cause a crash
       // if something uses this improperly

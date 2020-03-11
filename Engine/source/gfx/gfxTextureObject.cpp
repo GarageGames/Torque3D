@@ -212,7 +212,7 @@ F32 GFXTextureObject::getMaxVCoord() const
 U32 GFXTextureObject::getEstimatedSizeInBytes() const
 {
    // We have to deal with DDS specially.
-   if ( mFormat >= GFXFormatDXT1 )
+   if ( mFormat >= GFXFormatBC1 )
       return DDSFile::getSizeInBytes( mFormat, mTextureSize.x, mTextureSize.y, mMipLevels );
 
    // Else we need to calculate the size ourselves.

@@ -145,7 +145,7 @@ GFXDevice::GFXDevice()
    }
 
    mGlobalAmbientColorDirty = false;
-   mGlobalAmbientColor = ColorF(0.0f, 0.0f, 0.0f, 1.0f);
+   mGlobalAmbientColor = LinearColorF(0.0f, 0.0f, 0.0f, 1.0f);
 
    mLightMaterialDirty = false;
    dMemset(&mCurrentLightMaterial, 0, sizeof(GFXLightMaterial));
@@ -190,12 +190,6 @@ GFXDevice::GFXDevice()
       GFXShader::addGlobalMacro( "TORQUE_OS_MAC" );
    #elif defined TORQUE_OS_LINUX
       GFXShader::addGlobalMacro( "TORQUE_OS_LINUX" );      
-   #elif defined TORQUE_OS_XENON
-      GFXShader::addGlobalMacro( "TORQUE_OS_XENON" );
-   #elif defined TORQUE_OS_XBOX
-      GFXShader::addGlobalMacro( "TORQUE_OS_XBOX" );      
-   #elif defined TORQUE_OS_PS3
-      GFXShader::addGlobalMacro( "TORQUE_OS_PS3" );            
    #endif
 
    mStereoTargets[0] = NULL;
@@ -219,11 +213,11 @@ void GFXDevice::deviceInited()
    // Initialize the static helper textures.
    GBitmap temp( 2, 2, false, GFXFormatR8G8B8A8 );
    temp.fill( ColorI::ONE );
-   GFXTexHandle::ONE.set( &temp, &GFXDefaultStaticDiffuseProfile, false, "GFXTexHandle::ONE" ); 
+   GFXTexHandle::ONE.set( &temp, &GFXStaticTextureSRGBProfile, false, "GFXTexHandle::ONE" ); 
    temp.fill( ColorI::ZERO );
-   GFXTexHandle::ZERO.set( &temp, &GFXDefaultStaticDiffuseProfile, false, "GFXTexHandle::ZERO" ); 
+   GFXTexHandle::ZERO.set( &temp, &GFXStaticTextureSRGBProfile, false, "GFXTexHandle::ZERO" ); 
    temp.fill( ColorI( 128, 128, 255 ) );
-   GFXTexHandle::ZUP.set( &temp, &GFXDefaultStaticNormalMapProfile, false, "GFXTexHandle::ZUP" ); 
+   GFXTexHandle::ZUP.set( &temp, &GFXNormalMapProfile, false, "GFXTexHandle::ZUP" );
 }
 
 bool GFXDevice::destroy()
@@ -578,6 +572,13 @@ void GFXDevice::updateStates(bool forceSetAll /*=false*/)
 #endif
 }
 
+void GFXDevice::clearTextureStateImmediate(U32 stage)
+{
+   mCurrentTexture[stage] = NULL;
+   mCurrentCubemap[stage] = NULL;
+   setTextureInternal(stage, NULL);
+}
+
 void GFXDevice::setPrimitiveBuffer( GFXPrimitiveBuffer *buffer )
 {
    if( buffer == mCurrentPrimitiveBuffer )
@@ -745,7 +746,7 @@ void GFXDevice::setLightMaterial(const GFXLightMaterial& mat)
    mStateDirty = true;
 }
 
-void GFXDevice::setGlobalAmbientColor(const ColorF& color)
+void GFXDevice::setGlobalAmbientColor(const LinearColorF& color)
 {
    if(mGlobalAmbientColor != color)
    {
@@ -1321,10 +1322,9 @@ DefineEngineFunction( getBestHDRFormat, GFXFormat, (),,
    // Figure out the best HDR format.  This is the smallest
    // format which supports blending and filtering.
    Vector<GFXFormat> formats;
-   //formats.push_back( GFXFormatR10G10B10A2 ); TODO: replace with SRGB format once DX9 is gone - BJR
-   formats.push_back( GFXFormatR16G16B16A16F );
-   formats.push_back( GFXFormatR16G16B16A16 );    
-   GFXFormat format = GFX->selectSupportedFormat(  &GFXDefaultRenderTargetProfile,
+   formats.push_back(GFXFormatR16G16B16A16F);
+   formats.push_back( GFXFormatR10G10B10A2 );   
+   GFXFormat format = GFX->selectSupportedFormat(  &GFXRenderTargetProfile,
                                                    formats, 
                                                    true,
                                                    true,
@@ -1333,7 +1333,7 @@ DefineEngineFunction( getBestHDRFormat, GFXFormat, (),,
    return format;
 }
 
-DefineConsoleFunction(ResetGFX, void, (), , "forces the gbuffer to be reinitialized in cases of improper/lack of buffer clears.")
+DefineEngineFunction(ResetGFX, void, (), , "forces the gbuffer to be reinitialized in cases of improper/lack of buffer clears.")
 {
    GFX->beginReset();
 }

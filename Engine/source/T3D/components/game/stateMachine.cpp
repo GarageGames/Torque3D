@@ -30,6 +30,10 @@ StateMachine::StateMachine()
    mStartingState = "";
 
    mCurCreateState = NULL;
+
+   mStateMachineFile = StringTable->EmptyString();
+
+   mCurCreateState = nullptr;
 }
 
 StateMachine::~StateMachine()
@@ -148,7 +152,6 @@ void StateMachine::readConditions(StateTransition &currentTransition)
       //get our first state
       StateTransition::Condition firstCondition;
       StateField firstField;
-      bool fieldRead = false;
       
       readFieldName(&firstField, reader);
       firstCondition.field = firstField;

@@ -28,55 +28,98 @@
 #include "alu.h"
 #include "threads.h"
 
+#include "backends/base.h"
+
 #include <sndio.h>
 
 
-static const ALCchar sndio_device[] = "SndIO Default";
 
 
-static ALCboolean sndio_load(void)
-{
-    return ALC_TRUE;
-}
+typedef struct ALCsndioBackend {
+    DERIVE_FROM_TYPE(ALCbackend);
 
-
-typedef struct {
     struct sio_hdl *sndHandle;
 
     ALvoid *mix_data;
     ALsizei data_size;
 
-    volatile int killNow;
+    ATOMIC(int) killNow;
     althrd_t thread;
-} sndio_data;
+} ALCsndioBackend;
+
+static int ALCsndioBackend_mixerProc(void *ptr);
+
+static void ALCsndioBackend_Construct(ALCsndioBackend *self, ALCdevice *device);
+static void ALCsndioBackend_Destruct(ALCsndioBackend *self);
+static ALCenum ALCsndioBackend_open(ALCsndioBackend *self, const ALCchar *name);
+static ALCboolean ALCsndioBackend_reset(ALCsndioBackend *self);
+static ALCboolean ALCsndioBackend_start(ALCsndioBackend *self);
+static void ALCsndioBackend_stop(ALCsndioBackend *self);
+static DECLARE_FORWARD2(ALCsndioBackend, ALCbackend, ALCenum, captureSamples, void*, ALCuint)
+static DECLARE_FORWARD(ALCsndioBackend, ALCbackend, ALCuint, availableSamples)
+static DECLARE_FORWARD(ALCsndioBackend, ALCbackend, ClockLatency, getClockLatency)
+static DECLARE_FORWARD(ALCsndioBackend, ALCbackend, void, lock)
+static DECLARE_FORWARD(ALCsndioBackend, ALCbackend, void, unlock)
+DECLARE_DEFAULT_ALLOCATORS(ALCsndioBackend)
+
+DEFINE_ALCBACKEND_VTABLE(ALCsndioBackend);
 
 
-static int sndio_proc(void *ptr)
+static const ALCchar sndio_device[] = "SndIO Default";
+
+
+static void ALCsndioBackend_Construct(ALCsndioBackend *self, ALCdevice *device)
 {
-    ALCdevice *device = ptr;
-    sndio_data *data = device->ExtraData;
+    ALCbackend_Construct(STATIC_CAST(ALCbackend, self), device);
+    SET_VTABLE2(ALCsndioBackend, ALCbackend, self);
+
+    self->sndHandle = NULL;
+    self->mix_data = NULL;
+    ATOMIC_INIT(&self->killNow, AL_TRUE);
+}
+
+static void ALCsndioBackend_Destruct(ALCsndioBackend *self)
+{
+    if(self->sndHandle)
+        sio_close(self->sndHandle);
+    self->sndHandle = NULL;
+
+    al_free(self->mix_data);
+    self->mix_data = NULL;
+
+    ALCbackend_Destruct(STATIC_CAST(ALCbackend, self));
+}
+
+
+static int ALCsndioBackend_mixerProc(void *ptr)
+{
+    ALCsndioBackend *self = (ALCsndioBackend*)ptr;
+    ALCdevice *device = STATIC_CAST(ALCbackend, self)->mDevice;
     ALsizei frameSize;
     size_t wrote;
 
     SetRTPriority();
     althrd_setname(althrd_current(), MIXER_THREAD_NAME);
 
-    frameSize = FrameSizeFromDevFmt(device->FmtChans, device->FmtType);
+    frameSize = FrameSizeFromDevFmt(device->FmtChans, device->FmtType, device->AmbiOrder);
 
-    while(!data->killNow && device->Connected)
+    while(!ATOMIC_LOAD(&self->killNow, almemory_order_acquire) &&
+          ATOMIC_LOAD(&device->Connected, almemory_order_acquire))
     {
-        ALsizei len = data->data_size;
-        ALubyte *WritePtr = data->mix_data;
+        ALsizei len = self->data_size;
+        ALubyte *WritePtr = self->mix_data;
 
+        ALCsndioBackend_lock(self);
         aluMixData(device, WritePtr, len/frameSize);
-        while(len > 0 && !data->killNow)
+        ALCsndioBackend_unlock(self);
+        while(len > 0 && !ATOMIC_LOAD(&self->killNow, almemory_order_acquire))
         {
-            wrote = sio_write(data->sndHandle, WritePtr, len);
+            wrote = sio_write(self->sndHandle, WritePtr, len);
             if(wrote == 0)
             {
                 ERR("sio_write failed\n");
                 ALCdevice_Lock(device);
-                aluHandleDisconnect(device);
+                aluHandleDisconnect(device, "Failed to write playback samples");
                 ALCdevice_Unlock(device);
                 break;
             }
@@ -90,45 +133,30 @@ static int sndio_proc(void *ptr)
 }
 
 
-
-static ALCenum sndio_open_playback(ALCdevice *device, const ALCchar *deviceName)
+static ALCenum ALCsndioBackend_open(ALCsndioBackend *self, const ALCchar *name)
 {
-    sndio_data *data;
+    ALCdevice *device = STATIC_CAST(ALCbackend,self)->mDevice;
 
-    if(!deviceName)
-        deviceName = sndio_device;
-    else if(strcmp(deviceName, sndio_device) != 0)
+    if(!name)
+        name = sndio_device;
+    else if(strcmp(name, sndio_device) != 0)
         return ALC_INVALID_VALUE;
 
-    data = calloc(1, sizeof(*data));
-    data->killNow = 0;
-
-    data->sndHandle = sio_open(NULL, SIO_PLAY, 0);
-    if(data->sndHandle == NULL)
+    self->sndHandle = sio_open(NULL, SIO_PLAY, 0);
+    if(self->sndHandle == NULL)
     {
-        free(data);
         ERR("Could not open device\n");
         return ALC_INVALID_VALUE;
     }
 
-    al_string_copy_cstr(&device->DeviceName, deviceName);
-    device->ExtraData = data;
+    alstr_copy_cstr(&device->DeviceName, name);
 
     return ALC_NO_ERROR;
 }
 
-static void sndio_close_playback(ALCdevice *device)
+static ALCboolean ALCsndioBackend_reset(ALCsndioBackend *self)
 {
-    sndio_data *data = device->ExtraData;
-
-    sio_close(data->sndHandle);
-    free(data);
-    device->ExtraData = NULL;
-}
-
-static ALCboolean sndio_reset_playback(ALCdevice *device)
-{
-    sndio_data *data = device->ExtraData;
+    ALCdevice *device = STATIC_CAST(ALCbackend,self)->mDevice;
     struct sio_par par;
 
     sio_initpar(&par);
@@ -170,7 +198,7 @@ static ALCboolean sndio_reset_playback(ALCdevice *device)
     par.appbufsz = device->UpdateSize * (device->NumUpdates-1);
     if(!par.appbufsz) par.appbufsz = device->UpdateSize;
 
-    if(!sio_setpar(data->sndHandle, &par) || !sio_getpar(data->sndHandle, &par))
+    if(!sio_setpar(self->sndHandle, &par) || !sio_getpar(self->sndHandle, &par))
     {
         ERR("Failed to set device parameters\n");
         return ALC_FALSE;
@@ -211,77 +239,84 @@ static ALCboolean sndio_reset_playback(ALCdevice *device)
     return ALC_TRUE;
 }
 
-static ALCboolean sndio_start_playback(ALCdevice *device)
+static ALCboolean ALCsndioBackend_start(ALCsndioBackend *self)
 {
-    sndio_data *data = device->ExtraData;
+    ALCdevice *device = STATIC_CAST(ALCbackend,self)->mDevice;
 
-    if(!sio_start(data->sndHandle))
+    self->data_size = device->UpdateSize * FrameSizeFromDevFmt(
+        device->FmtChans, device->FmtType, device->AmbiOrder
+    );
+    al_free(self->mix_data);
+    self->mix_data = al_calloc(16, self->data_size);
+
+    if(!sio_start(self->sndHandle))
     {
         ERR("Error starting playback\n");
         return ALC_FALSE;
     }
 
-    data->data_size = device->UpdateSize * FrameSizeFromDevFmt(device->FmtChans, device->FmtType);
-    data->mix_data = calloc(1, data->data_size);
-
-    data->killNow = 0;
-    if(althrd_create(&data->thread, sndio_proc, device) != althrd_success)
+    ATOMIC_STORE(&self->killNow, AL_FALSE, almemory_order_release);
+    if(althrd_create(&self->thread, ALCsndioBackend_mixerProc, self) != althrd_success)
     {
-        sio_stop(data->sndHandle);
-        free(data->mix_data);
-        data->mix_data = NULL;
+        sio_stop(self->sndHandle);
         return ALC_FALSE;
     }
 
     return ALC_TRUE;
 }
 
-static void sndio_stop_playback(ALCdevice *device)
+static void ALCsndioBackend_stop(ALCsndioBackend *self)
 {
-    sndio_data *data = device->ExtraData;
     int res;
 
-    if(data->killNow)
+    if(ATOMIC_EXCHANGE(&self->killNow, AL_TRUE, almemory_order_acq_rel))
         return;
+    althrd_join(self->thread, &res);
 
-    data->killNow = 1;
-    althrd_join(data->thread, &res);
-
-    if(!sio_stop(data->sndHandle))
+    if(!sio_stop(self->sndHandle))
         ERR("Error stopping device\n");
 
-    free(data->mix_data);
-    data->mix_data = NULL;
+    al_free(self->mix_data);
+    self->mix_data = NULL;
 }
 
 
-static const BackendFuncs sndio_funcs = {
-    sndio_open_playback,
-    sndio_close_playback,
-    sndio_reset_playback,
-    sndio_start_playback,
-    sndio_stop_playback,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL
-};
+typedef struct ALCsndioBackendFactory {
+    DERIVE_FROM_TYPE(ALCbackendFactory);
+} ALCsndioBackendFactory;
+#define ALCSNDIOBACKENDFACTORY_INITIALIZER { { GET_VTABLE2(ALCsndioBackendFactory, ALCbackendFactory) } }
 
-ALCboolean alc_sndio_init(BackendFuncs *func_list)
+ALCbackendFactory *ALCsndioBackendFactory_getFactory(void);
+
+static ALCboolean ALCsndioBackendFactory_init(ALCsndioBackendFactory *self);
+static DECLARE_FORWARD(ALCsndioBackendFactory, ALCbackendFactory, void, deinit)
+static ALCboolean ALCsndioBackendFactory_querySupport(ALCsndioBackendFactory *self, ALCbackend_Type type);
+static void ALCsndioBackendFactory_probe(ALCsndioBackendFactory *self, enum DevProbe type);
+static ALCbackend* ALCsndioBackendFactory_createBackend(ALCsndioBackendFactory *self, ALCdevice *device, ALCbackend_Type type);
+DEFINE_ALCBACKENDFACTORY_VTABLE(ALCsndioBackendFactory);
+
+
+ALCbackendFactory *ALCsndioBackendFactory_getFactory(void)
 {
-    if(!sndio_load())
-        return ALC_FALSE;
-    *func_list = sndio_funcs;
+    static ALCsndioBackendFactory factory = ALCSNDIOBACKENDFACTORY_INITIALIZER;
+    return STATIC_CAST(ALCbackendFactory, &factory);
+}
+
+
+static ALCboolean ALCsndioBackendFactory_init(ALCsndioBackendFactory* UNUSED(self))
+{
+    /* No dynamic loading */
     return ALC_TRUE;
 }
 
-void alc_sndio_deinit(void)
+static ALCboolean ALCsndioBackendFactory_querySupport(ALCsndioBackendFactory* UNUSED(self), ALCbackend_Type type)
 {
+    if(type == ALCbackend_Playback)
+        return ALC_TRUE;
+    return ALC_FALSE;
 }
 
-void alc_sndio_probe(enum DevProbe type)
+static void ALCsndioBackendFactory_probe(ALCsndioBackendFactory* UNUSED(self), enum DevProbe type)
 {
     switch(type)
     {
@@ -291,4 +326,17 @@ void alc_sndio_probe(enum DevProbe type)
         case CAPTURE_DEVICE_PROBE:
             break;
     }
+}
+
+static ALCbackend* ALCsndioBackendFactory_createBackend(ALCsndioBackendFactory* UNUSED(self), ALCdevice *device, ALCbackend_Type type)
+{
+    if(type == ALCbackend_Playback)
+    {
+        ALCsndioBackend *backend;
+        NEW_OBJ(backend, ALCsndioBackend)(device);
+        if(!backend) return NULL;
+        return STATIC_CAST(ALCbackend, backend);
+    }
+
+    return NULL;
 }

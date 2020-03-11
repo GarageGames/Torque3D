@@ -480,7 +480,7 @@ static U32 sgStringInstances;
 
 
 #endif
-DefineConsoleFunction( dumpStringMemStats, void, (), , "()"
+DefineEngineFunction( dumpStringMemStats, void, (), , "()"
 				"@brief Dumps information about String memory usage\n\n"
 				"@ingroup Debugging\n"
 				"@ingroup Strings\n")
@@ -1427,7 +1427,7 @@ void String::copy(StringChar* dst, const StringChar *src, U32 len)
 
 //-----------------------------------------------------------------------------
 
-#if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN)
 // This standard function is not defined when compiling with VC7...
 #define vsnprintf	_vsnprintf
 #endif
@@ -1620,7 +1620,7 @@ String String::GetTrailingNumber(const char* str, S32& number)
    if ((*p == '-') || (*p == '_'))
       number = -dAtoi(p + 1);
    else
-      number = ((p == base.c_str()) ? dAtoi(p) : dAtoi(++p));
+      number = (isdigit(*p) ? dAtoi(p) : dAtoi(++p));
 
    // Remove space between the name and the number
    while ((p > base.c_str()) && dIsspace(*(p-1)))

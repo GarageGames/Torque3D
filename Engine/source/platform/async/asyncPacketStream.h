@@ -245,8 +245,8 @@ AsyncPacketBufferedInputStream< Stream, Packet >::AsyncPacketBufferedInputStream
             ThreadContext* threadContext )
    : Parent( stream, numSourceElementsToRead, numReadAhead, isLooping, threadPool, threadContext ),
      mPacketSize( packetSize ),
-     mNumTotalSourceElements( numSourceElementsToRead ),
-     mNextPacketIndex( 0 )
+     mNextPacketIndex( 0 ),
+     mNumTotalSourceElements( numSourceElementsToRead )
 {
    AssertFatal( mPacketSize > 0,
       "AsyncPacketStream::AsyncPacketStream() - packet size cannot be zero" );
@@ -281,9 +281,22 @@ void AsyncPacketBufferedInputStream< Stream, Packet >::_requestNext()
       IResettable* resettable = dynamic_cast< IResettable* >( s );
       if( resettable )
       {
+         IPositionable< U32 >* positionable = dynamic_cast< IPositionable< U32 >* >( &Deref( stream ) );
+         U32 pos;
+         if(positionable)
+            pos = positionable->getPosition();
+         
          resettable->reset();
          isEOS = false;
          this->mNumRemainingSourceElements = mNumTotalSourceElements;
+         
+         if( positionable )
+         {
+            positionable->setPosition(pos);
+            U32 dur = stream->getDuration();
+            if(dur != 0) //avoiding division by zero? not needed, probably
+               this->mNumRemainingSourceElements -= (U32)(mNumTotalSourceElements*(F32)pos/dur);
+         }
       }
    }
    else if( isEOS )

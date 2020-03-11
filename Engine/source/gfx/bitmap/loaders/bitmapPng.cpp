@@ -136,6 +136,7 @@ static void pngWarningFn(png_structp, png_const_charp /*pMessage*/)
 //--------------------------------------
 static bool sReadPNG(Stream &stream, GBitmap *bitmap)
 {
+   PROFILE_SCOPE(sReadPNG);
    static const U32 cs_headerBytesChecked = 8;
 
    U8 header[cs_headerBytesChecked];

@@ -172,7 +172,7 @@ public:
    inline void set(const GenericConstBufferLayout::ParamDesc& pd, const Point3F& fv) { internalSet(pd, GFXSCT_Float3, sizeof(Point3F), &fv); }
    inline void set(const GenericConstBufferLayout::ParamDesc& pd, const Point4F& fv) { internalSet(pd, GFXSCT_Float4, sizeof(Point4F), &fv); }
    inline void set(const GenericConstBufferLayout::ParamDesc& pd, const PlaneF& fv) { internalSet(pd, GFXSCT_Float4, sizeof(PlaneF), &fv); }
-   inline void set(const GenericConstBufferLayout::ParamDesc& pd, const ColorF& fv) { internalSet(pd, GFXSCT_Float4, sizeof(Point4F), &fv); }
+   inline void set(const GenericConstBufferLayout::ParamDesc& pd, const LinearColorF& fv) { internalSet(pd, GFXSCT_Float4, sizeof(Point4F), &fv); }
    inline void set(const GenericConstBufferLayout::ParamDesc& pd, const S32 f) { internalSet(pd, GFXSCT_Int, sizeof(S32), &f); }
    inline void set(const GenericConstBufferLayout::ParamDesc& pd, const Point2I& fv) { internalSet(pd, GFXSCT_Int2, sizeof(Point2I), &fv); }
    inline void set(const GenericConstBufferLayout::ParamDesc& pd, const Point3I& fv) { internalSet(pd, GFXSCT_Int3, sizeof(Point3I), &fv); }

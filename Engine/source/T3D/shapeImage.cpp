@@ -80,7 +80,7 @@ EndImplementEnumType;
 ImplementEnumType( ShapeBaseImageLightType,
    "@brief The type of light to attach to this ShapeBaseImage.\n\n"
    "@ingroup gameObjects\n\n")
-	{ ShapeBaseImageData::NoLight,           "NoLight", "No light is attached.\n" },
+   { ShapeBaseImageData::NoLight,           "NoLight", "No light is attached.\n" },
    { ShapeBaseImageData::ConstantLight,     "ConstantLight", "A constant emitting light is attached.\n" },
    { ShapeBaseImageData::SpotLight,         "SpotLight", "A spotlight is attached.\n" },
    { ShapeBaseImageData::PulsingLight,      "PulsingLight", "A pusling light is attached.\n" },
@@ -189,7 +189,7 @@ ShapeBaseImageData::ShapeBaseImageData()
    lightRadius = 10.f;
    lightBrightness = 1.0f;
 
-   shapeName = "core/art/shapes/noshape.dts";
+   shapeName = "core/shapes/noshape.dts";
    shapeNameFP = "";
    imageAnimPrefix = "";
    imageAnimPrefixFP = "";
@@ -522,7 +522,7 @@ bool ShapeBaseImageData::preload(bool server, String &errorStr)
             if (stateSequence[j] && stateSequence[j][0] && stateSequenceRandomFlash[j]) {
                char bufferVis[128];
                dStrncpy(bufferVis, stateSequence[j], 100);
-               dStrcat(bufferVis, "_vis");
+               dStrcat(bufferVis, "_vis", 128);
                s.sequenceVis[i] = shape[i]->findSequence(bufferVis);
             }
             if (s.sequenceVis[i] != -1)
@@ -1019,7 +1019,7 @@ void ShapeBaseImageData::packData(BitStream* stream)
 
    // Write the projectile datablock
    if (stream->writeFlag(projectile))
-      stream->writeRangedU32(packed? SimObjectId((uintptr_t)projectile):
+      stream->writeRangedU32(mPacked ? SimObjectId((uintptr_t)projectile):
                              projectile->getId(),DataBlockObjectIdFirst,DataBlockObjectIdLast);
 
    stream->writeFlag(cloakable);
@@ -1050,7 +1050,7 @@ void ShapeBaseImageData::packData(BitStream* stream)
 
    if( stream->writeFlag( casing ) )
    {
-      stream->writeRangedU32(packed? SimObjectId((uintptr_t)casing):
+      stream->writeRangedU32(mPacked ? SimObjectId((uintptr_t)casing):
          casing->getId(),DataBlockObjectIdFirst,DataBlockObjectIdLast);
    }
 
@@ -1139,7 +1139,7 @@ void ShapeBaseImageData::packData(BitStream* stream)
 
          if (stream->writeFlag(s.emitter))
          {
-            stream->writeRangedU32(packed? SimObjectId((uintptr_t)s.emitter):
+            stream->writeRangedU32(mPacked ? SimObjectId((uintptr_t)s.emitter):
                                    s.emitter->getId(),DataBlockObjectIdFirst,DataBlockObjectIdLast);
             stream->write(s.emitterTime);
 
@@ -1202,7 +1202,7 @@ void ShapeBaseImageData::unpackData(BitStream* stream)
    }
 
    projectile = (stream->readFlag() ?
-                 (ProjectileData*)stream->readRangedU32(DataBlockObjectIdFirst,
+                 (ProjectileData*)(uintptr_t)stream->readRangedU32(DataBlockObjectIdFirst,
                                                         DataBlockObjectIdLast) : 0);
 
    cloakable = stream->readFlag();
@@ -1340,7 +1340,7 @@ void ShapeBaseImageData::unpackData(BitStream* stream)
 
          if (stream->readFlag())
          {
-            s.emitter = (ParticleEmitterData*) stream->readRangedU32(DataBlockObjectIdFirst,
+            s.emitter = (ParticleEmitterData*)(uintptr_t)stream->readRangedU32(DataBlockObjectIdFirst,
                                                                      DataBlockObjectIdLast);
             stream->read(&s.emitterTime);
 
@@ -1532,7 +1532,7 @@ bool ShapeBase::unmountImage(U32 imageSlot)
 {
    AssertFatal(imageSlot<MaxMountedImages,"Out of range image slot");
 
-	bool returnValue = false;
+   bool returnValue = false;
    MountedImage& image = mMountedImageList[imageSlot];
    if (image.dataBlock)
    {
@@ -2772,7 +2772,7 @@ void ShapeBase::setImageState(U32 imageSlot, U32 newState,bool force)
    if( stateData.sound && isGhost() )
    {
       const Point3F& velocity         = getVelocity();
-	   image.addSoundSource(SFX->createSource( stateData.sound, &getRenderTransform(), &velocity )); 
+      image.addSoundSource(SFX->createSource( stateData.sound, &getRenderTransform(), &velocity )); 
    }
 
    // Play animation

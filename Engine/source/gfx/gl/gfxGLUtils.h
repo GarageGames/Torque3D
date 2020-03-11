@@ -26,6 +26,7 @@
 #include "core/util/preprocessorHelpers.h"
 #include "gfx/gl/gfxGLEnumTranslate.h"
 #include "gfx/gl/gfxGLStateCache.h"
+#include "gfx/bitmap/imageUtils.h"
 
 inline U32 getMaxMipmaps(U32 width, U32 height, U32 depth)
 {
@@ -59,27 +60,10 @@ inline GLenum minificationFilter(U32 minFilter, U32 mipFilter, U32 /*mipLevels*/
    }
 }
 
-// Check if format is compressed format.
-// Even though dxt2/4 are not supported, they are included because they are a compressed format.
-// Assert checks on supported formats are done elsewhere.
-inline bool isCompressedFormat( GFXFormat format )
-{
-   bool compressed = false;
-   if(format == GFXFormatDXT1 || format == GFXFormatDXT2
-         || format == GFXFormatDXT3
-         || format == GFXFormatDXT4
-         || format == GFXFormatDXT5 )
-   {
-      compressed = true;
-   }
-
-   return compressed;
-}
-
 //Get the surface size of a compressed mip map level - see ddsLoader.cpp
 inline U32 getCompressedSurfaceSize(GFXFormat format,U32 width, U32 height, U32 mipLevel=0 )
 {
-   if(!isCompressedFormat(format))
+   if(!ImageUtil::isCompressedFormat(format))
       return 0;
 
    // Bump by the mip level.
@@ -87,7 +71,7 @@ inline U32 getCompressedSurfaceSize(GFXFormat format,U32 width, U32 height, U32 
    width = getMax(U32(1), width >> mipLevel);
 
    U32 sizeMultiple = 0;
-   if(format == GFXFormatDXT1)
+   if(format == GFXFormatBC1 || format == GFXFormatBC1_SRGB)
       sizeMultiple = 8;
    else
       sizeMultiple = 16;

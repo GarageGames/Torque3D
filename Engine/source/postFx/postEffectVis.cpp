@@ -41,6 +41,8 @@ ConsoleDoc(
    "@ingroup GFX\n"
 );
 
+IMPLEMENT_STATIC_CLASS(PfxVis, , "")
+
 MODULE_BEGIN( PostEffectVis )
 
    MODULE_INIT
@@ -374,7 +376,8 @@ static ConsoleDocFragment _PfxVisclear(
    "PfxVis",
    "void clear();" );
 
-ConsoleStaticMethod( PfxVis, clear, void, 1, 1, "()"
+
+DefineEngineStaticMethod( PfxVis, clear, void, (),,
 					"@hide")
 {
    PFXVIS->clear();
@@ -391,16 +394,15 @@ static ConsoleDocFragment _PfxVisopen(
    "PfxVis",
    "void open(PostEffect effect, bool clear);" );
 
-ConsoleStaticMethod( PfxVis, open, void, 2, 3, "( PostEffect, [bool clear = false] )"
+DefineEngineStaticMethod( PfxVis, open, void, (PostEffect* pfx, bool clear), (false), "( PostEffect, [bool clear = false] )"
 					"@hide")
 {
-   if ( argc == 3 && dAtob( argv[2] ) )
+   if ( clear )
       PFXVIS->clear();
    
-   PostEffect *pfx;
-   if ( !Sim::findObject( argv[1], pfx ) )
+   if ( !pfx )
    {
-      Con::errorf( "PfxVis::add, argument %s was not a PostEffect", (const char*)argv[1] );
+      Con::errorf( "PfxVis::add, argument was not a PostEffect");
       return;
    }
 
@@ -415,7 +417,7 @@ static ConsoleDocFragment _PfxVishide(
    "PfxVis",
    "void hide();" );
 
-ConsoleStaticMethod( PfxVis, hide, void, 1, 1, "()"
+DefineEngineStaticMethod( PfxVis, hide, void, (),,
 					"@hide")
 {
    PFXVIS->setVisible( false );
@@ -429,7 +431,7 @@ static ConsoleDocFragment _PfxVisshow(
    "PfxVis",
    "void show();" );
 
-ConsoleStaticMethod( PfxVis, show, void, 1, 1, "()"
+DefineEngineStaticMethod( PfxVis, show, void, (),,
 					"@hide")
 {
    PFXVIS->setVisible( true );
@@ -444,13 +446,12 @@ static ConsoleDocFragment _PfxVisonWindowClosed(
    "PfxVis",
    "void onWindowClosed(GuiWindowCtrl *ctrl);" );
 
-ConsoleStaticMethod( PfxVis, onWindowClosed, void, 2, 2, "( GuiWindowCtrl )"
+DefineEngineStaticMethod( PfxVis, onWindowClosed, void, (GuiWindowCtrl* ctrl),,
 					"@hide")
 {
-   GuiWindowCtrl *ctrl;
-   if ( !Sim::findObject( argv[1], ctrl ) )
+   if ( !ctrl )
    {
-      Con::errorf( "PfxVis::onWindowClosed, argument %s was not a GuiWindowCtrl", (const char*)argv[1] );
+      Con::errorf( "PfxVis::onWindowClosed, argument was not a GuiWindowCtrl");
       return;
    }
 

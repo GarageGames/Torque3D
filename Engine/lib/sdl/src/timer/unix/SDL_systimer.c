@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -29,6 +29,7 @@
 
 #include "SDL_timer.h"
 #include "SDL_assert.h"
+#include "../SDL_timer_c.h"
 
 /* The clock_gettime provides monotonous time, so we should use it if
    it's available. The clock_gettime function is behind ifdef
@@ -111,8 +112,7 @@ SDL_GetTicks(void)
 #if HAVE_CLOCK_GETTIME
         struct timespec now;
         clock_gettime(SDL_MONOTONIC_CLOCK, &now);
-        ticks = (now.tv_sec - start_ts.tv_sec) * 1000 + (now.tv_nsec -
-                                                 start_ts.tv_nsec) / 1000000;
+        ticks = (Uint32)((now.tv_sec - start_ts.tv_sec) * 1000 + (now.tv_nsec - start_ts.tv_nsec) / 1000000);
 #elif defined(__APPLE__)
         uint64_t now = mach_absolute_time();
         ticks = (Uint32)((((now - start_mach) * mach_base_info.numer) / mach_base_info.denom) / 1000000);

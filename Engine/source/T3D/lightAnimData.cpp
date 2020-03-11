@@ -302,7 +302,7 @@ void LightAnimData::animate( LightInfo *lightInfo, LightAnimState *state )
 
    lightInfo->setTransform( transform );
 
-   ColorF color = state->color;
+   LinearColorF color = state->color;
    mColor.animate( time, color );
    lightInfo->setColor( color );
 

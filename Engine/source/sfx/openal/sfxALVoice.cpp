@@ -118,7 +118,8 @@ void SFXALVoice::_play()
    #ifdef DEBUG_SPEW
    Platform::outputDebugString( "[SFXALVoice] Starting playback" );
    #endif
-   
+   //send every voice that plays to the alauxiliary slot that has the reverb
+   mOpenAL.alSource3i(mSourceName, AL_AUXILIARY_SEND_FILTER, 1, 0, AL_FILTER_NULL);
    mOpenAL.alSourcePlay( mSourceName );
    
    //WORKAROUND: Adjust play cursor for buggy OAL when resuming playback.  Do this after alSourcePlay

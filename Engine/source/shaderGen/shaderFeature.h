@@ -145,8 +145,8 @@ public:
    ShaderFeature()
       :  output( NULL ),
          mProcessIndex( 0 ),
-         mInstancingFormat( NULL ),
-         mVertexFormat( NULL )
+         mVertexFormat( NULL ),
+         mInstancingFormat( NULL )
    {
    }
 

@@ -116,7 +116,7 @@ public:
 
    virtual GFXShader* createShader();
       
-   virtual void clear( U32 flags, ColorI color, F32 z, U32 stencil );
+   virtual void clear( U32 flags, const LinearColorF& color, F32 z, U32 stencil );
    virtual bool beginSceneInternal();
    virtual void endSceneInternal();
 
@@ -171,7 +171,7 @@ protected:
 
    virtual void setLightInternal(U32 lightStage, const GFXLightInfo light, bool lightEnable);
    virtual void setLightMaterialInternal(const GFXLightMaterial mat);
-   virtual void setGlobalAmbientInternal(ColorF color);
+   virtual void setGlobalAmbientInternal(LinearColorF color);
 
    /// @name State Initalization.
    /// @{

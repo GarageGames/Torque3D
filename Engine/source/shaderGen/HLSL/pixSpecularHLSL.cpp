@@ -27,10 +27,10 @@
 #include "shaderGen/shaderOp.h"
 #include "shaderGen/shaderGenVars.h"
 #include "gfx/gfxStructs.h"
-
+#include "shaderGen/shaderGen.h"
 
 PixelSpecularHLSL::PixelSpecularHLSL()
-   : mDep( "shaders/common/lighting.hlsl" )
+   : mDep(ShaderGen::smCommonShaderPath + String("/lighting.hlsl" ))
 {
    addDependency( &mDep );
 }
@@ -95,7 +95,7 @@ void PixelSpecularHLSL::processPix( Vector<ShaderComponent*> &componentList,
       if (specularColor)
          final = new GenOp( "@ * @", final, specularColor );
    }
-   else if ( fd.features[MFT_NormalMap] && !fd.features[MFT_IsDXTnm] )
+   else if ( fd.features[MFT_NormalMap] && !fd.features[MFT_IsBC3nm] && !fd.features[MFT_IsBC5nm])
    {
       Var *bumpColor = (Var*)LangElement::find( "bumpNormal" );
       final = new GenOp( "@ * @.a", final, bumpColor );
@@ -122,7 +122,6 @@ void SpecularMapHLSL::processVert(Vector<ShaderComponent*> &componentList, const
    // Add the texture coords.
    getOutTexCoord("texCoord",
      "float2",
-      true,
       fd.features[MFT_TexAnim],
       meta,
       componentList);
@@ -133,31 +132,22 @@ void SpecularMapHLSL::processVert(Vector<ShaderComponent*> &componentList, const
 void SpecularMapHLSL::processPix( Vector<ShaderComponent*> &componentList, const MaterialFeatureData &fd )
 {
    // Get the texture coord.
-   Var *texCoord = getInTexCoord( "texCoord", "float2", true, componentList );
+   Var *texCoord = getInTexCoord("texCoord", "float2", componentList);
 
    // create texture var
    Var *specularMap = new Var;
-   specularMap->setType( "sampler2D" );
+   specularMap->setType( "SamplerState" );
    specularMap->setName( "specularMap" );
    specularMap->uniform = true;
    specularMap->sampler = true;
    specularMap->constNum = Var::getTexUnitNum();
-   Var *specularMapTex = NULL;
 
-   if (mIsDirect3D11)
-   {
-      specularMap->setType("SamplerState");
-      specularMapTex = new Var;
-      specularMapTex->setName("specularMapTex");
-      specularMapTex->setType("Texture2D");
-      specularMapTex->uniform = true;
-      specularMapTex->texture = true;
-      specularMapTex->constNum = specularMap->constNum;
-   }
-   else
-   {
-      specularMap->setType("sampler2D");
-   }
+   Var *specularMapTex = new Var;
+   specularMapTex->setName("specularMapTex");
+   specularMapTex->setType("Texture2D");
+   specularMapTex->uniform = true;
+   specularMapTex->texture = true;
+   specularMapTex->constNum = specularMap->constNum;
 
    LangElement *texOp = NULL;
 

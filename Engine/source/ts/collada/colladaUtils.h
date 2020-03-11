@@ -50,6 +50,10 @@
 #include "console/console.h"
 #endif
 
+#ifndef _TSSHAPEINSTANCE_H_
+#include "ts/tsShapeInstance.h"
+#endif
+
 #include "platform/tmm_off.h"
 
 #include "dae.h"
@@ -63,6 +67,7 @@
 #include "dom/domCOLLADA.h"
 
 #include "platform/tmm_on.h"
+#include "core/strings/findMatch.h"
 
 namespace ColladaUtils
 {
@@ -85,6 +90,7 @@ namespace ColladaUtils
       String         neverImport;      // List of node names (with wildcards) to ignore on loading
       String         alwaysImportMesh; // List of mesh names (with wildcards) to import, even if in the neverImportMesh list
       String         neverImportMesh;  // List of mesh names (with wildcards) to ignore on loading
+      String         neverImportMat;   // List of material names (with wildcards) to ignore on loading
       bool           ignoreNodeScale;  // Ignore <scale> elements in <node>s
       bool           adjustCenter;     // Translate model so origin is at the center
       bool           adjustFloor;      // Translate model so origin is at the bottom
@@ -100,13 +106,14 @@ namespace ColladaUtils
       {
          upAxis = UPAXISTYPE_COUNT;
          unit = -1.0f;
-         lodType = DetectDTS;
+         lodType = TrailingNumber;
          singleDetailSize = 2;
          matNamePrefix = "";
          alwaysImport = "";
-         neverImport = "";
+         neverImport = String(Con::getVariable("$TSShapeConstructor::neverImport"));
          alwaysImportMesh = "";
-         neverImportMesh = "";
+         neverImportMesh = String(Con::getVariable("$TSShapeConstructor::neverImportMesh"));
+         neverImportMat = String(Con::getVariable("$TSShapeConstructor::neverImportMat"));
          ignoreNodeScale = false;
          adjustCenter = false;
          adjustFloor = false;
@@ -116,6 +123,126 @@ namespace ColladaUtils
    };
 
    ImportOptions& getOptions();
+
+   struct ExportData
+   {
+      struct detailLevel
+      {
+         OptimizedPolyList mesh;
+         S32 size;
+         Map<int, int> materialRefList;
+      };
+
+      struct meshLODData
+      {
+         Vector<detailLevel> meshDetailLevels;
+         TSShapeInstance* shapeInst;
+         MatrixF meshTransform;
+         SceneObject* originatingObject;
+
+         Point3F scale;
+
+         S32 hasDetailLevel(S32 size)
+         {
+            for (U32 i = 0; i < meshDetailLevels.size(); ++i)
+            {
+               U32 mdlSize = meshDetailLevels[i].size;
+
+               if (mdlSize == size)
+                  return i;
+            }
+
+            return -1;
+         }
+
+         meshLODData() : shapeInst(nullptr), meshTransform(true), originatingObject(nullptr), scale(0)
+         {}
+      };
+
+      struct colMesh
+      {
+         OptimizedPolyList mesh;
+         String colMeshName;
+      };
+
+      Vector<detailLevel> detailLevels;
+      Vector<meshLODData> meshData;
+      Vector<colMesh> colMeshes;
+      Vector<BaseMatInstance*> materials;
+
+      void processData();
+
+      S32 hasDetailLevel(U32 dl)
+      {
+         for (U32 i = 0; i < detailLevels.size(); i++)
+         {
+            if (detailLevels[i].size == dl)
+               return i;
+         }
+
+         return -1;
+      }
+
+      S32 hasMaterialInstance(BaseMatInstance* matInst)
+      {
+         for (U32 i = 0; i < materials.size(); i++)
+         {
+            if (materials[i] == matInst)
+               return i;
+         }
+
+         return -1;
+      }
+
+      S32 numberOfDetailLevels()
+      {
+         Vector<S32> detailLevelIdxs;
+
+         for (U32 i = 0; i < meshData.size(); ++i)
+         {
+            for (U32 d = 0; d < meshData[i].meshDetailLevels.size(); ++d)
+            {
+               detailLevelIdxs.push_back_unique(meshData[i].meshDetailLevels[d].size);
+            }
+         }
+
+         return detailLevelIdxs.size();
+      }
+
+      static S32 _Sort(const S32 *p1, const S32 *p2)
+      {
+         S32 e1 = (*p1);
+         S32 e2 = (*p2);
+
+         if (e1 > e2)
+            return 1;
+         else if (e1 < e2)
+            return -1;
+
+         return 0;
+      }
+
+      S32 getDetailLevelSize(U32 detailIdx)
+      {
+         Vector<S32> detailLevelIdxs;
+
+         for (U32 i = 0; i < meshData.size(); ++i)
+         {
+            for (U32 d = 0; d < meshData[i].meshDetailLevels.size(); ++d)
+            {
+               S32 mdlSize = meshData[i].meshDetailLevels[d].size;
+               detailLevelIdxs.push_back_unique(mdlSize);
+            }
+         }
+
+         if (detailIdx >= detailLevelIdxs.size())
+            return -1;
+
+         detailLevelIdxs.sort(&_Sort);
+
+         return detailLevelIdxs[detailIdx];
+      }
+   };
 
    void convertTransform(MatrixF& m);
 
@@ -139,8 +266,15 @@ namespace ColladaUtils
    void exportColladaMesh(TiXmlElement* rootNode, const OptimizedPolyList& mesh, const String& meshName, const Vector<String>& matNames);
    void exportColladaScene(TiXmlElement* rootNode, const String& meshName, const Vector<String>& matNames);
 
+   void exportColladaMaterials(TiXmlElement* rootNode, const ExportData& exportData, const Torque::Path& colladaFile);
+   void exportColladaMesh(TiXmlElement* rootNode, const ExportData& exportData, const String& meshName);
+   void exportColladaCollisionTriangles(TiXmlElement* meshNode, const ExportData& exportData, const U32 collisionIdx);
+   void exportColladaTriangles(TiXmlElement* meshNode, const ExportData& exportData, const U32 detailLevel, const String& meshName);
+   void exportColladaScene(TiXmlElement* rootNode, const ExportData& exportData, const String& meshName);
+
    // Export an OptimizedPolyList to a simple Collada file
    void exportToCollada(const Torque::Path& colladaFile, const OptimizedPolyList& mesh, const String& meshName = String::EmptyString);
+   void exportToCollada(const Torque::Path& colladaFile, const ExportData& exportData);
 };
 
 //-----------------------------------------------------------------------------
@@ -500,7 +634,7 @@ public:
 
    /// Most primitives can use these common implementations
    const char* getElementName() { return primitive->getElementName(); }
-   const char* getMaterial() { return primitive->getMaterial(); }
+   const char* getMaterial() { return (FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().neverImportMat, primitive->getMaterial(), false)) ? NULL : primitive->getMaterial(); }
    const domInputLocalOffset_Array& getInputs() { return primitive->getInput_array(); }
    S32 getStride() const { return stride; }
 
@@ -535,7 +669,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domTristrips>::getTrian
             continue;
 
          domUint* pSrcData = &(P->getValue()[0]);
-         S32 numTriangles = (P->getValue().getCount() / stride) - 2;
+         size_t numTriangles = (P->getValue().getCount() / stride) - 2;
 
          // Convert the strip back to a triangle list
          domUint* v0 = pSrcData;
@@ -576,7 +710,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domTrifans>::getTriangl
             continue;
 
          domUint* pSrcData = &(P->getValue()[0]);
-         S32 numTriangles = (P->getValue().getCount() / stride) - 2;
+         size_t numTriangles = (P->getValue().getCount() / stride) - 2;
 
          // Convert the fan back to a triangle list
          domUint* v0 = pSrcData + stride;
@@ -608,7 +742,7 @@ template<> inline const domListOfUInts *ColladaPrimitive<domPolygons>::getTriang
             continue;
 
          domUint* pSrcData = &(P->getValue()[0]);
-         S32 numPoints = P->getValue().getCount() / stride;
+         size_t numPoints = P->getValue().getCount() / stride;
 
          // Use a simple tri-fan (centered at the first point) method of
          // converting the polygon to triangles.

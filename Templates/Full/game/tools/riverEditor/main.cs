@@ -178,7 +178,7 @@ function RiverEditorPlugin::onSaveMission( %this, %missionFile )
 {
    if( RiverEditorGui.isDirty )
    {
-      MissionGroup.save( %missionFile );
+      getRootScene().save( %missionFile );
       RiverEditorGui.isDirty = false;
    }
 }

@@ -26,9 +26,7 @@
 #include "gui/editor/inspector/dynamicField.h"
 #include "console/engineAPI.h"
 
-#ifdef TORQUE_EXPERIMENTAL_EC
 #include "T3D/components/component.h"
-#endif
 
 IMPLEMENT_CONOBJECT(GuiInspectorDynamicGroup);
 
@@ -126,7 +124,6 @@ bool GuiInspectorDynamicGroup::inspectGroup()
       SimFieldDictionary * fieldDictionary = target->getFieldDictionary();
       for(SimFieldDictionaryIterator ditr(fieldDictionary); *ditr; ++ditr)
       {
-#ifdef TORQUE_EXPERIMENTAL_EC
          if (target->getClassRep()->isSubclassOf("Component"))
          {
             Component* compTarget = dynamic_cast<Component*>(target);
@@ -135,7 +132,7 @@ bool GuiInspectorDynamicGroup::inspectGroup()
             if (compField)
                continue;
          }
-#endif
+
          if( i == 0 )
          {
             flist.increment();
@@ -191,7 +188,7 @@ void GuiInspectorDynamicGroup::updateAllFields()
    inspectGroup();
 }
 
-DefineConsoleMethod(GuiInspectorDynamicGroup, inspectGroup, bool, (), , "Refreshes the dynamic fields in the inspector.")
+DefineEngineMethod(GuiInspectorDynamicGroup, inspectGroup, bool, (), , "Refreshes the dynamic fields in the inspector.")
 {
    return object->inspectGroup();
 }
@@ -266,11 +263,11 @@ void GuiInspectorDynamicGroup::addDynamicField()
    instantExpand();
 }
 
-DefineConsoleMethod( GuiInspectorDynamicGroup, addDynamicField, void, (), , "obj.addDynamicField();" )
+DefineEngineMethod( GuiInspectorDynamicGroup, addDynamicField, void, (), , "obj.addDynamicField();" )
 {
    object->addDynamicField();
 }
 
-DefineConsoleMethod( GuiInspectorDynamicGroup, removeDynamicField, void, (), , "" )
+DefineEngineMethod( GuiInspectorDynamicGroup, removeDynamicField, void, (), , "" )
 {
 }

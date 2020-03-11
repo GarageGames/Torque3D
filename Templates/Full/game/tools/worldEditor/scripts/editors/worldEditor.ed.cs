@@ -124,6 +124,12 @@ function WorldEditor::onSelectionCentroidChanged( %this )
    Inspector.refresh();
 }
 
+function WorldEditor::setSceneAsDirty(%this)
+{
+   EWorldEditor.isDirty = true;
+   
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 function WorldEditor::init(%this)
@@ -198,7 +204,7 @@ function WorldEditor::export(%this)
 
 function WorldEditor::doExport(%this, %file)
 {
-   missionGroup.save("~/editor/" @ %file, true);
+   getRootScene().save("~/editor/" @ %file, true);
 }
 
 function WorldEditor::import(%this)

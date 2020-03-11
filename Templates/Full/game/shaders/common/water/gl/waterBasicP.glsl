@@ -94,7 +94,7 @@ float fresnel(float NdotV, float bias, float power)
 // Uniforms                                                                  
 //-----------------------------------------------------------------------------
 uniform sampler2D      bumpMap;
-//uniform sampler2D    prepassTex;
+//uniform sampler2D    deferredTex;
 uniform sampler2D    reflectMap;
 uniform sampler2D      refractBuff;
 uniform samplerCube  skyMap;
@@ -120,7 +120,7 @@ void main()
 { 
    // Modulate baseColor by the ambientColor.
    vec4 waterBaseColor = baseColor * vec4( ambientColor.rgb, 1 );
-   waterBaseColor = toLinear(waterBaseColor);
+   waterBaseColor = waterBaseColor;
    
    // Get the bumpNorm...
    vec3 bumpNorm = ( texture( bumpMap, IN_rippleTexCoord01.xy ).rgb * 2.0 - 1.0 ) * rippleMagnitude.x;

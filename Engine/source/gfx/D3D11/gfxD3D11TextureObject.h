@@ -31,8 +31,9 @@ class GFXD3D11TextureObject : public GFXTextureObject
 {
 protected:
    static U32 mTexCount;
-   GFXTexHandle mLockTex;
+   GFXTexHandle mStagingTex;
    DXGI_MAPPED_RECT mLockRect;
+   D3D11_BOX mLockBox;
    bool mLocked;
 
    U32 mLockedSubresource;

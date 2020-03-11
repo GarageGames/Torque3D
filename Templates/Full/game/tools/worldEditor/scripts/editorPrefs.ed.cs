@@ -34,7 +34,6 @@ EditorSettings.setDefaultValue(  "orthoFOV",                "50" );
 EditorSettings.setDefaultValue(  "orthoShowGrid",           "1" );
 EditorSettings.setDefaultValue(  "currentEditor",           "WorldEditorInspectorPlugin" );
 EditorSettings.setDefaultValue(  "newLevelFile",            "tools/levels/BlankRoom.mis" );
-EditorSettings.setDefaultValue(  "newGameObjectDir",        "scripts/server/gameObjects" );
 
 if( isFile( "C:/Program Files/Torsion/Torsion.exe" ) )
    EditorSettings.setDefaultValue(  "torsionPath",          "C:/Program Files/Torsion/Torsion.exe" );
@@ -61,6 +60,9 @@ EditorSettings.endGroup();
 
 EditorSettings.beginGroup( "Tools" );
 EditorSettings.setDefaultValue(  "snapGround",              "0"               );
+EditorSettings.setDefaultValue(  "TerrainSnapOffsetZ",      "0"               );
+EditorSettings.setDefaultValue(  "OffsetZValue",            "0.01"             );
+
 EditorSettings.setDefaultValue(  "snapSoft",                "0"               );
 EditorSettings.setDefaultValue(  "snapSoftSize",            "2.0"             );
 EditorSettings.setDefaultValue(  "boundingBoxCollision",    "0"               );
@@ -128,7 +130,7 @@ EditorSettings.setDefaultValue(  "renderInfoText",          "1"               );
 
 EditorSettings.beginGroup( "Grid" );
 EditorSettings.setDefaultValue(  "gridColor",               "255 255 255 20"  );
-EditorSettings.setDefaultValue(  "gridSize",                "10 10 10"        );
+EditorSettings.setDefaultValue(  "gridSize",                "1 1 1"        );
 EditorSettings.setDefaultValue(  "snapToGrid",              "0"               ); //<-- Not currently used
 EditorSettings.setDefaultValue(  "renderPlane",             "0"               );
 EditorSettings.setDefaultValue(  "renderPlaneHashes",       "0"               );
@@ -216,6 +218,10 @@ function EditorGui::readWorldEditorSettings(%this)
    
    EditorSettings.beginGroup( "Tools" );
    EWorldEditor.stickToGround             = EditorSettings.value("snapGround");                 //$pref::WorldEditor::snapGround;
+   EWorldEditor.TerrainSnapOffsetZ        = EditorSettings.value("TerrainSnapOffsetZ");         //$pref::WorldEditor::TerrainSnapOffsetZ;
+   EWorldEditor.OffsetZValue              = EditorSettings.value("OffsetZValue");               //$pref::WorldEditor::OffsetZValue;
+   
+   
    EWorldEditor.setSoftSnap( EditorSettings.value("snapSoft") );                                //$pref::WorldEditor::snapSoft
    EWorldEditor.setSoftSnapSize( EditorSettings.value("snapSoftSize") );                        //$pref::WorldEditor::snapSoftSize
    EWorldEditor.boundingBoxCollision      = EditorSettings.value("boundingBoxCollision");       //$pref::WorldEditor::boundingBoxCollision;
@@ -311,6 +317,9 @@ function EditorGui::writeWorldEditorSettings(%this)
 
    EditorSettings.beginGroup( "Tools" );
    EditorSettings.setValue( "snapGround",             EWorldEditor.stickToGround );          //$Pref::WorldEditor::snapGround
+   EditorSettings.setValue( "TerrainSnapOffsetZ",      EWorldEditor.TerrainSnapOffsetZ );     //$pref::WorldEditor::TerrainSnapOffsetZ;
+   EditorSettings.setValue( "OffsetZValue",            EWorldEditor.OffsetZValue );           //$pref::WorldEditor::OffsetZValue;
+   
    EditorSettings.setValue( "snapSoft",               EWorldEditor.getSoftSnap() );          //$Pref::WorldEditor::snapSoft
    EditorSettings.setValue( "snapSoftSize",           EWorldEditor.getSoftSnapSize() );      //$Pref::WorldEditor::snapSoftSize
    EditorSettings.setValue( "boundingBoxCollision",   EWorldEditor.boundingBoxCollision );   //$Pref::WorldEditor::boundingBoxCollision

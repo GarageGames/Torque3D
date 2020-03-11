@@ -23,12 +23,12 @@
 #include "../../../gl/hlslCompat.glsl"
 
 in vec2 uv0;
-uniform sampler2D lightPrePassTex;
+uniform sampler2D lightDeferredTex;
 
 out vec4 OUT_col;
 
 void main()
 {
-   vec4 lightColor = texture( lightPrePassTex, uv0 );
+   vec4 lightColor = texture( lightDeferredTex, uv0 );
    OUT_col = vec4( lightColor.rgb, 1.0 );
 }

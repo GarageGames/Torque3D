@@ -35,6 +35,8 @@
 #include "lighting/advanced/advancedLightBinManager.h"
 #include "ts/tsShape.h"
 
+#include "shaderGen/shaderGen.h"
+
 LangElement * ShaderFeatureHLSL::setupTexSpaceMat( Vector<ShaderComponent*> &, // componentList
                                                    Var **texSpaceMat )
 {
@@ -146,8 +148,9 @@ LangElement *ShaderFeatureHLSL::expandNormalMap(   LangElement *sampleNormalOp,
                                                    const MaterialFeatureData &fd )
 {
    MultiLine *meta = new MultiLine;
-
-   if ( fd.features.hasFeature( MFT_IsDXTnm, getProcessIndex() ) )
+   const bool hasBc3 = fd.features.hasFeature(MFT_IsBC3nm, getProcessIndex() );
+   const bool hasBc5 = fd.features.hasFeature(MFT_IsBC5nm, getProcessIndex() );
+   if ( hasBc3 || hasBc5 )
    {
       if ( fd.features[MFT_ImposterVert] )
       {
@@ -155,11 +158,17 @@ LangElement *ShaderFeatureHLSL::expandNormalMap(   LangElement *sampleNormalOp,
          // encodes them with the z axis in the alpha component.
          meta->addStatement( new GenOp( "   @ = float4( normalize( @.xyw * 2.0 - 1.0 ), 0.0 ); // Obj DXTnm\r\n", normalDecl, sampleNormalOp ) );
       }
-      else
+      else if( hasBc3 )
       {
-         // DXT Swizzle trick
+         // BC3 Swizzle trick
          meta->addStatement( new GenOp( "   @ = float4( @.ag * 2.0 - 1.0, 0.0, 0.0 ); // DXTnm\r\n", normalDecl, sampleNormalOp ) );
          meta->addStatement( new GenOp( "   @.z = sqrt( 1.0 - dot( @.xy, @.xy ) ); // DXTnm\r\n", normalVar, normalVar, normalVar ) );
+      }
+      else if (hasBc5)
+      {
+         // BC5
+         meta->addStatement(new GenOp("   @ = float4( @.gr * 2.0 - 1.0, 0.0, 0.0 ); // bc5nm\r\n", normalDecl, sampleNormalOp ) );
+         meta->addStatement(new GenOp("   @.z = sqrt( 1.0 - dot( @.xy, @.xy ) ); // bc5nm\r\n", normalVar, normalVar, normalVar )) ;
       }
    }
    else
@@ -174,7 +183,6 @@ LangElement *ShaderFeatureHLSL::expandNormalMap(   LangElement *sampleNormalOp,
 ShaderFeatureHLSL::ShaderFeatureHLSL()
 {
    output = NULL;
-   mIsDirect3D11 = GFX->getAdapterType() == Direct3D11;
 }
 
 Var * ShaderFeatureHLSL::getVertTexCoord( const String &name )
@@ -334,7 +342,6 @@ Var* ShaderFeatureHLSL::getOutViewToTangent( Vector<ShaderComponent*> &component
 
 Var* ShaderFeatureHLSL::getOutTexCoord(   const char *name,
                                           const char *type,
-                                          bool mapsToSampler,
                                           bool useTexAnim,
                                           MultiLine *meta,
                                           Vector<ShaderComponent*> &componentList )
@@ -352,7 +359,6 @@ Var* ShaderFeatureHLSL::getOutTexCoord(   const char *name,
       texCoord->setName( outTexName );
       texCoord->setStructName( "OUT" );
       texCoord->setType( type );
-      texCoord->mapsToSampler = mapsToSampler;
 
       if ( useTexAnim )
       {
@@ -387,7 +393,6 @@ Var* ShaderFeatureHLSL::getOutTexCoord(   const char *name,
 
 Var* ShaderFeatureHLSL::getInTexCoord( const char *name,
                                        const char *type,
-                                       bool mapsToSampler,
                                        Vector<ShaderComponent*> &componentList )
 {
    Var* texCoord = (Var*)LangElement::find( name );
@@ -398,7 +403,6 @@ Var* ShaderFeatureHLSL::getInTexCoord( const char *name,
       texCoord->setName( name );
       texCoord->setStructName( "IN" );
       texCoord->setType( type );
-      texCoord->mapsToSampler = mapsToSampler;
    }
 
    AssertFatal( dStrcmp( type, (const char*)texCoord->type ) == 0, 
@@ -446,7 +450,6 @@ Var* ShaderFeatureHLSL::addOutVpos( MultiLine *meta,
       outVpos->setName( "outVpos" );
       outVpos->setStructName( "OUT" );
       outVpos->setType( "float4" );
-      outVpos->mapsToSampler = false;
 
       Var *outPosition = (Var*) LangElement::find( "hpos" );
       AssertFatal( outPosition, "ShaderFeatureHLSL::addOutVpos - Didn't find the output position." );
@@ -464,36 +467,13 @@ Var* ShaderFeatureHLSL::getInVpos(  MultiLine *meta,
    if ( inVpos )
       return inVpos;
 
-   ShaderConnector *connectComp = dynamic_cast<ShaderConnector*>( componentList[C_CONNECTOR] );
+   ShaderConnector *connectComp = dynamic_cast<ShaderConnector*>(componentList[C_CONNECTOR]);
 
-   F32 pixelShaderVer = GFX->getPixelShaderVersion();
-
-   if ( pixelShaderVer >= 4.0f )
-   {
-      inVpos = connectComp->getElement( RT_SVPOSITION );
-      inVpos->setName( "vpos" );
-      inVpos->setStructName( "IN" );
-      inVpos->setType( "float4" );
-      return inVpos;
-   }
-   else if ( pixelShaderVer >= 3.0f )
-   {
-      inVpos = connectComp->getElement( RT_VPOS );
-      inVpos->setName( "vpos" );
-      inVpos->setStructName( "IN" );
-      inVpos->setType( "float2" );
-      return inVpos;
-   }
-
-   inVpos = connectComp->getElement( RT_TEXCOORD );
-   inVpos->setName( "inVpos" );
+   inVpos = connectComp->getElement( RT_SVPOSITION );
+   inVpos->setName( "vpos" );
    inVpos->setStructName( "IN" );
    inVpos->setType( "float4" );
-
-   Var *vpos = new Var( "vpos", "float2" );
-   meta->addStatement( new GenOp( "   @ = @.xy / @.w;\r\n", new DecOp( vpos ), inVpos, inVpos ) );
-
-   return vpos;
+   return inVpos;
 }
 
 Var* ShaderFeatureHLSL::getInWorldToTangent( Vector<ShaderComponent*> &componentList )
@@ -532,26 +512,18 @@ Var* ShaderFeatureHLSL::getNormalMapTex()
    if (!normalMap)
    {
       normalMap = new Var;
-      normalMap->setType("sampler2D");
+      normalMap->setType("SamplerState");
       normalMap->setName("bumpMap");
       normalMap->uniform = true;
       normalMap->sampler = true;
       normalMap->constNum = Var::getTexUnitNum();
 
-      // D3D11
-      Var* normalMapTex = NULL;
-      if (GFX->getAdapterType() == Direct3D11)
-      {
-         normalMap->setType("SamplerState");
-         normalMapTex = new Var;
-         normalMapTex->setName("bumpMapTex");
-         normalMapTex->setType("Texture2D");
-         normalMapTex->uniform = true;
-         normalMapTex->texture = true;
-         normalMapTex->constNum = normalMap->constNum;
-      }
-
-
+      Var* normalMapTex = new Var;
+      normalMapTex->setName("bumpMapTex");
+      normalMapTex->setType("Texture2D");
+      normalMapTex->uniform = true;
+      normalMapTex->texture = true;
+      normalMapTex->constNum = normalMap->constNum;
    }
 
    return normalMap;
@@ -749,7 +721,6 @@ Var* ShaderFeatureHLSL::addOutWsPosition( Vector<ShaderComponent*> &componentLis
       outWsPosition->setName( "outWsPosition" );
       outWsPosition->setStructName( "OUT" );
       outWsPosition->setType( "float3" );
-      outWsPosition->mapsToSampler = false;
 
       getWsPosition( componentList, useInstancing, meta, outWsPosition );
    }
@@ -822,7 +793,6 @@ Var* ShaderFeatureHLSL::addOutDetailTexCoord(   Vector<ShaderComponent*> &compon
    outTex->setName( "detCoord" );
    outTex->setStructName( "OUT" );
    outTex->setType( "float2" );
-   outTex->mapsToSampler = true;
 
    if ( useTexAnim )
    {
@@ -853,7 +823,7 @@ Var* ShaderFeatureHLSL::addOutDetailTexCoord(   Vector<ShaderComponent*> &compon
 //****************************************************************************
 
 DiffuseMapFeatHLSL::DiffuseMapFeatHLSL()
-: mTorqueDep("shaders/common/torque.hlsl")
+: mTorqueDep(ShaderGen::smCommonShaderPath + String("/torque.hlsl"))
 {
 	addDependency(&mTorqueDep);
 }
@@ -864,7 +834,6 @@ void DiffuseMapFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
    MultiLine *meta = new MultiLine;
    getOutTexCoord(   "texCoord", 
                      "float2", 
-                     true, 
                      fd.features[MFT_TexAnim], 
                      meta, 
                      componentList );
@@ -880,7 +849,7 @@ void DiffuseMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    // grab connector texcoord register
-   Var *inTex = getInTexCoord( "texCoord", "float2", true, componentList );
+   Var *inTex = getInTexCoord( "texCoord", "float2", componentList );
 
    //determine output target
    ShaderFeature::OutputTarget targ = ShaderFeature::DefaultTarget;
@@ -889,24 +858,18 @@ void DiffuseMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
 
    // create texture var
    Var *diffuseMap = new Var;
-   diffuseMap->setType( "sampler2D" );
+   diffuseMap->setType( "SamplerState" );
    diffuseMap->setName( "diffuseMap" );
    diffuseMap->uniform = true;
    diffuseMap->sampler = true;
    diffuseMap->constNum = Var::getTexUnitNum();     // used as texture unit num here
 
-   Var* diffuseMapTex = NULL;
-   if (mIsDirect3D11)
-   {
-      diffuseMap->setType("SamplerState");
-
-      diffuseMapTex = new Var;
-      diffuseMapTex->setName("diffuseMapTex");
-      diffuseMapTex->setType("Texture2D");
-      diffuseMapTex->uniform = true;
-      diffuseMapTex->texture = true;
-      diffuseMapTex->constNum = diffuseMap->constNum;
-   }
+   Var* diffuseMapTex = new Var;
+   diffuseMapTex->setName("diffuseMapTex");
+   diffuseMapTex->setType("Texture2D");
+   diffuseMapTex->uniform = true;
+   diffuseMapTex->texture = true;
+   diffuseMapTex->constNum = diffuseMap->constNum;
    
    // create sample color
    Var *diffColor = new Var;
@@ -919,14 +882,7 @@ void DiffuseMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
 
    if (  fd.features[MFT_CubeMap] )
    {
-      if (mIsDirect3D11)
-         meta->addStatement(new GenOp("   @ = @.Sample(@, @);\r\n", colorDecl, diffuseMapTex, diffuseMap, inTex));
-      else
-         meta->addStatement(new GenOp("   @ = tex2D(@, @);\r\n", colorDecl, diffuseMap, inTex));
-
-      if (!fd.features[MFT_Imposter])
-         meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", diffColor, diffColor));
-
+      meta->addStatement(new GenOp("   @ = @.Sample(@, @);\r\n", colorDecl, diffuseMapTex, diffuseMap, inTex));
       meta->addStatement(new GenOp("   @;\r\n", assignColor(diffColor, Material::Mul, NULL, targ)));
    }
    else if(fd.features[MFT_DiffuseMapAtlas])
@@ -940,14 +896,14 @@ void DiffuseMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       LangElement *atDecl = new DecOp(atlasedTex);
 
       // Parameters of the texture atlas
-      Var *atParams  = new Var;
+      Var *atParams = new Var;
       atParams->setType("float4");
       atParams->setName("diffuseAtlasParams");
       atParams->uniform = true;
       atParams->constSortPos = cspPotentialPrimitive;
 
       // Parameters of the texture (tile) this object is using in the atlas
-      Var *tileParams  = new Var;
+      Var *tileParams = new Var;
       tileParams->setType("float4");
       tileParams->setName("diffuseAtlasTileParams");
       tileParams->uniform = true;
@@ -991,42 +947,22 @@ void DiffuseMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       // To dump out UV coords...
 //#define DEBUG_ATLASED_UV_COORDS
 #ifdef DEBUG_ATLASED_UV_COORDS
-      if(!fd.features[MFT_PrePassConditioner])
+      if(!fd.features[MFT_DeferredConditioner])
       {
          meta->addStatement(new GenOp("   @ = float4(@.xy, mipLod / @.w, 1.0);\r\n", new DecOp(diffColor), inTex, atParams));
          meta->addStatement(new GenOp("   @; return OUT;\r\n", assignColor(diffColor, Material::Mul, NULL, targ) ) );
          return;
       }
 #endif
-      if (mIsDirect3D11)
-      {
-         meta->addStatement(new GenOp("   @ = @.SampleLevel(@,@,mipLod);\r\n",
-            new DecOp(diffColor), diffuseMapTex, diffuseMap, inTex));
-      }
-      else if(is_sm3)
-      {
-         meta->addStatement(new GenOp( "   @ = tex2Dlod(@, float4(@, 0.0, mipLod));\r\n", 
-            new DecOp(diffColor), diffuseMap, inTex));
-      }
-      else
-      {
-         meta->addStatement(new GenOp( "   @ = tex2D(@, @);\r\n",
-            new DecOp(diffColor), diffuseMap, inTex));
-      }
-      if (!fd.features[MFT_Imposter])
-         meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", diffColor, diffColor));
+      meta->addStatement(new GenOp("   @ = @.SampleLevel(@,@,mipLod);\r\n",
+         new DecOp(diffColor), diffuseMapTex, diffuseMap, inTex));
 
       meta->addStatement(new GenOp("   @;\r\n", assignColor(diffColor, Material::Mul, NULL, targ) ) );
    }
    else
    {
-      if (mIsDirect3D11)
-         meta->addStatement(new GenOp("@ = @.Sample(@, @);\r\n", colorDecl, diffuseMapTex, diffuseMap, inTex));
-      else
-         meta->addStatement(new GenOp("@ = tex2D(@, @);\r\n", colorDecl, diffuseMap, inTex));
+       meta->addStatement(new GenOp("@ = @.Sample(@, @);\r\n", colorDecl, diffuseMapTex, diffuseMap, inTex));
 
-      if (!fd.features[MFT_Imposter])
-         meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", diffColor, diffColor));
       meta->addStatement(new GenOp("   @;\r\n", assignColor(diffColor, Material::Mul, NULL, targ)));
    }   
 }
@@ -1070,7 +1006,6 @@ void OverlayTexFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList,
    outTex->setName( "outTexCoord2" );
    outTex->setStructName( "OUT" );
    outTex->setType( "float2" );
-   outTex->mapsToSampler = true;
 
    if( fd.features[MFT_TexAnim] )
    {
@@ -1105,33 +1040,23 @@ void OverlayTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    inTex->setName( "texCoord2" );
    inTex->setStructName( "IN" );
    inTex->setType( "float2" );
-   inTex->mapsToSampler = true;
 
    // create texture var
    Var *diffuseMap = new Var;
-   diffuseMap->setType( "sampler2D" );
+   diffuseMap->setType( "SamplerState" );
    diffuseMap->setName( "overlayMap" );
    diffuseMap->uniform = true;
    diffuseMap->sampler = true;
    diffuseMap->constNum = Var::getTexUnitNum();     // used as texture unit num here
 
-   Var* diffuseMapTex = NULL;
-   if (mIsDirect3D11)
-   {
-      diffuseMap->setType("SamplerState");
-      diffuseMapTex = new Var;
-      diffuseMapTex->setName("overlayMapTex");
-      diffuseMapTex->setType("Texture2D");
-      diffuseMapTex->uniform = true;
-      diffuseMapTex->texture = true;
-      diffuseMapTex->constNum = diffuseMap->constNum;
-   }
+   Var* diffuseMapTex = new Var;
+   diffuseMapTex->setName("overlayMapTex");
+   diffuseMapTex->setType("Texture2D");
+   diffuseMapTex->uniform = true;
+   diffuseMapTex->texture = true;
+   diffuseMapTex->constNum = diffuseMap->constNum;
 
-   LangElement *statement = NULL;
-   if (mIsDirect3D11)
-      statement = new GenOp("@.Sample(@, @)", diffuseMapTex, diffuseMap, inTex);
-   else
-      statement = new GenOp("tex2D(@, @)", diffuseMap, inTex);
+   LangElement *statement = new GenOp("@.Sample(@, @)", diffuseMapTex, diffuseMap, inTex);
 
    output = new GenOp( "   @;\r\n", assignColor( statement, Material::LerpAlpha ) );
 }
@@ -1184,7 +1109,6 @@ void DiffuseFeatureHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       targ = ShaderFeature::RenderTarget1;
 
       col = (Var*)LangElement::find("col1");
-      MultiLine * meta = new MultiLine;
       if (!col)
       {
          // create color var
@@ -1192,7 +1116,7 @@ void DiffuseFeatureHLSL::processPix(   Vector<ShaderComponent*> &componentList,
          col->setType("fragout");
          col->setName(getOutputTargetVarName(targ));
          col->setStructName("OUT");
-         meta->addStatement(new GenOp("   @ = float4(1.0);\r\n", col));
+         meta->addStatement(new GenOp("   @ = float4(1.0,1.0,1.0,1.0);\r\n", col));
       }
    }
 
@@ -1233,7 +1157,7 @@ void DiffuseVertColorFeatureHLSL::processVert(  Vector< ShaderComponent* >& comp
 
       ShaderConnector* connectComp = dynamic_cast< ShaderConnector* >( componentList[ C_CONNECTOR ] );
       AssertFatal( connectComp, "DiffuseVertColorFeatureGLSL::processVert - C_CONNECTOR is not a ShaderConnector" );
-      Var* outColor = connectComp->getElement( RT_COLOR );
+      outColor = connectComp->getElement( RT_COLOR );
       outColor->setName( "vertColor" );
       outColor->setStructName( "OUT" );
       outColor->setType( "float4" );
@@ -1283,7 +1207,6 @@ void LightmapFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
    outTex->setName( "texCoord2" );
    outTex->setStructName( "OUT" );
    outTex->setType( "float2" );
-   outTex->mapsToSampler = true;
 
    // setup language elements to output incoming tex coords to output
    output = new GenOp( "   @ = @;\r\n", outTex, inTex );
@@ -1298,27 +1221,21 @@ void LightmapFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
    inTex->setName( "texCoord2" );
    inTex->setStructName( "IN" );
    inTex->setType( "float2" );
-   inTex->mapsToSampler = true;
 
    // create texture var
    Var *lightMap = new Var;
-   lightMap->setType( "sampler2D" );
+   lightMap->setType( "SamplerState" );
    lightMap->setName( "lightMap" );
    lightMap->uniform = true;
    lightMap->sampler = true;
    lightMap->constNum = Var::getTexUnitNum();     // used as texture unit num here
 
-   Var *lightMapTex = NULL;
-   if (mIsDirect3D11)
-   {
-      lightMap->setType("SamplerState");
-      lightMapTex->setName("lightMapTex");
-      lightMapTex->setType("Texture2D");
-      lightMapTex->uniform = true;
-      lightMapTex->texture = true;
-      lightMapTex->constNum = lightMap->constNum;
-   }
-
+   Var *lightMapTex = new Var;
+   lightMapTex->setName("lightMapTex");
+   lightMapTex->setType("Texture2D");
+   lightMapTex->uniform = true;
+   lightMapTex->texture = true;
+   lightMapTex->constNum = lightMap->constNum;
    
    // argh, pixel specular should prob use this too
    if( fd.features[MFT_NormalMap] )
@@ -1328,10 +1245,8 @@ void LightmapFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
       lmColor->setType( "float4" );
       LangElement *lmColorDecl = new DecOp( lmColor );
       
-      if (mIsDirect3D11)
-         output = new GenOp("   @ = @.Sample(@, @);\r\n", lmColorDecl, lightMapTex, lightMap, inTex);
-      else
-         output = new GenOp("   @ = tex2D(@, @);\r\n", lmColorDecl, lightMap, inTex);
+      output = new GenOp("   @ = @.Sample(@, @);\r\n", lmColorDecl, lightMapTex, lightMap, inTex);
+
       return;
    }
 
@@ -1347,7 +1262,7 @@ void LightmapFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
          bool bPreProcessedLighting = false;
          AdvancedLightBinManager *lightBin;
          if ( Sim::findObject( "AL_LightBinMgr", lightBin ) )
-            bPreProcessedLighting = lightBin->MRTLightmapsDuringPrePass();
+            bPreProcessedLighting = lightBin->MRTLightmapsDuringDeferred();
 
          // Lightmap has already been included in the advanced light bin, so
          // no need to do any sampling or anything
@@ -1355,10 +1270,7 @@ void LightmapFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
             statement = new GenOp("float4(@, 1.0)", inColor);
          else
          {
-            if (mIsDirect3D11)
-               statement = new GenOp("@.Sample(@, @) + float4(@.rgb, 0.0)", lightMapTex, lightMap, inTex, inColor);
-            else
-               statement = new GenOp("tex2D(@, @) + float4(@.rgb, 0.0)", lightMap, inTex, inColor);
+            statement = new GenOp("@.Sample(@, @) + float4(@.rgb, 0.0)", lightMapTex, lightMap, inTex, inColor);
          }
       }
    }
@@ -1366,10 +1278,7 @@ void LightmapFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
    // If we still don't have it... then just sample the lightmap.   
    if (!statement)
    {
-      if (mIsDirect3D11)
-         statement = new GenOp("@.Sample(@, @)", lightMapTex, lightMap, inTex);
-      else
-         statement = new GenOp("tex2D(@, @)", lightMap, inTex);
+      statement = new GenOp("@.Sample(@, @)", lightMapTex, lightMap, inTex);
    }
 
    // Assign to proper render target
@@ -1431,7 +1340,6 @@ void TonemapFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
       outTex2->setName( "texCoord2" );
       outTex2->setStructName( "OUT" );
       outTex2->setType( "float2" );
-      outTex2->mapsToSampler = true;
 
       output = new GenOp( "   @ = @;\r\n", outTex2, inTex2 );
    }
@@ -1447,27 +1355,21 @@ void TonemapFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
    inTex2->setName( "texCoord2" );
    inTex2->setStructName( "IN" );
    inTex2->setType( "float2" );
-   inTex2->mapsToSampler = true;
 
    // create texture var
    Var *toneMap = new Var;
-   toneMap->setType( "sampler2D" );
+   toneMap->setType( "SamplerState" );
    toneMap->setName( "toneMap" );
    toneMap->uniform = true;
    toneMap->sampler = true;
    toneMap->constNum = Var::getTexUnitNum();     // used as texture unit num here
 
-   Var *toneMapTex = NULL;
-   if (mIsDirect3D11)
-   {
-      toneMap->setType("SamplerState");
-      toneMapTex = new Var;
-      toneMapTex->setName("toneMapTex");
-      toneMapTex->setType("Texture2D");
-      toneMapTex->uniform = true;
-      toneMapTex->texture = true;
-      toneMapTex->constNum = toneMap->constNum;
-   }
+   Var *toneMapTex = new Var;
+   toneMapTex->setName("toneMapTex");
+   toneMapTex->setType("Texture2D");
+   toneMapTex->uniform = true;
+   toneMapTex->texture = true;
+   toneMapTex->constNum = toneMap->constNum;
 
    MultiLine * meta = new MultiLine;
 
@@ -1477,10 +1379,7 @@ void TonemapFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
    toneMapColor->setName( "toneMapColor" );
    LangElement *toneMapColorDecl = new DecOp( toneMapColor );
 
-   if (mIsDirect3D11)
-      meta->addStatement(new GenOp("   @ = @.Sample(@, @);\r\n", toneMapColorDecl, toneMapTex, toneMap, inTex2));
-   else
-      meta->addStatement(new GenOp("   @ = tex2D(@, @);\r\n", toneMapColorDecl, toneMap, inTex2));
+   meta->addStatement(new GenOp("   @ = @.Sample(@, @);\r\n", toneMapColorDecl, toneMapTex, toneMap, inTex2));
 
    // We do a different calculation if there is a diffuse map or not
    Material::BlendOp blendOp = Material::Mul;
@@ -1497,7 +1396,7 @@ void TonemapFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
    bool bPreProcessedLighting = false;
    AdvancedLightBinManager *lightBin;
    if ( Sim::findObject( "AL_LightBinMgr", lightBin ) )
-      bPreProcessedLighting = lightBin->MRTLightmapsDuringPrePass();
+      bPreProcessedLighting = lightBin->MRTLightmapsDuringDeferred();
 
    // Add in the realtime lighting contribution
    if ( fd.features[MFT_RTLighting] )
@@ -1587,7 +1486,7 @@ void VertLitHLSL::processVert(   Vector<ShaderComponent*> &componentList,
 
       // Grab the connector color
       ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-      Var *outColor = connectComp->getElement( RT_COLOR );
+      outColor = connectComp->getElement( RT_COLOR );
       outColor->setName( "vertColor" );
       outColor->setStructName( "OUT" );
       outColor->setType( "float4" );
@@ -1652,7 +1551,7 @@ void VertLitHLSL::processPix(   Vector<ShaderComponent*> &componentList,
          bool bPreProcessedLighting = false;
          AdvancedLightBinManager *lightBin;
          if ( Sim::findObject( "AL_LightBinMgr", lightBin ) )
-            bPreProcessedLighting = lightBin->MRTLightmapsDuringPrePass();
+            bPreProcessedLighting = lightBin->MRTLightmapsDuringDeferred();
 
          // Assign value in d_lightcolor to toneMapColor if it exists. This is
          // the dynamic light buffer, and it already has the baked-vertex-color 
@@ -1699,27 +1598,22 @@ void DetailFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
                                  const MaterialFeatureData &fd )
 {
    // Get the detail texture coord.
-   Var *inTex = getInTexCoord( "detCoord", "float2", true, componentList );
+   Var *inTex = getInTexCoord( "detCoord", "float2", componentList );
 
    // create texture var
    Var *detailMap = new Var;
-   detailMap->setType( "sampler2D" );
+   detailMap->setType( "SamplerState" );
    detailMap->setName( "detailMap" );
    detailMap->uniform = true;
    detailMap->sampler = true;
    detailMap->constNum = Var::getTexUnitNum();     // used as texture unit num here
 
-   Var* detailMapTex = NULL;
-   if (mIsDirect3D11)
-   {
-      detailMap->setType("SamplerState");
-      detailMapTex = new Var;
-      detailMapTex->setName("detailMapTex");
-      detailMapTex->setType("Texture2D");
-      detailMapTex->uniform = true;
-      detailMapTex->texture = true;
-      detailMapTex->constNum = detailMap->constNum;
-   }
+   Var* detailMapTex = new Var;
+   detailMapTex->setName("detailMapTex");
+   detailMapTex->setType("Texture2D");
+   detailMapTex->uniform = true;
+   detailMapTex->texture = true;
+   detailMapTex->constNum = detailMap->constNum;
 
    // We're doing the standard greyscale detail map
    // technique which can darken and lighten the 
@@ -1728,11 +1622,7 @@ void DetailFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
    // TODO: We could add a feature to toggle between this
    // and a simple multiplication with the detail map.
 
-   LangElement *statement = NULL;
-   if (mIsDirect3D11)
-      statement = new GenOp("( @.Sample(@, @) * 2.0 ) - 1.0", detailMapTex, detailMap, inTex);
-   else
-      statement = new GenOp("( tex2D(@, @) * 2.0 ) - 1.0", detailMap, inTex);
+   LangElement *statement = new GenOp("( @.Sample(@, @) * 2.0 ) - 1.0", detailMapTex, detailMap, inTex);
 
    if (  fd.features[MFT_isDeferred])
       output = new GenOp( "   @;\r\n", assignColor( statement, Material::Add, NULL, ShaderFeature::RenderTarget1 ) );
@@ -1789,11 +1679,7 @@ void VertPositionHLSL::processVert( Vector<ShaderComponent*> &componentList,
 
    // grab connector position
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-   Var *outPosition = NULL;
-   if (mIsDirect3D11)
-      outPosition = connectComp->getElement(RT_SVPOSITION);
-   else
-      outPosition = connectComp->getElement(RT_POSITION);
+   Var *outPosition = connectComp->getElement(RT_SVPOSITION);
    
    outPosition->setName( "hpos" );
    outPosition->setStructName( "OUT" );
@@ -1811,14 +1697,11 @@ void VertPositionHLSL::processVert( Vector<ShaderComponent*> &componentList,
 void VertPositionHLSL::processPix( Vector<ShaderComponent*> &componentList,
                                    const MaterialFeatureData &fd)
 {
-   if (mIsDirect3D11)
-   {
-      // grab connector position
-      ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>(componentList[C_CONNECTOR]);
-      Var *outPosition = connectComp->getElement(RT_SVPOSITION);
-      outPosition->setName("vpos");
-      outPosition->setStructName("IN");
-   }
+   // grab connector position
+   ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>(componentList[C_CONNECTOR]);
+   Var *outPosition = connectComp->getElement(RT_SVPOSITION);
+   outPosition->setName("vpos");
+   outPosition->setStructName("IN");
 }
 
 
@@ -1854,7 +1737,6 @@ void ReflectCubeFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
          outTex->setName( "texCoord" );
          outTex->setStructName( "OUT" );
          outTex->setType( "float2" );
-         outTex->mapsToSampler = true;
 
          // setup language elements to output incoming tex coords to output
          meta->addStatement( new GenOp( "   @ = @;\r\n", outTex, inTex ) );
@@ -1910,7 +1792,6 @@ void ReflectCubeFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
     reflectVec->setName( "reflectVec" );
     reflectVec->setStructName( "OUT" );
     reflectVec->setType( "float3" );
-    reflectVec->mapsToSampler = true;
 
     meta->addStatement( new GenOp( "   @ = reflect(@, @);\r\n", reflectVec, eyeToVert, cubeNormal ) );
 
@@ -1933,28 +1814,22 @@ void ReflectCubeFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
           fd.materialFeatures[MFT_NormalMap])
       {
          // grab connector texcoord register
-         Var *inTex = getInTexCoord( "texCoord", "float2", true, componentList );
-      
+         Var *inTex = getInTexCoord("texCoord", "float2", componentList);
+
          // create texture var
          Var *newMap = new Var;
-         newMap->setType( "sampler2D" );
+         newMap->setType( "SamplerState" );
          newMap->setName( "glossMap" );
          newMap->uniform = true;
          newMap->sampler = true;
          newMap->constNum = Var::getTexUnitNum();     // used as texture unit num here
 
-         Var* glowMapTex = NULL;
-         if (mIsDirect3D11)
-         {
-            newMap->setType("SamplerState");
-
-            glowMapTex = new Var;
-            glowMapTex->setName("glowMapTex");
-            glowMapTex->setType("Texture2D");
-            glowMapTex->uniform = true;
-            glowMapTex->texture = true;
-            glowMapTex->constNum = newMap->constNum;
-         }
+         Var* glowMapTex = new Var;
+         glowMapTex->setName("glowMapTex");
+         glowMapTex->setType("Texture2D");
+         glowMapTex->uniform = true;
+         glowMapTex->texture = true;
+         glowMapTex->constNum = newMap->constNum;
       
          // create sample color
          Var *color = new Var;
@@ -1964,10 +1839,7 @@ void ReflectCubeFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
 
          glossColor = color;
          
-         if (mIsDirect3D11)
-            meta->addStatement(new GenOp("   @ = @.Sample( @, @ );\r\n", colorDecl, glowMapTex, newMap, inTex));
-         else
-            meta->addStatement(new GenOp("   @ = tex2D( @, @ );\r\n", colorDecl, newMap, inTex));
+          meta->addStatement(new GenOp("   @ = @.Sample( @, @ );\r\n", colorDecl, glowMapTex, newMap, inTex));
       }
    }
    else
@@ -1988,27 +1860,21 @@ void ReflectCubeFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
    reflectVec->setName( "reflectVec" );
    reflectVec->setStructName( "IN" );
    reflectVec->setType( "float3" );
-   reflectVec->mapsToSampler = true;
 
    // create cubemap var
    Var *cubeMap = new Var;
-   cubeMap->setType( "samplerCUBE" );
+   cubeMap->setType( "SamplerState" );
    cubeMap->setName( "cubeMap" );
    cubeMap->uniform = true;
    cubeMap->sampler = true;
    cubeMap->constNum = Var::getTexUnitNum();     // used as texture unit num here
 
-   Var* cubeMapTex = NULL;
-   if (mIsDirect3D11)
-   {
-      cubeMap->setType("SamplerState");
-      cubeMapTex = new Var;
-      cubeMapTex->setName("cubeMapTex");
-      cubeMapTex->setType("TextureCube");  // cubeMapTex->setType("TextureCube");
-      cubeMapTex->uniform = true;
-      cubeMapTex->texture = true;
-      cubeMapTex->constNum = cubeMap->constNum;
-   }
+   Var* cubeMapTex = new Var;
+   cubeMapTex->setName("cubeMapTex");
+   cubeMapTex->setType("TextureCube");  // cubeMapTex->setType("TextureCube");
+   cubeMapTex->uniform = true;
+   cubeMapTex->texture = true;
+   cubeMapTex->constNum = cubeMap->constNum;
 
    // TODO: Restore the lighting attenuation here!
    Var *attn = NULL;
@@ -2029,34 +1895,22 @@ void ReflectCubeFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
 
       if (fd.features[MFT_DeferredSpecMap])
       {
-         if (mIsDirect3D11)
-            texCube = new GenOp("@.SampleLevel( @, @, @.a*5)", cubeMapTex, cubeMap, reflectVec, matinfo);
-         else
-            texCube = new GenOp("texCUBElod( @, float4(@, (@.a*5)) )", cubeMap, reflectVec, matinfo);
+         texCube = new GenOp("@.SampleLevel( @, @, @.a*5)", cubeMapTex, cubeMap, reflectVec, matinfo);
       }
       else
       {
-         if (mIsDirect3D11)
-            texCube = new GenOp("@.SampleLevel( @, @, (1.0-@.a)*6 )", cubeMapTex, cubeMap, reflectVec, matinfo);
-         else
-            texCube = new GenOp("texCUBElod( @, float4(@, ((1.0-@.a)*6)) )", cubeMap, reflectVec, matinfo);
+         texCube = new GenOp("@.SampleLevel( @, @, (1.0-@.a)*6 )", cubeMapTex, cubeMap, reflectVec, matinfo);
       }
    }
    else
    {
       if (glossColor) //failing that, rtry and find color data
       {
-         if (mIsDirect3D11)
-            texCube = new GenOp("@.SampleLevel( @, @, @.a*5)", cubeMapTex, cubeMap, reflectVec, glossColor);
-         else
-            texCube = new GenOp("texCUBElod( @, float4(@, @.a*5))", cubeMap, reflectVec, glossColor);
+         texCube = new GenOp("@.SampleLevel( @, @, @.a*5)", cubeMapTex, cubeMap, reflectVec, glossColor);
       }
       else //failing *that*, just draw the cubemap
       {
-         if (mIsDirect3D11)
-            texCube = new GenOp("@.Sample( @, @ )", cubeMapTex, cubeMap, reflectVec);
-         else
-            texCube = new GenOp("texCUBE( @, @ )", cubeMap, reflectVec);
+         texCube = new GenOp("@.Sample( @, @ )", cubeMapTex, cubeMap, reflectVec);
       }
    }
 
@@ -2168,7 +2022,7 @@ void ReflectCubeFeatHLSL::setTexData(  Material::StageData &stageDat,
 //****************************************************************************
 
 RTLightingFeatHLSL::RTLightingFeatHLSL()
-   : mDep( "shaders/common/lighting.hlsl" )
+   : mDep(ShaderGen::smCommonShaderPath + String("/lighting.hlsl" ))
 {
    addDependency( &mDep );
 }
@@ -2200,7 +2054,6 @@ void RTLightingFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList,
          outNormal->setName( "wsNormal" );
          outNormal->setStructName( "OUT" );
          outNormal->setType( "float3" );
-         outNormal->mapsToSampler = false;
 
          // Transform the normal to world space.
          meta->addStatement( new GenOp( "   @ = normalize( @ - @.xyz );\r\n", outNormal, eyePos, inPosition ) );
@@ -2232,7 +2085,6 @@ void RTLightingFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList,
       outNormal->setName( "wsNormal" );
       outNormal->setStructName( "OUT" );
       outNormal->setType( "float3" );
-      outNormal->mapsToSampler = false;
 
       // Get the transform to world space.
       Var *objTrans = getObjTrans( componentList, fd.features[MFT_UseInstancing], meta );
@@ -2383,7 +2235,7 @@ ShaderFeature::Resources RTLightingFeatHLSL::getResources( const MaterialFeature
 //****************************************************************************
 
 FogFeatHLSL::FogFeatHLSL()
-   : mFogDep( "shaders/common/torque.hlsl" )
+   : mFogDep(ShaderGen::smCommonShaderPath + String("/torque.hlsl" ))
 {
    addDependency( &mFogDep );
 }
@@ -2421,7 +2273,6 @@ void FogFeatHLSL::processVert(   Vector<ShaderComponent*> &componentList,
       fogAmount->setName( "fogAmount" );
       fogAmount->setStructName( "OUT" );
       fogAmount->setType( "float" );
-      fogAmount->mapsToSampler = false;
 
       meta->addStatement( new GenOp( "   @ = saturate( computeSceneFog( @, @, @.r, @.g, @.b ) );\r\n", 
          fogAmount, eyePos, wsPosition, fogData, fogData, fogData ) );
@@ -2514,7 +2365,7 @@ ShaderFeature::Resources FogFeatHLSL::getResources( const MaterialFeatureData &f
 //****************************************************************************
 
 VisibilityFeatHLSL::VisibilityFeatHLSL()
-   : mTorqueDep( "shaders/common/torque.hlsl" )
+   : mTorqueDep(ShaderGen::smCommonShaderPath + String("/torque.hlsl" ))
 {
    addDependency( &mTorqueDep );
 }
@@ -2561,7 +2412,7 @@ void VisibilityFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    // Get the visibility constant.
    Var *visibility = NULL;
    if ( fd.features[ MFT_UseInstancing ] )
-      visibility = getInTexCoord( "visibility", "float", false, componentList );
+      visibility = getInTexCoord( "visibility", "float", componentList );
    else
    {
       visibility = (Var*)LangElement::find( "visibility" );
@@ -2681,7 +2532,7 @@ void RenderTargetZeroHLSL::processPix( Vector<ShaderComponent*> &componentList, 
 //****************************************************************************
 
 HDROutHLSL::HDROutHLSL()
-   : mTorqueDep( "shaders/common/torque.hlsl" )
+   : mTorqueDep(ShaderGen::smCommonShaderPath + String("/torque.hlsl" ))
 {
    addDependency( &mTorqueDep );
 }
@@ -2702,7 +2553,7 @@ void HDROutHLSL::processPix(  Vector<ShaderComponent*> &componentList,
 #include "T3D/fx/groundCover.h"
 
 FoliageFeatureHLSL::FoliageFeatureHLSL()
-: mDep( "shaders/common/foliage.hlsl" )
+: mDep(ShaderGen::smCommonShaderPath + String("/foliage.hlsl" ))
 {
    addDependency( &mDep );
 }
@@ -2848,7 +2699,7 @@ void ParticleNormalFeatureHLSL::processVert(Vector<ShaderComponent*> &componentL
 //****************************************************************************
 
 ImposterVertFeatureHLSL::ImposterVertFeatureHLSL()
-   :  mDep( "shaders/common/imposter.hlsl" )
+   :  mDep(ShaderGen::smCommonShaderPath + String("/imposter.hlsl" ))
 {
    addDependency( &mDep );
 }

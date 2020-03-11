@@ -81,6 +81,9 @@ class SFXSound : public SFXSource,
       /// _initBuffer() used for managing virtual sources.
       U32 mDuration;
 
+      ///Used for setPosition (time in miliseconds)
+      U32 mSetPositionValue;
+
       /// Create a new voice for this source.
       bool _allocVoice( SFXDevice* device );
 

@@ -41,20 +41,20 @@
 
 ConsoleFunctionGroupBegin(ConsoleDoc, "Console self-documentation functions. These output psuedo C++ suitable for feeeding through Doxygen or another auto documentation tool.");
 
-DefineConsoleFunction( dumpConsoleClasses, void, (bool dumpScript, bool dumpEngine), ( true, true ),
+DefineEngineFunction( dumpConsoleClasses, void, (bool dumpScript, bool dumpEngine), ( true, true ),
             "@brief Dumps all declared console classes to the console.\n\n"
             "@param dumpScript Optional parameter specifying whether or not classes defined in script should be dumped.\n"
             "@param dumpEngine Optional parameter specifying whether or not classes defined in the engine should be dumped.\n"
-			"@ingroup Logging")
+         "@ingroup Logging")
 {
    Namespace::dumpClasses( dumpScript, dumpEngine );
 }
 
-DefineConsoleFunction(dumpConsoleFunctions, void, ( bool dumpScript, bool dumpEngine ), ( true, true ),
+DefineEngineFunction(dumpConsoleFunctions, void, ( bool dumpScript, bool dumpEngine ), ( true, true ),
             "@brief Dumps all declared console functions to the console.\n"
             "@param dumpScript Optional parameter specifying whether or not functions defined in script should be dumped.\n"
             "@param dumpEngine Optional parameter specitying whether or not functions defined in the engine should be dumped.\n"
-			"@ingroup Logging")
+         "@ingroup Logging")
 {
    Namespace::dumpFunctions( dumpScript, dumpEngine );
 }
@@ -85,12 +85,12 @@ void printClassHeader(const char* usage, const char * className, const char * su
       Con::printf("///       information was available for this class.");
    }
 
-   if( usage != NULL )
+   if((usage != NULL) && strlen(usage))
    {
       // Copy Usage Document
-      S32 usageLen = dStrlen( usage );
+      S32 usageLen = dStrlen( usage ) + 1;
       FrameTemp<char> usageStr( usageLen );
-      dStrcpy( usageStr, usage );
+      dStrcpy( usageStr, usage, usageLen );
 
       // Print Header
       Con::printf( "/*!" );
@@ -117,7 +117,7 @@ void printClassHeader(const char* usage, const char * className, const char * su
          }
          
          // Copy line and update usagePtr
-         dStrcpy( lineStr, usagePtr );
+         dStrcpy( lineStr, usagePtr, 2048 );
          usagePtr = (newLine != NULL ) ? newLine : usagePtr;
          lineLen = dStrlen( lineStr );
 
@@ -185,7 +185,7 @@ void printGroupStart(const char * aName, const char * aDocs)
    Con::printf("   /*! */");
 }
 
-void printClassMember(const bool isDeprec, const char * aType, const char * aName, const char * aDocs)
+void printClassMember(const bool isDeprec, const char * aType, const char * aName, const char * aDocs, S32 aElementCount)
 {
    Con::printf("   /*!");
 
@@ -200,7 +200,14 @@ void printClassMember(const bool isDeprec, const char * aType, const char * aNam
 
    Con::printf("    */");
 
-   Con::printf("   %s %s;", isDeprec ? "deprecated" : aType, aName);
+   if (aElementCount == 1)
+   {
+      Con::printf("   %s %s;", isDeprec ? "deprecated" : aType, aName);
+   }
+   else
+   {
+      Con::printf("   %s %s[%i];", isDeprec ? "deprecated" : aType, aName, aElementCount);
+   }
 }
 
 void printGroupEnd()
@@ -235,8 +242,17 @@ void Namespace::printNamespaceEntries(Namespace * g, bool dumpScript, bool dumpE
       // If it's a function
       if( eType >= Entry::ConsoleFunctionType )
       {
-         printClassMethod(true, typeNames[eType], funcName, ewalk->getArgumentsString().c_str(),
-            ewalk->getDocString().c_str());
+         if (ewalk->mHeader != NULL)
+         {
+            // The function was defined with types, so we can print out the actual return type
+            printClassMethod(true, ewalk->mHeader->mReturnString, funcName, ewalk->getArgumentsString().c_str(),
+               ewalk->getDocString().c_str());
+         }
+         else
+         {
+            printClassMethod(true, typeNames[eType], funcName, (ewalk->getArgumentsString() + "...").c_str(),
+               ewalk->getDocString().c_str());
+         }
       }
       else if(ewalk->mType == Entry::GroupMarker)
       {
@@ -416,7 +432,8 @@ void Namespace::dumpClasses( bool dumpScript, bool dumpEngine )
                         true,
                         "<deprecated>",
                         (*fieldList)[j].pFieldname,
-                        (*fieldList)[j].pFieldDocs
+                        (*fieldList)[j].pFieldDocs,
+                        (*fieldList)[j].elementCount
                         );
                   }
                   else
@@ -427,7 +444,8 @@ void Namespace::dumpClasses( bool dumpScript, bool dumpEngine )
                         false,
                         cbt ? cbt->getTypeClassName() : "<unknown>",
                         (*fieldList)[j].pFieldname,
-                        (*fieldList)[j].pFieldDocs
+                        (*fieldList)[j].pFieldDocs,
+                        (*fieldList)[j].elementCount
                         );
                   }
                }

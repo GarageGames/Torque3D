@@ -85,7 +85,7 @@ int bs2b_get_srate(struct bs2b *bs2b);
 /* Clear buffer */
 void bs2b_clear(struct bs2b *bs2b);
 
-void bs2b_cross_feed(struct bs2b *bs2b, float *restrict Left, float *restrict Right, unsigned int SamplesToDo);
+void bs2b_cross_feed(struct bs2b *bs2b, float *restrict Left, float *restrict Right, int SamplesToDo);
 
 #ifdef __cplusplus
 }    /* extern "C" */

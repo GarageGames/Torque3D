@@ -114,13 +114,6 @@ long SFXVorbisStream::_tell_func( void *datasource )
 
 bool SFXVorbisStream::_openVorbis()
 {
-#if defined(TORQUE_OS_XENON)
-   // For some reason the datasource pointer passed to the callbacks is not the
-   // same as it is when passed in to ov_open_callbacks
-#pragma message("There is a strange bug in ov_open_callbacks as it compiles on the Xbox360. Use FMOD resource loading.")
-   AssertWarn(false, "There is a strange bug in ov_open_callbacks as it compiles on the Xbox360. Use FMOD resource loading.");
-   return false;
-#endif
    mVF = new OggVorbis_File;
    dMemset( mVF, 0, sizeof( OggVorbis_File ) );
 
@@ -205,7 +198,7 @@ S32 SFXVorbisStream::read( U8 *buffer,
    // requests longer than this.
    const U32 MAXREAD = 4096;
 
-   U32 bytesRead = 0;
+   S64 bytesRead = 0;
    U32 offset = 0;
    U32 bytesToRead = 0;
 

@@ -50,7 +50,7 @@ BadWordFilter::BadWordFilter()
 {
    VECTOR_SET_ASSOCIATION( filterTables );
 
-   dStrcpy(defaultReplaceStr, "knqwrtlzs");
+   dStrcpy(defaultReplaceStr, "knqwrtlzs", 32);
    filterTables.push_back(new FilterTable);
    curOffset = 0;
 }
@@ -65,7 +65,7 @@ void BadWordFilter::create()
 {
    Con::addVariable("pref::enableBadWordFilter", TypeBool, &filteringEnabled, 
       "@brief If true, the bad word filter will be enabled.\n\n"
-	   "@ingroup Game");
+      "@ingroup Game");
    gBadWordFilter = new BadWordFilter;
    gBadWordFilter->addBadWord("shit");
    gBadWordFilter->addBadWord("fuck");
@@ -147,7 +147,7 @@ bool BadWordFilter::setDefaultReplaceStr(const char *str)
    U32 len = dStrlen(str);
    if(len < 2 || len >= sizeof(defaultReplaceStr))
       return false;
-   dStrcpy(defaultReplaceStr, str);
+   dStrcpy(defaultReplaceStr, str, 32);
    return true;
 }
 
@@ -251,7 +251,7 @@ DefineEngineFunction(addBadWord, bool, (const char* badWord),,
 
    "@ingroup Game")
 {
-	return gBadWordFilter->addBadWord(badWord);
+   return gBadWordFilter->addBadWord(badWord);
 }
 
 DefineEngineFunction(filterString, const char *, (const char* baseString, const char* replacementChars), (nullAsType<const char*>(), nullAsType<const char*>()),
@@ -279,17 +279,18 @@ DefineEngineFunction(filterString, const char *, (const char* baseString, const 
 
    "@ingroup Game")
 {
-	const char *replaceStr = NULL;
+   const char *replaceStr = NULL;
 
-	if(replacementChars)
-		replaceStr = replacementChars;
-	else
-		replaceStr = gBadWordFilter->getDefaultReplaceStr();
+   if(replacementChars)
+      replaceStr = replacementChars;
+   else
+      replaceStr = gBadWordFilter->getDefaultReplaceStr();
 
-	char *ret = Con::getReturnBuffer(dStrlen(baseString) + 1);
-	dStrcpy(ret, baseString);
-	gBadWordFilter->filterString(ret, replaceStr);
-	return ret;
+   dsize_t retLen = dStrlen(baseString) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, baseString, retLen);
+   gBadWordFilter->filterString(ret, replaceStr);
+   return ret;
 }
 
 DefineEngineFunction(containsBadWords, bool, (const char* text),,
@@ -316,17 +317,17 @@ DefineEngineFunction(containsBadWords, bool, (const char* text),,
       "// Otherwise print the original text\n"
       "if(containsBadWords(%userText))\n"
       "{\n"
-      "	// Filter the string\n"
-      "	%filteredText = filterString(%userText, %replacementChars);\n\n"
-      "	// Print filtered text\n"
-      "	echo(%filteredText);\n"
+      "  // Filter the string\n"
+      "  %filteredText = filterString(%userText, %replacementChars);\n\n"
+      "  // Print filtered text\n"
+      "  echo(%filteredText);\n"
       "}\n"
       "else\n"
-      "	echo(%userText);\n\n"
+      "  echo(%userText);\n\n"
    "@endtsexample\n"
 
    "@ingroup Game")
 {
-	return gBadWordFilter->containsBadWords(text);
+   return gBadWordFilter->containsBadWords(text);
 }
 

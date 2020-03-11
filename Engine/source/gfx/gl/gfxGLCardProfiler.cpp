@@ -74,7 +74,7 @@ void GFXGLCardProfiler::setupCardCapabilities()
 
 bool GFXGLCardProfiler::_queryCardCap(const String& query, U32& foundResult)
 {
-   // Just doing what the D3D9 layer does
+   // Just doing what the D3D11 layer does
    return 0;
 }
 

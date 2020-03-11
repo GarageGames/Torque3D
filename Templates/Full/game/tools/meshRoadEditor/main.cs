@@ -164,7 +164,7 @@ function MeshRoadEditorPlugin::onSaveMission( %this, %missionFile )
 {
    if( MeshRoadEditorGui.isDirty )
    {
-      MissionGroup.save( %missionFile );
+      getRootScene().save( %missionFile );
       MeshRoadEditorGui.isDirty = false;
    }
 }

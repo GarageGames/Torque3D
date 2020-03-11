@@ -151,16 +151,36 @@ public:
 
 //----------------------------------------------------------------------------
 
+// As shipped, AITurretShape plus the chain of classes it inherits from, consumes
+// all 32 mask-bits. AFX uses one additional mask-bit in GameBase, which pushes
+// AITurretShape over the mask-bit limit which will cause runtime crashes. As 
+// a workaround, AFX modifies AITurretShape so that it reuses the TurretUpdateMask
+// defined by TurretShape rather than adding a unique TurretStateMask. This will
+// make AITurretShape's network updates slightly less efficient, but should be 
+// acceptable for most uses of AITurretShape. If you plan to populate your levels
+// with many AITurretShape objects, consider restoring it to use of a unique
+// bit-mask, but if you do that, you will have to eliminate at use of at least one
+// bit by one of it's parent classes. (FYI ShapeBase uses 20 bits.)
+//
+// Comment out this define if you want AITurretShape to define it's own bit-mask.
+#define AFX_REUSE_TURRETSHAPE_MASKBITS
 class AITurretShape: public TurretShape
 {
    typedef TurretShape Parent;
 
 protected:
 
+#ifdef AFX_REUSE_TURRETSHAPE_MASKBITS
+   enum MaskBits {
+      TurretStateMask   = Parent::TurretUpdateMask,
+      NextFreeMask      = Parent::NextFreeMask
+   };
+#else // ORIGINAL CODE
    enum MaskBits {
       TurretStateMask   = Parent::NextFreeMask,
       NextFreeMask      = Parent::NextFreeMask << 1
    };
+#endif
 
    struct TargetInfo
    {
@@ -257,6 +277,9 @@ public:
 
    void addToIgnoreList(ShapeBase* obj);
    void removeFromIgnoreList(ShapeBase* obj);
+   void clearIgnoreList();
+   S32  ignoreListCount();
+   SimObject* getIgnoreListObject(S32 index);  
 
    void setTurretStateName(const char* newState, bool force=false);
    void setTurretState(U32 newState, bool force=false);

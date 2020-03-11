@@ -1,0 +1,13 @@
+# https://editorconfig.org/
+
+root = true
+
+[*]
+tab_width = 3
+indent_style = space
+indent_size = 3
+
+insert_final_newline = true
+trim_trailing_whitespace = true
+end_of_line = lf
+charset = utf-8

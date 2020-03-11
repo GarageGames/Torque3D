@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -37,6 +37,7 @@
 #include "SDL_uikitwindow.h"
 #include "SDL_uikitopengles.h"
 #include "SDL_uikitclipboard.h"
+#include "SDL_uikitvulkan.h"
 
 #define UIKITVID_DRIVER_NAME "uikit"
 
@@ -90,7 +91,7 @@ UIKit_CreateDevice(int devindex)
         device->SetDisplayMode = UIKit_SetDisplayMode;
         device->PumpEvents = UIKit_PumpEvents;
         device->SuspendScreenSaver = UIKit_SuspendScreenSaver;
-        device->CreateWindow = UIKit_CreateWindow;
+        device->CreateSDLWindow = UIKit_CreateWindow;
         device->SetWindowTitle = UIKit_SetWindowTitle;
         device->ShowWindow = UIKit_ShowWindow;
         device->HideWindow = UIKit_HideWindow;
@@ -101,13 +102,13 @@ UIKit_CreateDevice(int devindex)
         device->GetWindowWMInfo = UIKit_GetWindowWMInfo;
         device->GetDisplayUsableBounds = UIKit_GetDisplayUsableBounds;
 
-    #if SDL_IPHONE_KEYBOARD
+#if SDL_IPHONE_KEYBOARD
         device->HasScreenKeyboardSupport = UIKit_HasScreenKeyboardSupport;
         device->ShowScreenKeyboard = UIKit_ShowScreenKeyboard;
         device->HideScreenKeyboard = UIKit_HideScreenKeyboard;
         device->IsScreenKeyboardShown = UIKit_IsScreenKeyboardShown;
         device->SetTextInputRect = UIKit_SetTextInputRect;
-    #endif
+#endif
 
         device->SetClipboardText = UIKit_SetClipboardText;
         device->GetClipboardText = UIKit_GetClipboardText;
@@ -122,6 +123,15 @@ UIKit_CreateDevice(int devindex)
         device->GL_GetProcAddress   = UIKit_GL_GetProcAddress;
         device->GL_LoadLibrary      = UIKit_GL_LoadLibrary;
         device->free = UIKit_DeleteDevice;
+
+#if SDL_VIDEO_VULKAN
+        device->Vulkan_LoadLibrary = UIKit_Vulkan_LoadLibrary;
+        device->Vulkan_UnloadLibrary = UIKit_Vulkan_UnloadLibrary;
+        device->Vulkan_GetInstanceExtensions
+                                     = UIKit_Vulkan_GetInstanceExtensions;
+        device->Vulkan_CreateSurface = UIKit_Vulkan_CreateSurface;
+        device->Vulkan_GetDrawableSize = UIKit_Vulkan_GetDrawableSize;
+#endif
 
         device->gl_config.accelerated = 1;
 
@@ -176,18 +186,60 @@ UIKit_IsSystemVersionAtLeast(double version)
 CGRect
 UIKit_ComputeViewFrame(SDL_Window *window, UIScreen *screen)
 {
+    CGRect frame = screen.bounds;
+
 #if !TARGET_OS_TV && (__IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0)
     BOOL hasiOS7 = UIKit_IsSystemVersionAtLeast(7.0);
 
-    if (hasiOS7 || (window->flags & (SDL_WINDOW_BORDERLESS|SDL_WINDOW_FULLSCREEN))) {
-        /* The view should always show behind the status bar in iOS 7+. */
-        return screen.bounds;
-    } else {
-        return screen.applicationFrame;
+    /* The view should always show behind the status bar in iOS 7+. */
+    if (!hasiOS7 && !(window->flags & (SDL_WINDOW_BORDERLESS|SDL_WINDOW_FULLSCREEN))) {
+        frame = screen.applicationFrame;
     }
-#else
-    return screen.bounds;
 #endif
+
+#if !TARGET_OS_TV
+    /* iOS 10 seems to have a bug where, in certain conditions, putting the
+     * device to sleep with the a landscape-only app open, re-orienting the
+     * device to portrait, and turning it back on will result in the screen
+     * bounds returning portrait orientation despite the app being in landscape.
+     * This is a workaround until a better solution can be found.
+     * https://bugzilla.libsdl.org/show_bug.cgi?id=3505
+     * https://bugzilla.libsdl.org/show_bug.cgi?id=3465
+     * https://forums.developer.apple.com/thread/65337 */
+    if (UIKit_IsSystemVersionAtLeast(8.0)) {
+        UIInterfaceOrientation orient = [UIApplication sharedApplication].statusBarOrientation;
+        BOOL isLandscape = UIInterfaceOrientationIsLandscape(orient);
+
+        if (isLandscape != (frame.size.width > frame.size.height)) {
+            float height = frame.size.width;
+            frame.size.width = frame.size.height;
+            frame.size.height = height;
+        }
+    }
+#endif
+
+    return frame;
+}
+
+void
+UIKit_ForceUpdateHomeIndicator()
+{
+#if !TARGET_OS_TV
+    /* Force the main SDL window to re-evaluate home indicator state */
+    SDL_Window *focus = SDL_GetFocusWindow();
+    if (focus) {
+        SDL_WindowData *data = (__bridge SDL_WindowData *) focus->driverdata;
+        if (data != nil) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability-new"
+            if ([data.viewcontroller respondsToSelector:@selector(setNeedsUpdateOfHomeIndicatorAutoHidden)]) {
+                [data.viewcontroller performSelectorOnMainThread:@selector(setNeedsUpdateOfHomeIndicatorAutoHidden) withObject:nil waitUntilDone:NO];
+                [data.viewcontroller performSelectorOnMainThread:@selector(setNeedsUpdateOfScreenEdgesDeferringSystemGestures) withObject:nil waitUntilDone:NO];
+            }
+#pragma clang diagnostic pop
+        }
+    }
+#endif /* !TARGET_OS_TV */
 }
 
 /*
@@ -195,11 +247,28 @@ UIKit_ComputeViewFrame(SDL_Window *window, UIScreen *screen)
  *
  * This doesn't really have aything to do with the interfaces of the SDL video
  *  subsystem, but we need to stuff this into an Objective-C source code file.
+ *
+ * NOTE: This is copypasted from src/video/cocoa/SDL_cocoavideo.m! Thus, if
+ *  Cocoa is supported, we use that one instead. Be sure both versions remain
+ *  identical!
  */
 
+#if !defined(SDL_VIDEO_DRIVER_COCOA)
 void SDL_NSLog(const char *text)
 {
     NSLog(@"%s", text);
+}
+#endif /* SDL_VIDEO_DRIVER_COCOA */
+
+/*
+ * iOS Tablet detection
+ *
+ * This doesn't really have aything to do with the interfaces of the SDL video
+ * subsystem, but we need to stuff this into an Objective-C source code file.
+ */
+SDL_bool SDL_IsIPad(void)
+{
+    return (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
 }
 
 #endif /* SDL_VIDEO_DRIVER_UIKIT */

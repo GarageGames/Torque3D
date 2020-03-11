@@ -1584,7 +1584,7 @@ function ColladaImportDlg::onOK(%this)
 function ColladaImportDlg::loadLights(%this)
 {
    // Get the ID of the last object added
-   %obj = MissionGroup.getObject(MissionGroup.getCount()-1);
+   %obj = getRootScene().getObject(getRootScene().getCount()-1);
 
    // Create a new SimGroup to hold the model and lights
    %group = new SimGroup();
@@ -1596,7 +1596,7 @@ function ColladaImportDlg::loadLights(%this)
    {
       %group.add(%obj);
       %group.bringToFront(%obj);
-      MissionGroup.add(%group);
+      getRootScene().add(%group);
       if (EditorTree.isVisible())
       {
          EditorTree.removeItem(EditorTree.findItemByObjectId(%obj));

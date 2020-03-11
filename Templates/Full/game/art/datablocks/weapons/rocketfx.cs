@@ -28,7 +28,7 @@ datablock SFXProfile(RocketLauncherExplosionSound)
 datablock ParticleData(RocketDebrisTrailParticle)
 {
    textureName = "art/particles/impact";
-   dragCoeffiecient = 0;
+   dragCoefficient = 0;
    inheritedVelFactor = 0.0;
    constantAcceleration = 0.0;
    lifetimeMS = 1200;//1000;

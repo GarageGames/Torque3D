@@ -119,10 +119,10 @@ protected:
 
    void _generateSkyPoints();
 
-   void _getColor( const Point3F &pos, ColorF *outColor );
-   void _getFogColor( ColorF *outColor );
-   void _getAmbientColor( ColorF *outColor );
-   void _getSunColor( ColorF *outColor );
+   void _getColor( const Point3F &pos, LinearColorF *outColor );
+   void _getFogColor( LinearColorF *outColor );
+   void _getAmbientColor( LinearColorF *outColor );
+   void _getSunColor( LinearColorF *outColor );
    void _interpolateColors();
 
    void _conformLights();
@@ -161,7 +161,7 @@ protected:
 
    F32 mOuterRadius;
    F32 mScale;
-   ColorF mWavelength;
+   LinearColorF mWavelength;
    F32 mWavelength4[3];
    F32 mRayleighScaleDepth;
    F32 mMieScaleDepth;
@@ -185,16 +185,16 @@ protected:
 
    F32 mBrightness;
 
-   ColorF mNightColor;
-   ColorF mNightFogColor;
+   LinearColorF mNightColor;
+   LinearColorF mNightFogColor;
 
-   ColorF mAmbientColor;   ///< Not a field
-   ColorF mSunColor;       ///< Not a field
-   ColorF mFogColor;       ///< Not a field
+   LinearColorF mAmbientColor;   ///< Not a field
+   LinearColorF mSunColor;       ///< Not a field
+   LinearColorF mFogColor;       ///< Not a field
 
-   ColorF mAmbientScale;
-   ColorF mSunScale;
-   ColorF mFogScale;
+   LinearColorF mAmbientScale;
+   LinearColorF mSunScale;
+   LinearColorF mFogScale;
 
    LightInfo *mLight;
 
@@ -211,7 +211,7 @@ protected:
    String mMoonMatName;
    BaseMatInstance *mMoonMatInst;
    F32 mMoonScale;
-   ColorF mMoonTint;
+   LinearColorF mMoonTint;
    VectorF mMoonLightDir;
    CubemapData *mNightCubemap;
    String mNightCubemapName;
@@ -241,7 +241,7 @@ protected:
    GFXShaderConstHandle *mNightInterpolantAndExposureSC;
    GFXShaderConstHandle *mUseCubemapSC;
    F32 mColorizeAmt;
-   ColorF mColorize;
+   LinearColorF mColorize;
    GFXShaderConstHandle *mColorizeSC;
 
 };

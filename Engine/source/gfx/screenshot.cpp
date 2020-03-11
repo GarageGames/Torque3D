@@ -47,15 +47,15 @@ inline void sBlendPixelRGB888( U8* src, U8* dst, F32 factor )
 ScreenShot::ScreenShot()
    :  mPending( false ),
       mWriteJPG( false ),
-      mCurrTile( 0, 0 ),
-      mTiles( 1 )
+      mTiles( 1 ),
+      mCurrTile( 0, 0 )
 {
    mFilename[0] = 0;
 }
 
 void ScreenShot::setPending( const char *filename, bool writeJPG, S32 tiles, F32 overlap )
 {
-   dStrcpy( mFilename, filename );
+   dStrcpy( mFilename, filename, 256 );
    mWriteJPG = writeJPG;
    mTiles = getMax( tiles, 1 );
    mPixelOverlap.set(getMin(overlap, 0.25f), getMin(overlap, 0.25f));      

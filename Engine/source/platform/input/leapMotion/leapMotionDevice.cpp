@@ -82,7 +82,7 @@ U32 LeapMotionDevice::LM_FRAME = 0;
 LeapMotionDevice::LeapMotionDevice()
 {
    // From IInputDevice
-   dStrcpy(mName, "leapmotion");
+   dStrcpy(mName, "leapmotion", 30);
    mDeviceType = INPUTMGR->getNextDeviceType();
 
    mController = NULL;

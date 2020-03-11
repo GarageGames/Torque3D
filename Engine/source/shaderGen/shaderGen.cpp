@@ -49,6 +49,7 @@ MODULE_BEGIN( ShaderGen )
 
 MODULE_END;
 
+String ShaderGen::smCommonShaderPath("shaders/common");
 
 ShaderGen::ShaderGen()
 {
@@ -95,18 +96,13 @@ void ShaderGen::initShaderGen()
    if (!mInitDelegates[adapterType])
       return;
 
+   smCommonShaderPath = String(Con::getVariable("$Core::CommonShaderPath", "shaders/common"));
+
    mInitDelegates[adapterType](this);
    mFeatureInitSignal.trigger( adapterType );
    mInit = true;
 
    String shaderPath = Con::getVariable( "$shaderGen::cachePath");
-#if defined(TORQUE_SHADERGEN) && ( defined(TORQUE_OS_XENON) || defined(TORQUE_OS_PS3) )
-   // If this is a console build, and TORQUE_SHADERGEN is defined 
-   // (signifying that new shaders should be generated) then clear the shader
-   // path so that the MemFileSystem is used instead.
-   shaderPath.clear();
-#endif
-
    if (!shaderPath.equal( "shadergen:" ) && !shaderPath.isEmpty() )
    {
       // this is necessary, especially under Windows with UAC enabled
@@ -157,8 +153,8 @@ void ShaderGen::generateShader( const MaterialFeatureData &featureData,
    dSprintf( vertShaderName, sizeof(vertShaderName), "shadergen:/%s_V.%s", cacheName, mFileEnding.c_str() );
    dSprintf( pixShaderName, sizeof(pixShaderName), "shadergen:/%s_P.%s", cacheName, mFileEnding.c_str() );
    
-   dStrcpy( vertFile, vertShaderName );
-   dStrcpy( pixFile, pixShaderName );   
+   dStrcpy( vertFile, vertShaderName, 256 );
+   dStrcpy( pixFile, pixShaderName, 256 );
    
    // this needs to change - need to optimize down to ps v.1.1
    *pixVersion = GFX->getPixelShaderVersion();

@@ -28,6 +28,12 @@ $WORD::BITDEPTH = 3;
 $WORD::REFRESH = 4;
 $WORD::AA = 5;
 
+//We need to hook the missing/warn material stuff early, so do it here
+$Core::MissingTexturePath = "core/art/missingTexture";
+$Core::UnAvailableTexturePath = "core/art/unavailable";
+$Core::WarningTexturePath = "core/art/warnMat";
+$Core::CommonShaderPath = "shaders/common";
+
 //---------------------------------------------------------------------------------------------
 // CorePackage
 // Adds functionality for this mod to some standard functions.

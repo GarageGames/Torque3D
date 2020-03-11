@@ -31,37 +31,57 @@
 
 
 // Set up defaults...
-GFX_ImplementTextureProfile(GFXDefaultRenderTargetProfile, 
-                            GFXTextureProfile::DiffuseMap, 
-                            GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap | GFXTextureProfile::RenderTarget, 
+
+GFX_ImplementTextureProfile(GFXRenderTargetProfile,
+                            GFXTextureProfile::DiffuseMap,
+                            GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap | GFXTextureProfile::RenderTarget,
                             GFXTextureProfile::NONE);
-GFX_ImplementTextureProfile(GFXDefaultStaticDiffuseProfile, 
-                            GFXTextureProfile::DiffuseMap, 
-                            GFXTextureProfile::Static, 
+GFX_ImplementTextureProfile(GFXRenderTargetSRGBProfile,
+                            GFXTextureProfile::DiffuseMap,
+                            GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap | GFXTextureProfile::RenderTarget | GFXTextureProfile::SRGB,
                             GFXTextureProfile::NONE);
-GFX_ImplementTextureProfile(GFXDefaultStaticNormalMapProfile, 
-                            GFXTextureProfile::NormalMap, 
-                            GFXTextureProfile::Static, 
+GFX_ImplementTextureProfile(GFXStaticTextureProfile, GFXTextureProfile::DiffuseMap,
+                            GFXTextureProfile::Static,
                             GFXTextureProfile::NONE);
-GFX_ImplementTextureProfile(GFXDefaultStaticDXT5nmProfile, 
-                            GFXTextureProfile::NormalMap, 
-                            GFXTextureProfile::Static, 
-                            GFXTextureProfile::DXT5);
-GFX_ImplementTextureProfile(GFXDefaultPersistentProfile,
-                            GFXTextureProfile::DiffuseMap, 
-                            GFXTextureProfile::PreserveSize | GFXTextureProfile::Static | GFXTextureProfile::KeepBitmap, 
+GFX_ImplementTextureProfile(GFXStaticTextureSRGBProfile,
+                            GFXTextureProfile::DiffuseMap,
+                            GFXTextureProfile::Static | GFXTextureProfile::SRGB,
                             GFXTextureProfile::NONE);
-GFX_ImplementTextureProfile(GFXSystemMemProfile, 
-                            GFXTextureProfile::DiffuseMap, 
+GFX_ImplementTextureProfile(GFXTexturePersistentProfile,
+                            GFXTextureProfile::DiffuseMap,
+                            GFXTextureProfile::PreserveSize | GFXTextureProfile::Static | GFXTextureProfile::KeepBitmap,
+                            GFXTextureProfile::NONE);
+GFX_ImplementTextureProfile(GFXTexturePersistentSRGBProfile,
+                            GFXTextureProfile::DiffuseMap,
+                            GFXTextureProfile::PreserveSize | GFXTextureProfile::Static | GFXTextureProfile::KeepBitmap | GFXTextureProfile::SRGB,
+                            GFXTextureProfile::NONE);
+GFX_ImplementTextureProfile(GFXSystemMemTextureProfile,
+                            GFXTextureProfile::DiffuseMap,
                             GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap | GFXTextureProfile::SystemMemory,
                             GFXTextureProfile::NONE);
-GFX_ImplementTextureProfile(GFXDefaultZTargetProfile,
-                            GFXTextureProfile::DiffuseMap, 
-                            GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap | GFXTextureProfile::ZTarget | GFXTextureProfile::NoDiscard, 
+GFX_ImplementTextureProfile(GFXNormalMapProfile,
+                            GFXTextureProfile::NormalMap,
+                            GFXTextureProfile::Static,
+                            GFXTextureProfile::NONE);
+GFX_ImplementTextureProfile(GFXNormalMapBC3Profile,
+                            GFXTextureProfile::NormalMap,
+                            GFXTextureProfile::Static,
+                            GFXTextureProfile::BC3);
+GFX_ImplementTextureProfile(GFXNormalMapBC5Profile,
+                            GFXTextureProfile::NormalMap,
+                            GFXTextureProfile::Static,
+                            GFXTextureProfile::BC5);
+GFX_ImplementTextureProfile(GFXZTargetProfile,
+                            GFXTextureProfile::DiffuseMap,
+                            GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap | GFXTextureProfile::ZTarget | GFXTextureProfile::NoDiscard,
                             GFXTextureProfile::NONE);
 GFX_ImplementTextureProfile(GFXDynamicTextureProfile,
                             GFXTextureProfile::DiffuseMap,
                             GFXTextureProfile::Dynamic,
+                            GFXTextureProfile::NONE);
+GFX_ImplementTextureProfile(GFXDynamicTextureSRGBProfile,
+                            GFXTextureProfile::DiffuseMap,
+                            GFXTextureProfile::Dynamic | GFXTextureProfile::SRGB,
                             GFXTextureProfile::NONE);
 
 //-----------------------------------------------------------------------------

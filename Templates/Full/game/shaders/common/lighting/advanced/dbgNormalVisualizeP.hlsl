@@ -23,10 +23,10 @@
 #include "../../postfx/postFx.hlsl"
 #include "../../shaderModelAutoGen.hlsl"
 
-TORQUE_UNIFORM_SAMPLER2D(prepassTex, 0);
+TORQUE_UNIFORM_SAMPLER2D(deferredTex, 0);
 
 float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {   
-   float3 normal = TORQUE_PREPASS_UNCONDITION( prepassTex, IN.uv0 ).xyz;   
+   float3 normal = TORQUE_DEFERRED_UNCONDITION( deferredTex, IN.uv0 ).xyz;   
    return float4( ( normal + 1.0 ) * 0.5, 1.0 );
 }

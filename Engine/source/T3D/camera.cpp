@@ -1275,6 +1275,7 @@ void Camera::unpackUpdate(NetConnection *con, BitStream *bstream)
       bstream->read(&pos.z);
       bstream->read(&rot.x);
       bstream->read(&rot.z);
+      rot.y = 0.0f;
       _setPosition(pos,rot);
 
       // NewtonMode
@@ -1351,7 +1352,7 @@ void Camera::consoleInit()
    // ExtendedMove support
    Con::addVariable("$camera::extendedMovePosRotIndex", TypeS32, &smExtendedMovePosRotIndex, 
       "@brief The ExtendedMove position/rotation index used for camera movements.\n\n"
-	   "@ingroup BaseCamera\n");
+      "@ingroup BaseCamera\n");
 }
 
 //-----------------------------------------------------------------------------

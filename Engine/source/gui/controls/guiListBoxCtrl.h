@@ -70,7 +70,7 @@ public:
       String            itemTooltip;
       bool              isSelected;
       void*             itemData;
-      ColorF            color;
+      LinearColorF            color;
       bool              hasColor;
    };
 
@@ -102,12 +102,12 @@ public:
    void              setItemText( S32 index, StringTableEntry text );
 
    S32               addItem( StringTableEntry text, void *itemData = NULL );
-   S32               addItemWithColor( StringTableEntry text, ColorF color = ColorF(-1, -1, -1), void *itemData = NULL);
+   S32               addItemWithColor( StringTableEntry text, LinearColorF color = LinearColorF(-1, -1, -1), void *itemData = NULL);
    S32               insertItem( S32 index, StringTableEntry text, void *itemData = NULL );
-   S32               insertItemWithColor( S32 index, StringTableEntry text, ColorF color = ColorF(-1, -1, -1), void *itemData = NULL);
+   S32               insertItemWithColor( S32 index, StringTableEntry text, LinearColorF color = LinearColorF(-1, -1, -1), void *itemData = NULL);
    S32               findItemText( StringTableEntry text, bool caseSensitive = false );
 
-   void              setItemColor(S32 index, const ColorF& color);
+   void              setItemColor(S32 index, const LinearColorF& color);
    void              clearItemColor(S32 index);
 
    void              deleteItem( S32 index );

@@ -161,6 +161,11 @@ namespace MathUtils
    ///
    F32 getAngleBetweenVectors(VectorF vecA, VectorF vecB);
 
+   /// Returns the angle between two given vectors, utilizing a normal vector to discertain the angle's sign
+   /// 
+   /// Angles is in RADIANS
+   ///
+   F32 getSignedAngleBetweenVectors(VectorF vecA, VectorF vecB, VectorF norm);
 
    /// Simple reflection equation - pass in a vector and a normal to reflect off of
    inline Point3F reflect( Point3F &inVec, Point3F &norm )

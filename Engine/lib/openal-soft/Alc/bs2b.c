@@ -129,16 +129,16 @@ void bs2b_clear(struct bs2b *bs2b)
     memset(&bs2b->last_sample, 0, sizeof(bs2b->last_sample));
 } /* bs2b_clear */
 
-void bs2b_cross_feed(struct bs2b *bs2b, float *restrict Left, float *restrict Right, unsigned int SamplesToDo)
+void bs2b_cross_feed(struct bs2b *bs2b, float *restrict Left, float *restrict Right, int SamplesToDo)
 {
     float lsamples[128][2];
     float rsamples[128][2];
-    unsigned int base;
+    int base;
 
     for(base = 0;base < SamplesToDo;)
     {
-        unsigned int todo = minu(128, SamplesToDo-base);
-        unsigned int i;
+        int todo = mini(128, SamplesToDo-base);
+        int i;
 
         /* Process left input */
         lsamples[0][0] = bs2b->a0_lo*Left[0] +

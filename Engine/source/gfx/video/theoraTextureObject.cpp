@@ -191,7 +191,7 @@ void TheoraTextureObject::play()
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( TheoraTextureObject, play, void, (),,
+DefineEngineMethod( TheoraTextureObject, play, void, (),,
    "Start playback of the video." )
 {
    object->play();
@@ -199,7 +199,7 @@ DefineConsoleMethod( TheoraTextureObject, play, void, (),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( TheoraTextureObject, stop, void, (),,
+DefineEngineMethod( TheoraTextureObject, stop, void, (),,
    "Stop playback of the video." )
 {
    object->stop();
@@ -207,7 +207,7 @@ DefineConsoleMethod( TheoraTextureObject, stop, void, (),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( TheoraTextureObject, pause, void, (),,
+DefineEngineMethod( TheoraTextureObject, pause, void, (),,
    "Pause playback of the video." )
 {
    object->pause();

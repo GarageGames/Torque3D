@@ -44,8 +44,8 @@ EngineExport::EngineExport( const char* name, EngineExportKind kind, EngineExpor
    : mExportName( name ),
      mExportKind( kind ),
      mExportScope( scope ),
-     mNextExport( NULL ),
-     mDocString( docString )
+     mDocString( docString ),
+     mNextExport( NULL )
 {
    AssertFatal( name != NULL, "EngineExport - export without name!" );
    AssertFatal( scope != NULL, avar( "EngineExport - export '%s' is in no scope" ) );

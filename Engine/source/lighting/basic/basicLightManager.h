@@ -41,7 +41,7 @@
 
 class AvailableSLInterfaces;
 class GFXShaderConstHandle;
-class RenderPrePassMgr;
+class RenderDeferredMgr;
 class PlatformTimer;
 
 class blTerrainSystem;
@@ -77,7 +77,7 @@ protected:
    BasicLightManager();
    virtual ~BasicLightManager();
 
-   SimObjectPtr<RenderPrePassMgr> mPrePassRenderBin;
+   SimObjectPtr<RenderDeferredMgr> mDeferredRenderBin;
 
    struct LightingShaderConstants
    {

@@ -130,7 +130,7 @@ void GFXGLVertexDecl::_initVerticesFormat(U32 stream)
          glElement.normalized = false;
          glElement.type = GL_FLOAT;
          glElement.stride = vertexSize;
-         glElement.pointerFirst = (void*)buffer;
+         glElement.pointerFirst = (void*)(uintptr_t)buffer;
 
          buffer += element.getSizeInBytes();
       }
@@ -141,7 +141,7 @@ void GFXGLVertexDecl::_initVerticesFormat(U32 stream)
          glElement.normalized = false;
          glElement.type = GL_FLOAT;
          glElement.stride = vertexSize;
-         glElement.pointerFirst = (void*)buffer;
+         glElement.pointerFirst = (void*)(uintptr_t)buffer;
 
          buffer += element.getSizeInBytes();
       }
@@ -152,7 +152,7 @@ void GFXGLVertexDecl::_initVerticesFormat(U32 stream)
          glElement.normalized = false;
          glElement.type = GL_FLOAT;
          glElement.stride = vertexSize;
-         glElement.pointerFirst = (void*)buffer;
+         glElement.pointerFirst = (void*)(uintptr_t)buffer;
 
          buffer += element.getSizeInBytes();
       }
@@ -163,7 +163,7 @@ void GFXGLVertexDecl::_initVerticesFormat(U32 stream)
          glElement.normalized = false;
          glElement.type = GL_FLOAT;
          glElement.stride = vertexSize;
-         glElement.pointerFirst = (void*)buffer;
+         glElement.pointerFirst = (void*)(uintptr_t)buffer;
 
          buffer += element.getSizeInBytes();
       }
@@ -174,7 +174,7 @@ void GFXGLVertexDecl::_initVerticesFormat(U32 stream)
          glElement.normalized = false;
          glElement.type = GL_FLOAT;
          glElement.stride = vertexSize;
-         glElement.pointerFirst = (void*)buffer;
+         glElement.pointerFirst = (void*)(uintptr_t)buffer;
 
          buffer += element.getSizeInBytes();
       }
@@ -185,7 +185,7 @@ void GFXGLVertexDecl::_initVerticesFormat(U32 stream)
          glElement.normalized = true;
          glElement.type = GL_UNSIGNED_BYTE;
          glElement.stride = vertexSize;
-         glElement.pointerFirst = (void*)buffer;
+         glElement.pointerFirst = (void*)(uintptr_t)buffer;
 
          buffer += element.getSizeInBytes();
       }
@@ -196,7 +196,7 @@ void GFXGLVertexDecl::_initVerticesFormat(U32 stream)
          glElement.normalized = false;
          glElement.type = GL_FLOAT;
          glElement.stride = vertexSize;
-         glElement.pointerFirst = (void*)buffer;
+         glElement.pointerFirst = (void*)(uintptr_t)buffer;
 
          buffer += element.getSizeInBytes();
       }
@@ -207,7 +207,7 @@ void GFXGLVertexDecl::_initVerticesFormat(U32 stream)
          glElement.normalized = false;
          glElement.type = GL_UNSIGNED_BYTE;
          glElement.stride = vertexSize;
-         glElement.pointerFirst = (void*)buffer;
+         glElement.pointerFirst = (void*)(uintptr_t)buffer;
 
          buffer += element.getSizeInBytes();
       }
@@ -221,7 +221,7 @@ void GFXGLVertexDecl::_initVerticesFormat(U32 stream)
          glElement.normalized = false;
          glElement.type = GL_FLOAT;
          glElement.stride = vertexSize;
-         glElement.pointerFirst = (void*)buffer;
+         glElement.pointerFirst = (void*)(uintptr_t)buffer;
 
          buffer += element.getSizeInBytes();
          ++texCoordIndex;

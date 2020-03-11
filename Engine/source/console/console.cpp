@@ -40,6 +40,7 @@
 #include <stdarg.h>
 #include "platform/threads/mutex.h"
 #include "core/util/journal/journal.h"
+#include "cinterface/cinterface.h"
 
 extern StringStack STR;
 extern ConsoleValueStack CSTK;
@@ -49,7 +50,7 @@ ExprEvalState gEvalState;
 StmtNode *gStatementList;
 StmtNode *gAnonFunctionList;
 U32 gAnonFunctionID = 0;
-ConsoleConstructor *ConsoleConstructor::first = NULL;
+ConsoleConstructor *ConsoleConstructor::mFirst = NULL;
 bool gWarnUndefinedScriptVariables;
 
 static char scratchBuffer[4096];
@@ -85,47 +86,47 @@ static const char * prependPercent ( const char * name )
 //--------------------------------------
 void ConsoleConstructor::init( const char *cName, const char *fName, const char *usg, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
-   mina = minArgs;
-   maxa = maxArgs;
-   funcName = fName;
-   usage = usg;
-   className = cName;
-   sc = 0; fc = 0; vc = 0; bc = 0; ic = 0;
-   callback = group = false;
-   next = first;
-   ns = false;
-   first = this;
-   toolOnly = isToolOnly;
-   this->header = header;
+   mMina = minArgs;
+   mMaxa = maxArgs;
+   mFuncName = fName;
+   mUsage = usg;
+   mClassName = cName;
+   mSC = 0; mFC = 0; mVC = 0; mBC = 0; mIC = 0;
+   mCallback = mGroup = false;
+   mNext = mFirst;
+   mNS = false;
+   mFirst = this;
+   mToolOnly = isToolOnly;
+   mHeader = header;
 }
 
 void ConsoleConstructor::setup()
 {
-   for(ConsoleConstructor *walk = first; walk; walk = walk->next)
+   for(ConsoleConstructor *walk = mFirst; walk; walk = walk->mNext)
    {
 #ifdef TORQUE_DEBUG
       walk->validate();
 #endif
 
-      if( walk->sc )
-         Con::addCommand( walk->className, walk->funcName, walk->sc, walk->usage, walk->mina, walk->maxa, walk->toolOnly, walk->header );
-      else if( walk->ic )
-         Con::addCommand( walk->className, walk->funcName, walk->ic, walk->usage, walk->mina, walk->maxa, walk->toolOnly, walk->header );
-      else if( walk->fc )
-         Con::addCommand( walk->className, walk->funcName, walk->fc, walk->usage, walk->mina, walk->maxa, walk->toolOnly, walk->header );
-      else if( walk->vc )
-         Con::addCommand( walk->className, walk->funcName, walk->vc, walk->usage, walk->mina, walk->maxa, walk->toolOnly, walk->header );
-      else if( walk->bc )
-         Con::addCommand( walk->className, walk->funcName, walk->bc, walk->usage, walk->mina, walk->maxa, walk->toolOnly, walk->header );
-      else if( walk->group )
-         Con::markCommandGroup( walk->className, walk->funcName, walk->usage );
-      else if( walk->callback )
-         Con::noteScriptCallback( walk->className, walk->funcName, walk->usage, walk->header );
-      else if( walk->ns )
+      if( walk->mSC )
+         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mSC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
+      else if( walk->mIC )
+         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mIC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
+      else if( walk->mFC )
+         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mFC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
+      else if( walk->mVC )
+         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mVC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
+      else if( walk->mBC )
+         Con::addCommand( walk->mClassName, walk->mFuncName, walk->mBC, walk->mUsage, walk->mMina, walk->mMaxa, walk->mToolOnly, walk->mHeader);
+      else if( walk->mGroup )
+         Con::markCommandGroup( walk->mClassName, walk->mFuncName, walk->mUsage);
+      else if( walk->mClassName)
+         Con::noteScriptCallback( walk->mClassName, walk->mFuncName, walk->mUsage, walk->mHeader);
+      else if( walk->mNS )
       {
-         Namespace* ns = Namespace::find( StringTable->insert( walk->className ) );
+         Namespace* ns = Namespace::find( StringTable->insert( walk->mClassName) );
          if( ns )
-            ns->mUsage = walk->usage;
+            ns->mUsage = walk->mUsage;
       }
       else
       {
@@ -137,38 +138,38 @@ void ConsoleConstructor::setup()
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, StringCallback sfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
    init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
-   sc = sfunc;
+   mSC = sfunc;
 }
 
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, IntCallback ifunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
    init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
-   ic = ifunc;
+   mIC = ifunc;
 }
 
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, FloatCallback ffunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
    init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
-   fc = ffunc;
+   mFC = ffunc;
 }
 
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, VoidCallback vfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
    init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
-   vc = vfunc;
+   mVC = vfunc;
 }
 
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *funcName, BoolCallback bfunc, const char *usage, S32 minArgs, S32 maxArgs, bool isToolOnly, ConsoleFunctionHeader* header )
 {
    init( className, funcName, usage, minArgs, maxArgs, isToolOnly, header );
-   bc = bfunc;
+   mBC = bfunc;
 }
 
 ConsoleConstructor::ConsoleConstructor(const char* className, const char* groupName, const char* aUsage)
 {
-   init(className, groupName, usage, -1, -2);
+   init(className, groupName, mUsage, -1, -2);
 
-   group = true;
+   mGroup = true;
 
    // Somewhere, the entry list is getting flipped, partially.
    // so we have to do tricks to deal with making sure usage
@@ -179,36 +180,36 @@ ConsoleConstructor::ConsoleConstructor(const char* className, const char* groupN
    if(aUsage)
       lastUsage = (char *)aUsage;
 
-   usage = lastUsage;
+   mUsage = lastUsage;
 }
 
 ConsoleConstructor::ConsoleConstructor(const char *className, const char *callbackName, const char *usage, ConsoleFunctionHeader* header )
 {
    init( className, callbackName, usage, -2, -3, false, header );
-   callback = true;
-   ns = true;
+   mCallback = true;
+   mNS = true;
 }
 
 void ConsoleConstructor::validate()
 {
 #ifdef TORQUE_DEBUG
    // Don't do the following check if we're not a method/func.
-   if(this->group)
+   if(mGroup)
       return;
 
    // In debug, walk the list and make sure this isn't a duplicate.
-   for(ConsoleConstructor *walk = first; walk; walk = walk->next)
+   for(ConsoleConstructor *walk = mFirst; walk; walk = walk->mNext)
    {
       // Skip mismatching func/method names.
-      if(dStricmp(walk->funcName, this->funcName))
+      if(dStricmp(walk->mFuncName, mFuncName))
          continue;
 
       // Don't compare functions with methods or vice versa.
-      if(bool(this->className) != bool(walk->className))
+      if(bool(mClassName) != bool(walk->mClassName))
          continue;
 
       // Skip mismatching classnames, if they're present.
-      if(this->className && walk->className && dStricmp(walk->className, this->className))
+      if(mClassName && walk->mClassName && dStricmp(walk->mClassName, mClassName))
          continue;
 
       // If we encounter ourselves, stop searching; this prevents duplicate
@@ -218,13 +219,13 @@ void ConsoleConstructor::validate()
          break;
 
       // Match!
-      if(this->className)
+      if(mClassName)
       {
-         AssertISV(false, avar("ConsoleConstructor::setup - ConsoleMethod '%s::%s' collides with another of the same name.", this->className, this->funcName));
+         AssertISV(false, avar("ConsoleConstructor::setup - ConsoleMethod '%s::%s' collides with another of the same name.", mClassName, mFuncName));
       }
       else
       {
-         AssertISV(false, avar("ConsoleConstructor::setup - ConsoleFunction '%s' collides with another of the same name.", this->funcName));
+         AssertISV(false, avar("ConsoleConstructor::setup - ConsoleFunction '%s' collides with another of the same name.", mFuncName));
       }
    }
 #endif
@@ -277,9 +278,9 @@ bool useTimestamp = false;
 
 ConsoleFunctionGroupBegin( Clipboard, "Miscellaneous functions to control the clipboard and clear the console.");
 
-DefineConsoleFunction( cls, void, (), , "()"
-				"@brief Clears the console output.\n\n"
-				"@ingroup Console")
+DefineEngineFunction( cls, void, (), , "()"
+            "@brief Clears the console output.\n\n"
+            "@ingroup Console")
 {
    if(consoleLogLocked)
       return;
@@ -287,18 +288,18 @@ DefineConsoleFunction( cls, void, (), , "()"
    consoleLog.setSize(0);
 };
 
-DefineConsoleFunction( getClipboard, const char*, (), , "()"
-				"@brief Get text from the clipboard.\n\n"
-				"@internal")
+DefineEngineFunction( getClipboard, const char*, (), , "()"
+            "@brief Get text from the clipboard.\n\n"
+            "@internal")
 {
-	return Platform::getClipboard();
+   return Platform::getClipboard();
 };
 
-DefineConsoleFunction( setClipboard, bool, (const char* text), , "(string text)"
+DefineEngineFunction( setClipboard, bool, (const char* text), , "(string text)"
                "@brief Set the system clipboard.\n\n"
-			   "@internal")
+            "@internal")
 {
-	return Platform::setClipboard(text);
+   return Platform::setClipboard(text);
 };
 
 ConsoleFunctionGroupEnd( Clipboard );
@@ -332,25 +333,25 @@ void init()
    // Variables
    setVariable("Con::prompt", "% ");
    addVariable("Con::logBufferEnabled", TypeBool, &logBufferEnabled, "If true, the log buffer will be enabled.\n"
-	   "@ingroup Console\n");
+      "@ingroup Console\n");
    addVariable("Con::printLevel", TypeS32, &printLevel, 
       "@brief This is deprecated.\n\n"
       "It is no longer in use and does nothing.\n"      
-	   "@ingroup Console\n");
+      "@ingroup Console\n");
    addVariable("Con::warnUndefinedVariables", TypeBool, &gWarnUndefinedScriptVariables, "If true, a warning will be displayed in the console whenever a undefined variable is used in script.\n"
-	   "@ingroup Console\n");
+      "@ingroup Console\n");
    addVariable( "instantGroup", TypeRealString, &gInstantGroup, "The group that objects will be added to when they are created.\n"
-	   "@ingroup Console\n");
+      "@ingroup Console\n");
 
    addVariable("Con::objectCopyFailures", TypeS32, &gObjectCopyFailures, "If greater than zero then it counts the number of object creation "
       "failures based on a missing copy object and does not report an error..\n"
-	   "@ingroup Console\n");   
+      "@ingroup Console\n");   
 
    // Current script file name and root
    addVariable( "Con::File", TypeString, &gCurrentFile, "The currently executing script file.\n"
-	   "@ingroup FileSystem\n");
+      "@ingroup FileSystem\n");
    addVariable( "Con::Root", TypeString, &gCurrentRoot, "The mod folder for the currently executing script file.\n"
-	   "@ingroup FileSystem\n" );
+      "@ingroup FileSystem\n" );
 
    // alwaysUseDebugOutput determines whether to send output to the platform's 
    // "debug" system.  see winConsole for an example.  
@@ -364,14 +365,14 @@ void init()
    addVariable("Con::alwaysUseDebugOutput", TypeBool, &alwaysUseDebugOutput, 
       "@brief Determines whether to send output to the platform's \"debug\" system.\n\n" 
       "@note This is disabled in shipping builds.\n"
-	   "@ingroup Console");
+      "@ingroup Console");
 #else
    alwaysUseDebugOutput = false;
 #endif
 
    // controls whether a timestamp is prepended to every console message
    addVariable("Con::useTimestamp", TypeBool, &useTimestamp, "If true a timestamp is prepended to every console message.\n"
-	   "@ingroup Console\n");
+      "@ingroup Console\n");
 
    // Plug us into the journaled console input signal.
    smConsoleInput.notify(postConsoleInput);
@@ -440,7 +441,7 @@ U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forw
    {
       // If not...
       // Save it for checking next time.
-      dStrcpy(tabBuffer, inputBuffer);
+      dStrcpy(tabBuffer, inputBuffer, MaxCompletionBufferSize);
       // Scan backward from the cursor position to find the base to complete from.
       S32 p = cursorPos;
       while ((p > 0) && (inputBuffer[p - 1] != ' ') && (inputBuffer[p - 1] != '.') && (inputBuffer[p - 1] != '('))
@@ -527,7 +528,7 @@ U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forw
    }
 
    // Save the modified input buffer for checking next time.
-   dStrcpy(tabBuffer, inputBuffer);
+   dStrcpy(tabBuffer, inputBuffer, MaxCompletionBufferSize);
 
    // Return the new (maybe) cursor position.
    return cursorPos;
@@ -599,7 +600,7 @@ static void log(const char *string)
 static void _printf(ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, const char* fmt, va_list argptr)
 {
    if (!active)
-	   return;
+      return;
    Con::active = false; 
 
    char buffer[8192];
@@ -646,8 +647,9 @@ static void _printf(ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, co
             entry.mLevel  = level;
             entry.mType   = type;
 #ifndef TORQUE_SHIPPING // this is equivalent to a memory leak, turn it off in ship build            
-            entry.mString = (const char *)consoleLogChunker.alloc(dStrlen(pos) + 1);
-            dStrcpy(const_cast<char*>(entry.mString), pos);
+            dsize_t logStringLen = dStrlen(pos) + 1;
+            entry.mString = (const char *)consoleLogChunker.alloc(logStringLen);
+            dStrcpy(const_cast<char*>(entry.mString), pos, logStringLen);
             
             // This prevents infinite recursion if the console itself needs to
             // re-allocate memory to accommodate the new console log entry, and 
@@ -781,7 +783,7 @@ Dictionary::Entry *getAddVariableEntry(const char *name)
    StringTableEntry stName = StringTable->insert(name);
    Dictionary::Entry *entry = gEvalState.globalVars.lookup(stName);
    if (!entry)
-	   entry = gEvalState.globalVars.add(stName);
+      entry = gEvalState.globalVars.add(stName);
    return entry;
 }
 
@@ -791,7 +793,7 @@ Dictionary::Entry *getAddLocalVariableEntry(const char *name)
    StringTableEntry stName = StringTable->insert(name);
    Dictionary::Entry *entry = gEvalState.getCurrentFrame().lookup(stName);
    if (!entry)
-	   entry = gEvalState.getCurrentFrame().add(stName);
+      entry = gEvalState.getCurrentFrame().add(stName);
    return entry;
 }
 
@@ -802,7 +804,7 @@ void setVariable(const char *name, const char *value)
 
    if (getVariableObjectField(name, &obj, &objField))
    {
-	   obj->setDataField(StringTable->insert(objField), 0, value);
+      obj->setDataField(StringTable->insert(objField), 0, value);
    }
    else 
    {
@@ -824,13 +826,13 @@ void setBoolVariable(const char *varName, bool value)
 
    if (getVariableObjectField(varName, &obj, &objField))
    {
-	   obj->setDataField(StringTable->insert(objField), 0, value ? "1" : "0");
+      obj->setDataField(StringTable->insert(objField), 0, value ? "1" : "0");
    }
    else
    {
       varName = prependDollar(varName);
       Dictionary::Entry *entry = getAddVariableEntry(varName);
-	  entry->setStringValue(value ? "1" : "0");
+     entry->setStringValue(value ? "1" : "0");
    }
 }
 
@@ -841,9 +843,9 @@ void setIntVariable(const char *varName, S32 value)
 
    if (getVariableObjectField(varName, &obj, &objField))
    {
-	   char scratchBuffer[32];
-	   dSprintf(scratchBuffer, sizeof(scratchBuffer), "%d", value);
-	   obj->setDataField(StringTable->insert(objField), 0, scratchBuffer);
+      char varBuffer[32];
+      dSprintf(varBuffer, sizeof(varBuffer), "%d", value);
+      obj->setDataField(StringTable->insert(objField), 0, varBuffer);
    }
    else
    {
@@ -860,15 +862,15 @@ void setFloatVariable(const char *varName, F32 value)
 
    if (getVariableObjectField(varName, &obj, &objField))
    {
-	   char scratchBuffer[32];
-	   dSprintf(scratchBuffer, sizeof(scratchBuffer), "%g", value);
-	   obj->setDataField(StringTable->insert(objField), 0, scratchBuffer);
+      char varBuffer[32];
+      dSprintf(varBuffer, sizeof(varBuffer), "%g", value);
+      obj->setDataField(StringTable->insert(objField), 0, varBuffer);
    }
    else
    {
       varName = prependDollar(varName);
       Dictionary::Entry *entry = getAddVariableEntry(varName);
-	  entry->setFloatValue(value);
+     entry->setFloatValue(value);
    }
 }
 
@@ -960,7 +962,7 @@ const char *getObjectTokenField(const char *name)
    return NULL;
 }
 
-const char *getVariable(const char *name)
+const char *getVariable(const char *name, const char* def)
 {
    const char *objField = getObjectTokenField(name);
    if (objField)
@@ -970,7 +972,7 @@ const char *getVariable(const char *name)
    else
    {
       Dictionary::Entry *entry = getVariableEntry(name);
-      return entry ? entry->getStringValue() : "";
+      return entry ? entry->getStringValue() : def;
    }
 }
 
@@ -1020,7 +1022,7 @@ F32 getFloatVariable(const char *varName, F32 def)
    else
    {
       Dictionary::Entry *entry = getVariableEntry(varName);
-	   return entry ? entry->getFloatValue() : def;
+      return entry ? entry->getFloatValue() : def;
    }
 }
 
@@ -1200,10 +1202,8 @@ bool executeFile(const char* fileName, bool noCalls, bool journalScript)
          isEditorScript = true;
    }
 
-
    StringTableEntry scriptFileName = StringTable->insert(scriptFilenameBuffer);
 
-#ifndef TORQUE_OS_XENON
    // Is this a file we should compile? (anything in the prefs path should not be compiled)
    StringTableEntry prefsPath = Platform::getPrefsPath();
    bool compiled = dStricmp(ext, ".mis") && !journal && !Con::getBoolVariable("Scripts::ignoreDSOs");
@@ -1219,13 +1219,9 @@ bool executeFile(const char* fileName, bool noCalls, bool journalScript)
    // the dso along with the script to avoid name clashes with tools/game dsos.
    if ((dsoPath && *dsoPath == 0) || (prefsPath && prefsPath[0] && dStrnicmp(scriptFileName, prefsPath, dStrlen(prefsPath)) == 0))
       compiled = false;
-#else
-   bool compiled = false;  // Don't try to compile things on the 360, ignore DSO's when debugging
-                           // because PC prefs will screw up stuff like SFX.
-#endif
 
-                           // If we're in a journaling mode, then we will read the script
-                           // from the journal file.
+   // If we're in a journaling mode, then we will read the script
+   // from the journal file.
    if (journal && Journal::IsPlaying())
    {
       char fileNameBuf[256];
@@ -1277,7 +1273,7 @@ bool executeFile(const char* fileName, bool noCalls, bool journalScript)
       scriptFile = NULL;
 
       dsoModifiedTime = dsoFile->getModifiedTime();
-      dStrcpy(nameBuffer, scriptFileName);
+      dStrcpy(nameBuffer, scriptFileName, 512);
    }
 
    // If we're supposed to be compiling this file, check to see if there's a DSO
@@ -1308,8 +1304,8 @@ bool executeFile(const char* fileName, bool noCalls, bool journalScript)
 
    // Let's do a sanity check to complain about DSOs in the future.
    //
-   // MM:	This doesn't seem to be working correctly for now so let's just not issue
-   //		the warning until someone knows how to resolve it.
+   // MM:   This doesn't seem to be working correctly for now so let's just not issue
+   //    the warning until someone knows how to resolve it.
    //
    //if(compiled && rCom && rScr && Platform::compareFileTimes(comModifyTime, scrModifyTime) < 0)
    //{
@@ -1493,6 +1489,18 @@ ConsoleValueRef evaluatef(const char* string, ...)
 // Internal execute for global function which does not save the stack
 ConsoleValueRef _internalExecute(S32 argc, ConsoleValueRef argv[])
 {
+   const char** argv_str = static_cast<const char**>(malloc((argc - 1) * sizeof(char *)));
+   for (int i = 0; i < argc - 1; i++)
+   {
+      argv_str[i] = argv[i + 1];
+   }
+   bool result;
+   const char* methodRes = CInterface::CallFunction(NULL, argv[0], argv_str, argc - 1, &result);
+   if (result)
+   {
+      return ConsoleValueRef::fromValue(CSTK.pushString(methodRes));
+   }
+   
    Namespace::Entry *ent;
    StringTableEntry funcName = StringTable->insert(argv[0]);
    ent = Namespace::global()->lookup(funcName);
@@ -1515,7 +1523,7 @@ ConsoleValueRef execute(S32 argc, ConsoleValueRef argv[])
 #endif
       ConsoleStackFrameSaver stackSaver;
       stackSaver.save();
-	   return _internalExecute(argc, argv);
+      return _internalExecute(argc, argv);
 #ifdef TORQUE_MULTITHREAD
    }
    else
@@ -1562,6 +1570,18 @@ ConsoleValueRef _internalExecute(SimObject *object, S32 argc, ConsoleValueRef ar
          STR.popFrame();
          CSTK.popFrame();
       }
+   }
+
+   const char** argv_str = static_cast<const char**>(malloc((argc - 2) * sizeof(char *)));
+   for (int i = 0; i < argc - 2; i++)
+   {
+      argv_str[i] = argv[i + 2];
+   }
+   bool result;
+   const char* methodRes = CInterface::CallMethod(object, argv[0], argv_str, argc - 2, &result);
+   if (result)
+   {
+      return ConsoleValueRef::fromValue(CSTK.pushString(methodRes));
    }
 
    if(object->getNamespace())
@@ -1660,6 +1680,7 @@ inline ConsoleValueRef _executef(S32 checkArgc, S32 argc, ConsoleValueRef *argv)
 //------------------------------------------------------------------------------
 bool isFunction(const char *fn)
 {
+   if (CInterface::isMethod(NULL, fn)) return true;
    const char *string = StringTable->lookup(fn);
    if(!string)
       return false;
@@ -2103,12 +2124,12 @@ bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWor
          if (ensureTrailingSlash)
          {
             // Yes, so ensure it.
-            Con::ensureTrailingSlash(pDstPath, pSrcPath);
+            Con::ensureTrailingSlash(pDstPath, pSrcPath, size);
          }
          else
          {
             // No, so just use the source path.
-            dStrcpy(pDstPath, pSrcPath);
+            dStrcpy(pDstPath, pSrcPath, size);
          }
 
          return false;
@@ -2124,7 +2145,7 @@ bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWor
       if (ensureTrailingSlash)
       {
          // Yes, so ensure it.
-         Con::ensureTrailingSlash(pathBuffer, pathBuffer);
+         Con::ensureTrailingSlash(pathBuffer, pathBuffer, size);
       }
 
       // Strip repeat slashes.
@@ -2149,12 +2170,12 @@ bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWor
          if (ensureTrailingSlash)
          {
             // Yes, so ensure it.
-            Con::ensureTrailingSlash(pDstPath, pSrcPath);
+            Con::ensureTrailingSlash(pDstPath, pSrcPath, size);
          }
          else
          {
             // No, so just use the source path.
-            dStrcpy(pDstPath, pSrcPath);
+            dStrcpy(pDstPath, pSrcPath, size);
          }
 
          return false;
@@ -2189,7 +2210,7 @@ bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWor
       if (ensureTrailingSlash)
       {
          // Yes, so ensure it.
-         Con::ensureTrailingSlash(pathBuffer, pathBuffer);
+         Con::ensureTrailingSlash(pathBuffer, pathBuffer, size);
       }
 
       // Strip repeat slashes.
@@ -2214,7 +2235,7 @@ bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWor
    if (ensureTrailingSlash)
    {
       // Yes, so ensure it.
-      Con::ensureTrailingSlash(pathBuffer, pathBuffer);
+      Con::ensureTrailingSlash(pathBuffer, pathBuffer, size);
    }
 
    // Strip repeat slashes.
@@ -2306,10 +2327,10 @@ void collapsePath(char* pDstPath, U32 size, const char* pSrcPath, const char* pW
 }
 
 
-void ensureTrailingSlash(char* pDstPath, const char* pSrcPath)
+void ensureTrailingSlash(char* pDstPath, const char* pSrcPath, S32 dstSize)
 {
    // Copy to target.
-   dStrcpy(pDstPath, pSrcPath);
+   dStrcpy(pDstPath, pSrcPath, dstSize);
 
    // Find trailing character index.
    S32 trailIndex = dStrlen(pDstPath);
@@ -2359,7 +2380,7 @@ StringTableEntry getDSOPath(const char *scriptPath)
    else
    {
       StringTableEntry strippedPath = Platform::stripBasePath(scriptPath);
-      dStrcpy(relPath, strippedPath);
+      dStrcpy(relPath, strippedPath, 1024);
 
       char *slash = dStrrchr(relPath, '/');
       if (slash)
@@ -2616,13 +2637,13 @@ const char *ConsoleValue::getStringValue()
 
       U32 stringLen = dStrlen(internalValue);
       U32 newLen = ((stringLen + 1) + 15) & ~15; // pad upto next cache line
-	   
+      
       if (bufferLen == 0)
          sval = (char *) dMalloc(newLen);
       else if(newLen > bufferLen)
          sval = (char *) dRealloc(sval, newLen);
 
-      dStrcpy(sval, internalValue);
+      dStrcpy(sval, internalValue, newLen);
       bufferLen = newLen;
 
       return sval;

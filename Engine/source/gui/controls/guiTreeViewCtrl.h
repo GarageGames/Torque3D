@@ -513,6 +513,8 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       bool editItem( S32 itemId, const char* newText, const char* newValue );
 
       bool markItem( S32 itemId, bool mark );
+
+      S32 getItemAtPosition(Point2I position);
       
       bool isItemSelected( S32 itemId );
 
@@ -552,6 +554,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       S32 findItemByName(const char *name);
       S32 findItemByValue(const char *name);
       S32 findItemByObjectId(S32 iObjId);
+      S32 getItemObject(S32 itemId);
 
       void sortTree( bool caseSensitive, bool traverseHierarchy, bool parentsFirst );
 

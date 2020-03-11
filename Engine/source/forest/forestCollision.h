@@ -58,7 +58,7 @@ public:
       mData          = cv.mData;
       mScale         = cv.mScale;
       hullId         = cv.hullId;
-      box            = box;
+      box            = cv.box;
    }
 
    void           calculateTransform( const MatrixF &worldXfrm );

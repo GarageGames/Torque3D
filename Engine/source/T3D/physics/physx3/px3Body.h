@@ -40,10 +40,11 @@ class Px3World;
 class Px3Collision;
 struct Px3CollisionDesc;
 
-namespace physx{
-	class PxRigidActor;
-	class PxMaterial;
-	class PxShape;
+namespace physx
+{
+   class PxRigidActor;
+   class PxMaterial;
+   class PxShape;
 }
 
 

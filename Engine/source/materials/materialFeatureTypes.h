@@ -83,8 +83,9 @@ DeclareFeatureType( MFT_ParaboloidVertTransform );
 /// feature to detect if it needs to generate a single pass.
 DeclareFeatureType( MFT_IsSinglePassParaboloid );
 
-/// This feature does normal map decompression for DXT1/5.
-DeclareFeatureType( MFT_IsDXTnm );
+/// This two feature do normal map decompression for DXT5/3dc
+DeclareFeatureType( MFT_IsBC3nm );
+DeclareFeatureType( MFT_IsBC5nm );
 
 DeclareFeatureType( MFT_TexAnim );
 DeclareFeatureType( MFT_Parallax );
@@ -150,8 +151,8 @@ DeclareFeatureType( MFT_Fog );
 DeclareFeatureType( MFT_HDROut );
 
 ///
-DeclareFeatureType( MFT_PrePassConditioner );
-DeclareFeatureType( MFT_InterlacedPrePass );
+DeclareFeatureType( MFT_DeferredConditioner );
+DeclareFeatureType( MFT_InterlacedDeferred );
 
 /// This feature causes MFT_ToneMap and MFT_LightMap to output their light color
 /// to the second render-target

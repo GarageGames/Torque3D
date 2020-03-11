@@ -42,7 +42,7 @@ class RenderParticleMgr : public RenderTexTargetBinManager
    friend class RenderTranslucentMgr;
 
 public:
-   // Generic PrePass Render Instance Type
+   // Generic Deferred Render Instance Type
    static const RenderInstType RIT_Particles;
 
    RenderParticleMgr();
@@ -82,9 +82,9 @@ public:
 protected:
    bool mOffscreenRenderEnabled;
 
-   /// The prepass render target used for the
+   /// The deferred render target used for the
    /// soft particle shader effect.
-   NamedTexTargetRef mPrepassTarget;
+   NamedTexTargetRef mDeferredTarget;
 
    /// The shader used for particle rendering.
    GFXShaderRef mParticleShader;
@@ -109,11 +109,11 @@ protected:
       GFXShaderConstHandle *mFSModelViewProjSC;
       GFXShaderConstHandle *mOneOverFarSC;
       GFXShaderConstHandle *mOneOverSoftnessSC;
-      GFXShaderConstHandle *mPrePassTargetParamsSC;
+      GFXShaderConstHandle *mDeferredTargetParamsSC;
       GFXShaderConstHandle *mAlphaFactorSC;
       GFXShaderConstHandle *mAlphaScaleSC;
       GFXShaderConstHandle *mSamplerDiffuse;
-      GFXShaderConstHandle *mSamplerPrePassTex;
+      GFXShaderConstHandle *mSamplerDeferredTex;
       GFXShaderConstHandle *mSamplerParaboloidLightMap;
 
    } mParticleShaderConsts;

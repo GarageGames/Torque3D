@@ -79,19 +79,19 @@ public:
    /// Gets the global warning material instance, callers should not free this copy
    BaseMatInstance * getWarningMatInstance();
 
-   /// Set the prepass enabled state.
-   void setPrePassEnabled( bool enabled ) { mUsingPrePass = enabled; }
+   /// Set the deferred enabled state.
+   void setDeferredEnabled( bool enabled ) { mUsingDeferred = enabled; }
 
-   /// Get the prepass enabled state.
-   bool getPrePassEnabled() const { return mUsingPrePass; }
+   /// Get the deferred enabled state.
+   bool getDeferredEnabled() const { return mUsingDeferred; }
 
 #ifndef TORQUE_SHIPPING
 
    // Allocate and return an instance of mesh debugging materials.  Caller is responsible for the memory.
-   BaseMatInstance * createMeshDebugMatInstance(const ColorF &meshColor);
+   BaseMatInstance * createMeshDebugMatInstance(const LinearColorF &meshColor);
 
    // Gets the global material instance for a given color, callers should not free this copy
-   BaseMatInstance * getMeshDebugMatInstance(const ColorF &meshColor);
+   BaseMatInstance * getMeshDebugMatInstance(const LinearColorF &meshColor);
 
 #endif
 
@@ -153,7 +153,7 @@ protected:
    typedef Map<String, String> MaterialMap;
    MaterialMap mMaterialMap;
 
-   bool mUsingPrePass;
+   bool mUsingDeferred;
 
    // time tracking
    F32 mDt;

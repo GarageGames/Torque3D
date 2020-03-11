@@ -67,7 +67,6 @@ void EyeSpaceDepthOutGLSL::processPix( Vector<ShaderComponent*> &componentList,
    wsEyeVec->setName( "wsEyeVec" );
    wsEyeVec->setStructName( "IN" );
    wsEyeVec->setType( "float4" );
-   wsEyeVec->mapsToSampler = false;
    wsEyeVec->uniform = false;
 
    // get shader constants
@@ -108,7 +107,7 @@ void EyeSpaceDepthOutGLSL::processPix( Vector<ShaderComponent*> &componentList,
 
    // If there isn't an output conditioner for the pre-pass, than just write
    // out the depth to rgba and return.
-   if( !fd.features[MFT_PrePassConditioner] )
+   if( !fd.features[MFT_DeferredConditioner] )
       meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "float4(float3(@),1)", depthOut ), Material::None ) ) );
    
    output = meta;
@@ -153,7 +152,6 @@ void DepthOutGLSL::processPix(   Vector<ShaderComponent*> &componentList,
    depthVar->setName( "depth" );
    depthVar->setStructName( "IN" );
    depthVar->setType( "float" );
-   depthVar->mapsToSampler = false;
    depthVar->uniform = false;
 
    /*

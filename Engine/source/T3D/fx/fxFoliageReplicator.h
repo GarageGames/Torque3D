@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _FOLIAGEREPLICATOR_H_
 #define _FOLIAGEREPLICATOR_H_
 
@@ -126,7 +131,7 @@ public:
 public:
    bool IsQuadrantVisible(const Box3F VisBox, const MatrixF& RenderTransform);
    void SetupClipPlanes(SceneRenderState* state, const F32 FarClipPlane);
-   void DrawQuadBox(const Box3F& QuadBox, const ColorF Colour);
+   void DrawQuadBox(const Box3F& QuadBox, const LinearColorF Colour);
 };
 
 
@@ -317,8 +322,9 @@ public:
       bool            mHideFoliage;
       bool            mShowPlacementArea;
       U32             mPlacementBandHeight;
-      ColorF          mPlaceAreaColour;
+      LinearColorF          mPlaceAreaColour;
 
+      F32             mAmbientModulationBias;
       tagFieldData()
       {
          // Set Defaults.
@@ -377,6 +383,7 @@ public:
          mShowPlacementArea    = true;
          mPlacementBandHeight  = 25;
          mPlaceAreaColour      .set(0.4f, 0, 0.8f);
+         mAmbientModulationBias = 1.0f;
       }
 
    } mFieldData;

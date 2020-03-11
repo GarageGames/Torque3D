@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _TERRCELL_H_
 #define _TERRCELL_H_
 
@@ -226,6 +231,13 @@ public:
    void renderBounds() const;
 
    /// @}
+protected:
+   Point3F* zode_vertexBuffer;
+   void createZodiacVertexBuffer();
+public:
+   const Point3F* getZodiacVertexBuffer();
+   void deleteZodiacVertexBuffer();
+   static void createZodiacPrimBuffer(U16** primBuffer);
 };
 
 inline F32 TerrCell::getDistanceTo( const Point3F &pt ) const

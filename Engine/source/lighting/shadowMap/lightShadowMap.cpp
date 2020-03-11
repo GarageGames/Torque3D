@@ -83,12 +83,12 @@ GFX_ImplementTextureProfile( ShadowMapZProfile,
 
 LightShadowMap::LightShadowMap( LightInfo *light )
    :  mWorldToLightProj( true ),
-      mLight( light ),
       mTexSize( 0 ),
-      mLastShader( NULL ),
+      mLight( light ),
       mLastUpdate( 0 ),
-      mLastCull( 0 ),
+      mLastShader( NULL ),
       mIsViewDependent( false ),
+      mLastCull( 0 ),
       mLastScreenSize( 0.0f ),
       mLastPriority( 0.0f ),
       mIsDynamic( false )
@@ -210,18 +210,18 @@ void LightShadowMap::calcLightMatrices( MatrixF &outLightMatrix, const Frustum &
          //SceneManager::setVisibleDistance(width * 2.0f);
 
 #if 0
-         DebugDrawer::get()->drawFrustum(viewFrustum, ColorF(1.0f, 0.0f, 0.0f));
-         DebugDrawer::get()->drawBox(viewBB.minExtents, viewBB.maxExtents, ColorF(0.0f, 1.0f, 0.0f));
-         DebugDrawer::get()->drawBox(lightViewBB.minExtents, lightViewBB.maxExtents, ColorF(0.0f, 0.0f, 1.0f));
-         DebugDrawer::get()->drawBox(newLightPos - Point3F(1,1,1), newLightPos + Point3F(1,1,1), ColorF(1,1,0));
-         DebugDrawer::get()->drawLine(newLightPos, newLightPos + mLight.mDirection*3.0f, ColorF(0,1,1));
+         DebugDrawer::get()->drawFrustum(viewFrustum, LinearColorF(1.0f, 0.0f, 0.0f));
+         DebugDrawer::get()->drawBox(viewBB.minExtents, viewBB.maxExtents, LinearColorF(0.0f, 1.0f, 0.0f));
+         DebugDrawer::get()->drawBox(lightViewBB.minExtents, lightViewBB.maxExtents, LinearColorF(0.0f, 0.0f, 1.0f));
+         DebugDrawer::get()->drawBox(newLightPos - Point3F(1,1,1), newLightPos + Point3F(1,1,1), LinearColorF(1,1,0));
+         DebugDrawer::get()->drawLine(newLightPos, newLightPos + mLight.mDirection*3.0f, LinearColorF(0,1,1));
 
          Point3F a(newLightPos);
          Point3F b(newLightPos);
          Point3F offset(width, height,0.0f);
          a -= offset;
          b += offset;
-         DebugDrawer::get()->drawBox(a, b, ColorF(0.5f, 0.5f, 0.5f));
+         DebugDrawer::get()->drawBox(a, b, LinearColorF(0.5f, 0.5f, 0.5f));
 #endif
       }
       break;
@@ -519,7 +519,7 @@ void LightingShaderConstants::init(GFXShader* shader)
    mLightSpotParamsSC = shader->getShaderConstHandle("$lightSpotParams");
 
    // NOTE: These are the shader constants used for doing lighting 
-   // during the forward pass.  Do not confuse these for the prepass
+   // during the forward pass.  Do not confuse these for the deferred
    // lighting constants which are used from AdvancedLightBinManager.
    mLightPositionSC = shader->getShaderConstHandle( ShaderGenVars::lightPosition );
    mLightDiffuseSC = shader->getShaderConstHandle( ShaderGenVars::lightDiffuse );
@@ -580,8 +580,8 @@ MODULE_END;
 LightInfoExType ShadowMapParams::Type( "" );
 
 ShadowMapParams::ShadowMapParams( LightInfo *light ) 
-   :  mLight( light ),
-      mShadowMap( NULL ),
+   :  mShadowMap( NULL ),
+      mLight( light ),
       mDynamicShadowMap ( NULL ),
       isDynamic ( true )
 {
@@ -719,7 +719,7 @@ GFXTextureObject* ShadowMapParams::getCookieTex()
             cookie != mCookieTex->getPath() ) )
    {
       mCookieTex.set(   cookie, 
-                        &GFXDefaultStaticDiffuseProfile, 
+                        &GFXStaticTextureSRGBProfile, 
                         "ShadowMapParams::getCookieTex()" );
    }
    else if ( cookie.isEmpty() )

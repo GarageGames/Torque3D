@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -187,6 +187,7 @@ Cocoa_InitModes(_THIS)
     CGDisplayErr result;
     CGDirectDisplayID *displays;
     CGDisplayCount numDisplays;
+    SDL_bool isstack;
     int pass, i;
 
     result = CGGetOnlineDisplayList(0, NULL, &numDisplays);
@@ -194,11 +195,11 @@ Cocoa_InitModes(_THIS)
         CG_SetError("CGGetOnlineDisplayList()", result);
         return;
     }
-    displays = SDL_stack_alloc(CGDirectDisplayID, numDisplays);
+    displays = SDL_small_alloc(CGDirectDisplayID, numDisplays, &isstack);
     result = CGGetOnlineDisplayList(numDisplays, displays, &numDisplays);
     if (result != kCGErrorSuccess) {
         CG_SetError("CGGetOnlineDisplayList()", result);
-        SDL_stack_free(displays);
+        SDL_small_free(displays, isstack);
         return;
     }
 
@@ -260,7 +261,7 @@ Cocoa_InitModes(_THIS)
             SDL_free(display.name);
         }
     }
-    SDL_stack_free(displays);
+    SDL_small_free(displays, isstack);
 }}
 
 int
@@ -299,13 +300,9 @@ Cocoa_GetDisplayUsableBounds(_THIS, SDL_VideoDisplay * display, SDL_Rect * rect)
         return -1;
     }
 
-    const CGRect cgrect = CGDisplayBounds(cgdisplay);
     const NSRect frame = [screen visibleFrame];
-
-    // !!! FIXME: I assume -[NSScreen visibleFrame] is relative to the origin of the screen in question and not the whole desktop.
-    // !!! FIXME: The math vs CGDisplayBounds might be incorrect if that's not the case, though. Check this.
-    rect->x = (int)(cgrect.origin.x + frame.origin.x);
-    rect->y = (int)(cgrect.origin.y + frame.origin.y);
+    rect->x = (int)frame.origin.x;
+    rect->y = (int)(CGDisplayPixelsHigh(kCGDirectMainDisplay) - frame.origin.y - frame.size.height);
     rect->w = (int)frame.size.width;
     rect->h = (int)frame.size.height;
 
@@ -340,27 +337,53 @@ void
 Cocoa_GetDisplayModes(_THIS, SDL_VideoDisplay * display)
 {
     SDL_DisplayData *data = (SDL_DisplayData *) display->driverdata;
-    CFArrayRef modes = CGDisplayCopyAllDisplayModes(data->display, NULL);
+    CVDisplayLinkRef link = NULL;
+    CGDisplayModeRef desktopmoderef;
+    SDL_DisplayMode desktopmode;
+    CFArrayRef modes;
+
+    CVDisplayLinkCreateWithCGDisplay(data->display, &link);
+
+    desktopmoderef = CGDisplayCopyDisplayMode(data->display);
+
+    /* CopyAllDisplayModes won't always contain the desktop display mode (if
+     * NULL is passed in) - for example on a retina 15" MBP, System Preferences
+     * allows choosing 1920x1200 but it's not in the list. AddDisplayMode makes
+     * sure there are no duplicates so it's safe to always add the desktop mode
+     * even in cases where it is in the CopyAllDisplayModes list.
+     */
+    if (desktopmoderef && GetDisplayMode(_this, desktopmoderef, link, &desktopmode)) {
+        if (!SDL_AddDisplayMode(display, &desktopmode)) {
+            CGDisplayModeRelease(desktopmoderef);
+            SDL_free(desktopmode.driverdata);
+        }
+    } else {
+        CGDisplayModeRelease(desktopmoderef);
+    }
+
+    modes = CGDisplayCopyAllDisplayModes(data->display, NULL);
 
     if (modes) {
-        CVDisplayLinkRef link = NULL;
-        const CFIndex count = CFArrayGetCount(modes);
         CFIndex i;
-
-        CVDisplayLinkCreateWithCGDisplay(data->display, &link);
+        const CFIndex count = CFArrayGetCount(modes);
 
         for (i = 0; i < count; i++) {
             CGDisplayModeRef moderef = (CGDisplayModeRef) CFArrayGetValueAtIndex(modes, i);
             SDL_DisplayMode mode;
+
             if (GetDisplayMode(_this, moderef, link, &mode)) {
-                CGDisplayModeRetain(moderef);
-                SDL_AddDisplayMode(display, &mode);
+                if (SDL_AddDisplayMode(display, &mode)) {
+                    CGDisplayModeRetain(moderef);
+                } else {
+                    SDL_free(mode.driverdata);
+                }
             }
         }
 
-        CVDisplayLinkRelease(link);
         CFRelease(modes);
     }
+
+    CVDisplayLinkRelease(link);
 }
 
 int

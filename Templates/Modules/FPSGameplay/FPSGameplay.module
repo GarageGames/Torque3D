@@ -1,0 +1,15 @@
+<ModuleDefinition
+	ModuleId="FPSGameplay"
+	VersionId="1"
+	Description="Starter module for FPS gameplay."
+	ScriptFile="FPSGameplay.cs"
+	CreateFunction="create"
+	DestroyFunction="destroy"
+	Group="Game"
+    Dependencies="UI=1">
+	<DeclaredAssets
+        canSave="true"
+        canSaveDynamicFields="true"
+        Extension="asset.taml"
+        Recurse="true" />
+</ModuleDefinition>

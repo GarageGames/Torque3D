@@ -36,7 +36,7 @@
 #define SQUISH_USE_SSE 0
 #endif
 
-// Internally et SQUISH_USE_SIMD when either Altivec or SSE is available.
+// Internally set SQUISH_USE_SIMD when either Altivec or SSE is available.
 #if SQUISH_USE_ALTIVEC && SQUISH_USE_SSE
 #error "Cannot enable both Altivec and SSE!"
 #endif
@@ -44,12 +44,6 @@
 #define SQUISH_USE_SIMD 1
 #else
 #define SQUISH_USE_SIMD 0
-#endif
-
-// TORQUE MODIFICATIONS
-#ifdef TORQUE_DEBUG
-#  undef SQUISH_USE_SSE
-#  define SQUISH_USE_SSE 0
 #endif
 
 #endif // ndef SQUISH_CONFIG_H

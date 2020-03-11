@@ -46,7 +46,8 @@ void _initShaderGenHLSL( ShaderGen *shaderGen )
 
    FEATUREMGR->registerFeature( MFT_VertTransform, new VertPositionHLSL );
    FEATUREMGR->registerFeature( MFT_RTLighting, new RTLightingFeatHLSL );
-   FEATUREMGR->registerFeature( MFT_IsDXTnm, new NamedFeatureHLSL( "DXTnm" ) );
+   FEATUREMGR->registerFeature( MFT_IsBC3nm, new NamedFeatureHLSL( "BC3nm" ) );
+   FEATUREMGR->registerFeature( MFT_IsBC5nm, new NamedFeatureHLSL( "BC5nm" ) );
    FEATUREMGR->registerFeature( MFT_TexAnim, new TexAnimHLSL );
    FEATUREMGR->registerFeature( MFT_DiffuseMap, new DiffuseMapFeatHLSL );
    FEATUREMGR->registerFeature( MFT_OverlayMap, new OverlayTexFeatHLSL );
@@ -94,7 +95,7 @@ void _initShaderGenHLSL( ShaderGen *shaderGen )
 
    FEATUREMGR->registerFeature( MFT_ParticleNormal, new ParticleNormalFeatureHLSL );
 
-   FEATUREMGR->registerFeature( MFT_InterlacedPrePass, new NamedFeatureHLSL( "Interlaced Pre Pass" ) );
+   FEATUREMGR->registerFeature( MFT_InterlacedDeferred, new NamedFeatureHLSL( "Interlaced Pre Pass" ) );
 
    FEATUREMGR->registerFeature( MFT_ForwardShading, new NamedFeatureHLSL( "Forward Shaded Material" ) );
 
@@ -117,8 +118,6 @@ MODULE_BEGIN( ShaderGenHLSL )
    MODULE_INIT
    {
       sInitDelegate.bind(_initShaderGenHLSL);
-      SHADERGEN->registerInitDelegate(Direct3D9, sInitDelegate);
-      SHADERGEN->registerInitDelegate(Direct3D9_360, sInitDelegate);
       SHADERGEN->registerInitDelegate(Direct3D11, sInitDelegate);
    }
    

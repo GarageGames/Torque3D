@@ -76,7 +76,7 @@ public:
    TorqueUnitTestListener( bool verbose ) : mVerbose( verbose ) {}
 };
 
-DefineConsoleFunction( runAllUnitTests, int, (const char* testSpecs), (""),
+DefineEngineFunction( runAllUnitTests, int, (const char* testSpecs), (""),
    "Runs engine unit tests. Some tests are marked as 'stress' tests which do not "
    "necessarily check correctness, just performance or possible nondeterministic "
    "glitches. There may also be interactive or networking tests which may be "
@@ -99,8 +99,8 @@ DefineConsoleFunction( runAllUnitTests, int, (const char* testSpecs), (""),
       testArgc = 2;
       testArgv = new char*[2];
       testArgv[0] = NULL; // Program name is unused by googletest.
-      testArgv[1] = new char[specs.length()+1];
-      dStrcpy(testArgv[1], specs);
+      testArgv[1] = new char[specs.size()];
+      dStrcpy(testArgv[1], specs, specs.size());
    }
 
    // Initialize Google Test.

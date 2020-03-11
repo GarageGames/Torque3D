@@ -27,12 +27,13 @@
 #include "console/consoleTypes.h"
 #include "gfx/gfxCubemap.h"
 #include "gfx/gfxDevice.h"
+#include "gfx/gfxTextureManager.h"
 #include "gfx/gfxTransformSaver.h"
 #include "gfx/gfxDebugEvent.h"
+#include "gfx/gfxAPI.h"
 #include "scene/sceneManager.h"
 #include "console/engineAPI.h"
 #include "math/mathUtils.h"
-
 
 IMPLEMENT_CONOBJECT( CubemapData );
 
@@ -76,7 +77,10 @@ void CubemapData::initPersistFields()
       "  - cubeFace[3] is +Z\n"
       "  - cubeFace[4] is -Y\n"
       "  - cubeFace[5] is +Y\n" );
-   Parent::initPersistFields();
+
+   addField("cubeMap", TypeStringFilename, Offset(mCubeMapFile, CubemapData),
+      "@brief Cubemap dds file.\n\n");
+
 }
 
 bool CubemapData::onAdd()
@@ -95,21 +99,31 @@ void CubemapData::createMap()
    if( !mCubemap )
    {
        bool initSuccess = true;
-       
-       for( U32 i=0; i<6; i++ )
+       //check mCubeMapFile first
+       if (!mCubeMapFile.isEmpty())
        {
-           if( !mCubeFaceFile[i].isEmpty() )
-           {
-               if(!mCubeFace[i].set(mCubeFaceFile[i], &GFXDefaultStaticDiffuseProfile, avar("%s() - mCubeFace[%d] (line %d)", __FUNCTION__, i, __LINE__) ))
-               {
+          mCubemap = TEXMGR->createCubemap(mCubeMapFile);
+          return;
+       }
+       else
+       {
+          for (U32 i = 0; i < 6; i++)
+          {
+             if (!mCubeFaceFile[i].isEmpty())
+             {
+                if (!mCubeFace[i].set(mCubeFaceFile[i], &GFXStaticTextureProfile, avar("%s() - mCubeFace[%d] (line %d)", __FUNCTION__, i, __LINE__)))
+                {
                    Con::errorf("CubemapData::createMap - Failed to load texture '%s'", mCubeFaceFile[i].c_str());
                    initSuccess = false;
-               }
-           }
+                }
+             }
+          }
        }
+
        if( initSuccess )
        {
            mCubemap = GFX->createCubemap();
+           if (mCubeFace == NULL || mCubeFace->isNull()) return;
            mCubemap->initStatic( mCubeFace );
        }
    }
@@ -121,12 +135,21 @@ void CubemapData::updateFaces()
 
 	for( U32 i=0; i<6; i++ )
    {
-      if( !mCubeFaceFile[i].isEmpty() )
+      //check mCubeMapFile first
+      if (!mCubeMapFile.isEmpty())
       {
-         if(!mCubeFace[i].set(mCubeFaceFile[i], &GFXDefaultStaticDiffuseProfile, avar("%s() - mCubeFace[%d] (line %d)", __FUNCTION__, i, __LINE__) ))
+         mCubemap = TEXMGR->createCubemap(mCubeMapFile);
+         return;
+      }
+      else
+      {
+         if (!mCubeFaceFile[i].isEmpty())
          {
-				initSuccess = false;
-            Con::errorf("CubemapData::createMap - Failed to load texture '%s'", mCubeFaceFile[i].c_str());
+            if (!mCubeFace[i].set(mCubeFaceFile[i], &GFXStaticTextureProfile, avar("%s() - mCubeFace[%d] (line %d)", __FUNCTION__, i, __LINE__)))
+            {
+               initSuccess = false;
+               Con::errorf("CubemapData::createMap - Failed to load texture '%s'", mCubeFaceFile[i].c_str());
+            }
          }
       }
    }
@@ -138,6 +161,14 @@ void CubemapData::updateFaces()
 
 		mCubemap->initStatic( mCubeFace );
 	}
+}
+
+void CubemapData::setCubeFaceFile(U32 index, FileName newFaceFile)
+{
+   if (index >= 6)
+      return;
+
+   mCubeFaceFile[index] = newFaceFile;
 }
 
 DefineEngineMethod( CubemapData, updateFaces, void, (),,

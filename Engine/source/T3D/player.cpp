@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #include "platform/platform.h"
 #include "T3D/player.h"
 
@@ -1573,20 +1577,20 @@ Player::Player()
 {
    mTypeMask |= PlayerObjectType | DynamicShapeObjectType;
 
-   delta.pos = mAnchorPoint = Point3F(0,0,100);
-   delta.rot = delta.head = Point3F(0,0,0);
-   delta.rotOffset.set(0.0f,0.0f,0.0f);
-   delta.warpOffset.set(0.0f,0.0f,0.0f);
-   delta.posVec.set(0.0f,0.0f,0.0f);
-   delta.rotVec.set(0.0f,0.0f,0.0f);
-   delta.headVec.set(0.0f,0.0f,0.0f);
-   delta.warpTicks = 0;
-   delta.dt = 1.0f;
-   delta.move = NullMove;
+   mDelta.pos = mAnchorPoint = Point3F(0,0,100);
+   mDelta.rot = mDelta.head = Point3F(0,0,0);
+   mDelta.rotOffset.set(0.0f,0.0f,0.0f);
+   mDelta.warpOffset.set(0.0f,0.0f,0.0f);
+   mDelta.posVec.set(0.0f,0.0f,0.0f);
+   mDelta.rotVec.set(0.0f,0.0f,0.0f);
+   mDelta.headVec.set(0.0f,0.0f,0.0f);
+   mDelta.warpTicks = 0;
+   mDelta.dt = 1.0f;
+   mDelta.move = NullMove;
    mPredictionCount = sMaxPredictionTicks;
-   mObjToWorld.setColumn(3,delta.pos);
-   mRot = delta.rot;
-   mHead = delta.head;
+   mObjToWorld.setColumn(3, mDelta.pos);
+   mRot = mDelta.rot;
+   mHead = mDelta.head;
    mVelocity.set(0.0f, 0.0f, 0.0f);
    mDataBlock = 0;
    mHeadHThread = mHeadVThread = mRecoilThread = mImageStateThread = 0;
@@ -1656,6 +1660,8 @@ Player::Player()
    mLastAbsoluteYaw = 0.0f;
    mLastAbsolutePitch = 0.0f;
    mLastAbsoluteRoll = 0.0f;
+   
+   afx_init();
 }
 
 Player::~Player()
@@ -1947,6 +1953,7 @@ void Player::reSkin()
 {
    if ( isGhost() && mShapeInstance && mSkinNameHandle.isValidString() )
    {
+	  mShapeInstance->resetMaterialList();
       Vector<String> skins;
       String(mSkinNameHandle.getString()).split( ";", skins );
 
@@ -2070,28 +2077,57 @@ void Player::processTick(const Move* move)
    }
 
    Parent::processTick(move);
+   // Check for state changes in the standard move triggers and
+   // set bits for any triggers that switched on this tick in
+   // the fx_s_triggers mask. Flag any changes to be packed to
+   // clients.
+   if (isServerObject())
+   {
+      fx_s_triggers = 0;
+      if (move)
+      {
+         U8 on_bits = 0;
+         for (S32 i = 0; i < MaxTriggerKeys; i++)
+            if (move->trigger[i])
+               on_bits |= BIT(i);
+
+         if (on_bits != move_trigger_states)
+         {
+            U8 switched_on_bits = (on_bits & ~move_trigger_states);
+            if (switched_on_bits)
+            {
+               fx_s_triggers |= (U32)switched_on_bits;
+               setMaskBits(TriggerMask);
+            }
+            move_trigger_states = on_bits;
+         }
+      }
+   }
    // Warp to catch up to server
-   if (delta.warpTicks > 0) {
-      delta.warpTicks--;
+   if (mDelta.warpTicks > 0) {
+	   mDelta.warpTicks--;
 
       // Set new pos
-      getTransform().getColumn(3, &delta.pos);
-      delta.pos += delta.warpOffset;
-      delta.rot += delta.rotOffset;
+      getTransform().getColumn(3, &mDelta.pos);
+	  mDelta.pos += mDelta.warpOffset;
+	  mDelta.rot += mDelta.rotOffset;
 
       // Wrap yaw to +/-PI
-      if (delta.rot.z < - M_PI_F)
-         delta.rot.z += M_2PI_F;
-      else if (delta.rot.z > M_PI_F)
-         delta.rot.z -= M_2PI_F;
+      if (mDelta.rot.z < - M_PI_F)
+		  mDelta.rot.z += M_2PI_F;
+      else if (mDelta.rot.z > M_PI_F)
+		  mDelta.rot.z -= M_2PI_F;
 
-      setPosition(delta.pos,delta.rot);
+      if (!ignore_updates)
+      {
+         setPosition(mDelta.pos, mDelta.rot);
+      }
       updateDeathOffsets();
       updateLookAnimation();
 
       // Backstepping
-      delta.posVec = -delta.warpOffset;
-      delta.rotVec = -delta.rotOffset;
+	  mDelta.posVec = -mDelta.warpOffset;
+	  mDelta.rotVec = -mDelta.rotOffset;
    }
    else {
       // If there is no move, the player is either an
@@ -2104,7 +2140,7 @@ void Player::processTick(const Move* move)
             if (mPredictionCount-- <= 0)
                return;
 
-            move = &delta.move;
+            move = &mDelta.move;
          }
          else
             move = &NullMove;
@@ -2180,10 +2216,11 @@ void Player::interpolateTick(F32 dt)
    // Client side interpolation
    Parent::interpolateTick(dt);
 
-   Point3F pos = delta.pos + delta.posVec * dt;
-   Point3F rot = delta.rot + delta.rotVec * dt;
+   Point3F pos = mDelta.pos + mDelta.posVec * dt;
+   Point3F rot = mDelta.rot + mDelta.rotVec * dt;
 
-   setRenderPosition(pos,rot,dt);
+   if (!ignore_updates)
+      setRenderPosition(pos,rot,dt);
 
 /*
    // apply camera effects - is this the best place? - bramage
@@ -2201,13 +2238,16 @@ void Player::interpolateTick(F32 dt)
 */
 
    updateLookAnimation(dt);
-   delta.dt = dt;
+   mDelta.dt = dt;
 }
 
 void Player::advanceTime(F32 dt)
 {
    // Client side animations
    Parent::advanceTime(dt);
+   // Increment timer for triggering idle events.
+   if (idle_timer >= 0.0f)
+      idle_timer += dt;
    updateActionThread();
    updateAnimation(dt);
    updateSplash();
@@ -2498,7 +2538,31 @@ AngAxisF gPlayerMoveRot;
 
 void Player::updateMove(const Move* move)
 {
-   delta.move = *move;
+   struct Move my_move;
+   if (override_movement && movement_op < 3)
+   {
+      my_move = *move;
+      switch (movement_op)
+      {
+      case 0: // add
+         my_move.x += movement_data.x;
+         my_move.y += movement_data.y;
+         my_move.z += movement_data.z;
+         break;
+      case 1: // mult
+         my_move.x *= movement_data.x;
+         my_move.y *= movement_data.y;
+         my_move.z *= movement_data.z;
+         break;
+      case 2: // replace
+         my_move.x = movement_data.x;
+         my_move.y = movement_data.y;
+         my_move.z = movement_data.z;
+         break;
+      }
+      move = &my_move;
+   }
+   mDelta.move = *move;
 
 #ifdef TORQUE_OPENVR
    if (mControllers[0])
@@ -2548,7 +2612,7 @@ void Player::updateMove(const Move* move)
    // Update current orientation
    if (mDamageState == Enabled) {
       F32 prevZRot = mRot.z;
-      delta.headVec = mHead;
+	  mDelta.headVec = mHead;
 
       bool doStandardMove = true;
       bool absoluteDelta = false;
@@ -2709,29 +2773,29 @@ void Player::updateMove(const Move* move)
             mRot.z -= M_2PI_F;
       }
 
-      delta.rot = mRot;
-      delta.rotVec.x = delta.rotVec.y = 0.0f;
-      delta.rotVec.z = prevZRot - mRot.z;
-      if (delta.rotVec.z > M_PI_F)
-         delta.rotVec.z -= M_2PI_F;
-      else if (delta.rotVec.z < -M_PI_F)
-         delta.rotVec.z += M_2PI_F;
+	  mDelta.rot = mRot;
+	  mDelta.rotVec.x = mDelta.rotVec.y = 0.0f;
+	  mDelta.rotVec.z = prevZRot - mRot.z;
+      if (mDelta.rotVec.z > M_PI_F)
+		  mDelta.rotVec.z -= M_2PI_F;
+      else if (mDelta.rotVec.z < -M_PI_F)
+		  mDelta.rotVec.z += M_2PI_F;
 
-      delta.head = mHead;
-      delta.headVec -= mHead;
+	  mDelta.head = mHead;
+	  mDelta.headVec -= mHead;
 
       if (absoluteDelta)
       {
-         delta.headVec = Point3F(0, 0, 0);
-         delta.rotVec = Point3F(0, 0, 0);
+         mDelta.headVec = Point3F(0, 0, 0);
+		 mDelta.rotVec = Point3F(0, 0, 0);
       }
 
       for(U32 i=0; i<3; ++i)
       {
-         if (delta.headVec[i] > M_PI_F)
-            delta.headVec[i] -= M_2PI_F;
-         else if (delta.headVec[i] < -M_PI_F)
-            delta.headVec[i] += M_2PI_F;
+         if (mDelta.headVec[i] > M_PI_F)
+            mDelta.headVec[i] -= M_2PI_F;
+         else if (mDelta.headVec[i] < -M_PI_F)
+            mDelta.headVec[i] += M_2PI_F;
       }
    }
    MatrixF zRot;
@@ -2740,7 +2804,12 @@ void Player::updateMove(const Move* move)
    // Desired move direction & speed
    VectorF moveVec;
    F32 moveSpeed;
-   if ((mState == MoveState || (mState == RecoverState && mDataBlock->recoverRunForceScale > 0.0f)) && mDamageState == Enabled)
+   // If BLOCK_USER_CONTROL is set in anim_clip_flags, the user won't be able to
+   // resume control over the player character. This generally happens for
+   // short periods of time synchronized with script driven animation at places
+   // where it makes sense that user motion is prohibited, such as when the 
+   // player is lifted off the ground or knocked down.
+   if ((mState == MoveState || (mState == RecoverState && mDataBlock->recoverRunForceScale > 0.0f)) && mDamageState == Enabled && !isAnimationLocked())
    {
       zRot.getColumn(0,&moveVec);
       moveVec *= (move->x * (mPose == SprintPose ? mDataBlock->sprintStrafeScale : 1.0f));
@@ -2799,6 +2868,9 @@ void Player::updateMove(const Move* move)
       moveSpeed = 0.0f;
    }
 
+   // apply speed bias here.
+   speed_bias = speed_bias + (speed_bias_goal - speed_bias)*0.1f;
+   moveSpeed *= speed_bias;
    // Acceleration due to gravity
    VectorF acc(0.0f, 0.0f, mGravity * mGravityMod * TickSec);
 
@@ -2957,7 +3029,7 @@ void Player::updateMove(const Move* move)
 
       // get the head pitch and add it to the moveVec
       // This more accurate swim vector calc comes from Matt Fairfax
-      MatrixF xRot, zRot;
+      MatrixF xRot;
       xRot.set(EulerF(mHead.x, 0, 0));
       zRot.set(EulerF(0, 0, mRot.z));
       MatrixF rot;
@@ -3025,7 +3097,9 @@ void Player::updateMove(const Move* move)
       mContactTimer++;   
 
    // Acceleration from Jumping
-   if (move->trigger[sJumpTrigger] && canJump())// !isMounted() && 
+   // While BLOCK_USER_CONTROL is set in anim_clip_flags, the user won't be able to
+   // make the player character jump.
+   if (move->trigger[sJumpTrigger] && canJump() && !isAnimationLocked())
    {
       // Scale the jump impulse base on maxJumpSpeed
       F32 zSpeedScale = mVelocity.z;
@@ -3076,6 +3150,9 @@ void Player::updateMove(const Move* move)
          setActionThread( seq, true, false, true );
 
          mJumpSurfaceLastContact = JumpSkipContactsMax;
+         // Flag the jump event trigger.
+         fx_s_triggers |= PLAYER_JUMP_S_TRIGGER;
+         setMaskBits(TriggerMask);
       }
    }
    else
@@ -3493,8 +3570,21 @@ void Player::updateDamageState()
 
 void Player::updateLookAnimation(F32 dt)
 {
+   // If the preference setting overrideLookAnimation is true, the player's
+   // arm and head no longer animate according to the view direction. They
+   // are instead given fixed positions.
+   if (overrideLookAnimation)
+   {
+      if (mArmAnimation.thread) 
+         mShapeInstance->setPos(mArmAnimation.thread, armLookOverridePos);
+      if (mHeadVThread) 
+         mShapeInstance->setPos(mHeadVThread, headVLookOverridePos);
+      if (mHeadHThread) 
+         mShapeInstance->setPos(mHeadHThread, headHLookOverridePos);
+      return;
+   }
    // Calculate our interpolated head position.
-   Point3F renderHead = delta.head + delta.headVec * dt;
+   Point3F renderHead = mDelta.head + mDelta.headVec * dt;
 
    // Adjust look pos.  This assumes that the animations match
    // the min and max look angles provided in the datablock.
@@ -3533,6 +3623,8 @@ void Player::updateLookAnimation(F32 dt)
 
 bool Player::inDeathAnim()
 {
+   if ((anim_clip_flags & ANIM_OVERRIDDEN) != 0 && (anim_clip_flags & IS_DEATH_ANIM) == 0)
+      return false;
    if (mActionAnimation.thread && mActionAnimation.action >= 0)
       if (mActionAnimation.action < mDataBlock->actionCount)
          return mDataBlock->actionList[mActionAnimation.action].death;
@@ -3742,6 +3834,8 @@ bool Player::setArmThread(U32 action)
 
 bool Player::setActionThread(const char* sequence,bool hold,bool wait,bool fsp)
 {
+   if (anim_clip_flags & ANIM_OVERRIDDEN)
+      return false;
    for (U32 i = 1; i < mDataBlock->actionCount; i++)
    {
       PlayerData::ActionAnimation &anim = mDataBlock->actionList[i];
@@ -3766,6 +3860,11 @@ void Player::setActionThread(U32 action,bool forward,bool hold,bool wait,bool fs
       return;
    }
 
+   if (isClientObject())
+   {
+      mark_idle = (action == PlayerData::RootAnim);
+      idle_timer = (mark_idle) ? 0.0f : -1.0f;
+   }
    PlayerData::ActionAnimation &anim = mDataBlock->actionList[action];
    if (anim.sequence != -1)
    {
@@ -3858,7 +3957,8 @@ void Player::updateActionThread()
          offset = mDataBlock->decalOffset * getScale().x;
       }
 
-      if( triggeredLeft || triggeredRight )
+      process_client_triggers(triggeredLeft, triggeredRight);
+      if ((triggeredLeft || triggeredRight) && !noFootfallFX)
       {
          Point3F rot, pos;
          RayInfo rInfo;
@@ -3875,7 +3975,7 @@ void Player::updateActionThread()
             // Put footprints on surface, if appropriate for material.
 
             if( material && material->mShowFootprints
-                && mDataBlock->decalData )
+                && mDataBlock->decalData && !footfallDecalOverride )
             {
                Point3F normal;
                Point3F tangent;
@@ -3886,14 +3986,14 @@ void Player::updateActionThread()
             
             // Emit footpuffs.
 
-            if( rInfo.t <= 0.5 && mWaterCoverage == 0.0
-                && material && material->mShowDust )
+            if (!footfallDustOverride && rInfo.t <= 0.5f && mWaterCoverage == 0.0f
+                                         && material && material->mShowDust )
             {
                // New emitter every time for visibility reasons
                ParticleEmitter * emitter = new ParticleEmitter;
                emitter->onNewDataBlock( mDataBlock->footPuffEmitter, false );
 
-               ColorF colorList[ ParticleData::PDC_NUM_KEYS];
+               LinearColorF colorList[ ParticleData::PDC_NUM_KEYS];
 
                for( U32 x = 0; x < getMin( Material::NUM_EFFECT_COLOR_STAGES, ParticleData::PDC_NUM_KEYS ); ++ x )
                   colorList[ x ].set( material->mEffectColor[ x ].red,
@@ -3920,6 +4020,7 @@ void Player::updateActionThread()
 
             // Play footstep sound.
             
+            if (footfallSoundOverride <= 0)
             playFootstepSound( triggeredLeft, material, rInfo.object );
          }
       }
@@ -3941,8 +4042,10 @@ void Player::updateActionThread()
       pickActionAnimation();
    }
 
+   // prevent scaling of AFX picked actions
    if ( (mActionAnimation.action != PlayerData::LandAnim) &&
-        (mActionAnimation.action != PlayerData::NullAnimation) )
+        (mActionAnimation.action != PlayerData::NullAnimation) &&
+        !(anim_clip_flags & ANIM_OVERRIDDEN))
    {
       // Update action animation time scale to match ground velocity
       PlayerData::ActionAnimation &anim =
@@ -4319,8 +4422,8 @@ void Player::onImageStateAnimation(U32 imageSlot, const char* seqName, bool dire
 
          if (!found && hasImageBasePrefix && hasScriptPrefix)
          {
-            String seqName = String(imageBasePrefix) + String("_") + String(scriptPrefix) + String("_") + baseSeqName;
-            S32 index = mShapeInstance->getShape()->findSequence(seqName);
+            String comboSeqName = String(imageBasePrefix) + String("_") + String(scriptPrefix) + String("_") + baseSeqName;
+            S32 index = mShapeInstance->getShape()->findSequence(comboSeqName);
             if (index != -1)
             {
                seqIndex = index;
@@ -4330,8 +4433,8 @@ void Player::onImageStateAnimation(U32 imageSlot, const char* seqName, bool dire
 
          if (!found && hasImageBasePrefix)
          {
-            String seqName = String(imageBasePrefix) + String("_") + baseSeqName;
-            S32 index = mShapeInstance->getShape()->findSequence(seqName);
+            String imgSeqName = String(imageBasePrefix) + String("_") + baseSeqName;
+            S32 index = mShapeInstance->getShape()->findSequence(imgSeqName);
             if (index != -1)
             {
                seqIndex = index;
@@ -4341,8 +4444,8 @@ void Player::onImageStateAnimation(U32 imageSlot, const char* seqName, bool dire
 
          if (!found && hasScriptPrefix)
          {
-            String seqName = String(scriptPrefix) + String("_") + baseSeqName;
-            S32 index = mShapeInstance->getShape()->findSequence(seqName);
+            String scriptSeqName = String(scriptPrefix) + String("_") + baseSeqName;
+            S32 index = mShapeInstance->getShape()->findSequence(scriptSeqName);
             if (index != -1)
             {
                seqIndex = index;
@@ -4560,6 +4663,10 @@ void Player::updateAnimation(F32 dt)
    if (mImageStateThread)
       mShapeInstance->advanceTime(dt,mImageStateThread);
 
+   // update any active blend clips
+   if (isGhost())
+      for (S32 i = 0; i < blend_clips.size(); i++)
+         mShapeInstance->advanceTime(dt, blend_clips[i].thread);
    // If we are the client's player on this machine, then we need
    // to make sure the transforms are up to date as they are used
    // to setup the camera.
@@ -4573,6 +4680,11 @@ void Player::updateAnimation(F32 dt)
       else
       {
          updateAnimationTree(false);
+         // This addition forces recently visible players to animate their
+         // skeleton now rather than in pre-render so that constrained effects
+         // get up-to-date node transforms.
+         if (didRenderLastRender())
+            mShapeInstance->animate();
       }
    }
 }
@@ -4878,6 +4990,11 @@ Point3F Player::_move( const F32 travelTime, Collision *outCol )
          // we can use it to do impacts
          // and query collision.
          *outCol = *collision;
+         if (isServerObject() && bd > 6.8f && collision->normal.z > 0.7f)
+         {
+            fx_s_triggers |= PLAYER_LANDING_S_TRIGGER;
+            setMaskBits(TriggerMask);
+         }
 
          // Subtract out velocity
          VectorF dv = collision->normal * (bd + sNormalElasticity);
@@ -4997,7 +5114,7 @@ void Player::_handleCollision( const Collision &collision )
 bool Player::updatePos(const F32 travelTime)
 {
    PROFILE_SCOPE(Player_UpdatePos);
-   getTransform().getColumn(3,&delta.posVec);
+   getTransform().getColumn(3,&mDelta.posVec);
 
    // When mounted to another object, only Z rotation used.
    if (isMounted()) {
@@ -5089,7 +5206,7 @@ bool Player::updatePos(const F32 travelTime)
    else
    {
       if ( mVelocity.isZero() )
-         newPos = delta.posVec;
+         newPos = mDelta.posVec;
       else
          newPos = _move( travelTime, &col );
    
@@ -5106,9 +5223,9 @@ bool Player::updatePos(const F32 travelTime)
    // If on the client, calc delta for backstepping
    if (isClientObject())
    {
-      delta.pos = newPos;
-      delta.posVec = delta.posVec - delta.pos;
-      delta.dt = 1.0f;
+      mDelta.pos = newPos;
+	  mDelta.posVec = mDelta.posVec - mDelta.pos;
+	  mDelta.dt = 1.0f;
    }
 
    setPosition( newPos, mRot );
@@ -5344,8 +5461,8 @@ bool Player::displaceObject(const Point3F& displacement)
 
    sBalance--;
 
-   getTransform().getColumn(3, &delta.pos);
-   delta.posVec.set(0.0f, 0.0f, 0.0f);
+   getTransform().getColumn(3, &mDelta.pos);
+   mDelta.posVec.set(0.0f, 0.0f, 0.0f);
 
    return result;
 }
@@ -5364,8 +5481,8 @@ bool Player::displaceObject(const Point3F& displacement)
 
    bool result = updatePos(dt);
 
-   mObjToWorld.getColumn(3, &delta.pos);
-   delta.posVec.set(0.0f, 0.0f, 0.0f);
+   mObjToWorld.getColumn(3, &mDelta.pos);
+   mDelta.posVec.set(0.0f, 0.0f, 0.0f);
 
    return result;
 }
@@ -5568,10 +5685,10 @@ void Player::getRenderEyeBaseTransform(MatrixF* mat, bool includeBank)
    // Eye transform in world space.  We only use the eye position
    // from the animation and supply our own rotation.
    MatrixF pmat,xmat,zmat;
-   xmat.set(EulerF(delta.head.x + delta.headVec.x * delta.dt, 0.0f, 0.0f));
+   xmat.set(EulerF(mDelta.head.x + mDelta.headVec.x * mDelta.dt, 0.0f, 0.0f));
 
    if (mUseHeadZCalc)
-      zmat.set(EulerF(0.0f, 0.0f, delta.head.z + delta.headVec.z * delta.dt));
+      zmat.set(EulerF(0.0f, 0.0f, mDelta.head.z + mDelta.headVec.z * mDelta.dt));
    else
       zmat.identity();
 
@@ -5581,7 +5698,7 @@ void Player::getRenderEyeBaseTransform(MatrixF* mat, bool includeBank)
       MatrixF imat;
       imat.mul(zmat, xmat);
       MatrixF ymat;
-      ymat.set(EulerF(0.0f, delta.head.y + delta.headVec.y * delta.dt, 0.0f));
+      ymat.set(EulerF(0.0f, mDelta.head.y + mDelta.headVec.y * mDelta.dt, 0.0f));
       pmat.mul(imat, ymat);
    }
    else
@@ -5879,7 +5996,12 @@ void Player::applyImpulse(const Point3F&,const VectorF& vec)
 
 bool Player::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
 {
-   if (getDamageState() != Enabled)
+   // In standard Torque there's a rather brute force culling of all
+   // non-enabled players (corpses) from the ray cast. But, to
+   // demonstrate a resurrection spell, we need corpses to be
+   // selectable, so this code change allows consideration of corpses
+   // in the ray cast if corpsesHiddenFromRayCast is set to false.
+   if (sCorpsesHiddenFromRayCast && getDamageState() != Enabled)
       return false;
 
    // Collide against bounding box. Need at least this for the editor.
@@ -6028,8 +6150,22 @@ void Player::updateWorkingCollisionSet()
       mWorkingQueryBox.maxExtents += twolPoint;
 
       disableCollision();
+
+      //We temporarily disable the collisions of anything mounted to us so we don't accidentally walk into things we've attached to us
+      for (SceneObject *ptr = mMount.list; ptr; ptr = ptr->getMountLink())
+      {
+         ptr->disableCollision();
+      }
+
       mConvex.updateWorkingList(mWorkingQueryBox,
          isGhost() ? sClientCollisionContactMask : sServerCollisionContactMask);
+
+      //And now re-enable the collisions of the mounted things
+      for (SceneObject *ptr = mMount.list; ptr; ptr = ptr->getMountLink())
+      {
+         ptr->enableCollision();
+      }
+
       enableCollision();
    }
 }
@@ -6113,7 +6249,7 @@ void Player::readPacketData(GameConnection *connection, BitStream *stream)
       stream->read(&mVelocity.y);
       stream->read(&mVelocity.z);
       stream->setCompressionPoint(pos);
-      delta.pos = pos;
+	  mDelta.pos = pos;
       mJumpSurfaceLastContact = stream->readInt(4);
 
       if (stream->readFlag())
@@ -6136,7 +6272,7 @@ void Player::readPacketData(GameConnection *connection, BitStream *stream)
       }
    }
    else
-      pos = delta.pos;
+      pos = mDelta.pos;
    stream->read(&mHead.x);
    if(stream->readFlag())
    {
@@ -6146,9 +6282,10 @@ void Player::readPacketData(GameConnection *connection, BitStream *stream)
    stream->read(&mHead.z);
    stream->read(&rot.z);
    rot.x = rot.y = 0;
-   setPosition(pos,rot);
-   delta.head = mHead;
-   delta.rot = rot;
+   if (!ignore_updates)
+      setPosition(pos,rot);
+   mDelta.head = mHead;
+   mDelta.rot = rot;
 
    if (stream->readFlag()) {
       S32 gIndex = stream->readInt(NetConnection::GhostIdBitSize);
@@ -6188,6 +6325,7 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
          mArmAnimation.action != mDataBlock->lookAction))) {
       stream->writeInt(mArmAnimation.action,PlayerData::ActionAnimBits);
    }
+   retMask = afx_packUpdate(con, mask, stream, retMask);
 
    // The rest of the data is part of the control object packet update.
    // If we're controlled by this client, we don't need to send it.
@@ -6221,11 +6359,19 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
          if(len > 8191)
             len = 8191;
          stream->writeInt((S32)len, 13);
+
+         // constrain the range of mRot.z
+         while (mRot.z < 0.0f)
+            mRot.z += M_2PI_F;
+         while (mRot.z > M_2PI_F)
+            mRot.z -= M_2PI_F;
+
+
       }
       stream->writeFloat(mRot.z / M_2PI_F, 7);
       stream->writeSignedFloat(mHead.x / (mDataBlock->maxLookAngle - mDataBlock->minLookAngle), 6);
       stream->writeSignedFloat(mHead.z / mDataBlock->maxFreelookAngle, 6);
-      delta.move.pack(stream);
+	  mDelta.move.pack(stream);
       stream->writeFlag(!(mask & NoWarpMask));
    }
    // Ghost need energy to predict reliably
@@ -6292,6 +6438,7 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
          mArmAnimation.action = action;
    }
 
+   afx_unpackUpdate(con, stream);
    // Done if controlled by client ( and not initial update )
    if(stream->readFlag())
       return;
@@ -6330,80 +6477,82 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       rot.z = stream->readFloat(7) * M_2PI_F;
       mHead.x = stream->readSignedFloat(6) * (mDataBlock->maxLookAngle - mDataBlock->minLookAngle);
       mHead.z = stream->readSignedFloat(6) * mDataBlock->maxFreelookAngle;
-      delta.move.unpack(stream);
+	  mDelta.move.unpack(stream);
 
-      delta.head = mHead;
-      delta.headVec.set(0.0f, 0.0f, 0.0f);
+	  mDelta.head = mHead;
+	  mDelta.headVec.set(0.0f, 0.0f, 0.0f);
 
       if (stream->readFlag() && isProperlyAdded())
       {
          // Determine number of ticks to warp based on the average
          // of the client and server velocities.
-         delta.warpOffset = pos - delta.pos;
+		  mDelta.warpOffset = pos - mDelta.pos;
          F32 as = (speed + mVelocity.len()) * 0.5f * TickSec;
-         F32 dt = (as > 0.00001f) ? delta.warpOffset.len() / as: sMaxWarpTicks;
-         delta.warpTicks = (S32)((dt > sMinWarpTicks) ? getMax(mFloor(dt + 0.5f), 1.0f) : 0.0f);
+         F32 dt = (as > 0.00001f) ? mDelta.warpOffset.len() / as: sMaxWarpTicks;
+		 mDelta.warpTicks = (S32)((dt > sMinWarpTicks) ? getMax(mFloor(dt + 0.5f), 1.0f) : 0.0f);
 
-         if (delta.warpTicks)
+         if (mDelta.warpTicks)
          {
             // Setup the warp to start on the next tick.
-            if (delta.warpTicks > sMaxWarpTicks)
-               delta.warpTicks = sMaxWarpTicks;
-            delta.warpOffset /= (F32)delta.warpTicks;
+            if (mDelta.warpTicks > sMaxWarpTicks)
+				mDelta.warpTicks = sMaxWarpTicks;
+			mDelta.warpOffset /= (F32)mDelta.warpTicks;
 
-            delta.rotOffset = rot - delta.rot;
+			mDelta.rotOffset = rot - mDelta.rot;
 
             // Ignore small rotation differences
-            if (mFabs(delta.rotOffset.z) < 0.001f)
-               delta.rotOffset.z = 0;
+            if (mFabs(mDelta.rotOffset.z) < 0.001f)
+               mDelta.rotOffset.z = 0;
 
             // Wrap rotation to +/-PI
-            if(delta.rotOffset.z < - M_PI_F)
-               delta.rotOffset.z += M_2PI_F;
-            else if(delta.rotOffset.z > M_PI_F)
-               delta.rotOffset.z -= M_2PI_F;
+            if(mDelta.rotOffset.z < - M_PI_F)
+				mDelta.rotOffset.z += M_2PI_F;
+            else if(mDelta.rotOffset.z > M_PI_F)
+				mDelta.rotOffset.z -= M_2PI_F;
 
-            delta.rotOffset /= (F32)delta.warpTicks;
+			mDelta.rotOffset /= (F32)mDelta.warpTicks;
          }
          else
          {
             // Going to skip the warp, server and client are real close.
             // Adjust the frame interpolation to move smoothly to the
             // new position within the current tick.
-            Point3F cp = delta.pos + delta.posVec * delta.dt;
-            if (delta.dt == 0) 
+            Point3F cp = mDelta.pos + mDelta.posVec * mDelta.dt;
+            if (mDelta.dt == 0)
             {
-               delta.posVec.set(0.0f, 0.0f, 0.0f);
-               delta.rotVec.set(0.0f, 0.0f, 0.0f);
+               mDelta.posVec.set(0.0f, 0.0f, 0.0f);
+               mDelta.rotVec.set(0.0f, 0.0f, 0.0f);
             }
             else
             {
-               F32 dti = 1.0f / delta.dt;
-               delta.posVec = (cp - pos) * dti;
-               delta.rotVec.z = mRot.z - rot.z;
+               F32 dti = 1.0f / mDelta.dt;
+			   mDelta.posVec = (cp - pos) * dti;
+			   mDelta.rotVec.z = mRot.z - rot.z;
 
-               if(delta.rotVec.z > M_PI_F)
-                  delta.rotVec.z -= M_2PI_F;
-               else if(delta.rotVec.z < -M_PI_F)
-                  delta.rotVec.z += M_2PI_F;
+               if(mDelta.rotVec.z > M_PI_F)
+                  mDelta.rotVec.z -= M_2PI_F;
+               else if(mDelta.rotVec.z < -M_PI_F)
+                  mDelta.rotVec.z += M_2PI_F;
 
-               delta.rotVec.z *= dti;
+			   mDelta.rotVec.z *= dti;
             }
-            delta.pos = pos;
-            delta.rot = rot;
-            setPosition(pos,rot);
+			mDelta.pos = pos;
+			mDelta.rot = rot;
+            if (!ignore_updates)
+               setPosition(pos,rot);
          }
       }
       else 
       {
          // Set the player to the server position
-         delta.pos = pos;
-         delta.rot = rot;
-         delta.posVec.set(0.0f, 0.0f, 0.0f);
-         delta.rotVec.set(0.0f, 0.0f, 0.0f);
-         delta.warpTicks = 0;
-         delta.dt = 0.0f;
-         setPosition(pos,rot);
+         mDelta.pos = pos;
+         mDelta.rot = rot;
+		 mDelta.posVec.set(0.0f, 0.0f, 0.0f);
+		 mDelta.rotVec.set(0.0f, 0.0f, 0.0f);
+		 mDelta.warpTicks = 0;
+		 mDelta.dt = 0.0f;
+         if (!ignore_updates)
+            setPosition(pos,rot);
       }
    }
    F32 energy = stream->readFloat(EnergyLevelBits) * mDataBlock->maxEnergy;
@@ -6819,6 +6968,7 @@ void Player::consoleInit()
    Con::addVariable("$player::extendedMoveHeadPosRotIndex", TypeS32, &smExtendedMoveHeadPosRotIndex, 
       "@brief The ExtendedMove position/rotation index used for head movements.\n\n"
       "@ingroup GameObjects\n");
+   afx_consoleInit();
 }
 
 //--------------------------------------------------------------------------
@@ -6863,6 +7013,8 @@ void Player::calcClassRenderData()
 
 void Player::playFootstepSound( bool triggeredLeft, Material* contactMaterial, SceneObject* contactObject )
 {
+   if (footfallSoundOverride > 0)
+      return;
    MatrixF footMat = getTransform();
    if( mWaterCoverage > 0.0 )
    {
@@ -7172,6 +7324,339 @@ void Player::renderConvex( ObjectRenderInst *ri, SceneRenderState *state, BaseMa
    GFX->leaveDebugEvent();
 }
 
+// static 
+bool Player::sCorpsesHiddenFromRayCast = true; // this default matches stock Torque behavior.
+
+// static 
+void Player::afx_consoleInit()
+{
+   Con::addVariable("pref::Player::corpsesHiddenFromRayCast", TypeBool, &sCorpsesHiddenFromRayCast);
+}
+
+void Player::afx_init()
+{
+   overrideLookAnimation = false;
+   armLookOverridePos = 0.5f;
+   headVLookOverridePos = 0.5f;
+   headHLookOverridePos = 0.5f;
+   ignore_updates = false;
+   fx_c_triggers = 0;
+   mark_fx_c_triggers = 0;
+   fx_s_triggers = 0;
+   move_trigger_states = 0;
+   z_velocity = 0.0f;
+   mark_idle = false;
+   idle_timer = 0.0f;
+   mark_s_landing = false;
+   speed_bias = 1.0f;
+   speed_bias_goal = 1.0f;
+   override_movement = 0;
+   movement_data.zero();
+   movement_op = 1;
+   last_movement_tag = 0;
+   footfallDecalOverride = 0;
+   footfallSoundOverride = 0;
+   footfallDustOverride = 0;
+   noFootfallFX = false;
+}
+
+U32 Player::afx_packUpdate(NetConnection* con, U32 mask, BitStream* stream, U32 retMask)
+{
+#if 0
+   if (stream->writeFlag(mask & LookOverrideMask))
+#else
+   if (stream->writeFlag(mask & ActionMask))
+#endif
+      stream->writeFlag(overrideLookAnimation);
+
+   if (stream->writeFlag(mask & TriggerMask))
+      stream->write(fx_s_triggers);
+
+   return retMask;
+}
+
+void Player::afx_unpackUpdate(NetConnection* con, BitStream* stream)
+{
+   if (stream->readFlag()) // LookOverrideMask
+      overrideLookAnimation = stream->readFlag();
+
+   if (stream->readFlag()) // TriggerMask
+   {
+      U32 mask;
+      stream->read(&mask);
+      mark_fx_c_triggers = mask;
+   }
+}
+
+// Code for overriding player's animation with sequences selected by the
+// anim-clip component effect.
+
+void Player::restoreAnimation(U32 tag)
+{
+   // check if this is a blended clip
+   if ((tag & BLENDED_CLIP) != 0)
+   {
+      restoreBlendAnimation(tag);
+      return;
+   }
+
+   if (tag != 0 && tag == last_anim_tag)
+   {
+      bool is_death_anim = ((anim_clip_flags & IS_DEATH_ANIM) != 0);
+
+      anim_clip_flags &= ~(ANIM_OVERRIDDEN | IS_DEATH_ANIM);
+
+      if (isClientObject())
+      {
+         if (mDamageState != Enabled)
+         {
+            if (!is_death_anim)
+            {
+               // this is a bit hardwired and desperate,
+               // but if he's dead he needs to look like it.
+               setActionThread("death10", false, false, false);
+            }
+         }
+         else if (mState != MoveState)
+         {
+            // not sure what happens here
+         }
+         else
+         {
+            pickActionAnimation();
+         }
+      }
+
+      last_anim_tag = 0;
+      last_anim_id = -1;
+   }
+}
+
+U32 Player::getAnimationID(const char* name)
+{
+   for (U32 i = 0; i < mDataBlock->actionCount; i++)
+   {
+      PlayerData::ActionAnimation &anim = mDataBlock->actionList[i];
+      if (dStricmp(anim.name, name) == 0)
+         return i;
+   }
+
+   Con::errorf("Player::getAnimationID() -- Player does not contain a sequence that matches the name, %s.", name);
+   return BAD_ANIM_ID;
+}
+
+U32 Player::playAnimationByID(U32 anim_id, F32 pos, F32 rate, F32 trans, bool hold, bool wait, bool is_death_anim)
+{
+   if (anim_id == BAD_ANIM_ID)
+      return 0;
+
+   S32 seq_id = mDataBlock->actionList[anim_id].sequence;
+   if (seq_id == -1)
+   {
+      Con::errorf("Player::playAnimation() problem. BAD_SEQ_ID");
+      return 0;
+   }
+
+   if (mShapeInstance->getShape()->sequences[seq_id].isBlend())
+      return playBlendAnimation(seq_id, pos, rate);
+
+   if (isClientObject())
+   {
+      PlayerData::ActionAnimation &anim = mDataBlock->actionList[anim_id];
+      if (anim.sequence != -1) 
+      {
+         mActionAnimation.action          = anim_id;
+         mActionAnimation.forward         = (rate >= 0);
+         mActionAnimation.firstPerson     = false;
+         mActionAnimation.holdAtEnd       = hold;
+         mActionAnimation.waitForEnd      = hold? true: wait;
+         mActionAnimation.animateOnServer = false;
+         mActionAnimation.atEnd           = false;
+         mActionAnimation.delayTicks      = (S32)sNewAnimationTickTime;
+
+         F32 transTime = (trans < 0) ? sAnimationTransitionTime : trans;  
+
+         mShapeInstance->setTimeScale(mActionAnimation.thread, rate);
+         mShapeInstance->transitionToSequence(mActionAnimation.thread,anim.sequence,
+            pos, transTime, true);
+      }
+   }
+
+   if (is_death_anim)
+      anim_clip_flags |= IS_DEATH_ANIM;
+   else
+      anim_clip_flags &= ~IS_DEATH_ANIM;
+
+   anim_clip_flags |= ANIM_OVERRIDDEN;
+   last_anim_tag = unique_anim_tag_counter++;
+   last_anim_id = anim_id;
+
+   return last_anim_tag;
+}
+
+F32 Player::getAnimationDurationByID(U32 anim_id)
+{
+   if (anim_id == BAD_ANIM_ID)
+      return 0.0f;
+   S32 seq_id = mDataBlock->actionList[anim_id].sequence;
+   if (seq_id >= 0 && seq_id < mDataBlock->mShape->sequences.size())
+      return mDataBlock->mShape->sequences[seq_id].duration;
+
+   return 0.0f;
+}
+
+bool Player::isBlendAnimation(const char* name)
+{
+   U32 anim_id = getAnimationID(name);
+   if (anim_id == BAD_ANIM_ID)
+      return false;
+
+   S32 seq_id = mDataBlock->actionList[anim_id].sequence;
+   if (seq_id >= 0 && seq_id < mDataBlock->mShape->sequences.size())
+      return mDataBlock->mShape->sequences[seq_id].isBlend();
+
+   return false;
+}
+
+const char* Player::getLastClipName(U32 clip_tag)
+{ 
+   if (clip_tag != last_anim_tag || last_anim_id >= PlayerData::NumActionAnims)
+      return "";
+
+   return mDataBlock->actionList[last_anim_id].name;
+}
+
+void Player::unlockAnimation(U32 tag, bool force)
+{
+   if ((tag != 0 && tag == last_anim_lock_tag) || force)
+      anim_clip_flags &= ~BLOCK_USER_CONTROL;
+}
+
+U32 Player::lockAnimation()
+{
+   anim_clip_flags |= BLOCK_USER_CONTROL;
+   last_anim_lock_tag = unique_anim_tag_counter++;
+
+   return last_anim_lock_tag;
+}
+
+DefineEngineMethod(Player, isAnimationLocked, bool, (),, "")
+{
+   return object->isAnimationLocked();
+}
+
+
+void Player::setLookAnimationOverride(bool flag) 
+{ 
+   overrideLookAnimation = flag; 
+#if 0
+   setMaskBits(LookOverrideMask);
+#else
+   setMaskBits(ActionMask);
+#endif
+}
+
+DefineEngineMethod(Player, setLookAnimationOverride, void, (bool flag),, "")
+{
+   object->setLookAnimationOverride(flag);
+}
+
+DefineEngineMethod(Player, copyHeadRotation, void, (Player* other_player),, "")
+{
+   if (other_player)
+      object->copyHeadRotation(other_player);
+}
+void Player::process_client_triggers(bool triggeredLeft, bool triggeredRight)
+{
+   bool mark_landing = false;
+   Point3F my_vel = getVelocity();
+   if (my_vel.z > 5.0f)
+      z_velocity = 1;
+   else if (my_vel.z < -5.0f)
+      z_velocity = -1;
+   else
+   {
+      if (z_velocity < 0)
+         mark_landing = true;
+      z_velocity = 0.0f;
+   }
+
+   fx_c_triggers = mark_fx_c_triggers;
+   if (triggeredLeft)
+      fx_c_triggers |= PLAYER_LF_FOOT_C_TRIGGER;
+   if (triggeredRight)
+      fx_c_triggers |= PLAYER_RT_FOOT_C_TRIGGER;
+   if (mark_landing)
+      fx_c_triggers |= PLAYER_LANDING_C_TRIGGER;
+   if (idle_timer > 10.0f)
+   {
+      fx_c_triggers |= PLAYER_IDLE_C_TRIGGER;
+      idle_timer = 0.0f;
+   }
+   if (fx_c_triggers & PLAYER_LANDING_S_TRIGGER)
+   {
+      fx_c_triggers &= ~(PLAYER_LANDING_S_TRIGGER);
+   }
+}
+U32 Player::unique_movement_tag_counter = 1;
+
+void Player::setMovementSpeedBias(F32 bias) 
+{ 
+   speed_bias_goal = bias; 
+}
+
+U32 Player::setMovementOverride(F32 bias, const Point3F* mov, U32 op) 
+{ 
+   if (mov)
+   {
+      movement_data = *mov;
+      override_movement = true;
+      movement_op = (U8)op;
+   }
+   else
+      override_movement = false;
+
+   speed_bias_goal = bias;
+
+   last_movement_tag = unique_movement_tag_counter++;
+   return last_movement_tag;
+}
+
+void Player::restoreMovement(U32 tag) 
+{ 
+   if (tag != 0 && tag == last_movement_tag)
+   {
+      speed_bias_goal = 1.0;
+      override_movement = false;
+   }
+}
+
+DefineEngineMethod(Player, setMovementSpeedBias, void, (F32 bias),, "setMovementSpeedBias(F32 bias)")
+{
+   object->setMovementSpeedBias(bias);
+}
+
+void Player::overrideFootfallFX(bool decals, bool sounds, bool dust) 
+{ 
+   if (decals)
+      footfallDecalOverride++; 
+   if (sounds)
+      footfallSoundOverride++; 
+   if (dust)
+      footfallDustOverride++; 
+   noFootfallFX = (footfallDecalOverride > 0 && footfallSoundOverride > 0 && footfallDustOverride > 0);
+}
+
+void Player::restoreFootfallFX(bool decals, bool sounds, bool dust) 
+{ 
+   if (decals && footfallDecalOverride) 
+      footfallDecalOverride--; 
+   if (sounds && footfallSoundOverride) 
+      footfallSoundOverride--; 
+   if (dust && footfallDustOverride) 
+      footfallDustOverride--; 
+   noFootfallFX = (footfallDecalOverride > 0 && footfallSoundOverride > 0 && footfallDustOverride > 0);
+}
 #ifdef TORQUE_OPENVR
 void Player::setControllers(Vector<OpenVRTrackedObject*> controllerList)
 {
@@ -7179,12 +7664,11 @@ void Player::setControllers(Vector<OpenVRTrackedObject*> controllerList)
    mControllers[1] = controllerList.size() > 1 ? controllerList[1] : NULL;
 }
 
-ConsoleMethod(Player, setVRControllers, void, 4, 4, "")
+DefineEngineMethod(Player, setVRControllers, void, (OpenVRTrackedObject* controllerL, OpenVRTrackedObject* controllerR,, "")
 {
-   OpenVRTrackedObject *controllerL, *controllerR;
    Vector<OpenVRTrackedObject*> list;
 
-   if (Sim::findObject(argv[2], controllerL))
+   if (controllerL)
    {
       list.push_back(controllerL);
    }
@@ -7193,7 +7677,7 @@ ConsoleMethod(Player, setVRControllers, void, 4, 4, "")
       list.push_back(NULL);
    }
 
-   if (Sim::findObject(argv[3], controllerR))
+   if (controllerR)
    {
       list.push_back(controllerR);
    }

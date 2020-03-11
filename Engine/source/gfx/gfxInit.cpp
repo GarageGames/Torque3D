@@ -68,9 +68,6 @@ inline static void _GFXInitReportAdapters(Vector<GFXAdapter*> &adapters)
    {
       switch (adapters[i]->mType)
       {
-      case Direct3D9:
-         Con::printf("   Direct 3D (version 9.x) device found");
-         break;
       case OpenGL:
          Con::printf("   OpenGL device found");
          break;
@@ -87,28 +84,15 @@ inline static void _GFXInitReportAdapters(Vector<GFXAdapter*> &adapters)
    }
 }
 
-inline static void _GFXInitGetInitialRes(GFXVideoMode &vm, const Point2I &initialSize)
+inline static void _GFXInitGetInitialRes(GFXVideoMode &vm)
 {
-   const U32 kDefaultWindowSizeX = 800;
-   const U32 kDefaultWindowSizeY = 600;
-   const bool kDefaultFullscreen = false;
-   const U32 kDefaultBitDepth = 32;
-   const U32 kDefaultRefreshRate = 60;
-
    // cache the desktop size of the main screen
    GFXVideoMode desktopVm = GFXInit::getDesktopResolution();
 
    // load pref variables, properly choose windowed / fullscreen  
    const String resString = Con::getVariable("$pref::Video::mode");
 
-   // Set defaults into the video mode, then have it parse the user string.
-   vm.resolution.x = kDefaultWindowSizeX;
-   vm.resolution.y = kDefaultWindowSizeY;
-   vm.fullScreen   = kDefaultFullscreen;
-   vm.bitDepth     = kDefaultBitDepth;
-   vm.refreshRate  = kDefaultRefreshRate;
-   vm.wideScreen = false;
-
+   // Parse video mode settings from pref string
    vm.parseFromString(resString);
 }
 
@@ -259,7 +243,7 @@ GFXAdapter* GFXInit::chooseAdapter(GFXAdapterType type, S32 outputDeviceIndex)
 const char* GFXInit::getAdapterNameFromType(GFXAdapterType type)
 {
    // must match GFXAdapterType order
-   static const char* _names[] = { "OpenGL", "D3D11", "D3D9", "NullDevice", "Xenon" };
+   static const char* _names[] = { "OpenGL", "D3D11", "NullDevice" };
    
    if( type < 0 || type >= GFXAdapterType_Count )
    {
@@ -281,8 +265,8 @@ GFXAdapterType GFXInit::getAdapterTypeFromName(const char* name)
    
    if( ret == -1 )
    {
-      Con::errorf( "GFXInit::getAdapterTypeFromName - Invalid renderer name, defaulting to D3D9" );
-      ret = Direct3D9;
+      Con::errorf( "GFXInit::getAdapterTypeFromName - Invalid renderer name, defaulting to D3D11" );
+      ret = Direct3D11;
    }
    
    return (GFXAdapterType)ret;
@@ -322,7 +306,7 @@ GFXAdapter *GFXInit::getBestAdapterChoice()
    // If D3D is unavailable, we're not on windows, so GL is de facto the
    // best choice!
    F32 highestSMDX = 0.f, highestSMGL = 0.f;
-   GFXAdapter  *foundAdapter9 = NULL, *foundAdapterGL = NULL, *foundAdapter11 = NULL;
+   GFXAdapter *foundAdapterGL = NULL, *foundAdapter11 = NULL;
 
    for (S32 i = 0; i<smAdapters.size(); i++)
    {
@@ -336,15 +320,6 @@ GFXAdapter *GFXInit::getBestAdapterChoice()
             foundAdapter11 = currAdapter;
          }
          break;
-
-      case Direct3D9:
-         if (currAdapter->mShaderModel > highestSMDX)
-         {
-            highestSMDX = currAdapter->mShaderModel;
-            foundAdapter9 = currAdapter;
-         }
-         break;
-
       case OpenGL:
          if (currAdapter->mShaderModel > highestSMGL)
          {
@@ -358,12 +333,9 @@ GFXAdapter *GFXInit::getBestAdapterChoice()
       }
    }
 
-   // Return best found in order DX11,DX9, GL
+   // Return best found in order DX11, GL
    if (foundAdapter11)
       return foundAdapter11;
-
-   if (foundAdapter9)
-      return foundAdapter9;
 
    if (foundAdapterGL)
       return foundAdapterGL;
@@ -380,7 +352,7 @@ GFXAdapter *GFXInit::getBestAdapterChoice()
 GFXVideoMode GFXInit::getInitialVideoMode()
 {
    GFXVideoMode vm;
-   _GFXInitGetInitialRes(vm, Point2I(800,600));
+   _GFXInitGetInitialRes(vm);
    return vm;
 }
 
@@ -486,7 +458,7 @@ DefineEngineStaticMethod( GFXInit, getAdapterOutputName, String, ( S32 index ),,
 }
 
 DefineEngineStaticMethod( GFXInit, getAdapterType, GFXAdapterType, ( S32 index ),,
-   "Returns the type (D3D9, D3D8, GL, Null) of a graphics adapter.\n"
+   "Returns the type (D3D11, GL, Null) of a graphics adapter.\n"
    "@param index The index of the adapter." )
 {
    Vector<GFXAdapter*> adapters( __FILE__, __LINE__ );
@@ -551,7 +523,7 @@ DefineEngineStaticMethod( GFXInit, getAdapterModeCount, S32, ( S32 index ),,
    return adapters[index]->mAvailableModes.size();
 }
 
-DefineConsoleStaticMethod( GFXInit, getAdapterMode, String, ( S32 index, S32 modeIndex ),,
+DefineEngineStaticMethod( GFXInit, getAdapterMode, String, ( S32 index, S32 modeIndex ),,
    "Gets the details of the specified adapter mode.\n\n"
    "@param index Index of the adapter to query.\n"
    "@param modeIndex Index of the mode to get data from.\n"

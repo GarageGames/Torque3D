@@ -25,6 +25,10 @@
 
 #include <tuple>
 
+#ifndef _FIXEDTUPLE_H_
+#include "fixedTuple.h"
+#endif
+
 #ifndef _ENGINEEXPORTS_H_
    #include "console/engineExports.h"
 #endif
@@ -80,7 +84,7 @@ struct EngineFunctionDefaultArguments
 
 // Need byte-aligned packing for the default argument structures.
 #ifdef _WIN64
-#pragma pack( push, 4 )
+#pragma pack( push, 8 )
 #else
 #pragma pack( push, 1 )
 #endif
@@ -94,6 +98,7 @@ template<typename ...ArgTs>
 struct _EngineFunctionDefaultArguments< void(ArgTs...) > : public EngineFunctionDefaultArguments
 {
    template<typename T> using DefVST = typename EngineTypeTraits<T>::DefaultArgumentValueStoreType;
+   fixed_tuple<DefVST<ArgTs>  ...> mFixedArgs;
    std::tuple<DefVST<ArgTs>  ...> mArgs;
 private:
    using SelfType = _EngineFunctionDefaultArguments< void(ArgTs...) >;
@@ -108,7 +113,11 @@ private:
       std::tie(std::get<I + (sizeof...(ArgTs) - sizeof...(TailTs))>(args)...) = defaultArgs;
    }
    
+<<<<<<< HEAD
 #ifdef _MSC_VER == 1910
+=======
+#if defined(_MSC_VER) && (_MSC_VER >= 1910)
+>>>>>>> 48fa0c19688bbe3d01406a79f63c8de10b349201
    template<typename ...TailTs>
    struct DodgyVCHelper
    {
@@ -130,7 +139,9 @@ private:
 public:
    template<typename ...TailTs> _EngineFunctionDefaultArguments(TailTs ...tail)
    : EngineFunctionDefaultArguments({sizeof...(TailTs)}), mArgs(SelfType::tailInit(tail...))
-   {}
+   {
+      fixed_tuple_mutator<void(DefVST<ArgTs>...), void(DefVST<ArgTs>...)>::copy(mArgs, mFixedArgs);
+   }
 };
 
 #pragma pack( pop )

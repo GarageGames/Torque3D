@@ -364,7 +364,7 @@ ConsoleDocFragment _GuiPopUpMenuCtrlExAdd(
    "void add(string name, S32 idNum, S32 scheme=0);"
 );
 
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, add, void, (const char * name, S32 idNum, U32 scheme), ("", -1, 0), "(string name, int idNum, int scheme=0)")
+DefineEngineMethod( GuiPopUpMenuCtrlEx, add, void, (const char * name, S32 idNum, U32 scheme), ("", -1, 0), "(string name, int idNum, int scheme=0)")
 {
    object->addEntry(name, idNum, scheme);
 }
@@ -390,7 +390,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, addScheme, void, (S32 id, ColorI fontCol
    U32 r, g, b;
    char buf[64];
 
-   dStrcpy( buf, argv[3] );
+   dStrcpy( buf, argv[3], 64 );
    char* temp = dStrtok( buf, " \0" );
    r = temp ? dAtoi( temp ) : 0;
    temp = dStrtok( NULL, " \0" );
@@ -399,7 +399,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, addScheme, void, (S32 id, ColorI fontCol
    b = temp ? dAtoi( temp ) : 0;
    fontColor.set( r, g, b );
 
-   dStrcpy( buf, argv[4] );
+   dStrcpy( buf, argv[4], 64 );
    temp = dStrtok( buf, " \0" );
    r = temp ? dAtoi( temp ) : 0;
    temp = dStrtok( NULL, " \0" );
@@ -408,7 +408,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, addScheme, void, (S32 id, ColorI fontCol
    b = temp ? dAtoi( temp ) : 0;
    fontColorHL.set( r, g, b );
 
-   dStrcpy( buf, argv[5] );
+   dStrcpy( buf, argv[5], 64 );
    temp = dStrtok( buf, " \0" );
    r = temp ? dAtoi( temp ) : 0;
    temp = dStrtok( NULL, " \0" );
@@ -426,7 +426,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, addScheme, void, (S32 id, ColorI fontCol
 //   U32 r, g, b;
 //   char buf[64];
 //
-//   dStrcpy( buf, argv[3] );
+//   dStrcpy( buf, argv[3], 64 );
 //   char* temp = dStrtok( buf, " \0" );
 //   r = temp ? dAtoi( temp ) : 0;
 //   temp = dStrtok( NULL, " \0" );
@@ -435,7 +435,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, addScheme, void, (S32 id, ColorI fontCol
 //   b = temp ? dAtoi( temp ) : 0;
 //   fontColor.set( r, g, b );
 //
-//   dStrcpy( buf, argv[4] );
+//   dStrcpy( buf, argv[4], 64 );
 //   temp = dStrtok( buf, " \0" );
 //   r = temp ? dAtoi( temp ) : 0;
 //   temp = dStrtok( NULL, " \0" );
@@ -444,7 +444,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, addScheme, void, (S32 id, ColorI fontCol
 //   b = temp ? dAtoi( temp ) : 0;
 //   fontColorHL.set( r, g, b );
 //
-//   dStrcpy( buf, argv[5] );
+//   dStrcpy( buf, argv[5], 64 );
 //   temp = dStrtok( buf, " \0" );
 //   r = temp ? dAtoi( temp ) : 0;
 //   temp = dStrtok( NULL, " \0" );
@@ -525,7 +525,7 @@ ConsoleDocFragment _GuiPopUpMenuCtrlExsetSelected(
    "setSelected(int id, bool scriptCallback=true);"
 );
 
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, setSelected, void, (S32 id, bool scriptCallback), (true), "(int id, [scriptCallback=true])"
+DefineEngineMethod( GuiPopUpMenuCtrlEx, setSelected, void, (S32 id, bool scriptCallback), (true), "(int id, [scriptCallback=true])"
            "@hide")
 {
    object->setSelected( id, scriptCallback );
@@ -539,7 +539,7 @@ ConsoleDocFragment _GuiPopUpMenuCtrlExsetFirstSelected(
 );
 
 
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, setFirstSelected, void, (bool scriptCallback), (true), "([scriptCallback=true])"
+DefineEngineMethod( GuiPopUpMenuCtrlEx, setFirstSelected, void, (bool scriptCallback), (true), "([scriptCallback=true])"
            "@hide")
 {
    object->setFirstSelected( scriptCallback );
@@ -561,7 +561,7 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, getTextById, const char*, (S32 id),,
 }
 
 
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, getColorById,  ColorI, (S32 id), ,  
+DefineEngineMethod( GuiPopUpMenuCtrlEx, getColorById,  ColorI, (S32 id), ,  
            "@brief Get color of an entry's box\n\n"
            "@param id ID number of entry to query\n\n"
            "@return ColorI in the format of \"Red Green Blue Alpha\", each of with is a value between 0 - 255")
@@ -572,7 +572,7 @@ DefineConsoleMethod( GuiPopUpMenuCtrlEx, getColorById,  ColorI, (S32 id), ,
 
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, setEnumContent, void, ( const char * className, const char * enumName ), ,
+DefineEngineMethod( GuiPopUpMenuCtrlEx, setEnumContent, void, ( const char * className, const char * enumName ), ,
            "@brief This fills the popup with a classrep's field enumeration type info.\n\n"
               "More of a helper function than anything.   If console access to the field list is added, "
               "at least for the enumerated types, then this should go away.\n\n"
@@ -628,7 +628,7 @@ DefineConsoleMethod( GuiPopUpMenuCtrlEx, setEnumContent, void, ( const char * cl
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, findText, S32, (const char * text), , "(string text)"
+DefineEngineMethod( GuiPopUpMenuCtrlEx, findText, S32, (const char * text), , "(string text)"
               "Returns the id of the first entry containing the specified text or -1 if not found."
            "@param text String value used for the query\n\n"
            "@return Numerical ID of entry containing the text.")
@@ -637,7 +637,7 @@ DefineConsoleMethod( GuiPopUpMenuCtrlEx, findText, S32, (const char * text), , "
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, size, S32, (), , 
+DefineEngineMethod( GuiPopUpMenuCtrlEx, size, S32, (), , 
            "@brief Get the size of the menu\n\n"
            "@return Number of entries in the menu\n")
 {
@@ -645,7 +645,7 @@ DefineConsoleMethod( GuiPopUpMenuCtrlEx, size, S32, (), ,
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, replaceText, void, (S32 boolVal), , 
+DefineEngineMethod( GuiPopUpMenuCtrlEx, replaceText, void, (S32 boolVal), , 
            "@brief Flag that causes each new text addition to replace the current entry\n\n"
            "@param True to turn on replacing, false to disable it")
 {
@@ -737,7 +737,7 @@ void GuiPopUpMenuCtrlEx::clearEntry( S32 entry )
 }
 
 //------------------------------------------------------------------------------
-DefineConsoleMethod( GuiPopUpMenuCtrlEx, clearEntry, void, (S32 entry), , "(S32 entry)")
+DefineEngineMethod( GuiPopUpMenuCtrlEx, clearEntry, void, (S32 entry), , "(S32 entry)")
 {
    object->clearEntry(entry);
 }
@@ -771,13 +771,14 @@ void GuiPopUpMenuCtrlEx::setBitmap(const char *name)
    {
       char buffer[1024];
       char *p;
-      dStrcpy(buffer, name);
+      dStrcpy(buffer, name, 1024);
       p = buffer + dStrlen(buffer);
+      S32 pLen = 1024 - dStrlen(buffer);
 
-      dStrcpy(p, "_n");
+      dStrcpy(p, "_n", pLen);
       mTextureNormal = GFXTexHandle( (StringTableEntry)buffer, &GFXDefaultGUIProfile, avar("%s() - mTextureNormal (line %d)", __FUNCTION__, __LINE__) );
 
-      dStrcpy(p, "_d");
+      dStrcpy(p, "_d", pLen);
       mTextureDepressed = GFXTexHandle( (StringTableEntry)buffer, &GFXDefaultGUIProfile, avar("%s() - mTextureDepressed (line %d)", __FUNCTION__, __LINE__) );
       if ( !mTextureDepressed )
          mTextureDepressed = mTextureNormal;
@@ -840,7 +841,7 @@ void GuiPopUpMenuCtrlEx::addEntry(const char *buf, S32 id, U32 scheme)
       mIdMax = id;
 
    Entry e;
-   dStrcpy( e.buf, buf );
+   dStrcpy( e.buf, buf, 256 );
    e.id = id;
    e.scheme = scheme;
 
@@ -1210,9 +1211,9 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
       if ( drawbox )
       {
          Point2I coloredboxsize( 15, 10 );
-         RectI r( offset.x + mProfile->mTextOffset.x, offset.y + ( (getHeight() - coloredboxsize.y ) / 2 ), coloredboxsize.x, coloredboxsize.y );
-         drawUtil->drawRectFill( r, boxColor);
-         drawUtil->drawRect( r, ColorI(0,0,0));
+         RectI boxBounds( offset.x + mProfile->mTextOffset.x, offset.y + ( (getHeight() - coloredboxsize.y ) / 2 ), coloredboxsize.x, coloredboxsize.y );
+         drawUtil->drawRectFill(boxBounds, boxColor);
+         drawUtil->drawRect(boxBounds, ColorI(0,0,0));
 
          localStart.x += coloredboxsize.x + mProfile->mTextOffset.x;
       }
@@ -1236,18 +1237,18 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
 
          // Draw the second column to the right
          getColumn( mText, buff, 1, "\t" );
-         S32 txt_w = mProfile->mFont->getStrWidth( buff );
+         S32 colTxt_w = mProfile->mFont->getStrWidth( buff );
          if ( mProfile->getChildrenProfile() && mProfile->mBitmapArrayRects.size() )
          {
             // We're making use of a bitmap border, so take into account the
             // right cap of the border.
             RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
-            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - bitmapBounds[2].extent.x, localStart.y ) );
+            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - colTxt_w - bitmapBounds[2].extent.x, localStart.y ) );
             drawUtil->drawText( mProfile->mFont, textpos, buff, mProfile->mFontColors );
 
          } else
          {
-            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - 12, localStart.y ) );
+            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - colTxt_w - 12, localStart.y ) );
             drawUtil->drawText( mProfile->mFont, textpos, buff, mProfile->mFontColors );
          }
 

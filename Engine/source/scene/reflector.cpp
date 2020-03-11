@@ -315,20 +315,20 @@ void CubeReflector::updateReflection( const ReflectParams &params )
    const GFXFormat reflectFormat = REFLECTMGR->getReflectFormat();
 
    if (  texResize || 
-         cubemap.isNull() ||
-         cubemap->getFormat() != reflectFormat )
+         mCubemap.isNull() ||
+         mCubemap->getFormat() != reflectFormat )
    {
-      cubemap = GFX->createCubemap();
-      cubemap->initDynamic( texDim, reflectFormat );
+      mCubemap = GFX->createCubemap();
+      mCubemap->initDynamic( texDim, reflectFormat );
    }
    
-   GFXTexHandle depthBuff = LightShadowMap::_getDepthTarget( texDim, texDim );
+   mDepthBuff = LightShadowMap::_getDepthTarget( texDim, texDim );
 
-   if ( renderTarget.isNull() )
-      renderTarget = GFX->allocRenderToTextureTarget();   
+   if ( mRenderTarget.isNull() )
+      mRenderTarget = GFX->allocRenderToTextureTarget();   
 
    GFX->pushActiveRenderTarget();
-   renderTarget->attachTexture( GFXTextureTarget::DepthStencil, depthBuff );
+   mRenderTarget->attachTexture( GFXTextureTarget::DepthStencil, mDepthBuff );
 
   
    F32 oldVisibleDist = gClientSceneGraph->getVisibleDistance();
@@ -406,9 +406,9 @@ void CubeReflector::updateFace( const ReflectParams &params, U32 faceidx )
    matView.inverse();
 
    GFX->setWorldMatrix(matView);
-
-   renderTarget->attachTexture( GFXTextureTarget::Color0, cubemap, faceidx );
-   GFX->setActiveRenderTarget( renderTarget );
+   GFX->clearTextureStateImmediate(0);
+   mRenderTarget->attachTexture( GFXTextureTarget::Color0, mCubemap, faceidx );
+   GFX->setActiveRenderTarget(mRenderTarget);
    GFX->clear( GFXClearStencil | GFXClearTarget | GFXClearZBuffer, gCanvasClearColor, 1.0f, 0 );
 
    SceneRenderState reflectRenderState
@@ -427,7 +427,7 @@ void CubeReflector::updateFace( const ReflectParams &params, U32 faceidx )
    LIGHTMGR->unregisterAllLights();
 
    // Clean up.
-   renderTarget->resolve();   
+   mRenderTarget->resolve();
 }
 
 F32 CubeReflector::calcFaceScore( const ReflectParams &params, U32 faceidx )
@@ -614,7 +614,7 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
    // In the future we may want to fix this instead by having the scatterSky
    // render a skirt or something in its lower half.
    //
-   ColorF clearColor = gClientSceneGraph->getAmbientLightColor();
+   LinearColorF clearColor = gClientSceneGraph->getAmbientLightColor();
    GFX->clear( GFXClearZBuffer | GFXClearStencil | GFXClearTarget, clearColor, 1.0f, 0 );
 
    if(GFX->getCurrentRenderStyle() == GFXDevice::RS_StereoSideBySide)
@@ -746,18 +746,18 @@ void PlaneReflector::setGFXMatrices( const MatrixF &camTrans )
       MatrixF relCamTrans = invObjTrans * camTrans;
 
       MatrixF camReflectTrans = getCameraReflection( relCamTrans );
-      MatrixF camTrans = mObject->getRenderTransform() * camReflectTrans;
-      camTrans.inverse();
+      MatrixF objTrans = mObject->getRenderTransform() * camReflectTrans;
+	  objTrans.inverse();
 
-      GFX->setWorldMatrix( camTrans );
+      GFX->setWorldMatrix(objTrans);
 
       // use relative reflect transform for modelview since clip plane is in object space
-      camTrans = camReflectTrans;
-      camTrans.inverse();
+	  objTrans = camReflectTrans;
+	  objTrans.inverse();
 
       // set new projection matrix
       gClientSceneGraph->setNonClipProjection( (MatrixF&) GFX->getProjectionMatrix() );
-      MatrixF clipProj = getFrustumClipProj( camTrans );
+      MatrixF clipProj = getFrustumClipProj(objTrans);
       GFX->setProjectionMatrix( clipProj );
    }    
    else

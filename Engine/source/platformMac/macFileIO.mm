@@ -37,9 +37,9 @@
 #import "core/strings/stringFunctions.h"
 #import "console/console.h"
 #import "platform/profiler.h"
-#import "cinterface/cinterface.h"
+#import "cinterface/c_controlInterface.h"
 #import "core/volume.h"
-
+#include "console/engineAPI.h"
 //TODO: file io still needs some work...
 
 #define MAX_MAC_PATH_LONG     2048
@@ -894,7 +894,7 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
          {
             char child[1024];
             if ( (basePath[dStrlen(basePath) - 1]) == '/')
-               dStrcpy (child, d->d_name);
+               dStrcpy (child, d->d_name, 1024);
             else
                dSprintf(child, 1024, "/%s", d->d_name);
             if (currentDepth < recurseDepth || recurseDepth == -1)
@@ -992,25 +992,22 @@ bool Platform::fileTimeToString(FileTime * time, char * string, U32 strLen) { re
 
 //-----------------------------------------------------------------------------
 #if defined(TORQUE_DEBUG)
-ConsoleFunction(testHasSubdir,void,2,2,"tests platform::hasSubDirectory") {
-   Con::printf("testing %s",(const char*)argv[1]);
+DefineEngineFunction(testHasSubdir,void, (String _dir),,"tests platform::hasSubDirectory") {
    Platform::addExcludedDirectory(".svn");
-   if(Platform::hasSubDirectory(argv[1]))
+   if(Platform::hasSubDirectory(_dir.c_str()))
       Con::printf(" has subdir");
    else
       Con::printf(" does not have subdir");
 }
 
-ConsoleFunction(testDumpDirectories,void,4,4,"testDumpDirectories('path', int depth, bool noBasePath)") {
+DefineEngineFunction(testDumpDirectories,void,(String _path, S32 _depth, bool _noBasePath),,"testDumpDirectories('path', int depth, bool noBasePath)") {
    Vector<StringTableEntry> paths;
-   const S32 depth = dAtoi(argv[2]);
-   const bool noBasePath = dAtob(argv[3]);
    
    Platform::addExcludedDirectory(".svn");
    
-   Platform::dumpDirectories(argv[1], paths, depth, noBasePath);
+   Platform::dumpDirectories(_path.c_str(), paths, _depth, _noBasePath);
    
-   Con::printf("Dumping directories starting from %s with depth %i", (const char*)argv[1],depth);
+   Con::printf("Dumping directories starting from %s with depth %i", _path.c_str(), _depth);
    
    for(Vector<StringTableEntry>::iterator itr = paths.begin(); itr != paths.end(); itr++) {
       Con::printf(*itr);
@@ -1018,14 +1015,13 @@ ConsoleFunction(testDumpDirectories,void,4,4,"testDumpDirectories('path', int de
    
 }
 
-ConsoleFunction(testDumpPaths, void, 3, 3, "testDumpPaths('path', int depth)")
+DefineEngineFunction(testDumpPaths, void, (String _path, S32 _depth),, "testDumpPaths('path', int depth)")
 {
    Vector<Platform::FileInfo> files;
-   S32 depth = dAtoi(argv[2]);
    
    Platform::addExcludedDirectory(".svn");
    
-   Platform::dumpPath(argv[1], files, depth);
+   Platform::dumpPath(_path.c_str(), files, _depth);
    
    for(Vector<Platform::FileInfo>::iterator itr = files.begin(); itr != files.end(); itr++) {
       Con::printf("%s/%s",itr->pFullPath, itr->pFileName);
@@ -1033,15 +1029,15 @@ ConsoleFunction(testDumpPaths, void, 3, 3, "testDumpPaths('path', int depth)")
 }
 
 //-----------------------------------------------------------------------------
-ConsoleFunction(testFileTouch, bool , 2,2, "testFileTouch('path')")
+DefineEngineFunction(testFileTouch, bool , (String _path),, "testFileTouch('path')")
 {
-   return dFileTouch(argv[1]);
+   return dFileTouch(_path.c_str());
 }
 
-ConsoleFunction(testGetFileTimes, bool, 2,2, "testGetFileTimes('path')")
+DefineEngineFunction(testGetFileTimes, bool, (String _path),, "testGetFileTimes('path')")
 {
    FileTime create, modify;
-   bool ok = Platform::getFileTimes(argv[1], &create, &modify);
+   bool ok = Platform::getFileTimes(_path.c_str(), &create, &modify);
    Con::printf("%s Platform::getFileTimes %i, %i", ok ? "+OK" : "-FAIL", create, modify);
    return ok;
 }

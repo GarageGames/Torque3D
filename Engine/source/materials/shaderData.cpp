@@ -48,10 +48,10 @@ ConsoleDocClass( ShaderData,
 	"// Used for the procedural clould system\n"
 	"singleton ShaderData( CloudLayerShader )\n"
 	"{\n"
-	"	DXVertexShaderFile   = \"shaders/common/cloudLayerV.hlsl\";\n"
-	"	DXPixelShaderFile    = \"shaders/common/cloudLayerP.hlsl\";\n"
-	"	OGLVertexShaderFile = \"shaders/common/gl/cloudLayerV.glsl\";\n"
-	"	OGLPixelShaderFile = \"shaders/common/gl/cloudLayerP.glsl\";\n"
+   "	DXVertexShaderFile   = $Core::CommonShaderPath @ \"/cloudLayerV.hlsl\";\n"
+   "	DXPixelShaderFile    = $Core::CommonShaderPath @ \"/cloudLayerP.hlsl\";\n"
+   "	OGLVertexShaderFile = $Core::CommonShaderPath @ \"/gl/cloudLayerV.glsl\";\n"
+   "	OGLPixelShaderFile = $Core::CommonShaderPath @ \"/gl/cloudLayerP.glsl\";\n"
 	"	pixVersion = 2.0;\n"
 	"};\n"
 	"@endtsexample\n\n"
@@ -109,8 +109,8 @@ void ShaderData::initPersistFields()
       "@tsexample\n"
        "singleton ShaderData( FlashShader )\n"
           "{\n"
-              "DXVertexShaderFile 	= \"shaders/common/postFx/flashV.hlsl\";\n"
-              "DXPixelShaderFile 	= \"shaders/common/postFx/flashP.hlsl\";\n\n"
+              "DXVertexShaderFile 	= $shaderGen::cachePath @ \"/postFx/flashV.hlsl\";\n"
+              "DXPixelShaderFile 	= $shaderGen::cachePath @ \"/postFx/flashP.hlsl\";\n\n"
               " //Define setting the color of WHITE_COLOR.\n"
               "defines = \"WHITE_COLOR=float4(1.0,1.0,1.0,0.0)\";\n\n"
               "pixVersion = 2.0\n"
@@ -234,8 +234,6 @@ GFXShader* ShaderData::_createShader( const Vector<GFXShaderMacro> &macros )
    // Initialize the right shader type.
    switch( GFX->getAdapterType() )
    {
-      case Direct3D9_360:
-      case Direct3D9:
       case Direct3D11:
       {
          success = shader->init( mDXVertexShaderName, 
@@ -365,17 +363,17 @@ bool ShaderData::_checkDefinition(GFXShader *shader)
       {              
          if( !shader->findShaderConstHandle( String::ToString("$rtParams%d", pos)) )
          {
-            String error = String::ToString("ShaderData(%s) sampler[%d] used but rtParams%d not used in shader compilation. Possible error", shader->getPixelShaderFile().c_str(), pos, pos);
-            Con::errorf( error );
+            String errStr = String::ToString("ShaderData(%s) sampler[%d] used but rtParams%d not used in shader compilation. Possible error", shader->getPixelShaderFile().c_str(), pos, pos);
+            Con::errorf(errStr);
             error = true;
          }
       }     
 
       if(!find)
       {
-         String error = String::ToString("ShaderData(%s) sampler %s not defined", shader->getPixelShaderFile().c_str(), samplers[i].c_str());
-         Con::errorf(error );
-         GFXAssertFatal(0, error );
+         String errStr = String::ToString("ShaderData(%s) sampler %s not defined", shader->getPixelShaderFile().c_str(), samplers[i].c_str());
+         Con::errorf(errStr);
+         GFXAssertFatal(0, errStr);
          error = true;
       }
    }  

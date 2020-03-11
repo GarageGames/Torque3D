@@ -172,6 +172,7 @@ public:
    virtual void prepRenderImage( SceneRenderState *state );
    virtual void buildConvex( const Box3F &box, Convex *convex );
    virtual bool buildPolyList( PolyListContext context, AbstractPolyList *polyList, const Box3F &box, const SphereF &sphere );
+   virtual bool buildExportPolyList(ColladaUtils::ExportData* exportData, const Box3F &box, const SphereF &);
    virtual bool castRay( const Point3F &start, const Point3F &end, RayInfo *info );
    virtual bool collideBox( const Point3F &start, const Point3F &end, RayInfo *info );
 
@@ -199,6 +200,8 @@ public:
       void renderFaceEdges( S32 faceid, const ColorI &color = ColorI::WHITE, F32 lineWidth = 1.0f );
 
    /// @}
+
+      String getMaterialName() { return mMaterialName; }
 
 protected:
 

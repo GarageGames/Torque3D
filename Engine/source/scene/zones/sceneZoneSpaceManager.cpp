@@ -44,8 +44,8 @@ ClassChunker< SceneObject::ZoneRef > SceneZoneSpaceManager::smZoneRefChunker;
 //-----------------------------------------------------------------------------
 
 SceneZoneSpaceManager::SceneZoneSpaceManager( SceneContainer* container )
-   : mContainer( container ),
-     mRootZone( new SceneRootZone() ),
+   : mRootZone( new SceneRootZone() ),
+     mContainer( container ),
      mNumTotalAllocatedZones( 0 ),
      mNumActiveZones( 0 ),
      mDirtyArea( Box3F::Invalid )

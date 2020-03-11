@@ -244,7 +244,7 @@ void FlyingVehicleData::packData(BitStream* stream)
    {
       if (stream->writeFlag(sound[i]))
       {
-         SimObjectId writtenId = packed ? SimObjectId((uintptr_t)sound[i]) : sound[i]->getId();
+         SimObjectId writtenId = mPacked ? SimObjectId((uintptr_t)sound[i]) : sound[i]->getId();
          stream->writeRangedU32(writtenId, DataBlockObjectIdFirst, DataBlockObjectIdLast);
       }
    }
@@ -253,7 +253,7 @@ void FlyingVehicleData::packData(BitStream* stream)
    {
       if (stream->writeFlag(jetEmitter[j]))
       {
-         SimObjectId writtenId = packed ? SimObjectId((uintptr_t)jetEmitter[j]) : jetEmitter[j]->getId();
+         SimObjectId writtenId = mPacked ? SimObjectId((uintptr_t)jetEmitter[j]) : jetEmitter[j]->getId();
          stream->writeRangedU32(writtenId, DataBlockObjectIdFirst,DataBlockObjectIdLast);
       }
    }
@@ -282,14 +282,14 @@ void FlyingVehicleData::unpackData(BitStream* stream)
    for (S32 i = 0; i < MaxSounds; i++) {
       sound[i] = NULL;
       if (stream->readFlag())
-         sound[i] = (SFXProfile*)stream->readRangedU32(DataBlockObjectIdFirst,
+         sound[i] = (SFXProfile*)(uintptr_t)stream->readRangedU32(DataBlockObjectIdFirst,
                                                          DataBlockObjectIdLast);
    }
 
    for (S32 j = 0; j < MaxJetEmitters; j++) {
       jetEmitter[j] = NULL;
       if (stream->readFlag())
-         jetEmitter[j] = (ParticleEmitterData*)stream->readRangedU32(DataBlockObjectIdFirst,
+         jetEmitter[j] = (ParticleEmitterData*)(uintptr_t)stream->readRangedU32(DataBlockObjectIdFirst,
                                                                      DataBlockObjectIdLast);
    }
 
@@ -731,10 +731,10 @@ void FlyingVehicle::updateEmitter(bool active,F32 dt,ParticleEmitterData *emitte
          }
       }
       else {
-         for (S32 j = idx; j < idx + count; j++)
-            if (bool(mJetEmitter[j])) {
-               mJetEmitter[j]->deleteWhenEmpty();
-               mJetEmitter[j] = 0;
+         for (S32 k = idx; k < idx + count; k++)
+            if (bool(mJetEmitter[k])) {
+               mJetEmitter[k]->deleteWhenEmpty();
+               mJetEmitter[k] = 0;
             }
       }
 }

@@ -21,31 +21,23 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platformInput.h"
-#include "console/console.h"
+#include "console/engineAPI.h"
 #include "core/util/journal/process.h"
 #include "windowManager/platformWindowMgr.h"
 
 #include "sdlInput.h"
 #include "platform/platformInput.h"
+#include "sdlInputManager.h"
 #include "SDL.h"
 
-#ifdef LOG_INPUT
-#include <time.h>
-#include <stdarg.h>
-#endif
-
 // Static class variables:
-InputManager*  Input::smManager;
+InputManager*  Input::smManager = NULL;
 bool           Input::smActive;
 U8             Input::smModifierKeys;
 bool           Input::smLastKeyboardActivated;
 bool           Input::smLastMouseActivated;
 bool           Input::smLastJoystickActivated;
 InputEvent     Input::smInputEvent;
-
-#ifdef LOG_INPUT
-static HANDLE gInputLog;
-#endif
 
 static void fillAsciiTable() {}
 
@@ -91,22 +83,15 @@ void Input::init()
    fillAsciiTable();
    Con::printf( "" );
 
+   smManager = new SDLInputManager;
+   if (smManager)
+   {
+      SDLInputManager::init();
+   }
+
    // Set ourselves to participate in per-frame processing.
    Process::notify(Input::process, PROCESS_INPUT_ORDER);
 
-}
-
-//------------------------------------------------------------------------------
-ConsoleFunction( isJoystickDetected, bool, 1, 1, "isJoystickDetected()" )
-{
-   return( SDL_NumJoysticks() > 0 );
-}
-
-//------------------------------------------------------------------------------
-ConsoleFunction( getJoystickAxes, const char*, 2, 2, "getJoystickAxes( instance )" )
-{
-   // TODO SDL
-   return( "" );
 }
 
 //------------------------------------------------------------------------------
@@ -118,7 +103,7 @@ U16 Input::getKeyCode( U16 asciiCode )
     char c[2];
     c[0]= asciiCode;
     c[1] = NULL;
-    return KeyMapSDL::getTorqueScanCodeFromSDL( SDL_GetScancodeFromName( c ) );
+    return KeyMapSDL::getTorqueScanCodeFromSDL( SDL_GetScancodeFromKey( SDL_GetKeyFromName(c) ) );
 }
 
 //------------------------------------------------------------------------------
@@ -159,6 +144,13 @@ void Input::destroy()
 
    SDL_QuitSubSystem( SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMECONTROLLER );
 
+   if (smManager)
+   {
+      if (smManager->isEnabled())
+         smManager->disable();
+      delete smManager;
+      smManager = NULL;
+   }
 }
 
 //------------------------------------------------------------------------------
@@ -186,8 +178,8 @@ void Input::activate()
    //ImmReleaseContext( getWin32WindowHandle(), winState.imeHandle );
 #endif
 
-   if ( !Con::getBoolVariable( "$enableDirectInput" ) )
-      return;
+   if (smManager && !smManager->isEnabled())
+      smManager->enable();
 
    if ( smManager && smManager->isEnabled() && !smActive )
    {
@@ -199,7 +191,10 @@ void Input::activate()
 //------------------------------------------------------------------------------
 void Input::deactivate()
 {
-   if ( smManager && smManager->isEnabled() && smActive )
+   if (smManager && smManager->isEnabled())
+      smManager->disable();
+
+   if (smActive)
    {
       smActive = false;
       Con::printf( "Input deactivated." );

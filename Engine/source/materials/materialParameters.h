@@ -73,7 +73,7 @@ public:
    virtual void set(MaterialParameterHandle* handle, const Point2F& fv) {}
    virtual void set(MaterialParameterHandle* handle, const Point3F& fv) {}
    virtual void set(MaterialParameterHandle* handle, const Point4F& fv) {}
-   virtual void set(MaterialParameterHandle* handle, const ColorF& fv) {}
+   virtual void set(MaterialParameterHandle* handle, const LinearColorF& fv) {}
    virtual void set(MaterialParameterHandle* handle, const S32 f) {}
    virtual void set(MaterialParameterHandle* handle, const Point2I& fv) {}
    virtual void set(MaterialParameterHandle* handle, const Point3I& fv) {}

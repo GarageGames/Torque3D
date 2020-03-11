@@ -70,16 +70,16 @@ IMPLEMENT_CALLBACK( GuiWindowCtrl, onRestore, void, (), (),
 //-----------------------------------------------------------------------------
 
 GuiWindowCtrl::GuiWindowCtrl()
-   :  mResizeEdge(edgeNone),
-      mResizeWidth(true),
+   :  mResizeWidth(true),
+      mResizeEdge(edgeNone),
       mResizeHeight(true),
-      mResizeMargin(2.f),
       mCanMove(true),
+      mResizeMargin(2.f),
       mCanClose(true),
       mCanMinimize(true),
       mCanMaximize(true),
-      mCanDock(false),
       mCanCollapse(false),
+      mCanDock(false),
       mEdgeSnap(true),
       mCollapseGroup(-1),
       mCollapseGroupNum(-1),
@@ -357,7 +357,7 @@ void GuiWindowCtrl::moveToCollapseGroup(GuiWindowCtrl* hitWindow, bool orientati
       }
       else
       {
-         S32 groupVec = hitWindow->mCollapseGroup;
+         groupVec = hitWindow->mCollapseGroup;
          
          if(orientation == 0)
             parent->mCollapseGroupVec[groupVec].push_front(this);

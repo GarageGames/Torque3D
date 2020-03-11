@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -49,6 +49,8 @@ SDL_LookupString(const char *key)
 
 /* Public functions */
 
+static char *SDL_GetErrorMsg(char *errstr, int maxlen);
+
 int
 SDL_SetError(SDL_PRINTF_FORMAT_STRING const char *fmt, ...)
 {
@@ -73,6 +75,16 @@ SDL_SetError(SDL_PRINTF_FORMAT_STRING const char *fmt, ...)
             switch (*fmt++) {
             case 0:            /* Malformed format string.. */
                 --fmt;
+                break;
+            case 'l':
+                switch (*fmt++) {
+                case 0:        /* Malformed format string.. */
+                    --fmt;
+                    break;
+                case 'i': case 'd': case 'u': case 'x': case 'X':
+                    error->args[error->argc++].value_l = va_arg(ap, long);
+                    break;
+                }
                 break;
             case 'c':
             case 'i':
@@ -110,16 +122,83 @@ SDL_SetError(SDL_PRINTF_FORMAT_STRING const char *fmt, ...)
     }
     va_end(ap);
 
-    /* If we are in debug mode, print out an error message */
-    SDL_LogDebug(SDL_LOG_CATEGORY_ERROR, "%s", SDL_GetError());
-
+    if (SDL_LogGetPriority(SDL_LOG_CATEGORY_ERROR) <= SDL_LOG_PRIORITY_DEBUG) {
+        /* If we are in debug mode, print out an error message
+         * Avoid stomping on the static buffer in GetError, just
+         * in case this is called while processing a ShowMessageBox to
+         * show an error already in that static buffer.
+         */
+        char errmsg[SDL_ERRBUFIZE];
+        SDL_GetErrorMsg(errmsg, sizeof(errmsg));
+        SDL_LogDebug(SDL_LOG_CATEGORY_ERROR, "%s", errmsg);
+    }
     return -1;
 }
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
+/* Available for backwards compatibility */
+const char *
+SDL_GetError(void)
+{
+    static char errmsg[SDL_ERRBUFIZE];
+
+    return SDL_GetErrorMsg(errmsg, SDL_ERRBUFIZE);
+}
+
+void
+SDL_ClearError(void)
+{
+    SDL_error *error;
+
+    error = SDL_GetErrBuf();
+    error->error = 0;
+}
+
+/* Very common errors go here */
+int
+SDL_Error(SDL_errorcode code)
+{
+    switch (code) {
+    case SDL_ENOMEM:
+        return SDL_SetError("Out of memory");
+    case SDL_EFREAD:
+        return SDL_SetError("Error reading from datastream");
+    case SDL_EFWRITE:
+        return SDL_SetError("Error writing to datastream");
+    case SDL_EFSEEK:
+        return SDL_SetError("Error seeking in datastream");
+    case SDL_UNSUPPORTED:
+        return SDL_SetError("That operation is not supported");
+    default:
+        return SDL_SetError("Unknown SDL error");
+    }
+}
+
+#ifdef TEST_ERROR
+int
+main(int argc, char *argv[])
+{
+    char buffer[BUFSIZ + 1];
+
+    SDL_SetError("Hi there!");
+    printf("Error 1: %s\n", SDL_GetError());
+    SDL_ClearError();
+    SDL_memset(buffer, '1', BUFSIZ);
+    buffer[BUFSIZ] = 0;
+    SDL_SetError("This is the error: %s (%f)", buffer, 1.0);
+    printf("Error 2: %s\n", SDL_GetError());
+    exit(0);
+}
+#endif
+
+
+/* keep this at the end of the file so it works with GCC builds that don't
+   support "#pragma GCC diagnostic push" ... we'll just leave the warning
+   disabled after this. */
+/* this pragma arrived in GCC 4.2 and causes a warning on older GCCs! Sigh. */
+#if defined(__clang__) || (defined(__GNUC__) && ((__GNUC__ > 4) || (__GNUC__ == 4 && (__GNUC_MINOR__ >= 2))))
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
+
 /* This function has a bit more overhead than most error functions
    so that it supports internationalization and thread-safe errors.
 */
@@ -149,6 +228,22 @@ SDL_GetErrorMsg(char *errstr, int maxlen)
                 while ((*fmt == '.' || (*fmt >= '0' && *fmt <= '9'))
                        && spot < (tmp + SDL_arraysize(tmp) - 2)) {
                     *spot++ = *fmt++;
+                }
+                if (*fmt == 'l') {
+                    *spot++ = *fmt++;
+                    *spot++ = *fmt++;
+                    *spot++ = '\0';
+                    switch (spot[-2]) {
+                    case 'i': case 'd': case 'u': case 'x': case 'X':
+                      len = SDL_snprintf(msg, maxlen, tmp,
+                                         error->args[argi++].value_l);
+                      if (len > 0) {
+                          msg += len;
+                          maxlen -= len;
+                      }
+                      break;
+                    }
+                    continue;
                 }
                 *spot++ = *fmt++;
                 *spot++ = '\0';
@@ -220,63 +315,5 @@ SDL_GetErrorMsg(char *errstr, int maxlen)
     }
     return (errstr);
 }
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
-
-/* Available for backwards compatibility */
-const char *
-SDL_GetError(void)
-{
-    static char errmsg[SDL_ERRBUFIZE];
-
-    return SDL_GetErrorMsg(errmsg, SDL_ERRBUFIZE);
-}
-
-void
-SDL_ClearError(void)
-{
-    SDL_error *error;
-
-    error = SDL_GetErrBuf();
-    error->error = 0;
-}
-
-/* Very common errors go here */
-int
-SDL_Error(SDL_errorcode code)
-{
-    switch (code) {
-    case SDL_ENOMEM:
-        return SDL_SetError("Out of memory");
-    case SDL_EFREAD:
-        return SDL_SetError("Error reading from datastream");
-    case SDL_EFWRITE:
-        return SDL_SetError("Error writing to datastream");
-    case SDL_EFSEEK:
-        return SDL_SetError("Error seeking in datastream");
-    case SDL_UNSUPPORTED:
-        return SDL_SetError("That operation is not supported");
-    default:
-        return SDL_SetError("Unknown SDL error");
-    }
-}
-
-#ifdef TEST_ERROR
-int
-main(int argc, char *argv[])
-{
-    char buffer[BUFSIZ + 1];
-
-    SDL_SetError("Hi there!");
-    printf("Error 1: %s\n", SDL_GetError());
-    SDL_ClearError();
-    SDL_memset(buffer, '1', BUFSIZ);
-    buffer[BUFSIZ] = 0;
-    SDL_SetError("This is the error: %s (%f)", buffer, 1.0);
-    printf("Error 2: %s\n", SDL_GetError());
-    exit(0);
-}
-#endif
 
 /* vi: set ts=4 sw=4 expandtab: */

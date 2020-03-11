@@ -23,6 +23,7 @@
 #include "gfx/D3D11/gfxD3D11Device.h"
 #include "gfx/D3D11/gfxD3D11EnumTranslate.h"
 #include "gfx/bitmap/bitmapUtils.h"
+#include "gfx/bitmap/imageUtils.h"
 #include "gfx/gfxCardProfile.h"
 #include "gfx/gfxStringEnumTranslate.h"
 #include "core/strings/unicode.h"
@@ -139,7 +140,7 @@ void GFXD3D11TextureManager::_innerCreateTexture( GFXD3D11TextureObject *retTex,
    }
    else
    {
-		UINT numQualityLevels = 0;
+		U32 numQualityLevels = 0;
 
 		switch (antialiasLevel)
 		{
@@ -151,7 +152,6 @@ void GFXD3D11TextureManager::_innerCreateTexture( GFXD3D11TextureObject *retTex,
 			default:
 			{
 				antialiasLevel = 0;
-				UINT numQualityLevels;
 				D3D11DEVICE->CheckMultisampleQualityLevels(d3dTextureFormat, antialiasLevel, &numQualityLevels);
 				AssertFatal(numQualityLevels, "Invalid AA level!");
 				break;
@@ -287,7 +287,7 @@ bool GFXD3D11TextureManager::_loadTexture(GFXTextureObject *aTexture, GBitmap *p
    const bool supportsAutoMips = GFX->getCardProfiler()->queryProfile("autoMipMapLevel", true);
 
    // Helper bool
-   const bool isCompressedTexFmt = aTexture->mFormat >= GFXFormatDXT1 && aTexture->mFormat <= GFXFormatDXT5;
+   const bool isCompressedTexFmt = ImageUtil::isCompressedFormat(aTexture->mFormat);
 
    // Settings for mipmap generation
    U32 maxDownloadMip = pDL->getNumMipLevels();
@@ -312,10 +312,10 @@ bool GFXD3D11TextureManager::_loadTexture(GFXTextureObject *aTexture, GBitmap *p
 
 		   switch(texture->mFormat)
 			{
-				case GFXFormatR8G8B8:
+            case GFXFormatR8G8B8:
+            case GFXFormatR8G8B8_SRGB:
 				{
 					PROFILE_SCOPE(Swizzle24_Upload);
-					AssertFatal(pDL->getFormat() == GFXFormatR8G8B8, "Assumption failed");
 
 					U8* Bits = new U8[pDL->getWidth(i) * pDL->getHeight(i) * 4];
 					dMemcpy(Bits, pDL->getBits(i), pDL->getWidth(i) * pDL->getHeight(i) * 3);
@@ -330,6 +330,7 @@ bool GFXD3D11TextureManager::_loadTexture(GFXTextureObject *aTexture, GBitmap *p
 
 				case GFXFormatR8G8B8A8:
 				case GFXFormatR8G8B8X8:
+            case GFXFormatR8G8B8A8_SRGB:
 				{
                PROFILE_SCOPE(Swizzle32_Upload);
                copyBuffer = new U8[pDL->getWidth(i) * pDL->getHeight(i) * pDL->getBytesPerPixel()];
@@ -360,9 +361,9 @@ bool GFXD3D11TextureManager::_loadTexture(GFXTextureObject *aTexture, GBitmap *p
 			switch( texture->mFormat )
 			{
 				case GFXFormatR8G8B8:
+            case GFXFormatR8G8B8_SRGB:
 				{
 					PROFILE_SCOPE(Swizzle24_Upload);
-					AssertFatal(pDL->getFormat() == GFXFormatR8G8B8, "Assumption failed");
 
 					U8* Bits = new U8[pDL->getWidth(i) * pDL->getHeight(i) * 4];
 					dMemcpy(Bits, pDL->getBits(i), pDL->getWidth(i) * pDL->getHeight(i) * 3);
@@ -375,6 +376,7 @@ bool GFXD3D11TextureManager::_loadTexture(GFXTextureObject *aTexture, GBitmap *p
 
             case GFXFormatR8G8B8A8:
             case GFXFormatR8G8B8X8:
+            case GFXFormatR8G8B8A8_SRGB:
             {
                PROFILE_SCOPE(Swizzle32_Upload);
                dev->getDeviceSwizzle32()->ToBuffer(mapping.pData, pDL->getBits(i), pDL->getWidth(i) * pDL->getHeight(i) * pDL->getBytesPerPixel());
@@ -417,7 +419,7 @@ bool GFXD3D11TextureManager::_loadTexture(GFXTextureObject *inTex, void *raw)
 
    U8* Bits = NULL;
   
-   if(texture->mFormat == GFXFormatR8G8B8)
+   if(texture->mFormat == GFXFormatR8G8B8 || texture->mFormat == GFXFormatR8G8B8_SRGB)
    {
 	   // convert 24 bit to 32 bit
 	   Bits = new U8[texture->getWidth() * texture->getHeight() * texture->getDepth() * 4];
@@ -430,8 +432,10 @@ bool GFXD3D11TextureManager::_loadTexture(GFXTextureObject *inTex, void *raw)
    switch(texture->mFormat)
    {
       case GFXFormatR8G8B8:
+      case GFXFormatR8G8B8_SRGB:
       case GFXFormatR8G8B8A8:
       case GFXFormatR8G8B8X8:
+      case GFXFormatR8G8B8A8_SRGB:
          bytesPerPix = 4;
          break;
    }
@@ -444,7 +448,7 @@ bool GFXD3D11TextureManager::_loadTexture(GFXTextureObject *inTex, void *raw)
    box.top     = 0;
    box.bottom  = texture->getHeight();
 
-   if(texture->mFormat == GFXFormatR8G8B8) // converted format also for volume textures
+   if(texture->mFormat == GFXFormatR8G8B8 || texture->mFormat == GFXFormatR8G8B8_SRGB) // converted format also for volume textures
 		dev->getDeviceContext()->UpdateSubresource(texture->get3DTex(), 0, &box, Bits, texture->getWidth() * bytesPerPix, texture->getHeight() * bytesPerPix);
    else
 		dev->getDeviceContext()->UpdateSubresource(texture->get3DTex(), 0, &box, raw, texture->getWidth() * bytesPerPix, texture->getHeight() * bytesPerPix);

@@ -164,7 +164,7 @@ namespace StringUnit
 
       // replace this unit
       ret[sz] = '\0';
-      dStrcat(ret, replace);
+      dStrcat(ret, replace, 2048);
 
       // copy remaining chunks
       sz = dStrcspn(string, set);         // skip chunk we're replacing
@@ -172,7 +172,7 @@ namespace StringUnit
          return ret;
 
       string += sz;
-      dStrcat(ret, string);
+      dStrcat(ret, string, 2048);
       return ret;
    }
 
@@ -211,7 +211,7 @@ namespace StringUnit
       }
 
       string += sz + 1; // skip the extra field delimiter
-      dStrcat(ret, string);
+      dStrcat(ret, string, 2048);
       return ret;
    }
 }

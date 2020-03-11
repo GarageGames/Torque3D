@@ -484,7 +484,7 @@ static ConsoleDocFragment _FileObjectwriteObject2(
    "FileObject",
    "void writeObject( SimObject* object, string prepend);");
 
-DefineConsoleMethod( FileObject, writeObject, void,  (const char * simName, const char * objName), (""), "FileObject.writeObject(SimObject, object prepend)" 
+DefineEngineMethod( FileObject, writeObject, void,  (const char * simName, const char * objName), (""), "FileObject.writeObject(SimObject, object prepend)"
 			  "@hide")
 {
    SimObject* obj = Sim::findObject( simName );

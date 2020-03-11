@@ -424,7 +424,7 @@ void WaterBlock::setShaderParams( SceneRenderState *state, BaseMatInstance *mat,
    // set pixel shader constants
    //-----------------------------------
 
-   ColorF c( mWaterFogData.color );
+   LinearColorF c( mWaterFogData.color );
    matParams->setSafe( paramHandles.mBaseColorSC, c );
       
    // By default we need to show a true reflection is fullReflect is enabled and

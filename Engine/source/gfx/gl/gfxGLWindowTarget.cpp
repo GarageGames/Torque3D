@@ -37,7 +37,7 @@ GFX_ImplementTextureProfile( BackBufferDepthProfile,
 
 GFXGLWindowTarget::GFXGLWindowTarget(PlatformWindow *win, GFXDevice *d)
       : GFXWindowTarget(win), mDevice(d), mContext(NULL), mFullscreenContext(NULL)
-      , mCopyFBO(0), mBackBufferFBO(0), mSecondaryWindow(false)
+      , mCopyFBO(0), mBackBufferFBO(0)
 {      
    win->appEvent.notify(this, &GFXGLWindowTarget::_onAppSignal);
 }
@@ -52,14 +52,7 @@ GFXGLWindowTarget::~GFXGLWindowTarget()
 
 void GFXGLWindowTarget::resetMode()
 {
-   // Do some validation...
-   bool fullscreen = mWindow->getVideoMode().fullScreen;
-   if (fullscreen && mSecondaryWindow)
-   {
-      AssertFatal(false, "GFXGLWindowTarget::resetMode - Cannot go fullscreen with secondary window!");
-   }
-
-   if(fullscreen != mWindow->isFullscreen())
+   if(mWindow->getVideoMode().fullScreen != mWindow->isFullscreen())
    {
       _teardownCurrentMode();
       _setupNewMode();
@@ -118,9 +111,10 @@ void GFXGLWindowTarget::resolveTo(GFXTextureObject* obj)
 inline void GFXGLWindowTarget::_setupAttachments()
 {
    glBindFramebuffer( GL_FRAMEBUFFER, mBackBufferFBO);
+   glEnable(GL_FRAMEBUFFER_SRGB);
    GFXGL->getOpenglCache()->setCacheBinded(GL_FRAMEBUFFER, mBackBufferFBO);
    const Point2I dstSize = getSize();
-   mBackBufferColorTex.set(dstSize.x, dstSize.y, getFormat(), &PostFxTargetProfile, "backBuffer");
+   mBackBufferColorTex.set(dstSize.x, dstSize.y, getFormat(), &GFXRenderTargetSRGBProfile, "backBuffer");
    GFXGLTextureObject *color = static_cast<GFXGLTextureObject*>(mBackBufferColorTex.getPointer());
    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color->getHandle(), 0);
    mBackBufferDepthTex.set(dstSize.x, dstSize.y, GFXFormatD24S8, &BackBufferDepthProfile, "backBuffer");

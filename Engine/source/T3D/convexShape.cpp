@@ -492,7 +492,6 @@ void ConvexShape::unpackUpdate( NetConnection *conn, BitStream *stream )
 
 void ConvexShape::prepRenderImage( SceneRenderState *state )
 {   
-   /*
    if ( state->isDiffusePass() )
    {
       ObjectRenderInst *ri2 = state->getRenderPass()->allocInst<ObjectRenderInst>();
@@ -500,8 +499,7 @@ void ConvexShape::prepRenderImage( SceneRenderState *state )
       ri2->type = RenderPassManager::RIT_Editor;
       state->getRenderPass()->addInst( ri2 );
    }
-   */
-
+   
    if ( mVertexBuffer.isNull() || !state)
       return;
 
@@ -697,6 +695,52 @@ bool ConvexShape::buildPolyList( PolyListContext context, AbstractPolyList *plis
    return true;
 }
 
+bool ConvexShape::buildExportPolyList(ColladaUtils::ExportData* exportData, const Box3F &box, const SphereF &)
+{
+   if (mGeometry.points.empty())
+      return false;
+
+   //Get the collision mesh geometry
+   {
+      ColladaUtils::ExportData::colMesh* colMesh;
+      exportData->colMeshes.increment();
+      colMesh = &exportData->colMeshes.last();
+
+      colMesh->mesh.setTransform(&mObjToWorld, mObjScale);
+      colMesh->mesh.setObject(this);
+
+      //Just get the visible
+      buildPolyList(PLC_Export, &colMesh->mesh, getWorldBox(), getWorldSphere());
+
+      colMesh->colMeshName = String::ToString("ColMesh%d-1", exportData->colMeshes.size());
+   }
+
+   //Next, process the geometry and materials.
+   //Convex shapes only have the one 'level', so we'll just rely on the export post-process to back-fill
+   if (isServerObject() && getClientObject())
+   {
+      exportData->meshData.increment();
+
+      //Prep a meshData for this shape in particular
+      ColladaUtils::ExportData::meshLODData* meshData = &exportData->meshData.last();
+
+      //Fill out the info we'll need later to actually append our mesh data for the detail levels during the processing phase
+      meshData->shapeInst = nullptr;
+      meshData->originatingObject = this;
+      meshData->meshTransform = mObjToWorld;
+      meshData->scale = mObjScale;
+
+      meshData->meshDetailLevels.increment();
+
+      ColladaUtils::ExportData::detailLevel* curDetail = &meshData->meshDetailLevels.last();
+
+      //Make sure we denote the size this detail level has
+      curDetail->size = 512;
+   }
+
+   return true;
+}
+
 void ConvexShape::_export( OptimizedPolyList *plist, const Box3F &box, const SphereF &sphere )
 {
    BaseMatInstance *matInst = mMaterialInst;
@@ -747,21 +791,10 @@ bool ConvexShape::castRay( const Point3F &start, const Point3F &end, RayInfo *in
    F32 t;
    F32 tmin = F32_MAX;
    S32 hitFace = -1;
-   Point3F hitPnt, pnt;
+   Point3F pnt;
    VectorF rayDir( end - start );
    rayDir.normalizeSafe();
-
-   if ( false )
-   {
-      PlaneF plane( Point3F(0,0,0), Point3F(0,0,1) );
-      Point3F sp( 0,0,-1 );
-      Point3F ep( 0,0,1 );
-
-      F32 t = plane.intersect( sp, ep );
-      Point3F hitPnt;
-      hitPnt.interpolate( sp, ep, t );
-   }
-
+   
    for ( S32 i = 0; i < planeCount; i++ )
    {
       // Don't hit the back-side of planes.
@@ -1180,11 +1213,11 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
    GFX->setTexture( 0, NULL );
 
    // Render world box.
-   if ( false )
+   if (Con::getBoolVariable("$pref::convexDBG::ShowWorldBox", false))
    {
       Box3F wbox( mWorldBox );
-      //if ( getServerObject() )      
-      //   Box3F wbox = static_cast<ConvexShape*>( getServerObject() )->mWorldBox;      
+      if ( getServerObject() )      
+         wbox = static_cast<ConvexShape*>( getServerObject() )->mWorldBox;      
       GFXStateBlockDesc desc;
       desc.setCullMode( GFXCullNone );
       desc.setFillModeWireframe();
@@ -1196,7 +1229,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
 	const Vector< ConvexShape::Face > &faceList = mGeometry.faces;
 
    // Render Edges.
-   if ( false )
+   if (Con::getBoolVariable("$pref::convexDBG::ShowEdges", false))
    {
       GFXTransformSaver saver;
       //GFXFrustumSaver fsaver;
@@ -1226,7 +1259,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
 
          PrimBuild::begin( GFXLineList, edgeList.size() * 2 );
          
-         PrimBuild::color( ColorI::WHITE * 0.8f );
+         PrimBuild::color( LinearColorF(ColorI::WHITE) * 0.8f );
 
          for ( S32 j = 0; j < edgeList.size(); j++ )         
          {
@@ -1250,7 +1283,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
    objToWorld.scale( mObjScale );
 
    // Render faces centers/colors.
-   if ( false )
+   if (Con::getBoolVariable("$pref::convexDBG::ShowFaceColors", false))
    {
       GFXStateBlockDesc desc;
       desc.setCullMode( GFXCullNone );
@@ -1260,11 +1293,13 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
       for ( S32 i = 0; i < faceList.size(); i++ )
       {
          ColorI color = faceColorsx[ i % 4 ];
+         LinearColorF tCol = LinearColorF(color);
          S32 div = ( i / 4 ) * 4;
          if ( div > 0 )
-            color /= div;
-         color.alpha = 255;
-         
+            tCol /= div;
+         tCol.alpha = 1;
+         color = tCol.toColorI();
+
          Point3F pnt;
          objToWorld.mulP( faceList[i].centroid, &pnt );
          drawer->drawCube( desc, size, pnt, color, NULL );
@@ -1272,7 +1307,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
    }
 
    // Render winding order.
-   if ( false )
+   if (Con::getBoolVariable("$pref::convexDBG::ShowWinding", false))
    {
       GFXStateBlockDesc desc;
       desc.setCullMode( GFXCullNone );
@@ -1295,11 +1330,13 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
             objToWorld.mulP( p0 );
             objToWorld.mulP( p1 );
 
-            ColorI color = faceColorsx[ j % 4 ];
-            S32 div = ( j / 4 ) * 4;
-            if ( div > 0 )
-               color /= div;
-            color.alpha = 255;
+            ColorI color = faceColorsx[j % 4];
+            LinearColorF tCol = LinearColorF(color);
+            S32 div = (j / 4) * 4;
+            if (div > 0)
+               tCol /= div;
+            tCol.alpha = 1;
+            color = tCol.toColorI();
             
             PrimBuild::color( color );
             PrimBuild::vertex3fv( p0 );            
@@ -1327,7 +1364,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
    }
 
    // Render surface transforms.
-   if ( false )
+   if (Con::getBoolVariable("$pref::convexDBG::ShowSurfaceTransforms", false))
    {
       GFXStateBlockDesc desc;
       desc.setBlend( false );
@@ -1337,7 +1374,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
 
       for ( S32 i = 0; i < mSurfaces.size(); i++ )
       {
-         MatrixF objToWorld( mObjToWorld );
+         objToWorld = mObjToWorld;
          objToWorld.scale( mObjScale );
 
          MatrixF renderMat;

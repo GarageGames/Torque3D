@@ -90,6 +90,15 @@ static char *my_strtok_r(char *str, const char *delim, char **saveptr)
     return str;
 }
 
+static char *read_int(ALint *num, const char *line, int base)
+{
+    char *end;
+    *num = strtol(line, &end, base);
+    if(end && *end != '\0')
+        end = lstrip(end);
+    return end;
+}
+
 static char *read_uint(ALuint *num, const char *line, int base)
 {
     char *end;
@@ -131,7 +140,7 @@ char *read_clipped_line(FILE *f, char **buffer, size_t *maxlen)
 
 static int load_ambdec_speakers(AmbDecConf *conf, FILE *f, char **buffer, size_t *maxlen, char **saveptr)
 {
-    ALuint cur = 0;
+    ALsizei cur = 0;
     while(cur < conf->NumSpeakers)
     {
         const char *cmd = my_strtok_r(NULL, " \t", saveptr);
@@ -155,7 +164,7 @@ static int load_ambdec_speakers(AmbDecConf *conf, FILE *f, char **buffer, size_t
             const char *conn = my_strtok_r(NULL, " \t", saveptr);
 
             if(!name) WARN("Name not specified for speaker %u\n", cur+1);
-            else al_string_copy_cstr(&conf->Speakers[cur].Name, name);
+            else alstr_copy_cstr(&conf->Speakers[cur].Name, name);
             if(!dist) WARN("Distance not specified for speaker %u\n", cur+1);
             else read_float(&conf->Speakers[cur].Distance, dist);
             if(!az) WARN("Azimuth not specified for speaker %u\n", cur+1);
@@ -163,7 +172,7 @@ static int load_ambdec_speakers(AmbDecConf *conf, FILE *f, char **buffer, size_t
             if(!elev) WARN("Elevation not specified for speaker %u\n", cur+1);
             else read_float(&conf->Speakers[cur].Elevation, elev);
             if(!conn) TRACE("Connection not specified for speaker %u\n", cur+1);
-            else al_string_copy_cstr(&conf->Speakers[cur].Connection, conn);
+            else alstr_copy_cstr(&conf->Speakers[cur].Connection, conn);
 
             cur++;
         }
@@ -184,10 +193,10 @@ static int load_ambdec_speakers(AmbDecConf *conf, FILE *f, char **buffer, size_t
     return 1;
 }
 
-static int load_ambdec_matrix(ALfloat *gains, ALfloat (*matrix)[MAX_AMBI_COEFFS], ALuint maxrow, FILE *f, char **buffer, size_t *maxlen, char **saveptr)
+static int load_ambdec_matrix(ALfloat *gains, ALfloat (*matrix)[MAX_AMBI_COEFFS], ALsizei maxrow, FILE *f, char **buffer, size_t *maxlen, char **saveptr)
 {
     int gotgains = 0;
-    ALuint cur = 0;
+    ALsizei cur = 0;
     while(cur < maxrow)
     {
         const char *cmd = my_strtok_r(NULL, " \t", saveptr);
@@ -269,7 +278,7 @@ static int load_ambdec_matrix(ALfloat *gains, ALfloat (*matrix)[MAX_AMBI_COEFFS]
 
 void ambdec_init(AmbDecConf *conf)
 {
-    ALuint i;
+    ALsizei i;
 
     memset(conf, 0, sizeof(*conf));
     AL_STRING_INIT(conf->Description);
@@ -282,13 +291,13 @@ void ambdec_init(AmbDecConf *conf)
 
 void ambdec_deinit(AmbDecConf *conf)
 {
-    ALuint i;
+    ALsizei i;
 
-    al_string_deinit(&conf->Description);
+    alstr_reset(&conf->Description);
     for(i = 0;i < MAX_OUTPUT_CHANNELS;i++)
     {
-        al_string_deinit(&conf->Speakers[i].Name);
-        al_string_deinit(&conf->Speakers[i].Connection);
+        alstr_reset(&conf->Speakers[i].Name);
+        alstr_reset(&conf->Speakers[i].Connection);
     }
     memset(conf, 0, sizeof(*conf));
 }
@@ -322,7 +331,7 @@ int ambdec_load(AmbDecConf *conf, const char *fname)
         if(strcmp(command, "description") == 0)
         {
             char *value = my_strtok_r(NULL, "", &saveptr);
-            al_string_copy_cstr(&conf->Description, lstrip(value));
+            alstr_copy_cstr(&conf->Description, lstrip(value));
         }
         else if(strcmp(command, "version") == 0)
         {
@@ -370,7 +379,7 @@ int ambdec_load(AmbDecConf *conf, const char *fname)
             else if(strcmp(dec, "speakers") == 0)
             {
                 line = my_strtok_r(NULL, "", &saveptr);
-                line = read_uint(&conf->NumSpeakers, line, 10);
+                line = read_int(&conf->NumSpeakers, line, 10);
                 if(line && *line != '\0')
                 {
                     ERR("Extra junk after speakers: %s\n", line);

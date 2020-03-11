@@ -26,43 +26,48 @@
 #ifndef _SWIZZLE_H_
 #include "core/util/swizzle.h"
 #endif
-
-
-class ColorI;
-
+#include "core/color.h"
 
 class GFXVertexColor 
 {
 
 private:
-   U32 packedColorData;
+   U32 mPackedColorData;
    static Swizzle<U8, 4> *mDeviceSwizzle;
    
 public:
    static void setSwizzle( Swizzle<U8, 4> *val ) { mDeviceSwizzle = val; }
 
-   GFXVertexColor() : packedColorData( 0xFFFFFFFF ) {} // White with full alpha
+   GFXVertexColor() : mPackedColorData( 0xFFFFFFFF ) {} // White with full alpha
    GFXVertexColor( const ColorI &color ) { set( color ); }
 
    void set( U8 red, U8 green, U8 blue, U8 alpha = 255 )
    {
-      packedColorData = red << 0 | green << 8 | blue << 16 | alpha << 24;
-      mDeviceSwizzle->InPlace( &packedColorData, sizeof( packedColorData ) );
+      //we must set the color in linear space
+      LinearColorF linearColor = LinearColorF(ColorI(red, green, blue, alpha));
+      mPackedColorData = linearColor.getRGBAPack();
+      mDeviceSwizzle->InPlace( &mPackedColorData, sizeof( mPackedColorData ) );
    }
 
    void set( const ColorI &color )
    {
-      mDeviceSwizzle->ToBuffer( &packedColorData, (U8 *)&color, sizeof( packedColorData ) );
+      //we must set the color in linear space
+      LinearColorF linearColor = LinearColorF(color);
+      mPackedColorData = linearColor.getRGBAPack();
+      mDeviceSwizzle->InPlace(&mPackedColorData, sizeof(mPackedColorData));
    }
 
    GFXVertexColor &operator=( const ColorI &color ) { set( color ); return *this; }
-   operator const U32 *() const { return &packedColorData; }
-   const U32& getPackedColorData() const { return packedColorData; }
+   operator const U32 *() const { return &mPackedColorData; }
+   const U32& getPackedColorData() const { return mPackedColorData; }
 
-   void getColor( ColorI *color ) const
+   void getColor( ColorI *outColor ) const
    {
-      mDeviceSwizzle->ToBuffer( color, &packedColorData, sizeof( packedColorData ) );
-   }      
+      ColorI linearColor;
+      mDeviceSwizzle->ToBuffer( &linearColor, &mPackedColorData, sizeof( mPackedColorData ) );
+      //convert color back to srgb space
+      *outColor = linearColor.fromLinear();
+   }
 };
 
 #endif

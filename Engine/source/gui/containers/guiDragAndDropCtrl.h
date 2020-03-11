@@ -53,6 +53,8 @@ class GuiDragAndDropControl : public GuiControl
       /// If true, the control deletes itself when the left mouse button is released.
       bool mDeleteOnMouseUp;
 
+      bool mUseWholeCanvas;
+
       /// Controls may want to react when they are dragged over, entered or exited.
       SimObjectPtr<GuiControl> mLastTarget;
       
@@ -65,7 +67,7 @@ class GuiDragAndDropControl : public GuiControl
 
    public:
    
-      GuiDragAndDropControl() {}
+      GuiDragAndDropControl();
 
       void startDragging(Point2I offset = Point2I(0, 0));
 
@@ -81,6 +83,8 @@ class GuiDragAndDropControl : public GuiControl
       DECLARE_DESCRIPTION( "A special control that implements drag&drop behavior.\n"
                            "The control will notify other controls as it moves across the canvas.\n"
                            "Content can be attached through dynamic fields or child objects." );
+
+      DECLARE_CALLBACK(void, onControlDragCancelled, ());
 };
 
 #endif

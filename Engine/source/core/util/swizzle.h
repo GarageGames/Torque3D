@@ -154,8 +154,4 @@ inline void Swizzle<T, mapLength>::InPlace( void *memory, const dsize_t size ) c
 // Template specializations for certain swizzles
 //#include "core/util/swizzleSpec.h"
 
-#ifdef TORQUE_OS_XENON
-#  include "platformXbox/altivecSwizzle.h"
-#endif
-
 #endif

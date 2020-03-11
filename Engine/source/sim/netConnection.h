@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _NETCONNECTION_H_
 #define _NETCONNECTION_H_
 
@@ -1050,6 +1055,9 @@ public:
    virtual bool readDemoStartBlock(BitStream *stream);
    virtual void demoPlaybackComplete();
 /// @}
+public:
+   S32 getCurRatePacketSize() const { return mCurRate.packetSize; }
+   S32 getMaxRatePacketSize() const { return mMaxRate.packetSize; }
 };
 
 

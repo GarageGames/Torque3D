@@ -29,7 +29,7 @@ struct FogData
    F32 density;
    F32 densityOffset;
    F32 atmosphereHeight;
-   ColorF color;
+   LinearColorF color;
 
    FogData()
    {

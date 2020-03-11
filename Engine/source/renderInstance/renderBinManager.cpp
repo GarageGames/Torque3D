@@ -33,9 +33,9 @@ IMPLEMENT_CONOBJECT(RenderBinManager);
 
 
 RenderBinManager::RenderBinManager( const RenderInstType& ritype, F32 renderOrder, F32 processAddOrder ) :
-   mRenderInstType( ritype ),
-   mRenderOrder( renderOrder ),
    mProcessAddOrder( processAddOrder ),
+   mRenderOrder( renderOrder ),
+   mRenderInstType( ritype ),  
    mRenderPass( NULL ),
    mBasicOnly ( false )
 {

@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _GUICANVAS_H_
 #define _GUICANVAS_H_
 
@@ -193,6 +198,7 @@ protected:
 	static CanvasSizeChangeSignal smCanvasSizeChangeSignal;
 
    GuiControl *mMenuBarCtrl;
+   GuiControl* mMenuBackground;
 
 public:
    DECLARE_CONOBJECT(GuiCanvas);
@@ -205,6 +211,7 @@ public:
    virtual void onRemove();
 
    void setMenuBar(SimObject *obj);
+   SimObject* getMenuBar() { return mMenuBarCtrl; }
 
    static void initPersistFields();
 
@@ -329,6 +336,9 @@ public:
    /// Returns the point, in screenspace, at which the cursor is located.
    virtual Point2I getCursorPos();
 
+   /// Returns the point, in local coordinates, at which the cursor is located
+   virtual Point2I getCursorPosLocal() { return Point2I(S32(mCursorPt.x), S32(mCursorPt.y)); }
+
    /// Enable/disable rendering of the cursor.
    /// @param   state    True if we should render cursor
    virtual void showCursor(bool state);
@@ -446,6 +456,13 @@ public:
 
 private:
    static const U32 MAX_GAMEPADS = 4; ///< The maximum number of supported gamepads
+  protected:
+     bool   mConsumeLastInputEvent;
+  public:
+     void clearMouseRightButtonDown(void) { mMouseRightButtonDown = false; }
+     void clearMouseButtonDown(void) { mMouseButtonDown = false; }
+     void setConsumeLastInputEvent(bool flag) { mConsumeLastInputEvent = flag; }
+     bool getLastCursorPoint(Point2I& pt) const { pt = mLastCursorPt; return mLastCursorEnabled; }
 };
 
 #endif

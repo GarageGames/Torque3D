@@ -53,7 +53,7 @@ public:
 
          for(U32 i = 0; i < nameCount; i++)
          {
-            dStrcpy(mFileNames[i], (*nameList)[i]);
+            dStrcpy(mFileNames[i], (*nameList)[i], 256);
             //Con::printf("Sending request for file %s", mFileNames[i]);
          }
       }

@@ -1,1 +1,2 @@
-# Keep directory in git repo
+*.hlsl
+*.glsl

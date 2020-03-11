@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -39,11 +39,15 @@ Emscripten_GLES_LoadLibrary(_THIS, const char *path) {
     if (!_this->egl_data) {
         return SDL_OutOfMemory();
     }
-    
+
+    /* Emscripten forces you to manually cast eglGetProcAddress to the real
+       function type; grep for "__eglMustCastToProperFunctionPointerType" in
+       Emscripten's egl.h for details. */
+    _this->egl_data->eglGetProcAddress = (void *(EGLAPIENTRY *)(const char *)) eglGetProcAddress;
+
     LOAD_FUNC(eglGetDisplay);
     LOAD_FUNC(eglInitialize);
     LOAD_FUNC(eglTerminate);
-    LOAD_FUNC(eglGetProcAddress);
     LOAD_FUNC(eglChooseConfig);
     LOAD_FUNC(eglGetConfigAttrib);
     LOAD_FUNC(eglCreateContext);
@@ -56,7 +60,9 @@ Emscripten_GLES_LoadLibrary(_THIS, const char *path) {
     LOAD_FUNC(eglWaitNative);
     LOAD_FUNC(eglWaitGL);
     LOAD_FUNC(eglBindAPI);
-    
+    LOAD_FUNC(eglQueryString);
+    LOAD_FUNC(eglGetError);
+
     _this->egl_data->egl_display = _this->egl_data->eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (!_this->egl_data->egl_display) {
         return SDL_SetError("Could not get EGL display");
@@ -66,8 +72,6 @@ Emscripten_GLES_LoadLibrary(_THIS, const char *path) {
         return SDL_SetError("Could not initialize EGL");
     }
 
-    _this->gl_config.driver_loaded = 1;
-
     if (path) {
         SDL_strlcpy(_this->gl_config.driver_path, path, sizeof(_this->gl_config.driver_path) - 1);
     } else {
@@ -75,19 +79,6 @@ Emscripten_GLES_LoadLibrary(_THIS, const char *path) {
     }
     
     return 0;
-}
-
-void
-Emscripten_GLES_DeleteContext(_THIS, SDL_GLContext context)
-{
-    /*
-    WebGL contexts can't actually be deleted, so we need to reset it.
-    ES2 renderer resets state on init anyway, clearing the canvas should be enough
-    */
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-    SDL_EGL_DeleteContext(_this, context);
 }
 
 SDL_EGL_CreateContext_impl(Emscripten)

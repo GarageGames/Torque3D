@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,6 +18,10 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+#ifndef scancodes_xfree86_h_
+#define scancodes_xfree86_h_
+
 #include "../../include/SDL_scancode.h"
 
 /* XFree86 key code to SDL scancode mapping table
@@ -345,7 +349,7 @@ static const SDL_Scancode xfree86_scancode_table2[] = {
     /* 165 */   SDL_SCANCODE_AUDIOPREV,
     /* 166 */   SDL_SCANCODE_AUDIOSTOP,
     /* 167 */   SDL_SCANCODE_UNKNOWN,   /* XF86AudioRecord */
-    /* 168 */   SDL_SCANCODE_UNKNOWN,   /* XF86AudioRewind */
+    /* 168 */   SDL_SCANCODE_AUDIOREWIND,   /* XF86AudioRewind */
     /* 169 */   SDL_SCANCODE_UNKNOWN,   /* XF86Phone */
     /* 170 */   SDL_SCANCODE_UNKNOWN,
     /* 171 */   SDL_SCANCODE_F13,       /* XF86Tools */
@@ -502,5 +506,7 @@ static const SDL_Scancode xvnc_scancode_table[] = {
     /*  79 */   SDL_SCANCODE_F11,
     /*  80 */   SDL_SCANCODE_F12,
 };
+
+#endif /* scancodes_xfree86_h_ */
 
 /* *INDENT-ON* */

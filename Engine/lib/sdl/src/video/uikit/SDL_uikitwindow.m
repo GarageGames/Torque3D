@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -69,15 +69,23 @@
 
 - (void)layoutSubviews
 {
-    /* Workaround to fix window orientation issues in iOS 8+. */
-    self.frame = self.screen.bounds;
+    /* Workaround to fix window orientation issues in iOS 8. */
+    /* As of July 1 2019, I haven't been able to reproduce any orientation
+     * issues with this disabled on iOS 12. The issue this is meant to fix might
+     * only happen on iOS 8, or it might have been fixed another way with other
+     * code... This code prevents split view (iOS 9+) from working on iPads, so
+     * we want to avoid using it if possible. */
+    if (!UIKit_IsSystemVersionAtLeast(9.0)) {
+        self.frame = self.screen.bounds;
+    }
     [super layoutSubviews];
 }
 
 @end
 
 
-static int SetupWindowData(_THIS, SDL_Window *window, UIWindow *uiwindow, SDL_bool created)
+static int
+SetupWindowData(_THIS, SDL_Window *window, UIWindow *uiwindow, SDL_bool created)
 {
     SDL_VideoDisplay *display = SDL_GetDisplayForWindow(window);
     SDL_DisplayData *displaydata = (__bridge SDL_DisplayData *) display->driverdata;
@@ -107,6 +115,14 @@ static int SetupWindowData(_THIS, SDL_Window *window, UIWindow *uiwindow, SDL_bo
 
 #if !TARGET_OS_TV
     if (displaydata.uiscreen == [UIScreen mainScreen]) {
+        /* SDL_CreateWindow sets the window w&h to the display's bounds if the
+         * fullscreen flag is set. But the display bounds orientation might not
+         * match what we want, and GetSupportedOrientations call below uses the
+         * window w&h. They're overridden below anyway, so we'll just set them
+         * to the requested size for the purposes of determining orientation. */
+        window->w = window->windowed.w;
+        window->h = window->windowed.h;
+
         NSUInteger orients = UIKit_GetSupportedOrientations(window);
         BOOL supportsLandscape = (orients & UIInterfaceOrientationMaskLandscape) != 0;
         BOOL supportsPortrait = (orients & (UIInterfaceOrientationMaskPortrait|UIInterfaceOrientationMaskPortraitUpsideDown)) != 0;
@@ -136,12 +152,6 @@ static int SetupWindowData(_THIS, SDL_Window *window, UIWindow *uiwindow, SDL_bo
     /* Sets this view as the controller's view, and adds the view to the window
      * heirarchy. */
     [view setSDLWindow:window];
-
-    /* Make this window the current mouse focus for touch input */
-    if (displaydata.uiscreen == [UIScreen mainScreen]) {
-        SDL_SetMouseFocus(window);
-        SDL_SetKeyboardFocus(window);
-    }
 
     return 0;
 }
@@ -232,6 +242,14 @@ UIKit_ShowWindow(_THIS, SDL_Window * window)
     @autoreleasepool {
         SDL_WindowData *data = (__bridge SDL_WindowData *) window->driverdata;
         [data.uiwindow makeKeyAndVisible];
+
+        /* Make this window the current mouse focus for touch input */
+        SDL_VideoDisplay *display = SDL_GetDisplayForWindow(window);
+        SDL_DisplayData *displaydata = (__bridge SDL_DisplayData *) display->driverdata;
+        if (displaydata.uiscreen == [UIScreen mainScreen]) {
+            SDL_SetMouseFocus(window);
+            SDL_SetKeyboardFocus(window);
+        }
     }
 }
 
@@ -360,7 +378,7 @@ UIKit_GetWindowWMInfo(_THIS, SDL_Window * window, SDL_SysWMinfo * info)
 
             return SDL_TRUE;
         } else {
-            SDL_SetError("Application not compiled with SDL %d.%d\n",
+            SDL_SetError("Application not compiled with SDL %d.%d",
                          SDL_MAJOR_VERSION, SDL_MINOR_VERSION);
             return SDL_FALSE;
         }

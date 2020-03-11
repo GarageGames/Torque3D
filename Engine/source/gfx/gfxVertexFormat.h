@@ -298,15 +298,7 @@ public:
 /// @see GFXVertexFormat
 template<class T> inline const GFXVertexFormat* getGFXVertexFormat();
 
-#ifdef TORQUE_OS_XENON
-
-   /// On the Xbox360 we want we want to be sure that verts
-   /// are on aligned boundariess.
-   #define GFX_VERTEX_STRUCT __declspec(align(16)) struct
-
-#else
-   #define GFX_VERTEX_STRUCT struct
-#endif
+#define GFX_VERTEX_STRUCT struct
 
 
 /// The vertex format declaration which is usally placed in your header 

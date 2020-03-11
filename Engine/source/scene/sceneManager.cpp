@@ -38,6 +38,9 @@
 #include "T3D/gameBase/gameConnection.h"
 #include "math/mathUtils.h"
 
+#include "T3D/components/render/renderComponentInterface.h"
+#include "T3D/systems/render/meshRenderSystem.h"
+
 // For player object bounds workaround.
 #include "T3D/player.h"
 
@@ -117,7 +120,7 @@ SceneManager::SceneManager( bool isClient )
      mVisibleGhostDistance( 0 ),
      mNearClip( 0.1f ),
      mLightManager( NULL ),
-     mAmbientLightColor( ColorF( 0.1f, 0.1f, 0.1f, 1.0f ) ),
+     mAmbientLightColor( LinearColorF( 0.1f, 0.1f, 0.1f, 1.0f ) ),
      mDefaultRenderPass( NULL )
 {
    VECTOR_SET_ASSOCIATION( mBatchQueryList );
@@ -211,7 +214,7 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
          AssertFatal( baseObject != NULL, "SceneManager::renderScene - findZone() did not return an object" );
       }
 
-      ColorF zoneAmbient;
+      LinearColorF zoneAmbient;
       if( baseObject && baseObject->getZoneAmbientLightColor( baseZone, zoneAmbient ) )
          mAmbientLightColor.setTargetValue( zoneAmbient );
       else
@@ -357,6 +360,8 @@ void SceneManager::_renderScene( SceneRenderState* state, U32 objectMask, SceneZ
 
    if( gEditingMission && state->isDiffusePass() )
       objectMask = EDITOR_RENDER_TYPEMASK;
+
+   MeshRenderSystem::render(this, state);
 
    // Update the zoning state and traverse zones.
 
@@ -715,7 +720,7 @@ RenderPassManager* SceneManager::getDefaultRenderPass() const
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( sceneDumpZoneStates, void, ( bool updateFirst ), ( true ),
+DefineEngineFunction( sceneDumpZoneStates, void, ( bool updateFirst ), ( true ),
    "Dump the current zoning states of all zone spaces in the scene to the console.\n\n"
    "@param updateFirst If true, zoning states are brought up to date first; if false, the zoning states "
    "are dumped as is.\n\n"
@@ -740,7 +745,7 @@ DefineConsoleFunction( sceneDumpZoneStates, void, ( bool updateFirst ), ( true )
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( sceneGetZoneOwner, SceneObject*, ( U32 zoneId ), ( true ),
+DefineEngineFunction( sceneGetZoneOwner, SceneObject*, ( U32 zoneId ),,
    "Return the SceneObject that contains the given zone.\n\n"
    "@param zoneId ID of zone.\n"
    "@return A SceneObject or NULL if the given @a zoneId is invalid.\n\n"

@@ -116,7 +116,7 @@ bool GuiMissionAreaCtrl::onAdd()
 
    if (*mHandleBitmap)
    {
-      mHandleTexture = GFXTexHandle( mHandleBitmap, &GFXDefaultPersistentProfile, avar("%s() - mHandleTexture (line %d)", __FUNCTION__, __LINE__) );
+      mHandleTexture = GFXTexHandle( mHandleBitmap, &GFXTexturePersistentSRGBProfile, avar("%s() - mHandleTexture (line %d)", __FUNCTION__, __LINE__) );
       mHandleTextureSize = Point2I( mHandleTexture->getWidth(), mHandleTexture->getHeight() );
       mHandleTextureHalfSize = Point2F(mHandleTextureSize.x, mHandleTextureSize.y) * 0.5f;
    }

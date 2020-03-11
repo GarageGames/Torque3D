@@ -206,11 +206,11 @@ void AccumulationVolume::buildSilhouette( const SceneCameraState& cameraState, V
 
    if( mTransformDirty )
    {
-      const U32 numPoints = mPolyhedron.getNumPoints();
+      const U32 numPolyPoints = mPolyhedron.getNumPoints();
       const PolyhedronType::PointType* points = getPolyhedron().getPoints();
 
-      mWSPoints.setSize( numPoints );
-      for( U32 i = 0; i < numPoints; ++ i )
+      mWSPoints.setSize(numPolyPoints);
+      for( U32 i = 0; i < numPolyPoints; ++ i )
       {
          Point3F p = points[ i ];
          p.convolve( getScale() );
@@ -265,7 +265,7 @@ void AccumulationVolume::setTexture( const String& name )
    mTextureName = name;
    if ( isClientObject() && mTextureName.isNotEmpty() )
    {
-      mAccuTexture.set(mTextureName, &GFXDefaultStaticDiffuseProfile, "AccumulationVolume::mAccuTexture");
+      mAccuTexture.set(mTextureName, &GFXStaticTextureSRGBProfile, "AccumulationVolume::mAccuTexture");
       if ( mAccuTexture.isNull() )
          Con::warnf( "AccumulationVolume::setTexture - Unable to load texture: %s", mTextureName.c_str() );
    }

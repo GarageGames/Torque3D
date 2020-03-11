@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _EXPLOSION_H_
 #define _EXPLOSION_H_
 
@@ -42,6 +47,7 @@ class TSThread;
 class SFXTrack;
 struct DebrisData;
 
+class SFXProfile;
 //--------------------------------------------------------------------------
 class ExplosionData : public GameBaseData {
   public:
@@ -113,8 +119,8 @@ class ExplosionData : public GameBaseData {
    // interpolated from start to end time.
    F32               lightStartRadius;
    F32               lightEndRadius;
-   ColorF            lightStartColor;
-   ColorF            lightEndColor;
+   LinearColorF            lightStartColor;
+   LinearColorF            lightEndColor;
    F32               lightStartBrightness;
    F32               lightEndBrightness;
    F32               lightNormalOffset;
@@ -126,6 +132,11 @@ class ExplosionData : public GameBaseData {
    static void  initPersistFields();
    virtual void packData(BitStream* stream);
    virtual void unpackData(BitStream* stream);
+public:
+   /*C*/          ExplosionData(const ExplosionData&, bool = false);
+   /*D*/          ~ExplosionData();
+   ExplosionData* cloneAndPerformSubstitutions(const SimObject*, S32 index=0);
+   virtual bool   allowSubstitutions() const { return true; }
 };
 
 
@@ -188,6 +199,12 @@ class Explosion : public GameBase, public ISceneLight
 
    DECLARE_CONOBJECT(Explosion);
    static void initPersistFields();
+private:
+   SimObject*     ss_object;
+   S32            ss_index;
+   SFXProfile*    soundProfile_clone;
+public:
+   void           setSubstitutionData(SimObject* obj, S32 idx=0) { ss_object = obj; ss_index = idx; }
 };
 
 #endif // _H_EXPLOSION

@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "T3D/aiPlayer.h"
 
@@ -35,9 +40,9 @@ static U32 sAIPlayerLoSMask = TerrainObjectType | StaticShapeObjectType | Static
 IMPLEMENT_CO_NETOBJECT_V1(AIPlayer);
 
 ConsoleDocClass( AIPlayer,
-	"@brief A Player object not controlled by conventional input, but by an AI engine.\n\n"
+   "@brief A Player object not controlled by conventional input, but by an AI engine.\n\n"
 
-	"The AIPlayer provides a Player object that may be controlled from script.  You control "
+   "The AIPlayer provides a Player object that may be controlled from script.  You control "
    "where the player moves and how fast.  You may also set where the AIPlayer is aiming at "
    "-- either a location or another game object.\n\n"
 
@@ -70,19 +75,19 @@ ConsoleDocClass( AIPlayer,
    "position to the center of the target's bounding box.  The LOS ray test only checks against interiors, "
    "statis shapes, and terrain.\n\n"
 
-	"@tsexample\n"
-	"// Create the demo player object\n"
-	"%player = new AiPlayer()\n"
-	"{\n"
-	"	dataBlock = DemoPlayer;\n"
-	"	path = \"\";\n"
-	"};\n"
-	"@endtsexample\n\n"
+   "@tsexample\n"
+   "// Create the demo player object\n"
+   "%player = new AiPlayer()\n"
+   "{\n"
+   "  dataBlock = DemoPlayer;\n"
+   "  path = \"\";\n"
+   "};\n"
+   "@endtsexample\n\n"
 
-	"@see Player for a list of all inherited functions, variables, and base description\n"
+   "@see Player for a list of all inherited functions, variables, and base description\n"
 
-	"@ingroup AI\n"
-	"@ingroup gameObjects\n");
+   "@ingroup AI\n"
+   "@ingroup gameObjects\n");
 /**
  * Constructor
  */
@@ -97,6 +102,9 @@ AIPlayer::AIPlayer()
    mMoveSlowdown = true;
    mMoveState = ModeStop;
 
+   // This new member saves the movement state of the AI so that
+   // it can be restored after a substituted animation is finished.
+   mMoveState_saved = -1;
    mAimObject = 0;
    mAimLocationSet = false;
    mTargetInLOS = false;
@@ -147,7 +155,7 @@ void AIPlayer::initPersistFields()
 
       addField( "AttackRadius", TypeF32, Offset( mAttackRadius, AIPlayer ), 
          "@brief Distance considered in firing range for callback purposes.");
-      	  
+           
    endGroup( "AI" );
 
 #ifdef TORQUE_NAVIGATION_ENABLED
@@ -399,11 +407,11 @@ bool AIPlayer::getAIMove(Move *movePtr)
             {
                clearPath();
                mMoveState = ModeStop;
-			   throwCallback("onTargetInRange");
+            throwCallback("onTargetInRange");
             }
             else if((getPosition() - mFollowData.object->getPosition()).len() < mAttackRadius)
             {
-			   throwCallback("onTargetInFiringRange");
+            throwCallback("onTargetInFiringRange");
             }
          }
       }
@@ -547,23 +555,27 @@ bool AIPlayer::getAIMove(Move *movePtr)
             mMoveState = ModeMove;
          }
 
-         if (mMoveStuckTestCountdown > 0)
-            --mMoveStuckTestCountdown;
-         else
-         {
-            // We should check to see if we are stuck...
-            F32 locationDelta = (location - mLastLocation).len();
+         // Don't check for ai stuckness if animation during
+         // an anim-clip effect override.
+         if (mDamageState == Enabled && !(anim_clip_flags & ANIM_OVERRIDDEN) && !isAnimationLocked()) {
+	         if (mMoveStuckTestCountdown > 0)
+	            --mMoveStuckTestCountdown;
+	         else
+	         {
+	            // We should check to see if we are stuck...
+	            F32 locationDelta = (location - mLastLocation).len();
             if (locationDelta < mMoveStuckTolerance && mDamageState == Enabled) 
             {
                // If we are slowing down, then it's likely that our location delta will be less than
                // our move stuck tolerance. Because we can be both slowing and stuck
                // we should TRY to check if we've moved. This could use better detection.
                if ( mMoveState != ModeSlowing || locationDelta == 0 )
-               {
-                  mMoveState = ModeStuck;
-                  onStuck();
-               }
-            }
+	               {
+	                  mMoveState = ModeStuck;
+	                  onStuck();
+	               }
+	            }
+	         }
          }
       }
    }
@@ -626,6 +638,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
    }
 #endif // TORQUE_NAVIGATION_ENABLED
 
+   if (!(anim_clip_flags & ANIM_OVERRIDDEN) && !isAnimationLocked())
    mLastLocation = location;
 
    return true;
@@ -854,7 +867,7 @@ DefineEngineMethod(AIPlayer, getPathDestination, Point3F, (),,
 
    "@see setPathDestination()\n")
 {
-	return object->getPathDestination();
+   return object->getPathDestination();
 }
 
 void AIPlayer::followNavPath(NavPath *path)
@@ -1148,7 +1161,7 @@ DefineEngineMethod( AIPlayer, setMoveSpeed, void, ( F32 speed ),,
    
    "@see getMoveDestination()\n")
 {
-	object->setMoveSpeed(speed);
+   object->setMoveSpeed(speed);
 }
 
 DefineEngineMethod( AIPlayer, getMoveSpeed, F32, ( ),,
@@ -1186,7 +1199,7 @@ DefineEngineMethod( AIPlayer, getMoveDestination, Point3F, (),,
    
    "@see setMoveDestination()\n")
 {
-	return object->getMoveDestination();
+   return object->getMoveDestination();
 }
 
 DefineEngineMethod( AIPlayer, setAimLocation, void, ( Point3F target ),,
@@ -1196,7 +1209,7 @@ DefineEngineMethod( AIPlayer, setAimLocation, void, ( Point3F target ),,
    
    "@see getAimLocation()\n")
 {
-	object->setAimLocation(target);
+   object->setAimLocation(target);
 }
 
 DefineEngineMethod( AIPlayer, getAimLocation, Point3F, (),,
@@ -1212,7 +1225,7 @@ DefineEngineMethod( AIPlayer, getAimLocation, Point3F, (),,
    "@see setAimLocation()\n"
    "@see setAimObject()\n")
 {
-	return object->getAimLocation();
+   return object->getAimLocation();
 }
 
 ConsoleDocFragment _setAimObject(
@@ -1238,9 +1251,9 @@ ConsoleDocFragment _setAimObject(
    "void setAimObject(GameBase targetObject, Point3F offset);"
 );
 
-DefineConsoleMethod( AIPlayer, setAimObject, void, ( const char * objName, Point3F offset ), (Point3F::Zero), "( GameBase obj, [Point3F offset] )"
+DefineEngineMethod( AIPlayer, setAimObject, void, ( const char * objName, Point3F offset ), (Point3F::Zero), "( GameBase obj, [Point3F offset] )"
               "Sets the bot's target object. Optionally set an offset from target location."
-			  "@hide")
+           "@hide")
 {
 
    // Find the target
@@ -1262,7 +1275,7 @@ DefineEngineMethod( AIPlayer, getAimObject, S32, (),,
    
    "@see setAimObject()\n")
 {
-	GameBase* obj = object->getAimObject();
+   GameBase* obj = object->getAimObject();
    return obj? obj->getId(): -1;
 }
 
@@ -1413,6 +1426,47 @@ DefineEngineMethod( AIPlayer, clearMoveTriggers, void, ( ),,
    "@see clearMoveTrigger()\n")
 {
    object->clearMoveTriggers();
+}
+
+// These changes coordinate with anim-clip mods to parent class, Player.
+
+// New method, restartMove(), restores the AIPlayer to its normal move-state
+// following animation overrides from AFX. The tag argument is used to match
+// the latest override and prevents interruption of overlapping animation
+// overrides. See related anim-clip changes in Player.[h,cc].
+void AIPlayer::restartMove(U32 tag)
+{
+   if (tag != 0 && tag == last_anim_tag)
+   {
+      if (mMoveState_saved != -1)
+      {
+         mMoveState = (MoveState) mMoveState_saved;
+         mMoveState_saved = -1;
+      }
+
+      bool is_death_anim = ((anim_clip_flags & IS_DEATH_ANIM) != 0);
+
+      last_anim_tag = 0;
+      anim_clip_flags &= ~(ANIM_OVERRIDDEN | IS_DEATH_ANIM);
+
+      if (mDamageState != Enabled)
+      {
+         if (!is_death_anim)
+         {
+            // this is a bit hardwired and desperate,
+            // but if he's dead he needs to look like it.
+            setActionThread("death10", false, false, false);
+         }
+      }
+   }
+}
+
+// New method, saveMoveState(), stores the current movement state
+// so that it can be restored when restartMove() is called.
+void AIPlayer::saveMoveState()
+{
+   if (mMoveState_saved == -1)
+      mMoveState_saved = (S32) mMoveState;
 }
 
 F32 AIPlayer::getTargetDistance(GameBase* target, bool _checkEnabled)

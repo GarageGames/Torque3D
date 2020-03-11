@@ -271,9 +271,9 @@ bool Stream::write(const ColorI& rColor)
    return success;
 }
 
-bool Stream::write(const ColorF& rColor)
+bool Stream::write(const LinearColorF& rColor)
 {
-   ColorI temp = rColor;
+   ColorI temp = LinearColorF(rColor).toColorI();
    return write(temp);
 }
 
@@ -287,7 +287,7 @@ bool Stream::read(ColorI* pColor)
    return success;
 }
 
-bool Stream::read(ColorF* pColor)
+bool Stream::read(LinearColorF* pColor)
 {
    ColorI temp;
    bool success = read(&temp);

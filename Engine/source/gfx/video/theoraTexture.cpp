@@ -227,8 +227,8 @@ void TheoraTexture::FrameStream::releaseTextureLocks()
 TheoraTexture::AsyncState::AsyncState( const ThreadSafeRef< OggInputStream >& oggStream, bool looping )
    : mOggStream( oggStream ),
      mTheoraDecoder( dynamic_cast< OggTheoraDecoder* >( oggStream->getDecoder( "Theora" ) ) ),
-     mVorbisDecoder( dynamic_cast< OggVorbisDecoder* >( oggStream->getDecoder( "Vorbis" ) ) ),
-     mCurrentTime( 0 )
+     mCurrentTime( 0 ),
+     mVorbisDecoder( dynamic_cast< OggVorbisDecoder* >( oggStream->getDecoder( "Vorbis" ) ) )
 {
    if( mTheoraDecoder )
    {
@@ -276,8 +276,8 @@ bool TheoraTexture::AsyncState::isAtEnd()
 //-----------------------------------------------------------------------------
 
 TheoraTexture::TheoraTexture()
-   : mPlaybackQueue( NULL ),
-     mCurrentFrame( NULL ),
+   : mCurrentFrame( NULL ),
+     mPlaybackQueue( NULL ),
      mIsPaused( true )
 {
    GFXTextureManager::addEventDelegate( this, &TheoraTexture::_onTextureEvent );

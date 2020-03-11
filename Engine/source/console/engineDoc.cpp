@@ -248,13 +248,13 @@ static void dumpFunction(  Stream &stream,
       const char* brief = dStrstr( doc, "@brief" );
       if( !brief )
       {
-         String brief = entry->getBriefDescription( &doc );
+         String briefStr = entry->getBriefDescription( &doc );
          
-         brief.trim();
-         if( !brief.isEmpty() )
+		 briefStr.trim();
+         if( !briefStr.isEmpty() )
          {
             stream.writeText( "@brief " );
-            stream.writeText( brief );
+            stream.writeText(briefStr);
             stream.writeText( "\r\n\r\n" );
          }
       }

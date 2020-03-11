@@ -32,7 +32,7 @@ singleton ShaderData( FogPassShader )
    OGLVertexShaderFile  = "shaders/common/postFx/gl/postFxV.glsl";
    OGLPixelShaderFile   = "shaders/common/postFx/gl/fogP.glsl";
             
-   samplerNames[0] = "$prepassTex";
+   samplerNames[0] = "$deferredTex";
    
    pixVersion = 2.0;
 };
@@ -58,7 +58,7 @@ singleton PostEffect( FogPostFx )
    
    shader = FogPassShader;
    stateBlock = FogPassStateBlock;
-   texture[0] = "#prepass";
+   texture[0] = "#deferred";
    
    renderPriority = 5;
    
@@ -79,7 +79,7 @@ singleton ShaderData( UnderwaterFogPassShader )
    OGLVertexShaderFile  = "shaders/common/postFx/gl/postFxV.glsl";
    OGLPixelShaderFile   = "shaders/common/postFx/gl/underwaterFogP.glsl";
             
-   samplerNames[0] = "$prepassTex";
+   samplerNames[0] = "$deferredTex";
    samplerNames[1] = "$backbuffer";
    samplerNames[2] = "$waterDepthGradMap";
    
@@ -110,7 +110,7 @@ singleton PostEffect( UnderwaterFogPostFx )
   
    shader = UnderwaterFogPassShader;
    stateBlock = UnderwaterFogPassStateBlock;
-   texture[0] = "#prepass";
+   texture[0] = "#deferred";
    texture[1] = "$backBuffer";
    texture[2] = "#waterDepthGradMap";
    

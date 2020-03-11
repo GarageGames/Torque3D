@@ -27,10 +27,10 @@
 #include "shaderGen/shaderOp.h"
 #include "shaderGen/shaderGenVars.h"
 #include "gfx/gfxStructs.h"
-
+#include "shaderGen/shaderGen.h"
 
 PixelSpecularGLSL::PixelSpecularGLSL()
-   : mDep( "shaders/common/gl/lighting.glsl" )
+   : mDep(ShaderGen::smCommonShaderPath + String("/gl/lighting.glsl" ))
 {
    addDependency( &mDep );
 }
@@ -91,7 +91,7 @@ void PixelSpecularGLSL::processPix( Vector<ShaderComponent*> &componentList,
       if (specularColor)
          final = new GenOp( "@ * @", final, specularColor );
    }
-   else if ( fd.features[MFT_NormalMap] && !fd.features[MFT_IsDXTnm] )
+   else if ( fd.features[MFT_NormalMap] && !fd.features[MFT_IsBC3nm] && !fd.features[MFT_IsBC5nm])
    {
       Var *bumpColor = (Var*)LangElement::find( "bumpNormal" );
       final = new GenOp( "@ * @.a", final, bumpColor );
@@ -118,7 +118,6 @@ void SpecularMapGLSL::processVert(Vector<ShaderComponent*> &componentList, const
    // Add the texture coords.
    getOutTexCoord("texCoord",
      "vec2",
-      true,
       fd.features[MFT_TexAnim],
       meta,
       componentList);
@@ -129,7 +128,7 @@ void SpecularMapGLSL::processVert(Vector<ShaderComponent*> &componentList, const
 void SpecularMapGLSL::processPix( Vector<ShaderComponent*> &componentList, const MaterialFeatureData &fd )
 {
    // Get the texture coord.
-   Var *texCoord = getInTexCoord( "texCoord", "vec2", true, componentList );
+   Var *texCoord = getInTexCoord( "texCoord", "vec2", componentList );
 
    // create texture var
    Var *specularMap = new Var;

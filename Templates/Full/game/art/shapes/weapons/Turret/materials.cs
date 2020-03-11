@@ -29,7 +29,7 @@ singleton Material(Turret_Base)
    translucentBlendOp = "None";
    normalMap[0] = "art/shapes/weapons/Turret/Turret_N.dds";
    pixelSpecular[0] = "1";
-   specularMap[0] = "art/shapes/weapons/Turret/Turret_D.dds";
+   specularMap[0] = "art/shapes/weapons/Turret/Turret_S.dds";
    useAnisotropic[0] = "1";
    castDynamicShadows = true;    
    materialTag0 = "Weapon";

@@ -41,14 +41,14 @@ LightInfoExType::LightInfoExType( const char *type )
 
 
 LightInfo::LightInfo() 
-   :  mTransform( true ), 
-      mColor( 0.0f, 0.0f, 0.0f, 1.0f ), 
+   :  mColor( 0.0f, 0.0f, 0.0f, 1.0f ),
+      mTransform( true ),
       mBrightness( 1.0f ),
       mAmbient( 0.0f, 0.0f, 0.0f, 1.0f ), 
       mRange( 1.0f, 1.0f, 1.0f ),
       mInnerConeAngle( 90.0f ), 
-      mOuterConeAngle( 90.0f ),
       mType( Vector ),
+      mOuterConeAngle( 90.0f ),
       mCastShadows( false ),
       mStaticRefreshFreq( 250 ),
       mDynamicRefreshFreq( 8 ),

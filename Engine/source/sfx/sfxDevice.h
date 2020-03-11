@@ -178,6 +178,9 @@ public:
       
       /// Set the rolloff scale factor for distance attenuation of 3D sounds.
       virtual void setRolloffFactor( F32 factor ) {}
+
+      /// send empty function to all sfxdevices
+      virtual void openSlots() {}
       
       /// Set the global reverb environment.
       virtual void setReverb( const SFXReverbProperties& reverb ) {}

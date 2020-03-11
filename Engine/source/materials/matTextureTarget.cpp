@@ -91,8 +91,8 @@ NamedTexTarget* NamedTexTarget::find( const String &name )
 }
 
 NamedTexTarget::NamedTexTarget()
-   :  mViewport( RectI::One ),
-      mIsRegistered( false ),
+   :  mIsRegistered( false ),
+      mViewport( RectI::One ),
       mConditioner( NULL )
 {   
 }

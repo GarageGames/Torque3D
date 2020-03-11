@@ -254,7 +254,7 @@ void PSSMLightShadowMap::_render(   RenderPassManager* renderPass,
 
    for (U32 i = 0; i < mNumSplits; i++)
    {
-      GFXTransformSaver saver;
+      GFXTransformSaver splitSaver;
 
       // Calculate a sub-frustum
       Frustum subFrustum(fullFrustum);

@@ -35,6 +35,12 @@
 #ifndef _CONTAINERQUERY_H_
 #include "T3D/containerQuery.h"
 #endif
+#ifndef _ASSET_PTR_H_
+#include "assets/assetPtr.h"
+#endif 
+#ifndef GAME_OBJECT_ASSET_H
+#include "T3D/assets/GameObjectAsset.h"
+#endif
 
 class Component;
 
@@ -52,18 +58,43 @@ private:
 
    Vector<Component*>         mComponents;
 
-   Vector<Component*>         mToLoadComponents;
+   //Bit of helper data to let us track and manage the adding, removal and updating of networked components
+   struct NetworkedComponent
+   {
+      U32 componentIndex;
+
+      enum UpdateState
+      {
+         None,
+         Adding,
+         Removing,
+         Updating
+      };
+
+      UpdateState updateState;
+
+      U32 updateMaskBits;
+   };
+
+   Vector<NetworkedComponent> mNetworkedComponents;
+
+   U32                        mComponentNetMask;
 
    bool                       mStartComponentUpdate;
+
+   StringTableEntry		      mGameObjectAssetId;
+   AssetPtr<GameObjectAsset>  mGameObjectAsset;
 
    ContainerQueryInfo containerInfo;
 
    bool mInitialized;
 
+   String mTags;
+
    Signal< void(Component*) > onComponentAdded;
    Signal< void(Component*) > onComponentRemoved;
 
-   Signal< void(MatrixF*) > onTransformSet;
+   S32                       mLifetimeMS;
 
 protected:
 
@@ -96,15 +127,20 @@ public:
    {
       TransformMask = Parent::NextFreeMask << 0,
       BoundsMask = Parent::NextFreeMask << 1,
-      ComponentsMask = Parent::NextFreeMask << 2,
-      NoWarpMask = Parent::NextFreeMask << 3,
-      NextFreeMask = Parent::NextFreeMask << 4
+      ComponentsUpdateMask = Parent::NextFreeMask << 2,
+      AddComponentsMask = Parent::NextFreeMask << 3,
+      RemoveComponentsMask = Parent::NextFreeMask << 4,
+      NoWarpMask = Parent::NextFreeMask << 5,
+      NamespaceMask = Parent::NextFreeMask << 6,
+      NextFreeMask = Parent::NextFreeMask << 7
    };
 
    StateDelta mDelta;
    S32 mPredictionCount;            ///< Number of ticks to predict
 
    Move lastMove;
+
+   S32      mStartTimeMS;
 
    //
    Entity();
@@ -116,25 +152,23 @@ public:
    virtual void setTransform(const MatrixF &mat);
    virtual void setRenderTransform(const MatrixF &mat);
 
-   void setTransform(Point3F position, RotationF rotation);
+   void setTransform(const Point3F& position, const RotationF& rotation);
 
-   void setRenderTransform(Point3F position, RotationF rotation);
+   void setRenderTransform(const Point3F& position, const RotationF& rotation);
 
    virtual MatrixF getTransform();
    virtual Point3F getPosition() const { return mPos; }
 
-   //void setTransform(Point3F position, RotationF rot);
-
-   //void setRotation(RotationF rotation);
-
-   void setRotation(RotationF rotation) {
+   void setRotation(const RotationF& rotation) {
       mRot = rotation;
       setMaskBits(TransformMask);
    };
    RotationF getRotation() { return mRot; }
 
-   void setMountOffset(Point3F posOffset);
-   void setMountRotation(EulerF rotOffset);
+   static bool _setGameObject(void *object, const char *index, const char *data);
+
+   void setMountOffset(const Point3F& posOffset);
+   void setMountRotation(const EulerF& rotOffset);
 
    //static bool _setEulerRotation( void *object, const char *index, const char *data );
    static bool _setPosition(void *object, const char *index, const char *data);
@@ -146,13 +180,18 @@ public:
    virtual void getMountTransform(S32 index, const MatrixF &xfm, MatrixF *outMat);
    virtual void getRenderMountTransform(F32 delta, S32 index, const MatrixF &xfm, MatrixF *outMat);
 
-   void setForwardVector(VectorF newForward, VectorF upVector = VectorF::Zero);
-
    virtual void mountObject(SceneObject *obj, S32 node, const MatrixF &xfm = MatrixF::Identity);
-   void mountObject(SceneObject* objB, MatrixF txfm);
+   void mountObject(SceneObject* objB, const MatrixF& txfm);
    void onMount(SceneObject *obj, S32 node);
    void onUnmount(SceneObject *obj, S32 node);
 
+   /// Sets the client controlling this object
+   /// @param  client   Client that is now controlling this object
+   virtual void setControllingClient(GameConnection *client);
+
+   //
+   //Networking
+   //
    // NetObject
    U32 packUpdate(NetConnection *conn, U32 mask, BitStream *stream);
    void unpackUpdate(NetConnection *conn, BitStream *stream);
@@ -160,8 +199,12 @@ public:
    void setComponentsDirty();
    void setComponentDirty(Component *comp, bool forceUpdate = false);
 
+   void setComponentNetMask(Component* comp, U32 mask);
+
    //Components
    virtual bool deferAddingComponents() const { return true; }
+
+   void notifyComponents(String signalFunction, String argA, String argB, String argC, String argD, String argE);
 
    template <class T>
    T* getComponent();
@@ -175,7 +218,7 @@ public:
       return mComponents.size(); 
    }
 
-   virtual void setObjectBox(Box3F objBox);
+   virtual void setObjectBox(const Box3F& objBox);
 
    void resetWorldBox() { Parent::resetWorldBox(); }
    void resetObjectBox() { Parent::resetObjectBox(); }
@@ -266,7 +309,6 @@ Vector<T*> Entity::getComponents()
    Vector<T*> foundObjects;
 
    T *curObj;
-   Component* comp;
 
    // Loop through our child objects.
    for (U32 i = 0; i < mComponents.size(); i++)

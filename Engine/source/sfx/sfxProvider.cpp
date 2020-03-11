@@ -53,8 +53,8 @@ void SFXProvider::regProvider( SFXProvider* provider )
 }
 
 SFXProvider::SFXProvider( const String& name )
-   :  mName( name ),
-      mNextProvider( NULL )
+   :  mNextProvider( NULL ),
+      mName( name )
 {
    VECTOR_SET_ASSOCIATION( mDeviceInfo );
 

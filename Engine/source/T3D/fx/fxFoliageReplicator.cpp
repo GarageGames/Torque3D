@@ -43,6 +43,11 @@
 // POTENTIAL TODO LIST:
 //   TODO: Clamp item alpha to fog alpha
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "T3D/fx/fxFoliageReplicator.h"
 
@@ -166,7 +171,7 @@ void fxFoliageRenderList::SetupClipPlanes( SceneRenderState* state, const F32 fa
 //------------------------------------------------------------------------------
 
 
-inline void fxFoliageRenderList::DrawQuadBox(const Box3F& QuadBox, const ColorF Colour)
+inline void fxFoliageRenderList::DrawQuadBox(const Box3F& QuadBox, const LinearColorF Colour)
 {
    // Define our debug box.
    static Point3F BoxPnts[] = {
@@ -402,6 +407,9 @@ void fxFoliageReplicator::initPersistFields()
       addField( "AllowedTerrainSlope", TypeS32,       Offset( mFieldData.mAllowedTerrainSlope,  fxFoliageReplicator ), "Maximum surface angle allowed for foliage instances." );
    endGroup( "Restrictions" );	// MM: Added Group Footer.
 
+   addGroup( "AFX" );
+      addField( "AmbientModulationBias", TypeF32,     Offset( mFieldData.mAmbientModulationBias,fxFoliageReplicator ), "Multiplier controling amount foliage is modulated by sun's ambient." );
+   endGroup( "AFX" );
    // Initialise parents' persistent fields.
    Parent::initPersistFields();
 }
@@ -1260,7 +1268,7 @@ bool fxFoliageReplicator::onAdd()
    {
       // Yes, so load foliage texture.
       if( mFieldData.mFoliageFile != NULL && dStrlen(mFieldData.mFoliageFile) > 0 )
-         mFieldData.mFoliageTexture = GFXTexHandle( mFieldData.mFoliageFile, &GFXDefaultStaticDiffuseProfile, avar("%s() - mFieldData.mFoliageTexture (line %d)", __FUNCTION__, __LINE__) );
+         mFieldData.mFoliageTexture = GFXTexHandle( mFieldData.mFoliageFile, &GFXStaticTextureSRGBProfile, avar("%s() - mFieldData.mFoliageTexture (line %d)", __FUNCTION__, __LINE__) );
 
       if ((GFXTextureObject*) mFieldData.mFoliageTexture == NULL)
          Con::printf("fxFoliageReplicator:  %s is an invalid or missing foliage texture file.", mFieldData.mFoliageFile);
@@ -1407,7 +1415,7 @@ void fxFoliageReplicator::computeAlphaTex()
       ColorI c((U8) (255.0f * ItemAlpha), 0, 0);
       mAlphaLookup->setColor(i, 0, c);
    }
-   mAlphaTexture.set(mAlphaLookup, &GFXDefaultStaticDiffuseProfile, false, String("fxFoliage Replicator Alpha Texture") );
+   mAlphaTexture.set(mAlphaLookup, &GFXStaticTextureSRGBProfile, false, String("fxFoliage Replicator Alpha Texture") );
 }
 
 // Renders a triangle stripped oval
@@ -1564,7 +1572,12 @@ void fxFoliageReplicator::renderObject(ObjectRenderInst *ri, SceneRenderState *s
             mFoliageShaderConsts->setSafe(mFoliageShaderGroundAlphaSC, Point4F(mFieldData.mGroundAlpha, mFieldData.mGroundAlpha, mFieldData.mGroundAlpha, mFieldData.mGroundAlpha));
 
             if (mFoliageShaderAmbientColorSC->isValid())
-               mFoliageShaderConsts->set(mFoliageShaderAmbientColorSC, state->getAmbientLightColor());
+            {
+               LinearColorF ambient = state->getAmbientLightColor();
+               LinearColorF ambient_inv(1.0f-ambient.red, 1.0f-ambient.green, 1.0f-ambient.blue, 0.0f);
+               ambient += ambient_inv*(1.0f - mFieldData.mAmbientModulationBias);
+               mFoliageShaderConsts->set(mFoliageShaderAmbientColorSC, ambient);
+            }
 
             GFX->setShaderConstBuffer(mFoliageShaderConsts);
 
@@ -1619,7 +1632,7 @@ void fxFoliageReplicator::renderQuad(fxFoliageQuadrantNode* quadNode, const Matr
       {
          // Draw the Quad Box (Debug Only).
          if (UseDebug) 
-            mFrustumRenderSet.DrawQuadBox(quadNode->QuadrantBox, ColorF(0.0f, 1.0f, 0.1f, 1.0f));
+            mFrustumRenderSet.DrawQuadBox(quadNode->QuadrantBox, LinearColorF(0.0f, 1.0f, 0.1f, 1.0f));
          if (quadNode->Level != 0) {
             for (U32 i = 0; i < 4; i++)
                renderQuad(quadNode->QuadrantChildNode[i], RenderTransform, UseDebug);
@@ -1632,7 +1645,7 @@ void fxFoliageReplicator::renderQuad(fxFoliageQuadrantNode* quadNode, const Matr
       } else {
          // Use a different color to say "I think I'm not visible!"
          if (UseDebug) 
-            mFrustumRenderSet.DrawQuadBox(quadNode->QuadrantBox, ColorF(1.0f, 0.8f, 0.1f, 1.0f));
+            mFrustumRenderSet.DrawQuadBox(quadNode->QuadrantBox, LinearColorF(1.0f, 0.8f, 0.1f, 1.0f));
       }
    }
 }
@@ -1705,6 +1718,7 @@ U32 fxFoliageReplicator::packUpdate(NetConnection * con, U32 mask, BitStream * s
       stream->writeFlag(mFieldData.mShowPlacementArea);				// Show Placement Area Flag.
       stream->write(mFieldData.mPlacementBandHeight);					// Placement Area Height.
       stream->write(mFieldData.mPlaceAreaColour);						// Placement Area Colour.
+      stream->write(mFieldData.mAmbientModulationBias);
    }
 
    // Were done ...
@@ -1782,6 +1796,7 @@ void fxFoliageReplicator::unpackUpdate(NetConnection * con, BitStream * stream)
       stream->read(&mFieldData.mPlacementBandHeight);					// Placement Area Height.
       stream->read(&mFieldData.mPlaceAreaColour);
 
+      stream->read(&mFieldData.mAmbientModulationBias);
       // Calculate Fade-In/Out Gradients.
       mFadeInGradient		= 1.0f / mFieldData.mFadeInRegion;
       mFadeOutGradient	= 1.0f / mFieldData.mFadeOutRegion;
@@ -1791,7 +1806,7 @@ void fxFoliageReplicator::unpackUpdate(NetConnection * con, BitStream * stream)
 
       // Load Foliage Texture on the client.
       if( mFieldData.mFoliageFile != NULL && dStrlen(mFieldData.mFoliageFile) > 0 )
-         mFieldData.mFoliageTexture = GFXTexHandle( mFieldData.mFoliageFile, &GFXDefaultStaticDiffuseProfile, avar("%s() - mFieldData.mFoliageTexture (line %d)", __FUNCTION__, __LINE__) );
+         mFieldData.mFoliageTexture = GFXTexHandle( mFieldData.mFoliageFile, &GFXStaticTextureSRGBProfile, avar("%s() - mFieldData.mFoliageTexture (line %d)", __FUNCTION__, __LINE__) );
 
       if ((GFXTextureObject*) mFieldData.mFoliageTexture == NULL)
          Con::printf("fxFoliageReplicator:  %s is an invalid or missing foliage texture file.", mFieldData.mFoliageFile);

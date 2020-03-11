@@ -682,7 +682,7 @@ bool ForestBrushTool::getGroundAt( const Point3F &worldPt, F32 *zValueOut, Vecto
    return true;
 }
 
-DefineConsoleMethod( ForestBrushTool, collectElements, void, (), , "" )
+DefineEngineMethod( ForestBrushTool, collectElements, void, (), , "" )
 {
    object->collectElements();
 }

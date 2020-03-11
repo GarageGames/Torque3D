@@ -24,8 +24,9 @@ They are available from the [downloads](http://wiki.torque3d.org/main:downloads)
 ## Related repositories
 
 * [Project Manager repository](https://github.com/GarageGames/Torque3D-ProjectManager)
-* [Offline documentation repository](https://github.com/GarageGames/Torque3D-Documentation)
+* [Offline documentation repository](https://github.com/Torque3D-GameEngine/Torque3D-Documentation)
 
 # License 
 
 All assets and code are under the [![license](https://img.shields.io/github/license/GarageGames/Torque3D.svg)](https://github.com/GarageGames/Torque3D/blob/master/LICENSE.md)
+dilip

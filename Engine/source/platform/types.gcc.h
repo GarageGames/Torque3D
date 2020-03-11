@@ -73,11 +73,6 @@ typedef unsigned long  U64;
 #  define TORQUE_SUPPORTS_GCC_INLINE_X86_ASM
 #  include "platform/types.win.h"
 
-#elif defined(SN_TARGET_PS3)
-#  define TORQUE_OS_STRING "PS3"
-#  define TORQUE_OS_PS3
-#  include "platform/types.posix.h"
-
 #elif defined(linux) || defined(LINUX)
 #  define TORQUE_OS_STRING "Linux"
 #  define TORQUE_OS_LINUX

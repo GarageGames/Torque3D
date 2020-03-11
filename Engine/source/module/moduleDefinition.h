@@ -89,6 +89,7 @@ private:
     bool                            mSynchronized;
     bool                            mDeprecated;
     bool                            mCriticalMerge;
+    bool                            mOverrideExistingObjects;
     StringTableEntry                mModuleDescription;
     StringTableEntry                mAuthor;;
     StringTableEntry                mModuleGroup;
@@ -141,6 +142,8 @@ public:
     inline bool             getDeprecated( void ) const                         { return mDeprecated; }
     inline void             setCriticalMerge( const bool mergeCritical )        { if ( checkUnlocked() ) { mCriticalMerge = mergeCritical; } }
     inline bool             getCriticalMerge( void ) const                      { return mCriticalMerge; }
+    inline void             setOverrideExistingObjects(const bool overrideExistingObj) { if (checkUnlocked()) { mOverrideExistingObjects = overrideExistingObj; } }
+    inline bool             getOverrideExistingObjects(void) const              { return mOverrideExistingObjects; }
     inline void             setModuleDescription( const char* pModuleDescription ) { if ( checkUnlocked() ) { mModuleDescription = StringTable->insert(pModuleDescription); } }
     inline StringTableEntry getModuleDescription( void ) const                  { return mModuleDescription; }
     inline void             setAuthor( const char* pAuthor )                    { if ( checkUnlocked() ) { mAuthor = StringTable->insert(pAuthor); } }
@@ -163,6 +166,8 @@ public:
     inline void             setAssetTagsManifest( const char* pTagsAssetManifest ) { if ( checkUnlocked() ) { mAssetTagsManifest = StringTable->insert(pTagsAssetManifest); } }
     inline StringTableEntry getAssetTagsManifest( void ) const                  { return mAssetTagsManifest; }
     inline typeModuleAssetsVector& getModuleAssets( void )                      { return mModuleAssets; }
+    void                    addDeclaredAsset(AssetDefinition* asset)            { mModuleAssets.push_back(asset); }
+
 
     /// Module location.
     inline void             setModulePath( const char* pModulePath )            { if ( checkUnlocked() ) { mModulePath = StringTable->insert(pModulePath); } }
@@ -206,6 +211,8 @@ protected:
     static bool             setDeprecated(void* obj, const char* index, const char* data)                  { static_cast<ModuleDefinition*>(obj)->setDeprecated(dAtob(data)); return false; }
     static bool             writeDeprecated( void* obj, StringTableEntry pFieldName )   { return static_cast<ModuleDefinition*>(obj)->getDeprecated() == true; }
     static bool             writeCriticalMerge( void* obj, StringTableEntry pFieldName ){ return static_cast<ModuleDefinition*>(obj)->getCriticalMerge() == true; }    
+    static bool             setOverrideExistingObjects(void* obj, const char* index, const char* data)     { static_cast<ModuleDefinition*>(obj)->setOverrideExistingObjects(dAtob(data)); return false; }
+    static bool             writeOverrideExistingObjects(void* obj, StringTableEntry pFieldName)           { return static_cast<ModuleDefinition*>(obj)->getOverrideExistingObjects() == true; }
     static bool             setModuleDescription(void* obj, const char* index, const char* data)           { static_cast<ModuleDefinition*>(obj)->setModuleDescription(data); return false; }
     static bool             writeModuleDescription( void* obj, StringTableEntry pFieldName ) { return static_cast<ModuleDefinition*>(obj)->getModuleDescription() != StringTable->EmptyString(); }
     static bool             setAuthor(void* obj, const char* index, const char* data)                      { static_cast<ModuleDefinition*>(obj)->setAuthor(data); return false; }
@@ -247,11 +254,11 @@ protected:
             for ( U32 dependencyIndex = 0; dependencyIndex < dependencyWordCount; ++dependencyIndex )
             {
                 // Fetch slot.
-                dStrcpy( slotUnit, StringUnit::getUnit( pDependencyValue, dependencyIndex, "," ) );
+                dStrcpy( slotUnit, StringUnit::getUnit( pDependencyValue, dependencyIndex, "," ), 256 );
         
                 // Fetch slot name and value.
-                dStrcpy( slotName, StringUnit::getUnit( slotUnit, 0, "=" ) );
-                dStrcpy( slotValue, StringUnit::getUnit( slotUnit, 1, "=" ) );
+                dStrcpy( slotName, StringUnit::getUnit( slotUnit, 0, "=" ), 256 );
+                dStrcpy( slotValue, StringUnit::getUnit( slotUnit, 1, "=" ), 256 );
 
                 // Fetch module Id.
                 StringTableEntry moduleId = StringTable->insert( slotName );

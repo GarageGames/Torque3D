@@ -31,7 +31,7 @@
 #include "renderInstance/renderImposterMgr.h"
 #include "gfx/gfxTransformSaver.h"
 #include "gfx/bitmap/ddsFile.h"
-#include "gfx/bitmap/ddsUtils.h"
+#include "gfx/bitmap/imageUtils.h"
 #include "gfx/gfxTextureManager.h"
 #include "math/mRandom.h"
 #include "core/stream/fileStream.h"
@@ -82,7 +82,7 @@ TSLastDetail::TSLastDetail(   TSShape *shape,
    mDl = dl;
    mDim = getMax( dim, (S32)32 );
 
-   mRadius = mShape->radius;
+   mRadius = mShape->mRadius;
    mCenter = mShape->center;
 
    mCachePath = cachePath;
@@ -101,7 +101,7 @@ TSLastDetail::~TSLastDetail()
       mMaterial->deleteObject();
 
    // Remove ourselves from the list.
-   Vector<TSLastDetail*>::iterator iter = find( smLastDetails.begin(), smLastDetails.end(), this );
+   Vector<TSLastDetail*>::iterator iter = T3D::find( smLastDetails.begin(), smLastDetails.end(), this );
    smLastDetails.erase( iter );
 }
 
@@ -240,12 +240,12 @@ void TSLastDetail::update( bool forceUpdate )
 
    // Get the diffuse texture and from its size and
    // the imposter dimensions we can generate the UVs.
-   GFXTexHandle diffuseTex( diffuseMapPath, &GFXDefaultStaticDiffuseProfile, String::EmptyString );
+   GFXTexHandle diffuseTex( diffuseMapPath, &GFXStaticTextureSRGBProfile, String::EmptyString );
    Point2I texSize( diffuseTex->getWidth(), diffuseTex->getHeight() );
 
    _validateDim();
 
-   S32 downscaledDim = mDim >> GFXTextureManager::getTextureDownscalePower(&GFXDefaultStaticDiffuseProfile);
+   S32 downscaledDim = mDim >> GFXTextureManager::getTextureDownscalePower(&GFXStaticTextureSRGBProfile);
 
    // Ok... pack in bitmaps till we run out.
    Vector<RectF> imposterUVs;
@@ -420,24 +420,24 @@ void TSLastDetail::_update()
 
       imposterCap->end();
 
-      Point2I texSize( destBmp.getWidth(mip), destBmp.getHeight(mip) );
+      Point2I atlasSize( destBmp.getWidth(mip), destBmp.getHeight(mip) );
 
       // Ok... pack in bitmaps till we run out.
-      for ( S32 y=0; y+currDim <= texSize.y; )
+      for ( S32 y=0; y+currDim <= atlasSize.y; )
       {
-         for ( S32 x=0; x+currDim <= texSize.x; )
+         for ( S32 x=0; x+currDim <= atlasSize.x; )
          {
             // Copy the next bitmap to the dest texture.
-            GBitmap* bmp = bitmaps.first();
+            GBitmap* cell = bitmaps.first();
             bitmaps.pop_front();
-            destBmp.copyRect( bmp, RectI( 0, 0, currDim, currDim ), Point2I( x, y ), 0, mip );
-            delete bmp;
+            destBmp.copyRect(cell, RectI( 0, 0, currDim, currDim ), Point2I( x, y ), 0, mip );
+            delete cell;
 
             // Copy the next normal to the dest texture.
-            GBitmap* normalmap = normalmaps.first();
+            GBitmap* cellNormalmap = normalmaps.first();
             normalmaps.pop_front();
-            destNormal.copyRect( normalmap, RectI( 0, 0, currDim, currDim ), Point2I( x, y ), 0, mip );
-            delete normalmap;
+            destNormal.copyRect(cellNormalmap, RectI( 0, 0, currDim, currDim ), Point2I( x, y ), 0, mip );
+            delete cellNormalmap;
 
             // Did we finish?
             if ( bitmaps.empty() )
@@ -482,14 +482,14 @@ void TSLastDetail::_update()
    // DEBUG: Some code to force usage of a test image.
    //GBitmap* tempMap = GBitmap::load( "./forest/data/test1234.png" );
    //tempMap->extrudeMipLevels();
-   //mTexture.set( tempMap, &GFXDefaultStaticDiffuseProfile, false );
+   //mTexture.set( tempMap, &GFXStaticTextureSRGBProfile, false );
    //delete tempMap;
 
    DDSFile *ddsDest = DDSFile::createDDSFileFromGBitmap( &destBmp );
-   DDSUtil::squishDDS( ddsDest, GFXFormatDXT3 );
+   ImageUtil::ddsCompress( ddsDest, GFXFormatBC2 );
 
    DDSFile *ddsNormals = DDSFile::createDDSFileFromGBitmap( &destNormal );
-   DDSUtil::squishDDS( ddsNormals, GFXFormatDXT5 );
+   ImageUtil::ddsCompress( ddsNormals, GFXFormatBC3 );
 
    // Finally save the imposters to disk.
    FileStream fs;
@@ -543,7 +543,7 @@ void TSLastDetail::updateImposterImages( bool forceUpdate )
       GFX->endScene();
 }
 
-DefineConsoleFunction( tsUpdateImposterImages, void, (bool forceUpdate), (false), "tsUpdateImposterImages( bool forceupdate )")
+DefineEngineFunction( tsUpdateImposterImages, void, (bool forceUpdate), (false), "tsUpdateImposterImages( bool forceupdate )")
 {
    TSLastDetail::updateImposterImages(forceUpdate);
 }

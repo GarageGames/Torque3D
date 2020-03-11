@@ -291,12 +291,12 @@ bool TSMaterialList::renameMaterial(U32 i, const String& newName)
       GFXTexHandle texHandle;
       if (mLookupPath.isEmpty())
       {
-         texHandle.set( newName, &GFXDefaultStaticDiffuseProfile, avar("%s() - handle (line %d)", __FUNCTION__, __LINE__) );
+         texHandle.set( newName, &GFXStaticTextureSRGBProfile, avar("%s() - handle (line %d)", __FUNCTION__, __LINE__) );
       }
       else
       {
          String fullPath = String::ToString( "%s/%s", mLookupPath.c_str(), newName.c_str() );
-         texHandle.set( fullPath, &GFXDefaultStaticDiffuseProfile, avar("%s() - handle (line %d)", __FUNCTION__, __LINE__) );
+         texHandle.set( fullPath, &GFXStaticTextureSRGBProfile, avar("%s() - handle (line %d)", __FUNCTION__, __LINE__) );
       }
       if (!texHandle.isValid())
          return false;

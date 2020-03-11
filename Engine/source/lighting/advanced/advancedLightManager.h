@@ -54,7 +54,7 @@
 
 class AvailableSLInterfaces;
 class AdvancedLightBinManager;
-class RenderPrePassMgr;
+class RenderDeferredMgr;
 class BaseMatInstance;
 class MaterialParameters;
 class MaterialParameterHandle;
@@ -97,6 +97,10 @@ public:
 
    LightShadowMap* findShadowMapForObject( SimObject *object );
 
+#ifndef TORQUE_BASIC_LIGHTING
+   static F32 getShadowFilterDistance() { return smProjectedShadowFilterDistance; }
+#endif
+
 protected:   
 
    // LightManager
@@ -115,7 +119,7 @@ protected:
 
    SimObjectPtr<AdvancedLightBinManager> mLightBinManager;
 
-   SimObjectPtr<RenderPrePassMgr> mPrePassRenderBin;
+   SimObjectPtr<RenderDeferredMgr> mDeferredRenderBin;
 
    LightConstantMap mConstantLookup;
 
@@ -138,6 +142,12 @@ protected:
 
    LightingShaderConstants* getLightingShaderConstants(GFXShaderConstBuffer* shader);
    
+#ifndef TORQUE_BASIC_LIGHTING
+   /// This is used to determine the distance  
+   /// at which the shadow filtering PostEffect  
+   /// will be enabled for ProjectedShadow.  
+   static F32 smProjectedShadowFilterDistance;
+#endif
 };
 
 #endif // _ADVANCEDLIGHTMANAGER_H_

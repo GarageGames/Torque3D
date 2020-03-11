@@ -187,7 +187,7 @@ void SimPersistSet::addObject( SimObject* object )
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( SimPersistSet, resolvePersistentIds, void, (), , "() - Try to bind unresolved persistent IDs in the set." )
+DefineEngineMethod( SimPersistSet, resolvePersistentIds, void, (), , "() - Try to bind unresolved persistent IDs in the set." )
 {
    object->resolvePIDs();
 }

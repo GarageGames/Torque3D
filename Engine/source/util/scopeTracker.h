@@ -515,11 +515,11 @@ void ScopeTracker< NUM_DIMENSIONS, Object >::updateObject( Object object )
       
       while( !mPotentialScopeInObjects.empty() )
       {
-         Object object = mPotentialScopeInObjects.last();
+         Object obj = mPotentialScopeInObjects.last();
          mPotentialScopeInObjects.decrement();
          
-         if( Deref( object ).isInScope() )
-            _onScopeIn( object );
+         if( Deref(obj).isInScope() )
+            _onScopeIn(obj);
       }
    }
    else

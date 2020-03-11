@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "materials/materialList.h"
 
@@ -309,7 +314,12 @@ void MaterialList::mapMaterial( U32 i )
       return;
    }
 
-   String materialName = MATMGR->getMapEntry(matName);
+   String materialName;
+   // Skip past a leading '#' marker.
+   if (matName.compare("#", 1) == 0)
+      materialName = MATMGR->getMapEntry(matName.substr(1, matName.length()-1));
+   else
+      materialName = MATMGR->getMapEntry(matName);
 
    // IF we didn't find it, then look for a PolyStatic generated Material
    //  [a little cheesy, but we need to allow for user override of generated Materials]
@@ -331,14 +341,14 @@ void MaterialList::mapMaterial( U32 i )
          GFXTexHandle texHandle;
          if (mLookupPath.isEmpty())
          {
-            texHandle.set( mMaterialNames[i], &GFXDefaultStaticDiffuseProfile, avar("%s() - handle (line %d)", __FUNCTION__, __LINE__) );
+            texHandle.set( mMaterialNames[i], &GFXStaticTextureSRGBProfile, avar("%s() - handle (line %d)", __FUNCTION__, __LINE__) );
          }
          else
          {
             // Should we strip off the extension of the path here before trying
             // to load the texture?
             String fullPath = String::ToString( "%s/%s", mLookupPath.c_str(), mMaterialNames[i].c_str() );
-            texHandle.set( fullPath, &GFXDefaultStaticDiffuseProfile, avar("%s() - handle (line %d)", __FUNCTION__, __LINE__) );
+            texHandle.set( fullPath, &GFXStaticTextureSRGBProfile, avar("%s() - handle (line %d)", __FUNCTION__, __LINE__) );
          }
 
          if ( texHandle.isValid() )

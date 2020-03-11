@@ -557,7 +557,7 @@ ConsoleGetType( TypeEaseF )
    static const U32 bufSize = 256;
    char* returnBuffer = Con::getReturnBuffer(bufSize);
    dSprintf(returnBuffer, bufSize, "%d %d %g %g",
-            pEase->dir, pEase->type, pEase->param[0], pEase->param[1]);
+            pEase->mDir, pEase->mType, pEase->mParam[0], pEase->mParam[1]);
 
    return returnBuffer;
 }
@@ -567,11 +567,11 @@ ConsoleSetType( TypeEaseF )
    EaseF* pDst = (EaseF*)dptr;
 
    // defaults...
-   pDst->param[0] = -1.0f;
-   pDst->param[1] = -1.0f;
+   pDst->mParam[0] = -1.0f;
+   pDst->mParam[1] = -1.0f;
    if (argc == 1) {
       U32 args = dSscanf(argv[0], "%d %d %f %f", // the two params are optional and assumed -1 if not present...
-                         &pDst->dir, &pDst->type, &pDst->param[0],&pDst->param[1]);
+                         &pDst->mDir, &pDst->mType, &pDst->mParam[0],&pDst->mParam[1]);
       if( args < 2 )
          Con::warnf( "Warning, EaseF probably not read properly" );
    } else {
@@ -631,7 +631,7 @@ ConsoleSetType(TypeRotationF)
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( VectorAdd, VectorF, ( VectorF a, VectorF b ),,
+DefineEngineFunction( VectorAdd, VectorF, ( VectorF a, VectorF b ),,
    "Add two vectors.\n"
    "@param a The first vector.\n"
    "@param b The second vector.\n"
@@ -659,7 +659,7 @@ DefineConsoleFunction( VectorAdd, VectorF, ( VectorF a, VectorF b ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( VectorSub, VectorF, ( VectorF a, VectorF b ),,
+DefineEngineFunction( VectorSub, VectorF, ( VectorF a, VectorF b ),,
    "Subtract two vectors.\n"
    "@param a The first vector.\n"
    "@param b The second vector.\n"
@@ -689,7 +689,7 @@ DefineConsoleFunction( VectorSub, VectorF, ( VectorF a, VectorF b ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( VectorScale, VectorF, ( VectorF a, F32 scalar ),,
+DefineEngineFunction( VectorScale, VectorF, ( VectorF a, F32 scalar ),,
    "Scales a vector by a scalar.\n"
    "@param a The vector to scale.\n"
    "@param scalar The scale factor.\n"
@@ -716,7 +716,7 @@ DefineConsoleFunction( VectorScale, VectorF, ( VectorF a, F32 scalar ),,
 {
    return a * scalar;
 }
-DefineConsoleFunction( VectorMul, VectorF, ( VectorF a, VectorF b ),,
+DefineEngineFunction( VectorMul, VectorF, ( VectorF a, VectorF b ),,
    "Multiplies two vectors.\n"
    "@param a The first vector.\n"
    "@param b The second vector.\n"
@@ -744,7 +744,7 @@ DefineConsoleFunction( VectorMul, VectorF, ( VectorF a, VectorF b ),,
    return a * b;
 }
 
-DefineConsoleFunction( VectorDiv, VectorF, ( VectorF a, VectorF b ),,
+DefineEngineFunction( VectorDiv, VectorF, ( VectorF a, VectorF b ),,
    "Divide two vectors.\n"
    "@param a The first vector.\n"
    "@param b The second vector.\n"
@@ -779,7 +779,7 @@ DefineConsoleFunction( VectorDiv, VectorF, ( VectorF a, VectorF b ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( VectorNormalize, VectorF, ( VectorF v ),,
+DefineEngineFunction( VectorNormalize, VectorF, ( VectorF v ),,
    "Brings a vector into its unit form, i.e. such that it has the magnitute 1.\n"
    "@param v The vector to normalize.\n"
    "@return The vector @a v scaled to length 1.\n\n"
@@ -811,7 +811,7 @@ DefineConsoleFunction( VectorNormalize, VectorF, ( VectorF v ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( VectorDot, F32, ( VectorF a, VectorF b ),,
+DefineEngineFunction( VectorDot, F32, ( VectorF a, VectorF b ),,
    "Compute the dot product of two vectors.\n"
    "@param a The first vector.\n"
    "@param b The second vector.\n"
@@ -841,7 +841,7 @@ DefineConsoleFunction( VectorDot, F32, ( VectorF a, VectorF b ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( VectorCross, VectorF, ( VectorF a, VectorF b ),,
+DefineEngineFunction( VectorCross, VectorF, ( VectorF a, VectorF b ),,
    "Calculcate the cross product of two vectors.\n"
    "@param a The first vector.\n"
    "@param b The second vector.\n"
@@ -873,7 +873,7 @@ DefineConsoleFunction( VectorCross, VectorF, ( VectorF a, VectorF b ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( VectorDist, F32, ( VectorF a, VectorF b ),,
+DefineEngineFunction( VectorDist, F32, ( VectorF a, VectorF b ),,
    "Compute the distance between two vectors.\n"
    "@param a The first vector.\n"
    "@param b The second vector.\n"
@@ -906,7 +906,7 @@ DefineConsoleFunction( VectorDist, F32, ( VectorF a, VectorF b ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( VectorMidPoint, VectorF, ( VectorF a, VectorF b ),,
+DefineEngineFunction( VectorMidPoint, VectorF, ( VectorF a, VectorF b ),,
    "Gets the midpoint between the two vectors.\n"
    "@param a The first vector.\n"
    "@param b The second vector.\n"
@@ -934,7 +934,7 @@ DefineConsoleFunction( VectorMidPoint, VectorF, ( VectorF a, VectorF b ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( VectorLen, F32, ( VectorF v ),,
+DefineEngineFunction( VectorLen, F32, ( VectorF v ),,
    "Calculate the magnitude of the given vector.\n"
    "@param v A vector.\n"
    "@return The length of vector @a v.\n\n"
@@ -963,7 +963,7 @@ DefineConsoleFunction( VectorLen, F32, ( VectorF v ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( VectorOrthoBasis, MatrixF, ( AngAxisF aa ),,
+DefineEngineFunction( VectorOrthoBasis, MatrixF, ( AngAxisF aa ),,
    "Create an orthogonal basis from the given vector.\n"
    "@param aaf The vector to create the orthogonal basis from.\n"
    "@return A matrix representing the orthogonal basis.\n"
@@ -977,7 +977,7 @@ DefineConsoleFunction( VectorOrthoBasis, MatrixF, ( AngAxisF aa ),,
 //-----------------------------------------------------------------------------
 
 //ConsoleFunction(VectorRot, const char*, 3, 3, "(Vector3F, float) rotate a vector in 2d")
-DefineConsoleFunction( VectorRot, const char*, (Point3F v, F32 angle), , "(Vector3F, float) rotate a vector in 2d")
+DefineEngineFunction( VectorRot, const char*, (Point3F v, F32 angle), , "(Vector3F, float) rotate a vector in 2d")
 {
 	//VectorF v(0,0,0);
 	//dSscanf(argv[1],"%g %g %g",&v.x,&v.y,&v.z);
@@ -996,7 +996,7 @@ DefineConsoleFunction( VectorRot, const char*, (Point3F v, F32 angle), , "(Vecto
 	return returnBuffer;
 }
 
-DefineConsoleFunction( VectorLerp, VectorF, ( VectorF a, VectorF b, F32 t ),,
+DefineEngineFunction( VectorLerp, VectorF, ( VectorF a, VectorF b, F32 t ),,
    "Linearly interpolate between two vectors by @a t.\n"
    "@param a Vector to start interpolation from.\n"
    "@param b Vector to interpolate to.\n"
@@ -1032,7 +1032,7 @@ DefineConsoleFunction( VectorLerp, VectorF, ( VectorF a, VectorF b, F32 t ),,
    return c;
 }
 
-DefineConsoleFunction(VectorReflect, VectorF, (VectorF vec, VectorF normal), ,
+DefineEngineFunction(VectorReflect, VectorF, (VectorF vec, VectorF normal), ,
    "Compute the reflection of a vector based on a normal.\n"
    "@param a The vector.\n"
    "@param b The normal.\n"
@@ -1046,7 +1046,7 @@ DefineConsoleFunction(VectorReflect, VectorF, (VectorF vec, VectorF normal), ,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( MatrixCreate, TransformF, ( VectorF position, AngAxisF orientation ),,
+DefineEngineFunction( MatrixCreate, TransformF, ( VectorF position, AngAxisF orientation ),,
    "Create a transform from the given translation and orientation.\n"
    "@param position The translation vector for the transform.\n"
    "@param orientation The axis and rotation that orients the transform.\n"
@@ -1059,7 +1059,7 @@ DefineConsoleFunction( MatrixCreate, TransformF, ( VectorF position, AngAxisF or
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( MatrixCreateFromEuler, TransformF, ( Point3F angles ),,
+DefineEngineFunction( MatrixCreateFromEuler, TransformF, ( Point3F angles ),,
    "@Create a matrix from the given rotations.\n\n"
    "@param Vector3F X, Y, and Z rotation in *radians*.\n"
    "@return A transform based on the given orientation.\n"
@@ -1074,7 +1074,7 @@ DefineConsoleFunction( MatrixCreateFromEuler, TransformF, ( Point3F angles ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( MatrixMultiply, TransformF, ( TransformF left, TransformF right ),,
+DefineEngineFunction( MatrixMultiply, TransformF, ( TransformF left, TransformF right ),,
    "@brief Multiply the two matrices.\n\n"
    "@param left First transform.\n"
    "@param right Right transform.\n"
@@ -1091,7 +1091,7 @@ DefineConsoleFunction( MatrixMultiply, TransformF, ( TransformF left, TransformF
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( MatrixMulVector, VectorF, ( TransformF transform, VectorF vector ),,
+DefineEngineFunction( MatrixMulVector, VectorF, ( TransformF transform, VectorF vector ),,
    "@brief Multiply the vector by the transform assuming that w=0.\n\n"
    "This function will multiply the given vector by the given transform such that translation will "
    "not affect the vector.\n\n"
@@ -1107,7 +1107,7 @@ DefineConsoleFunction( MatrixMulVector, VectorF, ( TransformF transform, VectorF
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( MatrixMulPoint, Point3F, ( TransformF transform, Point3F point ),,
+DefineEngineFunction( MatrixMulPoint, Point3F, ( TransformF transform, Point3F point ),,
    "@brief Multiply the given point by the given transform assuming that w=1.\n\n"
    "This function will multiply the given vector such that translation with take effect.\n"
    "@param transform A transform.\n"
@@ -1124,7 +1124,7 @@ ConsoleFunctionGroupEnd(MatrixMath);
 
 //------------------------------------------------------------------------------
 
-DefineConsoleFunction( getBoxCenter, Point3F, ( Box3F box ),,
+DefineEngineFunction( getBoxCenter, Point3F, ( Box3F box ),,
    "Get the center point of an axis-aligned box.\n\n"
    "@param b A Box3F, in string format using \"minExtentX minExtentY minExtentZ maxExtentX maxExtentY maxExtentZ\"\n"
    "@return Center of the box.\n"
@@ -1176,7 +1176,7 @@ F32 mRandF()
    return gRandGen.randF();
 }
 
-DefineConsoleFunction(getRandom, F32, (S32 a, S32 b), (S32_MAX, S32_MAX),
+DefineEngineFunction(getRandom, F32, (S32 a, S32 b), (S32_MAX, S32_MAX),
    "( int a, int b ) "
    "@brief Returns a random number based on parameters passed in..\n\n"
    "If no parameters are passed in, getRandom() will return a float between 0.0 and 1.0. If one "

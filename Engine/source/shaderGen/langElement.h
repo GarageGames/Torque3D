@@ -121,7 +121,6 @@ struct Var : public LangElement
    bool  connector;     // variable that will be passed to pixel shader
    bool  sampler;       // texture
    bool  texture;       //for D3D11 texture variables
-   bool  mapsToSampler; // for ps 1.x shaders - texcoords must be mapped to same sampler stage
    U32   arraySize;     // 1 = no array, > 1 array of "type"
    U32   rank;          // optional rank system to assist in sorting vars if needed
 

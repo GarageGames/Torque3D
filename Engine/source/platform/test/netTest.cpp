@@ -76,8 +76,8 @@ TEST(Net, TCPRequest)
    handler.mDataReceived = 0;
 
    // Hook into the signals.
-   Net::smConnectionNotify .notify(&handler, &TcpHandle::notify);
-   Net::smConnectionReceive.notify(&handler, &TcpHandle::receive);
+   Net::smConnectionNotify ->notify(&handler, &TcpHandle::notify);
+   Net::smConnectionReceive->notify(&handler, &TcpHandle::receive);
 
    // Open a TCP connection to garagegames.com
    handler.mSocket = Net::openConnectTo("72.246.107.193:80");
@@ -85,8 +85,8 @@ TEST(Net, TCPRequest)
    while(Process::processEvents() && (Platform::getRealMilliseconds() < limit) ) {}
 
    // Unhook from the signals.
-   Net::smConnectionNotify .remove(&handler, &TcpHandle::notify);
-   Net::smConnectionReceive.remove(&handler, &TcpHandle::receive);
+   Net::smConnectionNotify ->remove(&handler, &TcpHandle::notify);
+   Net::smConnectionReceive->remove(&handler, &TcpHandle::receive);
 
    EXPECT_GT(handler.mDataReceived, 0)
       << "Didn't get any data back!";
@@ -139,8 +139,8 @@ struct JournalHandle
       mDataReceived = 0;
 
       // Hook into the signals.
-      Net::smConnectionNotify .notify(this, &JournalHandle::notify);
-      Net::smConnectionReceive.notify(this, &JournalHandle::receive);
+      Net::smConnectionNotify ->notify(this, &JournalHandle::notify);
+      Net::smConnectionReceive->notify(this, &JournalHandle::receive);
 
       // Open a TCP connection to garagegames.com
       mSocket = Net::openConnectTo("72.246.107.193:80");
@@ -149,8 +149,8 @@ struct JournalHandle
       while(Process::processEvents()) {}
 
       // Unhook from the signals.
-      Net::smConnectionNotify .remove(this, &JournalHandle::notify);
-      Net::smConnectionReceive.remove(this, &JournalHandle::receive);
+      Net::smConnectionNotify ->remove(this, &JournalHandle::notify);
+      Net::smConnectionReceive->remove(this, &JournalHandle::receive);
 
       EXPECT_GT(mDataReceived, 0)
          << "Didn't get any data back!";

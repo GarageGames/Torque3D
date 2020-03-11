@@ -97,6 +97,7 @@ static S32 jpegErrorFn(void *client_data)
 //--------------------------------------
 static bool sReadJPG(Stream &stream, GBitmap *bitmap)
 {
+   PROFILE_SCOPE(sReadJPG);
    JFREAD  = jpegReadDataFn;
    JFERROR = jpegErrorFn;
 

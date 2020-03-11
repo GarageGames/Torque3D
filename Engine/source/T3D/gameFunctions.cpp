@@ -33,6 +33,8 @@
 #include "core/module.h"
 #include "console/engineAPI.h"
 #include "platform/output/IDisplayDevice.h"
+#include "postFx/postEffectManager.h"
+#include "gfx/gfxTransformSaver.h"
 
 static void RegisterGameFunctions();
 static void Process3D();
@@ -112,7 +114,7 @@ static U32 sgServerQueryIndex = 0;
 //SERVER FUNCTIONS ONLY
 ConsoleFunctionGroupBegin( Containers, "Spatial query functions. <b>Server side only!</b>");
 
-DefineConsoleFunction( containerFindFirst, const char*, (U32 typeMask, Point3F origin, Point3F size), , "(int mask, Point3F point, float x, float y, float z)"
+DefineEngineFunction( containerFindFirst, const char*, (U32 typeMask, Point3F origin, Point3F size), , "(int mask, Point3F point, float x, float y, float z)"
    "@brief Find objects matching the bitmask type within a box centered at point, with extents x, y, z.\n\n"
    "@returns The first object found, or an empty string if nothing was found.  Thereafter, you can get more "
    "results using containerFindNext()."
@@ -144,7 +146,7 @@ DefineConsoleFunction( containerFindFirst, const char*, (U32 typeMask, Point3F o
    return buff;
 }
 
-DefineConsoleFunction( containerFindNext, const char*, (), , "()"
+DefineEngineFunction( containerFindNext, const char*, (), , "()"
    "@brief Get more results from a previous call to containerFindFirst().\n\n"
    "@note You must call containerFindFirst() to begin the search.\n"
    "@returns The next object found, or an empty string if nothing else was found.\n"
@@ -432,7 +434,196 @@ void GameRenderWorld()
    PROFILE_END();
 }
 
+//================================================================================================
+//Render a full frame from a given transform and frustum, and render out to a target
+//================================================================================================
+void renderFrame(GFXTextureTargetRef* target, MatrixF transform, Frustum frustum, U32 typeMask, ColorI canvasClearColor)
+{
+   if (!GFX->allowRender() || GFX->canCurrentlyRender())
+      return;
 
+   PROFILE_START(GameFunctions_RenderFrame);
+
+   GFX->setActiveRenderTarget(*target);
+   if (!GFX->getActiveRenderTarget())
+      return;
+
+   GFXTarget* renderTarget = GFX->getActiveRenderTarget();
+   if (renderTarget == NULL)
+      return;
+
+   // Make sure the root control is the size of the canvas.
+   Point2I size = renderTarget->getSize();
+   if (size.x == 0 || size.y == 0)
+      return;
+
+   //Now, getting to the meat of it!
+#ifdef TORQUE_GFX_STATE_DEBUG
+   GFX->getDebugStateManager()->startFrame();
+#endif
+   RectI targetRect(0, 0, size.x, size.y);
+
+   // Signal the interested parties.
+   GuiCanvas::getGuiCanvasFrameSignal().trigger(true);
+
+   GFXTransformSaver saver;
+
+   // Gross hack to make sure we don't end up with advanced lighting and msaa 
+   // at the same time, which causes artifacts. At the same time we don't 
+   // want to just throw the settings the user has chosen if the light manager 
+   // changes at a later time.
+   /*GFXVideoMode mode = mPlatformWindow->getVideoMode();
+   if (dStricmp(LIGHTMGR->getId(), "ADVLM") == 0 && mode.antialiasLevel > 0)
+   {
+      const char *pref = Con::getVariable("$pref::Video::mode");
+      mode.parseFromString(pref);
+      mode.antialiasLevel = 0;
+      mPlatformWindow->setVideoMode(mode);
+
+      Con::printf("AntiAliasing has been disabled; it is not compatible with AdvancedLighting.");
+   }
+   else if (dStricmp(LIGHTMGR->getId(), "BLM") == 0)
+   {
+      const char *pref = Con::getVariable("$pref::Video::mode");
+
+      U32 prefAA = dAtoi(StringUnit::getUnit(pref, 5, " "));
+      if (prefAA != mode.antialiasLevel)
+      {
+         mode.parseFromString(pref);
+         mPlatformWindow->setVideoMode(mode);
+
+         Con::printf("AntiAliasing has been enabled while running BasicLighting.");
+      }
+   }*/
+
+   // Begin GFX
+   PROFILE_START(GameFunctions_RenderFrame_GFXBeginScene);
+   bool beginSceneRes = GFX->beginScene();
+   PROFILE_END();
+
+   PROFILE_START(GameFunctions_RenderFrame_OffscreenCanvases);
+
+   // Render all offscreen canvas objects here since we may need them in the render loop
+   if (GuiOffscreenCanvas::sList.size() != 0)
+   {
+      // Reset the entire state since oculus shit will have barfed it.
+      GFX->updateStates(true);
+
+      for (Vector<GuiOffscreenCanvas*>::iterator itr = GuiOffscreenCanvas::sList.begin(); itr != GuiOffscreenCanvas::sList.end(); itr++)
+      {
+         (*itr)->renderFrame(false, false);
+      }
+
+      GFX->setActiveRenderTarget(renderTarget);
+   }
+
+   PROFILE_END();
+
+   // Can't render if waiting for device to reset.   
+   if (!beginSceneRes)
+   {
+      // Since we already triggered the signal once for begin-of-frame,
+      // we should be consistent and trigger it again for end-of-frame.
+      GuiCanvas::getGuiCanvasFrameSignal().trigger(false);
+
+      return;
+   }
+
+   // Clear the current viewport area
+   GFX->setViewport(targetRect);
+   GFX->clear(GFXClearZBuffer | GFXClearStencil | GFXClearTarget, canvasClearColor, 1.0f, 0);
+
+   // Make sure we have a clean matrix state 
+   // before we start rendering anything!   
+   GFX->setWorldMatrix(MatrixF::Identity);
+   GFX->setViewMatrix(MatrixF::Identity);
+   GFX->setProjectionMatrix(MatrixF::Identity);
+
+   {
+      GFXStateBlockDesc d;
+
+      d.cullDefined = true;
+      d.cullMode = GFXCullNone;
+      d.zDefined = true;
+      d.zEnable = false;
+
+      GFXStateBlockRef mDefaultGuiSB = GFX->createStateBlock(d);
+
+      GFX->setClipRect(targetRect);
+      GFX->setStateBlock(mDefaultGuiSB);
+
+      GFXTargetRef origTarget = GFX->getActiveRenderTarget();
+
+      // Clear the zBuffer so GUI doesn't hose object rendering accidentally
+      GFX->clear(GFXClearZBuffer, ColorI(20, 20, 20), 1.0f, 0);
+
+      GFX->setFrustum(frustum);
+      MatrixF mSaveProjection = GFX->getProjectionMatrix();
+      
+      // We're going to be displaying this render at size of this control in
+      // pixels - let the scene know so that it can calculate e.g. reflections
+      // correctly for that final display result.
+      gClientSceneGraph->setDisplayTargetResolution(size);
+
+      // Set the GFX world matrix to the world-to-camera transform, but don't 
+      // change the cameraMatrix in mLastCameraQuery. This is because 
+      // mLastCameraQuery.cameraMatrix is supposed to contain the camera-to-world
+      // transform. In-place invert would save a copy but mess up any GUIs that
+      // depend on that value.
+      CameraQuery camera;
+      GameProcessCameraQuery(&camera);
+
+      MatrixF worldToCamera = transform;
+
+      RotationF tranRot = RotationF(transform);
+      EulerF trf = tranRot.asEulerF(RotationF::Degrees);
+      Point3F pos = transform.getPosition();
+
+      GFX->setWorldMatrix(worldToCamera);
+
+      mSaveProjection = GFX->getProjectionMatrix();
+      MatrixF mSaveModelview = GFX->getWorldMatrix();
+
+      Point2F mSaveWorldToScreenScale = GFX->getWorldToScreenScale();
+      Frustum mSaveFrustum = GFX->getFrustum();
+      mSaveFrustum.setTransform(transform);
+
+      // Set the default non-clip projection as some 
+      // objects depend on this even in non-reflect cases.
+      gClientSceneGraph->setNonClipProjection(mSaveProjection);
+
+      // Give the post effect manager the worldToCamera, and cameraToScreen matrices
+      PFXMGR->setFrameMatrices(mSaveModelview, mSaveProjection);
+
+      //renderWorld(guiViewport);
+      PROFILE_START(GameFunctions_RenderFrame_RenderWorld);
+      FrameAllocator::setWaterMark(0);
+
+      gClientSceneGraph->renderScene(SPT_Reflect, typeMask);
+
+      // renderScene leaves some states dirty, which causes problems if GameTSCtrl is the last Gui object rendered
+      GFX->updateStates();
+
+      AssertFatal(FrameAllocator::getWaterMark() == 0,
+         "Error, someone didn't reset the water mark on the frame allocator!");
+      FrameAllocator::setWaterMark(0);
+      PROFILE_END();
+   }
+
+   PROFILE_START(GameFunctions_RenderFrame_GFXEndScene);
+   GFX->endScene();
+   PROFILE_END();
+
+#ifdef TORQUE_GFX_STATE_DEBUG
+   GFX->getDebugStateManager()->endFrame();
+#endif
+
+   saver.restore();
+
+   PROFILE_END();
+}
+
+//================================================================================================
 static void Process3D()
 {
    MATMGR->updateTime();

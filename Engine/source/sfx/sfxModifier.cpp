@@ -60,8 +60,8 @@ bool SFXOneShotModifier::update()
 SFXRangeModifier::SFXRangeModifier( SFXSource* source, F32 startTime, F32 endTime, bool removeWhenDone )
    : Parent( source, removeWhenDone ),
      mStartTime( startTime ),
-     mEndTime( endTime ),
-     mIsActive( false )
+     mIsActive( false ),
+     mEndTime( endTime )
 {
 }
 

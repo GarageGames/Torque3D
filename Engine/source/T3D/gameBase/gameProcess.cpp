@@ -34,7 +34,7 @@ ClientProcessList* ClientProcessList::smClientProcessList = NULL;
 ServerProcessList* ServerProcessList::smServerProcessList = NULL;
 static U32 gNetOrderNextId = 0;
 
-DefineConsoleFunction( dumpProcessList, void, ( ), ,
+DefineEngineFunction( dumpProcessList, void, ( ), ,
    "Dumps all ProcessObjects in ServerProcessList and ClientProcessList to the console." )
 {
    Con::printf( "client process list:" );

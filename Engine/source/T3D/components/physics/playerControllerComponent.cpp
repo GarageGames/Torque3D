@@ -119,8 +119,11 @@ PlayerControllerComponent::PlayerControllerComponent() : Component()
 
    mInputVelocity = Point3F(0, 0, 0);
 
-   mPhysicsRep = NULL;
-   mPhysicsWorld = NULL;
+   mPhysicsRep = nullptr;
+   mPhysicsWorld = nullptr;
+
+   mOwnerCollisionInterface = nullptr;
+   mIntegrationCount = 0;
 }
 
 PlayerControllerComponent::~PlayerControllerComponent()
@@ -327,96 +330,6 @@ void PlayerControllerComponent::updateMove()
    }
 
    // Update current orientation
-   bool doStandardMove = true;
-   GameConnection* con = mOwner->getControllingClient();
-
-#ifdef TORQUE_EXTENDED_MOVE
-   // Work with an absolute rotation from the ExtendedMove class?
-   if (con && con->getControlSchemeAbsoluteRotation())
-   {
-      doStandardMove = false;
-      const ExtendedMove* emove = dynamic_cast<const ExtendedMove*>(move);
-      U32 emoveIndex = smExtendedMoveHeadPosRotIndex;
-      if (emoveIndex >= ExtendedMove::MaxPositionsRotations)
-         emoveIndex = 0;
-
-      if (emove->EulerBasedRotation[emoveIndex])
-      {
-         // Head pitch
-         mHead.x += (emove->rotX[emoveIndex] - mLastAbsolutePitch);
-
-         // Do we also include the relative yaw value?
-         if (con->getControlSchemeAddPitchToAbsRot())
-         {
-            F32 x = move->pitch;
-            if (x > M_PI_F)
-               x -= M_2PI_F;
-
-            mHead.x += x;
-         }
-
-         // Constrain the range of mHead.x
-         while (mHead.x < -M_PI_F)
-            mHead.x += M_2PI_F;
-         while (mHead.x > M_PI_F)
-            mHead.x -= M_2PI_F;
-
-         // Rotate (heading) head or body?
-         if (move->freeLook && ((isMounted() && getMountNode() == 0) || (con && !con->isFirstPerson())))
-         {
-            // Rotate head
-            mHead.z += (emove->rotZ[emoveIndex] - mLastAbsoluteYaw);
-
-            // Do we also include the relative yaw value?
-            if (con->getControlSchemeAddYawToAbsRot())
-            {
-               F32 z = move->yaw;
-               if (z > M_PI_F)
-                  z -= M_2PI_F;
-
-               mHead.z += z;
-            }
-
-            // Constrain the range of mHead.z
-            while (mHead.z < 0.0f)
-               mHead.z += M_2PI_F;
-            while (mHead.z > M_2PI_F)
-               mHead.z -= M_2PI_F;
-         }
-         else
-         {
-            // Rotate body
-            mRot.z += (emove->rotZ[emoveIndex] - mLastAbsoluteYaw);
-
-            // Do we also include the relative yaw value?
-            if (con->getControlSchemeAddYawToAbsRot())
-            {
-               F32 z = move->yaw;
-               if (z > M_PI_F)
-                  z -= M_2PI_F;
-
-               mRot.z += z;
-            }
-
-            // Constrain the range of mRot.z
-            while (mRot.z < 0.0f)
-               mRot.z += M_2PI_F;
-            while (mRot.z > M_2PI_F)
-               mRot.z -= M_2PI_F;
-         }
-         mLastAbsoluteYaw = emove->rotZ[emoveIndex];
-         mLastAbsolutePitch = emove->rotX[emoveIndex];
-
-         // Head bank
-         mHead.y = emove->rotY[emoveIndex];
-
-         // Constrain the range of mHead.y
-         while (mHead.y > M_PI_F)
-            mHead.y -= M_2PI_F;
-      }
-   }
-#endif
-
    MatrixF zRot;
    zRot.set(EulerF(0.0f, 0.0f, mOwner->getRotation().asEulerF().z));
 
@@ -439,7 +352,6 @@ void PlayerControllerComponent::updateMove()
    mContactInfo.jump = false;
    mContactInfo.run = false;
 
-   bool jumpSurface = false, runSurface = false;
    if (!mOwner->isMounted())
       findContact(&mContactInfo.run, &mContactInfo.jump, &mContactInfo.contactNormal);
    if (mContactInfo.jump)
@@ -525,16 +437,15 @@ void PlayerControllerComponent::updateMove()
 
       // get the head pitch and add it to the moveVec
       // This more accurate swim vector calc comes from Matt Fairfax
-      MatrixF xRot, zRot;
+      MatrixF xRot;
       xRot.set(EulerF(mOwner->getRotation().asEulerF().x, 0, 0));
-      zRot.set(EulerF(0, 0, mOwner->getRotation().asEulerF().z));
+      zRot.set(EulerF(0, 0, mOwner->getRotation().asEulerF().z));//reset prior uses
       MatrixF rot;
       rot.mul(zRot, xRot);
       rot.getColumn(0, &moveVec);
 
       moveVec *= move->x;
-      VectorF tv;
-      rot.getColumn(1, &tv);
+      rot.getColumn(1, &tv);//reset prior uses
       moveVec += tv * move->y;
       rot.getColumn(2, &tv);
       moveVec += tv * move->z;
@@ -662,7 +573,6 @@ void PlayerControllerComponent::updatePos(const F32 travelTime)
    newPos = mPhysicsRep->move(mVelocity * travelTime, collisionList);
 
    bool haveCollisions = false;
-   bool wasFalling = mFalling;
    if (collisionList.getCount() > 0)
    {
       mFalling = false;

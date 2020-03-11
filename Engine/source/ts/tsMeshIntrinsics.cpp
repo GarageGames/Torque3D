@@ -59,24 +59,13 @@ MODULE_BEGIN( TSMeshIntrinsics )
       // Assign defaults (C++ versions)
       zero_vert_normal_bulk = zero_vert_normal_bulk_C;
 
-   #if defined(TORQUE_OS_XENON)
-      zero_vert_normal_bulk = zero_vert_normal_bulk_X360;
-   #else
       // Find the best implementation for the current CPU
       if(Platform::SystemInfo.processor.properties & CPU_PROP_SSE)
       {
-   #if (defined( TORQUE_CPU_X86 ) || defined( TORQUE_CPU_X64 )) 
-         
-         zero_vert_normal_bulk = zero_vert_normal_bulk_SSE;
-   #endif
+         #if (defined( TORQUE_CPU_X86 ) || defined( TORQUE_CPU_X64 )) 
+            zero_vert_normal_bulk = zero_vert_normal_bulk_SSE;
+         #endif
       }
-      else if(Platform::SystemInfo.processor.properties & CPU_PROP_ALTIVEC)
-      {
-   #if !defined(TORQUE_OS_XENON) && defined(TORQUE_CPU_PPC)
-         zero_vert_normal_bulk = zero_vert_normal_bulk_gccvec;
-   #endif
-      }
-   #endif
    }
 
 MODULE_END;

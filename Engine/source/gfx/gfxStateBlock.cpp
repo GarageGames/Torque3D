@@ -281,6 +281,7 @@ GFXSamplerStateDesc::GFXSamplerStateDesc()
    magFilter = GFXTextureFilterLinear;
    minFilter = GFXTextureFilterLinear;
    mipFilter = GFXTextureFilterLinear;
+   samplerFunc = GFXCmpNever;
    maxAnisotropy = 1;
    alphaArg1 = GFXTATexture;
    alphaArg2 = GFXTADiffuse;

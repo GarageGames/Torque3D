@@ -8,39 +8,39 @@
 extern "C" {
 #endif
 
-struct ALlistenerProps {
-    ATOMIC(ALfloat) Position[3];
-    ATOMIC(ALfloat) Velocity[3];
-    ATOMIC(ALfloat) Forward[3];
-    ATOMIC(ALfloat) Up[3];
-    ATOMIC(ALfloat) Gain;
-    ATOMIC(ALfloat) MetersPerUnit;
+struct ALcontextProps {
+    ALfloat DopplerFactor;
+    ALfloat DopplerVelocity;
+    ALfloat SpeedOfSound;
+    ALboolean SourceDistanceModel;
+    enum DistanceModel DistanceModel;
+    ALfloat MetersPerUnit;
 
-    ATOMIC(ALfloat) DopplerFactor;
-    ATOMIC(ALfloat) DopplerVelocity;
-    ATOMIC(ALfloat) SpeedOfSound;
-    ATOMIC(ALboolean) SourceDistanceModel;
-    ATOMIC(enum DistanceModel) DistanceModel;
+    ATOMIC(struct ALcontextProps*) next;
+};
+
+struct ALlistenerProps {
+    ALfloat Position[3];
+    ALfloat Velocity[3];
+    ALfloat Forward[3];
+    ALfloat Up[3];
+    ALfloat Gain;
 
     ATOMIC(struct ALlistenerProps*) next;
 };
 
 typedef struct ALlistener {
-    volatile ALfloat Position[3];
-    volatile ALfloat Velocity[3];
-    volatile ALfloat Forward[3];
-    volatile ALfloat Up[3];
-    volatile ALfloat Gain;
-    volatile ALfloat MetersPerUnit;
+    alignas(16) ALfloat Position[3];
+    ALfloat Velocity[3];
+    ALfloat Forward[3];
+    ALfloat Up[3];
+    ALfloat Gain;
+
+    ATOMIC_FLAG PropsClean;
 
     /* Pointer to the most recent property values that are awaiting an update.
      */
     ATOMIC(struct ALlistenerProps*) Update;
-
-    /* A linked list of unused property containers, free to use for future
-     * updates.
-     */
-    ATOMIC(struct ALlistenerProps*) FreeList;
 
     struct {
         aluMatrixf Matrix;
@@ -50,7 +50,8 @@ typedef struct ALlistener {
         ALfloat MetersPerUnit;
 
         ALfloat DopplerFactor;
-        ALfloat SpeedOfSound;
+        ALfloat SpeedOfSound; /* in units per sec! */
+        ALfloat ReverbSpeedOfSound; /* in meters per sec! */
 
         ALboolean SourceDistanceModel;
         enum DistanceModel DistanceModel;

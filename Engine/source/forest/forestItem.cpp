@@ -42,8 +42,8 @@ SimSet* ForestItemData::smSet = NULL;
 ForestItemData::ForestItemData()
    :  mNeedPreload( true ),
       mShapeFile( NULL ),
+      mRadius( 1 ),
       mCollidable( true ),
-      mRadius( 1 ),      
       mWindScale( 0.0f ),
       mTrunkBendScale( 0.0f ),
       mWindBranchAmp( 0.0f ),
@@ -215,9 +215,9 @@ ForestItem::ForestItem()
    :  mDataBlock( NULL ),
       mTransform( true ),
       mScale( 0.0f ),
-      mWorldBox( 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f ),
+      mKey( 0 ),
       mRadius( 0.0f ),
-      mKey( 0 )
+      mWorldBox( 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f )
 {
 }
 

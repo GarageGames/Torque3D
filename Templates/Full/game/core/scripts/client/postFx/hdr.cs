@@ -172,7 +172,7 @@ singleton ShaderData( HDR_CombineShader )
    samplerNames[2] = "$bloomTex";
    samplerNames[3] = "$colorCorrectionTex";
    
-   samplerNames[4] = "prepassTex";
+   samplerNames[4] = "deferredTex";
 
    pixVersion = 3.0;
 };
@@ -275,10 +275,6 @@ function HDRPostFX::preProcess( %this )
 
 function HDRPostFX::onEnabled( %this )
 {
-   // We don't allow hdr on OSX yet.
-   if ( $platform $= "macos" )
-      return false;
-      
    // See what HDR format would be best.
    %format = getBestHDRFormat();
    if ( %format $= "" || %format $= "GFXFormatR8G8B8A8" )

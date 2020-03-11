@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,12 +20,14 @@
 */
 #include "../SDL_internal.h"
 
-#ifndef _SDL_sysvideo_h
-#define _SDL_sysvideo_h
+#ifndef SDL_sysvideo_h_
+#define SDL_sysvideo_h_
 
 #include "SDL_messagebox.h"
 #include "SDL_shape.h"
 #include "SDL_thread.h"
+
+#include "SDL_vulkan_internal.h"
 
 /* The SDL video driver */
 
@@ -117,8 +119,8 @@ struct SDL_Window
      !((W)->flags & SDL_WINDOW_MINIMIZED))
 
 /*
- * Define the SDL display structure This corresponds to physical monitors
- * attached to the system.
+ * Define the SDL display structure.
+ * This corresponds to physical monitors attached to the system.
  */
 struct SDL_VideoDisplay
 {
@@ -128,6 +130,7 @@ struct SDL_VideoDisplay
     SDL_DisplayMode *display_modes;
     SDL_DisplayMode desktop_mode;
     SDL_DisplayMode current_mode;
+    SDL_DisplayOrientation orientation;
 
     SDL_Window *fullscreen_window;
 
@@ -163,6 +166,11 @@ struct SDL_VideoDevice
      */
     void (*VideoQuit) (_THIS);
 
+    /*
+     * Reinitialize the touch devices -- called if an unknown touch ID occurs.
+     */
+    void (*ResetTouch) (_THIS);
+
     /* * * */
     /*
      * Display functions
@@ -174,14 +182,14 @@ struct SDL_VideoDevice
     int (*GetDisplayBounds) (_THIS, SDL_VideoDisplay * display, SDL_Rect * rect);
 
     /*
-     * Get the dots/pixels-per-inch of a display
-     */
-    int (*GetDisplayDPI) (_THIS, SDL_VideoDisplay * display, float * ddpi, float * hdpi, float * vdpi);
-
-    /*
      * Get the usable bounds of a display (bounds minus menubar or whatever)
      */
     int (*GetDisplayUsableBounds) (_THIS, SDL_VideoDisplay * display, SDL_Rect * rect);
+
+    /*
+     * Get the dots/pixels-per-inch of a display
+     */
+    int (*GetDisplayDPI) (_THIS, SDL_VideoDisplay * display, float * ddpi, float * hdpi, float * vdpi);
 
     /*
      * Get a list of the available display modes for a display.
@@ -200,8 +208,8 @@ struct SDL_VideoDevice
     /*
      * Window functions
      */
-    int (*CreateWindow) (_THIS, SDL_Window * window);
-    int (*CreateWindowFrom) (_THIS, SDL_Window * window, const void *data);
+    int (*CreateSDLWindow) (_THIS, SDL_Window * window);
+    int (*CreateSDLWindowFrom) (_THIS, SDL_Window * window, const void *data);
     void (*SetWindowTitle) (_THIS, SDL_Window * window);
     void (*SetWindowIcon) (_THIS, SDL_Window * window, SDL_Surface * icon);
     void (*SetWindowPosition) (_THIS, SDL_Window * window);
@@ -252,8 +260,19 @@ struct SDL_VideoDevice
     void (*GL_GetDrawableSize) (_THIS, SDL_Window * window, int *w, int *h);
     int (*GL_SetSwapInterval) (_THIS, int interval);
     int (*GL_GetSwapInterval) (_THIS);
-    void (*GL_SwapWindow) (_THIS, SDL_Window * window);
+    int (*GL_SwapWindow) (_THIS, SDL_Window * window);
     void (*GL_DeleteContext) (_THIS, SDL_GLContext context);
+    void (*GL_DefaultProfileConfig) (_THIS, int *mask, int *major, int *minor);
+
+    /* * * */
+    /*
+     * Vulkan support
+     */
+    int (*Vulkan_LoadLibrary) (_THIS, const char *path);
+    void (*Vulkan_UnloadLibrary) (_THIS);
+    SDL_bool (*Vulkan_GetInstanceExtensions) (_THIS, SDL_Window *window, unsigned *count, const char **names);
+    SDL_bool (*Vulkan_CreateSurface) (_THIS, SDL_Window *window, VkInstance instance, VkSurfaceKHR *surface);
+    void (*Vulkan_GetDrawableSize) (_THIS, SDL_Window * window, int *w, int *h);
 
     /* * * */
     /*
@@ -286,8 +305,12 @@ struct SDL_VideoDevice
     /* Hit-testing */
     int (*SetWindowHitTest)(SDL_Window * window, SDL_bool enabled);
 
+    /* Tell window that app enabled drag'n'drop events */
+    void (*AcceptDragAndDrop)(SDL_Window * window, SDL_bool accept);
+
     /* * * */
     /* Data common to all drivers */
+    SDL_bool is_dummy;
     SDL_bool suspend_screensaver;
     int num_displays;
     SDL_VideoDisplay *displays;
@@ -295,7 +318,7 @@ struct SDL_VideoDevice
     SDL_Window *grabbed_window;
     Uint8 window_magic;
     Uint32 next_object_id;
-    char * clipboard_text;
+    char *clipboard_text;
 
     /* * * */
     /* Data used by the GL drivers */
@@ -323,7 +346,9 @@ struct SDL_VideoDevice
         int profile_mask;
         int share_with_current_context;
         int release_behavior;
+        int reset_notification;
         int framebuffer_srgb_capable;
+        int no_error;
         int retained_backing;
         int driver_loaded;
         char driver_path[256];
@@ -339,6 +364,17 @@ struct SDL_VideoDevice
     SDL_GLContext current_glctx;
     SDL_TLSID current_glwin_tls;
     SDL_TLSID current_glctx_tls;
+
+    /* * * */
+    /* Data used by the Vulkan drivers */
+    struct
+    {
+        PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr;
+        PFN_vkEnumerateInstanceExtensionProperties vkEnumerateInstanceExtensionProperties;
+        int loader_loaded;
+        char loader_path[256];
+        void *loader_handle;
+    } vulkan_config;
 
     /* * * */
     /* Data private to this driver */
@@ -366,66 +402,39 @@ typedef struct VideoBootStrap
     SDL_VideoDevice *(*create) (int devindex);
 } VideoBootStrap;
 
-#if SDL_VIDEO_DRIVER_COCOA
+/* Not all of these are available in a given build. Use #ifdefs, etc. */
 extern VideoBootStrap COCOA_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_X11
 extern VideoBootStrap X11_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_MIR
-extern VideoBootStrap MIR_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_DIRECTFB
 extern VideoBootStrap DirectFB_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_WINDOWS
 extern VideoBootStrap WINDOWS_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_WINRT
 extern VideoBootStrap WINRT_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_HAIKU
 extern VideoBootStrap HAIKU_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_PANDORA
 extern VideoBootStrap PND_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_UIKIT
 extern VideoBootStrap UIKIT_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_ANDROID
 extern VideoBootStrap Android_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_PSP
 extern VideoBootStrap PSP_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_RPI
 extern VideoBootStrap RPI_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_DUMMY
+extern VideoBootStrap KMSDRM_bootstrap;
 extern VideoBootStrap DUMMY_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_WAYLAND
 extern VideoBootStrap Wayland_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_NACL
 extern VideoBootStrap NACL_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_VIVANTE
 extern VideoBootStrap VIVANTE_bootstrap;
-#endif
-#if SDL_VIDEO_DRIVER_EMSCRIPTEN
 extern VideoBootStrap Emscripten_bootstrap;
-#endif
+extern VideoBootStrap QNX_bootstrap;
 
 extern SDL_VideoDevice *SDL_GetVideoDevice(void);
 extern int SDL_AddBasicVideoDisplay(const SDL_DisplayMode * desktop_mode);
 extern int SDL_AddVideoDisplay(const SDL_VideoDisplay * display);
 extern SDL_bool SDL_AddDisplayMode(SDL_VideoDisplay *display, const SDL_DisplayMode * mode);
+extern int SDL_GetIndexOfDisplay(SDL_VideoDisplay *display);
+extern SDL_VideoDisplay *SDL_GetDisplay(int displayIndex);
 extern SDL_VideoDisplay *SDL_GetDisplayForWindow(SDL_Window *window);
 extern void *SDL_GetDisplayDriverData( int displayIndex );
 
+extern void SDL_GL_DeduceMaxSupportedESProfile(int* major, int* minor);
+
 extern int SDL_RecreateWindow(SDL_Window * window, Uint32 flags);
+extern SDL_bool SDL_HasWindows(void);
 
 extern void SDL_OnWindowShown(SDL_Window * window);
 extern void SDL_OnWindowHidden(SDL_Window * window);
@@ -443,6 +452,15 @@ extern SDL_bool SDL_ShouldAllowTopmost(void);
 
 extern float SDL_ComputeDiagonalDPI(int hpix, int vpix, float hinches, float vinches);
 
-#endif /* _SDL_sysvideo_h */
+extern void SDL_OnApplicationWillTerminate(void);
+extern void SDL_OnApplicationDidReceiveMemoryWarning(void);
+extern void SDL_OnApplicationWillResignActive(void);
+extern void SDL_OnApplicationDidEnterBackground(void);
+extern void SDL_OnApplicationWillEnterForeground(void);
+extern void SDL_OnApplicationDidBecomeActive(void);
+
+extern void SDL_ToggleDragAndDropSupport(void);
+
+#endif /* SDL_sysvideo_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

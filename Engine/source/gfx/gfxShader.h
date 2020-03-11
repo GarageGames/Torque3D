@@ -59,7 +59,7 @@
 
 class Point2I;
 class Point2F;
-class ColorF;
+class LinearColorF;
 class MatrixF;
 class GFXShader;
 class GFXVertexFormat;
@@ -176,7 +176,7 @@ public:
    virtual void set(GFXShaderConstHandle* handle, const Point3F& fv) = 0;
    virtual void set(GFXShaderConstHandle* handle, const Point4F& fv) = 0;
    virtual void set(GFXShaderConstHandle* handle, const PlaneF& fv) = 0;
-   virtual void set(GFXShaderConstHandle* handle, const ColorF& fv) = 0;
+   virtual void set(GFXShaderConstHandle* handle, const LinearColorF& fv) = 0;
    virtual void set(GFXShaderConstHandle* handle, const S32 f) = 0;
    virtual void set(GFXShaderConstHandle* handle, const Point2I& fv) = 0;
    virtual void set(GFXShaderConstHandle* handle, const Point3I& fv) = 0;

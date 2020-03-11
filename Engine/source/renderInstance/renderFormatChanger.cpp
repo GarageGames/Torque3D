@@ -223,7 +223,7 @@ void RenderFormatToken::_updateTargets()
             || mTargetColorTexture[i].getWidthHeight() != rtSize)
          {
          mTargetColorTexture[i].set( rtSize.x, rtSize.y, mColorFormat, 
-            &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ),
+            &GFXRenderTargetSRGBProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ),
             1, mTargetAALevel );
          mTargetChain[i]->attachTexture( GFXTextureTarget::Color0, mTargetColorTexture[i] );
       }
@@ -240,7 +240,7 @@ void RenderFormatToken::_updateTargets()
             || mTargetDepthStencilTexture[i].getWidthHeight() != rtSize)
          {
          mTargetDepthStencilTexture[i].set( rtSize.x, rtSize.y, mDepthFormat, 
-            &GFXDefaultZTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ),
+            &GFXZTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ),
             1, mTargetAALevel );
             mTargetChain[i]->attachTexture( GFXTextureTarget::DepthStencil, mTargetDepthStencilTexture[i] );
          }

@@ -386,8 +386,8 @@ void ProximityMine::setDeployedPos( const Point3F& pos, const Point3F& normal )
    MathUtils::getMatrixFromUpVector( normal, &mat );
    mat.setPosition( pos + normal * mObjBox.minExtents.z );
 
-   delta.pos = pos;
-   delta.posVec.set(0, 0, 0);
+   mDelta.pos = pos;
+   mDelta.posVec.set(0, 0, 0);
 
    ShapeBase::setTransform( mat );
    if ( mPhysicsRep )
@@ -653,7 +653,7 @@ void ProximityMine::renderObject( ObjectRenderInst* ri,
    // Render the trigger area
    if ( mState == Armed || mState == Triggered )
    {
-      const ColorF drawColor(1, 0, 0, 0.05f);
+      const LinearColorF drawColor(1, 0, 0, 0.05f);
       if ( drawColor.alpha > 0 )
       {
          GFXStateBlockDesc desc;

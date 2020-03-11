@@ -24,7 +24,6 @@
 #include "console/simBase.h"
 #include "console/consoleTypes.h"
 #include "console/scriptObjects.h"
-#include "console/simBase.h"
 #include "console/engineAPI.h"
 
 //-----------------------------------------------------------------------------

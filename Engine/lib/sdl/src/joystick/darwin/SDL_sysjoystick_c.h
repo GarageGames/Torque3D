@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,6 +24,8 @@
 #define SDL_JOYSTICK_IOKIT_H
 
 #include <IOKit/hid/IOHIDLib.h>
+#include <ForceFeedback/ForceFeedback.h>
+#include <ForceFeedback/ForceFeedbackConstants.h>
 
 struct recElement
 {
@@ -45,6 +47,10 @@ struct joystick_hwdata
 {
     IOHIDDeviceRef deviceRef;   /* HIDManager device handle */
     io_service_t ffservice;     /* Interface for force feedback, 0 = no ff */
+    FFDeviceObjectReference ffdevice;
+    FFEFFECT *ffeffect;
+    FFEffectObjectReference ffeffect_ref;
+    SDL_bool ff_initialized;
 
     char product[256];          /* name of product */
     uint32_t usage;                 /* usage page from IOUSBHID Parser.h which defines general usage */
@@ -68,5 +74,6 @@ struct joystick_hwdata
 };
 typedef struct joystick_hwdata recDevice;
 
-
 #endif /* SDL_JOYSTICK_IOKIT_H */
+
+/* vi: set ts=4 sw=4 expandtab: */

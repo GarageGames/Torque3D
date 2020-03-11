@@ -111,7 +111,8 @@ function initClient()
 
    if (isFile("./config.cs"))
       exec("./config.cs");
-
+   if (isFile("./config_vehicle.cs"))
+      exec("./config_vehicle.cs");
    loadMaterials();
 
    // Really shouldn't be starting the networking unless we are

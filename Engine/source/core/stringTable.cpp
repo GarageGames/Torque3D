@@ -142,10 +142,11 @@ StringTableEntry _StringTable::insert(const char* _val, const bool caseSens)
    }
    char *ret = 0;
    if(!*walk) {
+      dsize_t valLen = dStrlen(val) + 1;
       *walk = (Node *) mempool.alloc(sizeof(Node));
       (*walk)->next = 0;
-      (*walk)->val = (char *) mempool.alloc(dStrlen(val) + 1);
-      dStrcpy((*walk)->val, val);
+      (*walk)->val = (char *) mempool.alloc(valLen);
+      dStrcpy((*walk)->val, val, valLen);
       ret = (*walk)->val;
       itemCount ++;
    }
@@ -232,7 +233,7 @@ void _StringTable::resize(const U32 _newSize)
    walk = head;
    while(walk) {
       U32 key;
-      Node *temp = walk;
+      temp = walk;
 
       walk = walk->next;
       key = hashString(temp->val);

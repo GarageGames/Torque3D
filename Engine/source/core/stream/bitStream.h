@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _BITSTREAM_H_
 #define _BITSTREAM_H_
 
@@ -48,7 +53,7 @@ class QuatF;
 class BitStream : public Stream
 {
 protected:
-   U8 *dataPtr;
+   U8 *mDataPtr;
    S32  bitNum;
    S32  bufSize;
    bool error;
@@ -63,7 +68,7 @@ public:
    static void sendPacketStream(const NetAddress *addr);
 
    void setBuffer(void *bufPtr, S32 bufSize, S32 maxSize = 0);
-   U8*  getBuffer() { return dataPtr; }
+   U8*  getBuffer() { return mDataPtr; }
    U8*  getBytePtr();
 
    U32 getReadByteSize();
@@ -202,18 +207,18 @@ public:
    void readAffineTransform(MatrixF*);
 
    /// Writes a quaternion in a lossy compressed format that
-   /// is ( bitCount * 3 ) + 1 bits in size.
+   /// is ( bitCount * 3 ) + 2 bits in size.
    ///
    /// @param quat The normalized quaternion to write.
-   /// @param bitCount The the storage space for the xyz component of
+   /// @param bitCount The the storage space for the packed components of
    ///                 the quaternion.
    ///
    void writeQuat( const QuatF& quat, U32 bitCount = 9 );
 
    /// Reads a quaternion written with writeQuat.
    ///
-   /// @param quat The normalized quaternion to write.
-   /// @param bitCount The the storage space for the xyz component of
+   /// @param quat The quaternion that was read.
+   /// @param bitCount The the storage space for the packed components of
    ///                 the quaternion.  Must match the bitCount at write.
    /// @see writeQuat
    ///
@@ -254,6 +259,7 @@ public:
    U32  getPosition() const;
    bool setPosition(const U32 in_newPosition);
    U32  getStreamSize();
+   S32  getMaxWriteBitNum() const { return maxWriteBitNum; }
 };
 
 class ResizeBitStream : public BitStream
@@ -331,7 +337,7 @@ inline bool BitStream::readFlag()
       return false;
    }
    S32 mask = 1 << (bitNum & 0x7);
-   bool ret = (*(dataPtr + (bitNum >> 3)) & mask) != 0;
+   bool ret = (*(mDataPtr + (bitNum >> 3)) & mask) != 0;
    bitNum++;
    return ret;
 }

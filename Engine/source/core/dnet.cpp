@@ -50,7 +50,7 @@ static const char *packetTypeNames[] =
 //-----------------------------------------------------------------
 //-----------------------------------------------------------------
 //-----------------------------------------------------------------
-DefineConsoleFunction( DNetSetLogging, void, (bool enabled), , "(bool enabled)"
+DefineEngineFunction( DNetSetLogging, void, (bool enabled), , "(bool enabled)"
    "@brief Enables logging of the connection protocols\n\n"
    "When enabled a lot of network debugging information is sent to the console.\n"
    "@param enabled True to enable, false to disable\n"

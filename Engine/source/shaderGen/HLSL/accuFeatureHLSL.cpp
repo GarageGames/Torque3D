@@ -37,7 +37,6 @@ void AccuTexFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList,
    MultiLine *meta = new MultiLine;
    getOutTexCoord(   "texCoord", 
                      "float2", 
-                     true, 
                      false, 
                      meta, 
                      componentList );
@@ -65,10 +64,7 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
 
    // accu map
    Var *accuMap = new Var;
-   if (mIsDirect3D11)
-      accuMap->setType("SamplerState");
-   else
-      accuMap->setType("sampler2D");
+   accuMap->setType("SamplerState");
 
    accuMap->setName( "accuMap" );
    accuMap->uniform = true;
@@ -139,8 +135,8 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       accuSpecular->constSortPos = cspPotentialPrimitive;
    }
 
-   Var *inTex = getInTexCoord( "texCoord", "float2", true, componentList );
-   Var *accuVec = getInTexCoord( "accuVec", "float3", true, componentList );
+   Var *inTex = getInTexCoord( "texCoord", "float2", componentList );
+   Var *accuVec = getInTexCoord( "accuVec", "float3", componentList );
    Var *bumpNorm = (Var *)LangElement::find( "bumpSample" );
    if( bumpNorm == NULL )
    {
@@ -150,18 +146,14 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    }
 
    // get the accu pixel color
-   if (mIsDirect3D11)
-   {
-      Var *accuMapTex = new Var;
-      accuMapTex->setType("Texture2D");
-      accuMapTex->setName("accuMapTex");
-      accuMapTex->uniform = true;
-      accuMapTex->texture = true;
-      accuMapTex->constNum = accuMap->constNum;
-      meta->addStatement(new GenOp("   @ = @.Sample(@, @ * @);\r\n", colorAccuDecl, accuMapTex, accuMap, inTex, accuScale));
-   }
-   else
-      meta->addStatement(new GenOp("   @ = tex2D(@, @ * @);\r\n", colorAccuDecl, accuMap, inTex, accuScale));
+
+   Var *accuMapTex = new Var;
+   accuMapTex->setType("Texture2D");
+   accuMapTex->setName("accuMapTex");
+   accuMapTex->uniform = true;
+   accuMapTex->texture = true;
+   accuMapTex->constNum = accuMap->constNum;
+   meta->addStatement(new GenOp("   @ = @.Sample(@, @ * @);\r\n", colorAccuDecl, accuMapTex, accuMap, inTex, accuScale));
 
    // scale up normals
    meta->addStatement( new GenOp( "   @.xyz = @.xyz * 2.0 - 0.5;\r\n", bumpNorm, bumpNorm ) );
@@ -250,7 +242,6 @@ Var* AccuTexFeatHLSL::addOutAccuVec( Vector<ShaderComponent*> &componentList, Mu
       outAccuVec->setName( "accuVec" );
       outAccuVec->setStructName( "OUT" );
       outAccuVec->setType( "float3" );
-      outAccuVec->mapsToSampler = false;
 
       getAccuVec( meta, outAccuVec );
    }

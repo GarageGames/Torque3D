@@ -81,16 +81,15 @@ class GuiColorPickerCtrl : public GuiControl
    /// @{
    void renderColorBox(RectI &bounds); ///< Function that draws the actual color box
    void drawSelector(RectI &bounds, Point2I &selectorPos, SelectorMode mode); /// < Function that draws the selection indicator
-   void drawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, ColorF &c3, ColorF &c4);
+   void drawBlendBox(RectI &bounds, LinearColorF &c1, LinearColorF &c2, LinearColorF &c3, LinearColorF &c4);
    void drawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors, ColorI *colors);
    /// @}
 
    /// @name Core Variables
    /// @{
-   ColorF mPickColor;		///< Color that has been picked from control
-   ColorF mBaseColor;		///< Colour we display (in case of pallet and blend mode)
+   LinearColorF mPickColor;		///< Color that has been picked from control
+   LinearColorF mBaseColor;		///< Colour we display (in case of pallet and blend mode)
    PickMode mDisplayMode;	///< Current color display mode of the selector
-   bool mUseSRGB;          ///< use sRGB color scale
    
    Point2I mSelectorPos;	///< Current position of the selector
    bool mPositionChanged;	///< Current position has changed since last render?
@@ -99,10 +98,10 @@ class GuiColorPickerCtrl : public GuiControl
    bool mActionOnMove;		///< Perform onAction() when position has changed?
 
    bool mSelectColor;
-   ColorF mSetColor;
+   LinearColorF mSetColor;
    GBitmap* mBitmap;
 
-   Point2I findColor(const ColorF & color, const Point2I& offset, const Point2I& resolution, GBitmap& bmp);
+   Point2I findColor(const LinearColorF & color, const Point2I& offset, const Point2I& resolution, GBitmap& bmp);
    
    S32   mSelectorGap;		///< The half-way "gap" between the selector pos and where the selector is allowed to draw. 
 
@@ -125,9 +124,9 @@ class GuiColorPickerCtrl : public GuiControl
    /// @name Color Value Functions
    /// @{
    /// NOTE: setValue only sets baseColor, since setting pickColor wouldn't be useful
-   void setValue(ColorF &value) {mBaseColor = value;}
+   void setValue(LinearColorF &value) {mBaseColor = value;}
    /// NOTE: getValue() returns baseColor if pallet (since pallet controls can't "pick" colours themselves)
-   ColorF getValue() { return mDisplayMode == pPallet ? mBaseColor : mPickColor; }
+   LinearColorF getValue() { return mDisplayMode == pPallet ? mBaseColor : mPickColor; }
    const char *getScriptValue();
    void setScriptValue(const char *value);
    void updateColor() {mPositionChanged = true;}
@@ -136,7 +135,7 @@ class GuiColorPickerCtrl : public GuiControl
    /// @name Selector Functions
    /// @{
    void setSelectorPos(const Point2I &pos); ///< Set new pos (in local coords)
-   void setSelectorPos(const ColorF & color);
+   void setSelectorPos(const LinearColorF & color);
    Point2I getSelectorPos() {return mSelectorPos;}
    /// @}
 

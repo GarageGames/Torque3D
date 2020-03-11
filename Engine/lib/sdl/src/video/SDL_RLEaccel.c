@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -90,9 +90,6 @@
 #include "SDL_blit.h"
 #include "SDL_RLEaccel_c.h"
 
-#ifndef MAX
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
@@ -448,7 +445,7 @@ RLEClipBlit(int w, Uint8 * srcbuf, SDL_Surface * surf_dst,
 
 
 /* blit a colorkeyed RLE surface */
-int
+int SDLCALL
 SDL_RLEBlit(SDL_Surface * surf_src, SDL_Rect * srcrect,
             SDL_Surface * surf_dst, SDL_Rect * dstrect)
 {
@@ -726,7 +723,7 @@ RLEAlphaClipBlit(int w, Uint8 * srcbuf, SDL_Surface * surf_dst,
 }
 
 /* blit a pixel-alpha RLE surface */
-int
+int SDLCALL
 SDL_RLEAlphaBlit(SDL_Surface * surf_src, SDL_Rect * srcrect,
                  SDL_Surface * surf_dst, SDL_Rect * dstrect)
 {
@@ -1223,8 +1220,9 @@ RLEAlphaSurface(SDL_Surface * surface)
 
     /* Now that we have it encoded, release the original pixels */
     if (!(surface->flags & SDL_PREALLOC)) {
-        SDL_free(surface->pixels);
+        SDL_SIMDFree(surface->pixels);
         surface->pixels = NULL;
+        surface->flags &= ~SDL_SIMD_ALIGNED;
     }
 
     /* realloc the buffer to release unused memory */
@@ -1280,7 +1278,7 @@ RLEColorkeySurface(SDL_Surface * surface)
     int y;
     Uint8 *srcbuf, *lastline;
     int maxsize = 0;
-    int bpp = surface->format->BytesPerPixel;
+    const int bpp = surface->format->BytesPerPixel;
     getpix_func getpix;
     Uint32 ckey, rgbmask;
     int w, h;
@@ -1303,6 +1301,9 @@ RLEColorkeySurface(SDL_Surface * surface)
         maxsize = surface->h * (4 * (surface->w / 65535 + 1)
                                 + surface->w * 4) + 4;
         break;
+
+    default:
+        return -1;
     }
 
     rlebuf = (Uint8 *) SDL_malloc(maxsize);
@@ -1383,8 +1384,9 @@ RLEColorkeySurface(SDL_Surface * surface)
 
     /* Now that we have it encoded, release the original pixels */
     if (!(surface->flags & SDL_PREALLOC)) {
-        SDL_free(surface->pixels);
+        SDL_SIMDFree(surface->pixels);
         surface->pixels = NULL;
+        surface->flags &= ~SDL_SIMD_ALIGNED;
     }
 
     /* realloc the buffer to release unused memory */
@@ -1396,7 +1398,7 @@ RLEColorkeySurface(SDL_Surface * surface)
         surface->map->data = p;
     }
 
-    return (0);
+    return 0;
 }
 
 int
@@ -1484,10 +1486,11 @@ UnRLEAlpha(SDL_Surface * surface)
         uncopy_opaque = uncopy_transl = uncopy_32;
     }
 
-    surface->pixels = SDL_malloc(surface->h * surface->pitch);
+    surface->pixels = SDL_SIMDAlloc(surface->h * surface->pitch);
     if (!surface->pixels) {
         return (SDL_FALSE);
     }
+    surface->flags |= SDL_SIMD_ALIGNED;
     /* fill background with transparent pixels */
     SDL_memset(surface->pixels, 0, surface->h * surface->pitch);
 
@@ -1510,8 +1513,9 @@ UnRLEAlpha(SDL_Surface * surface)
             if (run) {
                 srcbuf += uncopy_opaque(dst + ofs, srcbuf, run, df, sf);
                 ofs += run;
-            } else if (!ofs)
-                return (SDL_TRUE);
+            } else if (!ofs) {
+                goto end_function;
+            }
         } while (ofs < w);
 
         /* skip padding if needed */
@@ -1532,7 +1536,8 @@ UnRLEAlpha(SDL_Surface * surface)
         } while (ofs < w);
         dst += surface->pitch >> 2;
     }
-    /* Make the compiler happy */
+
+end_function:
     return (SDL_TRUE);
 }
 
@@ -1547,12 +1552,13 @@ SDL_UnRLESurface(SDL_Surface * surface, int recode)
                 SDL_Rect full;
 
                 /* re-create the original surface */
-                surface->pixels = SDL_malloc(surface->h * surface->pitch);
+                surface->pixels = SDL_SIMDAlloc(surface->h * surface->pitch);
                 if (!surface->pixels) {
                     /* Oh crap... */
                     surface->flags |= SDL_RLEACCEL;
                     return;
                 }
+                surface->flags |= SDL_SIMD_ALIGNED;
 
                 /* fill it with the background color */
                 SDL_FillRect(surface, NULL, surface->map->info.colorkey);

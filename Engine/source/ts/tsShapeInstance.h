@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _TSSHAPEINSTANCE_H_
 #define _TSSHAPEINSTANCE_H_
 
@@ -157,7 +162,7 @@ class TSShapeInstance
       S32 frame;
       S32 matFrame;
       F32 visible;
-      
+      S32 mLastObjectDetail;
       /// If true this mesh is forced to be hidden
       /// regardless of the animation state.
       bool forceHidden;
@@ -372,7 +377,7 @@ protected:
    }
 
    void reSkin( String newBaseName, String oldBaseName = String::EmptyString );
-
+   void resetMaterialList();
    enum
    {
       MaskNodeRotation       = 0x01,
@@ -690,6 +695,8 @@ protected:
 //-------------------------------------------------------------------------------------
 
    bool hasAccumulation();
+   // provides access to full mTriggerStates mask.
+   U32 getTriggerStateMask() const { return mTriggerStates; }
 };
 
 
@@ -720,7 +727,7 @@ class TSThread
    TSShapeInstance * mShapeInstance;  ///< Instance of the shape that this thread animates
 
    S32 sequence;                      ///< Sequence this thread will perform
-   F32 pos;
+   F32 mSeqPos;
 
    F32 timeScale;                     ///< How fast to play through the sequence
 

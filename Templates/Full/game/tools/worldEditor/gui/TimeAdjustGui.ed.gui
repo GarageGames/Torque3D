@@ -184,11 +184,11 @@ function TimeAdjustSliderCtrl::onAction(%this)
    
    if ( !isObject( %this.tod ) )
    {
-      if ( isObject( MissionGroup ) )
+      if ( isObject( getRootScene() ) )
       {
-         for ( %i = 0; %i < MissionGroup.getCount(); %i++ )
+         for ( %i = 0; %i < getRootScene().getCount(); %i++ )
          {
-            %obj = MissionGroup.getObject( %i );
+            %obj = getRootScene().getObject( %i );
             
             if ( %obj.getClassName() $= "TimeOfDay" )
             {

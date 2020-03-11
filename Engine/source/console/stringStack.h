@@ -79,105 +79,31 @@ struct StringStack
    U32 mArgBufferSize;
    char *mArgBuffer;
 
-   void validateBufferSize(U32 size)
-   {
-      if(size > mBufferSize)
-      {
-         mBufferSize = size + 2048;
-         mBuffer = (char *) dRealloc(mBuffer, mBufferSize);
-      }
-   }
+   void validateBufferSize(U32 size);
+   void validateArgBufferSize(U32 size);
 
-   void validateArgBufferSize(U32 size)
-   {
-      if(size > mArgBufferSize)
-      {
-         mArgBufferSize = size + 2048;
-         mArgBuffer = (char *) dRealloc(mArgBuffer, mArgBufferSize);
-      }
-   }
-
-   StringStack()
-   {
-      mBufferSize = 0;
-      mBuffer = NULL;
-      mArgBufferSize = 0;
-      mArgBuffer = NULL;
-      mNumFrames = 0;
-      mStart = 0;
-      mLen = 0;
-      mStartStackSize = 0;
-      mFunctionOffset = 0;
-      validateBufferSize(8192);
-      validateArgBufferSize(2048);
-      dMemset(mBuffer, '\0', mBufferSize);
-      dMemset(mArgBuffer, '\0', mArgBufferSize);
-   }
-   ~StringStack()
-   {
-      if( mBuffer )
-         dFree( mBuffer );
-      if( mArgBuffer )
-         dFree( mArgBuffer );
-   }
+   StringStack();
+   ~StringStack();
 
    /// Set the top of the stack to be an integer value.
-   void setIntValue(U32 i)
-   {
-      validateBufferSize(mStart + 32);
-      dSprintf(mBuffer + mStart, 32, "%d", i);
-      mLen = dStrlen(mBuffer + mStart);
-   }
+   void setIntValue(U32 i);
 
    /// Set the top of the stack to be a float value.
-   void setFloatValue(F64 v)
-   {
-      validateBufferSize(mStart + 32);
-      dSprintf(mBuffer + mStart, 32, "%g", v);
-      mLen = dStrlen(mBuffer + mStart);
-   }
+   void setFloatValue(F64 v);
 
    /// Return a temporary buffer we can use to return data.
-   char* getReturnBuffer(U32 size)
-   {
-      AssertFatal(Con::isMainThread(), "Manipulating return buffer from a secondary thread!");
-      validateArgBufferSize(size);
-      return mArgBuffer;
-   }
+   char* getReturnBuffer(U32 size);
 
    /// Return a buffer we can use for arguments.
    ///
    /// This updates the function offset.
-   char *getArgBuffer(U32 size)
-   {
-      AssertFatal(Con::isMainThread(), "Manipulating console arg buffer from a secondary thread!");
-      validateBufferSize(mStart + mFunctionOffset + size);
-      char *ret = mBuffer + mStart + mFunctionOffset;
-      mFunctionOffset += size;
-      return ret;
-   }
+   char *getArgBuffer(U32 size);
 
    /// Clear the function offset.
-   void clearFunctionOffset()
-   {
-      //Con::printf("StringStack mFunctionOffset = 0 (from %i)", mFunctionOffset);
-      mFunctionOffset = 0;
-   }
+   void clearFunctionOffset();
 
    /// Set a string value on the top of the stack.
-   void setStringValue(const char *s)
-   {
-      if(!s)
-      {
-         mLen = 0;
-         mBuffer[mStart] = 0;
-         return;
-      }
-      mLen = dStrlen(s);
-
-      validateBufferSize(mStart + mLen + 2);
-      dStrcpy(mBuffer + mStart, s);
-   }
+   void setStringValue(const char *s);
 
    /// Get the top of the stack, as a StringTableEntry.
    ///
@@ -226,33 +152,17 @@ struct StringStack
    ///
    /// @note You should use StringStack::push, not this, if you want to
    ///       properly push the stack.
-   void advance()
-   {
-      mStartOffsets[mStartStackSize++] = mStart;
-      mStart += mLen;
-      mLen = 0;
-   }
+   void advance();
 
    /// Advance the start stack, placing a single character, null-terminated strong
    /// on the top.
    ///
    /// @note You should use StringStack::push, not this, if you want to
    ///       properly push the stack.
-   void advanceChar(char c)
-   {
-      mStartOffsets[mStartStackSize++] = mStart;
-      mStart += mLen;
-      mBuffer[mStart] = c;
-      mBuffer[mStart+1] = 0;
-      mStart += 1;
-      mLen = 0;
-   }
+   void advanceChar(char c);
 
    /// Push the stack, placing a zero-length string on the top.
-   void push()
-   {
-      advanceChar(0);
-   }
+   void push();
 
    inline void setLen(U32 newlen)
    {
@@ -260,64 +170,20 @@ struct StringStack
    }
 
    /// Pop the start stack.
-   void rewind()
-   {
-      mStart = mStartOffsets[--mStartStackSize];
-      mLen = dStrlen(mBuffer + mStart);
-   }
+   void rewind();
 
    // Terminate the current string, and pop the start stack.
-   void rewindTerminate()
-   {
-      mBuffer[mStart] = 0;
-      mStart = mStartOffsets[--mStartStackSize];
-      mLen   = dStrlen(mBuffer + mStart);
-   }
+   void rewindTerminate();
 
    /// Compare 1st and 2nd items on stack, consuming them in the process,
    /// and returning true if they matched, false if they didn't.
-   U32 compare()
-   {
-      // Figure out the 1st and 2nd item offsets.
-      U32 oldStart = mStart;
-      mStart = mStartOffsets[--mStartStackSize];
+   U32 compare();
 
-      // Compare current and previous strings.
-      U32 ret = !dStricmp(mBuffer + mStart, mBuffer + oldStart);
+   void pushFrame();
 
-      // Put an empty string on the top of the stack.
-      mLen = 0;
-      mBuffer[mStart] = 0;
+   void popFrame();
 
-      return ret;
-   }
-
-   void pushFrame()
-   {
-      //Con::printf("StringStack pushFrame [frame=%i, start=%i]", mNumFrames, mStartStackSize);
-      mFrameOffsets[mNumFrames++] = mStartStackSize;
-      mStartOffsets[mStartStackSize++] = mStart;
-      mStart += ReturnBufferSpace;
-      validateBufferSize(0);
-   }
-
-   void popFrame()
-   {
-      //Con::printf("StringStack popFrame [frame=%i, start=%i]", mNumFrames, mStartStackSize);
-      mStartStackSize = mFrameOffsets[--mNumFrames];
-      mStart = mStartOffsets[mStartStackSize];
-      mLen = 0;
-   }
-
-   void clearFrames()
-   {
-      //Con::printf("StringStack clearFrames");
-      mNumFrames = 0;
-      mStart = 0;
-      mLen = 0;
-      mStartStackSize = 0;
-      mFunctionOffset = 0;
-   }
+   void clearFrames();
 
    /// Get the arguments for a function call from the stack.
    void getArgcArgv(StringTableEntry name, U32 *argc, const char ***in_argv, bool popStackFrame = false);

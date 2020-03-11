@@ -39,10 +39,10 @@ ThreadPool::Context ThreadPool::Context::smRootContext( "ROOT", NULL, 1.0 );
 //--------------------------------------------------------------------------
 
 ThreadPool::Context::Context( const char* name, ThreadPool::Context* parent, F32 priorityBias )
-   : mName( name ),
-     mParent( parent ),
-     mSibling( 0 ),
+   : mParent( parent ),
+     mName( name ),
      mChildren( 0 ),
+     mSibling( 0 ),
      mPriorityBias( priorityBias ),
      mAccumulatedPriorityBias( 0.0 )
 {
@@ -215,8 +215,8 @@ private:
 };
 
 ThreadPool::WorkerThread::WorkerThread( ThreadPool* pool, U32 index )
-   : mPool( pool ),
-     mIndex( index )
+   : mIndex( index ),
+     mPool( pool )
 {
    // Link us to the pool's thread list.
 
@@ -240,17 +240,6 @@ void ThreadPool::WorkerThread::run( void* arg )
    }
    #endif
 
-#if defined(TORQUE_OS_XENON)
-   // On Xbox 360 you must explicitly assign software threads to hardware threads.
-
-   // This will distribute job threads across the secondary CPUs leaving both
-   // primary CPU cores available to the "main" thread. This will help prevent
-   // more L2 thrashing of the main thread/core.
-   static U32 sCoreAssignment = 2;
-   XSetThreadProcessor( GetCurrentThread(), sCoreAssignment );
-   sCoreAssignment = sCoreAssignment < 6 ? sCoreAssignment + 1 : 2;
-#endif
-      
    while( 1 )
    {
       if( checkForStop() )
@@ -322,8 +311,8 @@ ThreadPool::ThreadPool( const char* name, U32 numThreads )
      mNumThreads( numThreads ),
      mNumThreadsAwake( 0 ),
      mNumPendingItems( 0 ),
-     mThreads( 0 ),
-     mSemaphore( 0 )
+     mSemaphore( 0 ),
+     mThreads( 0 )
 {
    // Number of worker threads to create.
 

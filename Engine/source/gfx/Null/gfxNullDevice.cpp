@@ -309,7 +309,7 @@ void GFXNullDevice::enumerateAdapters( Vector<GFXAdapter*> &adapterList )
    vm.resolution.set(800,600);
    toAdd->mAvailableModes.push_back(vm);
 
-   dStrcpy(toAdd->mName, "GFX Null Device");
+   dStrcpy(toAdd->mName, "GFX Null Device", GFXAdapter::MaxAdapterNameLen);
 
    adapterList.push_back(toAdd);
 }

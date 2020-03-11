@@ -93,26 +93,6 @@ typedef int SOCKET;
 
 #define closesocket close
 
-#elif defined( TORQUE_OS_XENON )
-
-#include <Xtl.h>
-#include <string>
-
-#define TORQUE_USE_WINSOCK
-#define EINPROGRESS WSAEINPROGRESS
-#define ioctl ioctlsocket
-typedef S32 socklen_t;
-
-DWORD _getLastErrorAndClear()
-{
-   DWORD err = WSAGetLastError();
-   WSASetLastError( 0 );
-
-   return err;
-}
-
-#else
-
 #endif
 
 #if defined(TORQUE_USE_WINSOCK)
@@ -250,7 +230,6 @@ namespace PlatformNetState
       // which are required for LAN queries (PC->Xbox connectivity).  The wire protocol still
       // uses the VDP packet structure, though.
       S32 protocol = IPPROTO_UDP;
-      bool useVDP = false;
 #ifdef TORQUE_DISABLE_PC_CONNECTIVITY
       // Xbox uses a VDP (voice/data protocol) socket for networking
       protocol = IPPROTO_VDP;
@@ -300,7 +279,7 @@ namespace PlatformNetState
       if (addressString[0] == '[')
       {
          // Must be ipv6 notation
-         dStrcpy(outAddress, addressString+1);
+         dStrcpy(outAddress, addressString+1, 256);
          addressString = outAddress;
 
          portString = dStrchr(outAddress, ']');
@@ -325,7 +304,7 @@ namespace PlatformNetState
       }
       else
       {
-         dStrcpy(outAddress, addressString);
+         dStrcpy(outAddress, addressString, 256);
          addressString = outAddress;
 
          // Check to see if we have multiple ":" which would indicate this is an ipv6 address
@@ -492,10 +471,10 @@ template<class T> T ReservedSocketList<T>::resolve(NetSocket socketToResolve)
    return entry.used ? entry.value : -1;
 }
 
-static ConnectionNotifyEvent*   smConnectionNotify = NULL;
-static ConnectionAcceptedEvent* smConnectionAccept = NULL;
-static ConnectionReceiveEvent*  smConnectionReceive = NULL;
-static PacketReceiveEvent*      smPacketReceive = NULL;
+ConnectionNotifyEvent*   Net::smConnectionNotify = NULL;
+ConnectionAcceptedEvent* Net::smConnectionAccept = NULL;
+ConnectionReceiveEvent*  Net::smConnectionReceive = NULL;
+PacketReceiveEvent*      Net::smPacketReceive = NULL;
 
 ConnectionNotifyEvent& Net::getConnectionNotifyEvent()
 {
@@ -566,7 +545,7 @@ static PolledSocket* addPolledSocket(NetSocket handleFd, SOCKET fd, S32 state,
    sock->handleFd = handleFd;
    sock->state = state;
    if (remoteAddr)
-      dStrcpy(sock->remoteAddr, remoteAddr);
+      dStrcpy(sock->remoteAddr, remoteAddr, 256);
    if (port != -1)
       sock->remotePort = port;
    gPolledSockets.push_back(sock);
@@ -596,20 +575,6 @@ bool Net::init()
 #if defined(TORQUE_USE_WINSOCK)
    if(!PlatformNetState::initCount)
    {
-#ifdef TORQUE_OS_XENON
-      // Configure startup parameters
-      XNetStartupParams xnsp;
-      memset( &xnsp, 0, sizeof( xnsp ) );
-      xnsp.cfgSizeOfStruct = sizeof( XNetStartupParams );
-
-#ifndef TORQUE_DISABLE_PC_CONNECTIVITY
-      xnsp.cfgFlags = XNET_STARTUP_BYPASS_SECURITY;
-      Con::warnf("XNET_STARTUP_BYPASS_SECURITY enabled! This build can talk to PCs!");
-#endif
-
-      AssertISV( !XNetStartup( &xnsp ), "Net::init - failed to init XNet" );
-#endif
-
       WSADATA stWSAData;
       AssertISV( !WSAStartup( 0x0101, &stWSAData ), "Net::init - failed to init WinSock!" );
 
@@ -654,10 +619,6 @@ void Net::shutdown()
    if(!PlatformNetState::initCount)
    {
       WSACleanup();
-
-#ifdef TORQUE_OS_XENON
-      XNetCleanup();
-#endif
    }
 #endif
 }
@@ -809,7 +770,8 @@ NetSocket Net::openConnectTo(const char *addressString)
       error = Net::WrongProtocolType;
    }
 
-   if (error != NoError || error == NeedHostLookup)
+   // Open socket
+   if (error == NoError || error == NeedHostLookup)
    {
       handleFd = openSocket();
    }
@@ -823,13 +785,16 @@ NetSocket Net::openConnectTo(const char *addressString)
       if (socketFd != InvalidSocketHandle)
       {
          setBlocking(handleFd, false);
-         if (::connect(socketFd, (struct sockaddr *)&ipAddr, sizeof(ipAddr)) == -1 &&
-            errno != EINPROGRESS)
+         if (::connect(socketFd, (struct sockaddr *)&ipAddr, sizeof(ipAddr)) == -1)
          {
-            Con::errorf("Error connecting %s: %s",
-               addressString, strerror(errno));
-            closeSocket(handleFd);
-            handleFd = NetSocket::INVALID;
+            Net::Error err = PlatformNetState::getLastError();
+            if (err != Net::WouldBlock)
+            {
+               Con::errorf("Error connecting to %s: %u",
+                  addressString, err);
+               closeSocket(handleFd);
+               handleFd = NetSocket::INVALID;
+            }
          }
       }
       else
@@ -849,14 +814,20 @@ NetSocket Net::openConnectTo(const char *addressString)
       sockaddr_in6 ipAddr6;
       NetAddressToIPSocket6(&address, &ipAddr6);
       SOCKET socketFd = PlatformNetState::smReservedSocketList.activate(handleFd, AF_INET6, false, true);
-      if (::connect(socketFd, (struct sockaddr *)&ipAddr6, sizeof(ipAddr6)) == -1 &&
-         errno != EINPROGRESS)
+      if (socketFd != InvalidSocketHandle)
       {
          setBlocking(handleFd, false);
-         Con::errorf("Error connecting %s: %s",
-            addressString, strerror(errno));
-         closeSocket(handleFd);
-         handleFd = NetSocket::INVALID;
+         if (::connect(socketFd, (struct sockaddr *)&ipAddr6, sizeof(ipAddr6)) == -1)
+         {
+            Net::Error err = PlatformNetState::getLastError();
+            if (err != Net::WouldBlock)
+            {
+               Con::errorf("Error connecting to %s: %u",
+                  addressString, err);
+               closeSocket(handleFd);
+               handleFd = NetSocket::INVALID;
+            }
+         }
       }
       else
       {
@@ -1196,14 +1167,8 @@ void Net::process()
          break;
       case PolledSocket::ConnectionPending:
          // see if it is now connected
-#ifdef TORQUE_OS_XENON
-         // WSASetLastError has no return value, however part of the SO_ERROR behavior
-         // is to clear the last error, so this needs to be done here.
-         if( ( optval = _getLastErrorAndClear() ) == -1 ) 
-#else
          if (getsockopt(currentSock->fd, SOL_SOCKET, SO_ERROR,
             (char*)&optval, &optlen) == -1)
-#endif
          {
             Con::errorf("Error getting socket options: %s",  strerror(errno));
             
@@ -1876,8 +1841,6 @@ void Net::addressToString(const NetAddress *address, char  addressString[256])
       {
          char buffer[256];
          buffer[0] = '\0';
-         sockaddr_in ipAddr;
-         NetAddressToIPSocket(address, &ipAddr);
          inet_ntop(AF_INET, &(ipAddr.sin_addr), buffer, sizeof(buffer));
          if (ipAddr.sin_port == 0)
             dSprintf(addressString, 256, "IP:%s", buffer);
@@ -1992,7 +1955,6 @@ void Net::enableMulticast()
 
          if (error == NoError)
          {
-            NetAddress listenAddress;
             char listenAddressStr[256];
             Net::addressToString(&multicastAddress, listenAddressStr);
             Con::printf("Multicast initialized on %s", listenAddressStr);
