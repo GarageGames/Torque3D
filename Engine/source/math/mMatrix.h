@@ -35,12 +35,18 @@
 #include "math/mPoint4.h"
 #endif
 
+#ifndef _ENGINETYPEINFO_H_
+#include "console/engineTypeInfo.h"
+#endif
+
+
 /// 4x4 Matrix Class
 ///
 /// This runs at F32 precision.
 
 class MatrixF
 {
+   friend class MatrixFEngineExport;
 private:
    F32 m[16];     ///< Note: Torque uses row-major matrices
 
@@ -222,6 +228,12 @@ public:
 
    // Static identity matrix
    const static MatrixF Identity;
+};
+
+class MatrixFEngineExport
+{
+public:
+   static EngineFieldTable::Field getMatrixField();
 };
 
 

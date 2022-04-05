@@ -26,6 +26,7 @@
 #ifndef _PLATFORM_H_
    #include "platform/platform.h"
 #endif
+#include "console/engineTypeInfo.h"
 
 
 namespace Torque
@@ -33,6 +34,7 @@ namespace Torque
    /// A universally unique identifier.
    class UUID
    {
+      friend class UUIDEngineExport;
       public:
       
          typedef void Parent;
@@ -80,6 +82,17 @@ namespace Torque
          {
             return !( *this == uuid );
          }
+   };
+
+   class UUIDEngineExport
+   {
+   public:
+      static EngineFieldTable::Field getAField();
+      static EngineFieldTable::Field getBField();
+      static EngineFieldTable::Field getCField();
+      static EngineFieldTable::Field getDField();
+      static EngineFieldTable::Field getEField();
+      static EngineFieldTable::Field getFField();
    };
 }
 

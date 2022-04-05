@@ -1532,6 +1532,7 @@ DefineEngineMethod( SFXSource, setPitch, void, ( F32 pitch ),,
 // Need an overload here as we can't use a default parameter to signal omission of the direction argument
 // and we need to properly detect the omission to leave the currently set direction on the source as is.
 
+/* LukasPJ: For now, just use the setTransform with strings as parameters.
 DEFINE_CALLIN( fnSFXSoure_setTransform1, setTransform, SFXSource, void, ( SFXSource* source, const VectorF& position ),,,
    "Set the position of the source's 3D sound.\n\n"
    "@param position The new position in world space.\n"
@@ -1551,6 +1552,7 @@ DEFINE_CALLIN( fnSFXSoure_setTransform2, setTransform, SFXSource, void, ( SFXSou
    mat.setColumn( 1, direction );
    source->setTransform( mat );
 }
+*/
 
 // Console interop version.
 

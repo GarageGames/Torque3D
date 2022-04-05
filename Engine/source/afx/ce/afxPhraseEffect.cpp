@@ -297,12 +297,12 @@ void afxPhraseEffectData::gather_cons_defs(Vector<afxConstraintDef>& defs)
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//
 
-DefineEngineMethod( afxPhraseEffectData, addEffect, void, ( afxEffectBaseData* effectData ),,
-   "Add a child effect to a phrase effect datablock. Argument can be an afxEffectWrappperData or an afxEffectGroupData.\n" )
+DefineEngineMethod( afxPhraseEffectData, pushEffect, void, ( afxEffectBaseData* effectData ),,
+   "Push a child effect to a phrase effect datablock. Argument can be an afxEffectWrappperData or an afxEffectGroupData.\n" )
 {
   if (!effectData) 
   {
-    Con::errorf("afxPhraseEffectData::addEffect() -- failed to resolve effect datablock.");
+    Con::errorf("afxPhraseEffectData::pushEffect() -- failed to resolve effect datablock.");
     return;
   }
 

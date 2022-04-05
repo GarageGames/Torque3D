@@ -240,12 +240,12 @@ struct _EngineStructTypeTraits
    typedef void SuperType;
    
    // Structs get passed in as pointers and passed out as full copies.
-   typedef T ArgumentValueType;
+   typedef T* ArgumentValueType;
    typedef T ReturnValueType;
    typedef T DefaultArgumentValueStoreType;
 
    typedef ReturnValueType ReturnValue;
-   static ValueType ArgumentToValue( ArgumentValueType val ) { return val; }
+   static ValueType ArgumentToValue( ArgumentValueType val ) { return *val; }
 
    static const EngineTypeInfo* const TYPEINFO;
 };
@@ -564,12 +564,18 @@ namespace _Private {
 
 
 ///
+#define _FIELD( fieldName, exportName, numElements, doc ) \
+   { #exportName, doc, numElements, TYPE( ( ( ThisType* ) 16 )->fieldName ), (U32)FIELDOFFSET( fieldName ) } // Artificial offset to avoid compiler warnings.
+
 #define FIELD( fieldName, exportName, numElements, doc ) \
-   { #exportName, doc, numElements, TYPE( ( ( ThisType* ) 16 )->fieldName ), (U32)FIELDOFFSET( fieldName ) }, // Artificial offset to avoid compiler warnings.
+   _FIELD(fieldName, exportName, numElements, doc),
 
 ///
+#define _FIELD_AS( type, fieldName, exportName, numElements, doc ) \
+   { #exportName, doc, numElements, TYPE( *( ( type* ) &( ( ThisType* ) 16 )->fieldName ) ), (U32)FIELDOFFSET( fieldName ) } // Artificial offset to avoid compiler warnings.
+
 #define FIELD_AS( type, fieldName, exportName, numElements, doc ) \
-   { #exportName, doc, numElements, TYPE( *( ( type* ) &( ( ThisType* ) 16 )->fieldName ) ), (U32)FIELDOFFSET( fieldName ) }, // Artificial offset to avoid compiler warnings.
+   _FIELD_AS(type, fieldName, exportName, numElements, doc),
    
 ///
 #define FIELDOFFSET( fieldName ) \

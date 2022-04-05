@@ -42,6 +42,7 @@
 #include "persistence/taml/tamlCustom.h"
 
 #include "sim/netObject.h"
+#include "cinterface/cinterface.h"
 
 IMPLEMENT_CONOBJECT( SimObject );
 
@@ -828,6 +829,10 @@ bool SimObject::isMethod( const char* methodName )
 {
    if( !methodName || !methodName[0] )
       return false;
+
+   if (CInterface::isMethod(this->getName(), methodName) || CInterface::isMethod(this->getClassName(), methodName)) {
+      return true;
+   }
 
    StringTableEntry stname = StringTable->insert( methodName );
 

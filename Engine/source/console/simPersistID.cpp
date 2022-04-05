@@ -24,15 +24,25 @@
 #include "console/simObject.h"
 #include "core/util/tDictionary.h"
 #include "core/util/safeDelete.h"
+#include "engineAPI.h"
 
 
 //#define DEBUG_SPEW
 
+IMPLEMENT_CLASS(SimPersistID, "")
+END_IMPLEMENT_CLASS;
 
 SimPersistID::LookupTableType* SimPersistID::smLookupTable;
 
 
 //-----------------------------------------------------------------------------
+
+SimPersistID::SimPersistID()
+{
+   mObject = NULL;
+   mUUID.generate();
+   smLookupTable->insertUnique(mUUID, this);
+}
 
 SimPersistID::SimPersistID( SimObject* object )
    : mObject( object )
@@ -135,4 +145,14 @@ SimPersistID* SimPersistID::findOrCreate( const Torque::UUID& uuid )
    }
       
    return pid;
+}
+
+DefineNewEngineMethod(SimPersistID, getUUID, Torque::UUID, (), , "")
+{
+   return object->getUUID();
+}
+
+DefineNewEngineMethod(SimPersistID, getObject, SimObject*, (), , "")
+{
+   return object->getObject();
 }

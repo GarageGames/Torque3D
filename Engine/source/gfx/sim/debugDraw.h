@@ -93,6 +93,7 @@ class GFont;
 ///
 class DebugDrawer : public SimObject
 {
+   typedef SimObject Parent;
 public:
    DECLARE_CONOBJECT(DebugDrawer);
 
@@ -162,8 +163,6 @@ public:
 
    /// @}
 private:
-   typedef SimObject Parent;
-
    static DebugDrawer* sgDebugDrawer;
 
    struct DebugPrim

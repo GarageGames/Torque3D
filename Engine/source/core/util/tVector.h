@@ -29,6 +29,8 @@
 #include "platform/platform.h"
 #endif
 #include <algorithm>
+#include "console/engineTypes.h"
+#include "console/engineTypeInfo.h"
 
 //-----------------------------------------------------------------------------
 // Helper definitions for the vector class.
@@ -63,6 +65,7 @@ extern bool VectorResize(U32 *aSize, U32 *aCount, void **arrayPtr, U32 newCount,
 template<class T>
 class Vector
 {
+   friend class VectorFieldEngineExport;
   protected:
    U32 mElementCount; ///< Number of elements currently in the Vector.
    U32 mArraySize;    ///< Number of elements allocated for the Vector.
@@ -186,6 +189,29 @@ class Vector
    void reverse();
 
    /// @}
+};
+
+class VectorFieldEngineExport
+{
+public:
+   template <class T>
+   static EngineFieldTable::Field getElementCountField()
+   {
+      typedef Vector<T> ThisType;
+      return _FIELD(mElementCount, elementCount, 1, "");
+   };
+   template <class T>
+   static EngineFieldTable::Field getArraySizeField()
+   {
+      typedef Vector<T> ThisType;
+      return _FIELD(mArraySize, arraySize, 1, "");
+   };
+   template <class T>
+   static EngineFieldTable::Field getArrayField()
+   {
+      typedef Vector<T> ThisType;
+      return _FIELD(mArray, array, 1, "");
+   };
 };
 
 template<class T> inline Vector<T>::~Vector()
@@ -966,7 +992,7 @@ public:
 };
 
 // Include vector specializations
-#ifndef _VECTORSPEC_H_
+#ifndef _TVECTORSPEC_H_
 #include "core/util/tVectorSpecializations.h"
 #endif
 

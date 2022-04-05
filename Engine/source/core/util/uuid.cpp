@@ -68,6 +68,7 @@
 #include <ctype.h>
 
 #include "core/util/md5.h"
+#include "console/enginePrimitives.h"
 
 #if defined (TORQUE_OS_MAC) && defined(TORQUE_CPU_X64)
 typedef unsigned int    unsigned32;
@@ -451,3 +452,42 @@ namespace Torque
       return ( a + b + c + d + e + f[ 0 ] + f[ 1 ] + f[ 2 ] + f[ 3 ] + f[ 4 ] + f[ 5 ] );
    }
 }
+
+EngineFieldTable::Field Torque::UUIDEngineExport::getAField()
+{
+   typedef UUID ThisType;
+   return _FIELD(a, a, 1, "");
+}
+
+EngineFieldTable::Field Torque::UUIDEngineExport::getBField()
+{
+   typedef UUID ThisType;
+   return _FIELD(b, b, 1, "");
+}
+
+EngineFieldTable::Field Torque::UUIDEngineExport::getCField()
+{
+   typedef UUID ThisType;
+   return _FIELD(c, c, 1, "");
+}
+
+EngineFieldTable::Field Torque::UUIDEngineExport::getDField()
+{
+   typedef UUID ThisType;
+   return _FIELD(d, d, 1, "");
+}
+
+EngineFieldTable::Field Torque::UUIDEngineExport::getEField()
+{
+   typedef UUID ThisType;
+   return _FIELD(e, e, 1, "");
+}
+
+EngineFieldTable::Field Torque::UUIDEngineExport::getFField()
+{
+   typedef UUID ThisType;
+   return _FIELD_AS(U8, f, f, 6, "");
+}
+
+
+

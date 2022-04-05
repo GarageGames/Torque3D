@@ -425,8 +425,8 @@ void SFXDescription::initPersistFields()
       "Reverb echo depth.");
    addField("reverbModTime", TypeF32, Offset(mReverb.flModulationTime, SFXDescription),
       "Reverb Modulation time.");
-   addField("reverbModTime", TypeF32, Offset(mReverb.flModulationDepth, SFXDescription),
-      "Reverb Modulation time.");
+   addField("reverbModDepth", TypeF32, Offset(mReverb.flModulationDepth, SFXDescription),
+      "Reverb Modulation Depth.");
    addField("airAbsorbtionGainHF", TypeF32, Offset(mReverb.flAirAbsorptionGainHF, SFXDescription),
       "High Frequency air absorbtion");
    addField("reverbHFRef", TypeF32, Offset(mReverb.flHFReference, SFXDescription),

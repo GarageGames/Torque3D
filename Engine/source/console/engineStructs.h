@@ -27,6 +27,8 @@
    #include "console/engineTypes.h"
 #endif
 
+#include "math/mPlane.h"
+#include "math/mPolyhedron.h"
 
 /// @file
 /// Definitions for the core engine structured types.
@@ -44,6 +46,12 @@ class LinearColorF;
 DECLARE_STRUCT_R(Vector< bool >);
 DECLARE_STRUCT_R(Vector< S32 >);
 DECLARE_STRUCT_R(Vector< F32 >);
+DECLARE_STRUCT_R(Vector< Point3F >);
+DECLARE_STRUCT_R(PlaneF);
+DECLARE_STRUCT_R(Vector< PlaneF >);
+DECLARE_STRUCT_R(PolyhedronData::Edge);
+DECLARE_STRUCT_R(Vector< PolyhedronData::Edge >);
+DECLARE_STRUCT_R(Vector< const char* >);
 DECLARE_STRUCT_R(Torque::UUID);
 DECLARE_STRUCT_R(ColorI);
 DECLARE_STRUCT_R(LinearColorF);

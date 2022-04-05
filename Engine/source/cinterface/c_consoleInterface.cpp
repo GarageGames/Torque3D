@@ -26,12 +26,24 @@
 
 namespace Con
 {
+   /* Consumer Callback is not defined as EngineType yet, until then we have to define these methods directly.
    DefineNewEngineFunction(AddConsumer, void, (ConsumerCallback cb), , "")
    {
       addConsumer(cb);
    }
 
    DefineNewEngineFunction(RemoveConsumer, void, (ConsumerCallback cb), , "")
+   {
+      removeConsumer(cb);
+   }
+   */
+
+   TORQUE_API void fnAddConsumer(ConsumerCallback cb)
+   {
+      addConsumer(cb);
+   }
+
+   TORQUE_API void fnRemoveConsumer(ConsumerCallback cb)
    {
       removeConsumer(cb);
    }

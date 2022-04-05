@@ -27,9 +27,23 @@
 IMPLEMENT_PRIMITIVE( bool,          bool,,      "Boolean true/false." );
 IMPLEMENT_PRIMITIVE( S8,            byte,,      "8bit signed integer." );
 IMPLEMENT_PRIMITIVE( U8,            ubyte,,     "8bit unsigned integer." );
+IMPLEMENT_PRIMITIVE( S16,           short,,     "16bit signed integer.");
+IMPLEMENT_PRIMITIVE( U16,           ushort,,    "16bit unsigned integer.");
 IMPLEMENT_PRIMITIVE( S32,           int,,       "32bit signed integer." );
 IMPLEMENT_PRIMITIVE( U32,           uint,,      "32bit unsigned integer." );
 IMPLEMENT_PRIMITIVE( F32,           float,,     "32bit single-precision floating-point." );
 IMPLEMENT_PRIMITIVE( F64,           double,,    "64bit double-precision floating-point." );
 IMPLEMENT_PRIMITIVE( String,        string,,    "Null-terminated UTF-16 Unicode string." );
+IMPLEMENT_PRIMITIVE( const UTF8*,   cstring,,   "Null-terminated UTF-8 Unicode string.");
 IMPLEMENT_PRIMITIVE( void*,         ptr,,       "Opaque pointer." );
+
+// Define pointer types for vectors.
+IMPLEMENT_PRIMITIVE( bool*,                 ptr_bool,,    "Pointer to a bool." );
+IMPLEMENT_PRIMITIVE( U8*,                   ptr_ubyte,,   "Pointer to an unsigned byte." );
+IMPLEMENT_PRIMITIVE( U32*,                  ptr_uint,,    "Pointer to an unsigned 32bit int." );
+IMPLEMENT_PRIMITIVE( S32*,                  ptr_int,,     "Pointer to a 32bit int." );
+IMPLEMENT_PRIMITIVE( F32*,                  ptr_float,,   "Pointer to a 32bit float." );
+IMPLEMENT_PRIMITIVE( Point3F*,              ptr_Point3F,, "Pointer to a Point3F struct." );
+IMPLEMENT_PRIMITIVE( PlaneF*,               ptr_PlaneF,,  "Pointer to a PlaneF struct." );
+IMPLEMENT_PRIMITIVE( PolyhedronData::Edge*, ptr_Edge,,    "Pointer to an Edge struct." );
+IMPLEMENT_PRIMITIVE( const UTF8**,          ptr_string,,  "Pointer to an UTF-8 string." );

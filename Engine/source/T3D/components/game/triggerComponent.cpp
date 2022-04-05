@@ -18,28 +18,28 @@
 
 #include "gfx/sim/debugDraw.h"
 
-IMPLEMENT_CALLBACK( TriggerComponent, onEnterViewCmd, void, 
+IMPLEMENT_CALLBACK( TriggerComponent, onEnterView, void, 
    ( Entity* cameraEnt, bool firstTimeSeeing ), ( cameraEnt, firstTimeSeeing ),
    "@brief Called when an object enters the volume of the Trigger instance using this TriggerData.\n\n"
 
    "@param trigger the Trigger instance whose volume the object entered\n"
    "@param obj the object that entered the volume of the Trigger instance\n" );
 
-IMPLEMENT_CALLBACK( TriggerComponent, onExitViewCmd, void, 
+IMPLEMENT_CALLBACK( TriggerComponent, onExitView, void, 
    ( Entity* cameraEnt ), ( cameraEnt ),
    "@brief Called when an object enters the volume of the Trigger instance using this TriggerData.\n\n"
 
    "@param trigger the Trigger instance whose volume the object entered\n"
    "@param obj the object that entered the volume of the Trigger instance\n" );
 
-IMPLEMENT_CALLBACK( TriggerComponent, onUpdateInViewCmd, void, 
+IMPLEMENT_CALLBACK( TriggerComponent, onUpdateInView, void, 
    ( Entity* cameraEnt ), ( cameraEnt ),
    "@brief Called when an object enters the volume of the Trigger instance using this TriggerData.\n\n"
 
    "@param trigger the Trigger instance whose volume the object entered\n"
    "@param obj the object that entered the volume of the Trigger instance\n" );
 
-IMPLEMENT_CALLBACK( TriggerComponent, onUpdateOutOfViewCmd, void, 
+IMPLEMENT_CALLBACK( TriggerComponent, onUpdateOutOfView, void, 
    ( Entity* cameraEnt ), ( cameraEnt ),
    "@brief Called when an object enters the volume of the Trigger instance using this TriggerData.\n\n"
 
@@ -146,8 +146,8 @@ void TriggerComponent::initPersistFields()
 
    addField("visibile",   TypeBool,  Offset( mVisible, TriggerComponent ), "" );
 
-   addField("onEnterViewCmd", TypeCommand, Offset(mEnterCommand, TriggerComponent), "");
-   addField("onExitViewCmd", TypeCommand, Offset(mOnExitCommand, TriggerComponent), "");
+   addField("onEnterViewCmd", TypeCommand, Offset(mOnEnterViewCmd, TriggerComponent), "");
+   addField("onExitViewCmd", TypeCommand, Offset(mOnExitViewCmd, TriggerComponent), "");
    addField("onUpdateInViewCmd", TypeCommand, Offset(mOnUpdateInViewCmd, TriggerComponent), "");
 }
 
@@ -180,10 +180,10 @@ void TriggerComponent::potentialEnterObject(SceneObject *collider)
       {
          mObjectList.push_back(collider);
 
-         if (!mEnterCommand.isEmpty())
+         if (!mOnEnterViewCmd.isEmpty())
          {
             String command = String("%obj = ") + collider->getIdString() + ";" + 
-               String("%this = ") + getIdString() + ";" + mEnterCommand;
+               String("%this = ") + getIdString() + ";" + mOnEnterViewCmd;
             Con::evaluate(command.c_str());
          }
 
@@ -262,10 +262,10 @@ void TriggerComponent::processTick()
       {
          if(!testObject(mObjectList[i]))
          {
-            if (!mOnExitCommand.isEmpty())
+            if (!mOnExitViewCmd.isEmpty())
             {
                String command = String("%obj = ") + mObjectList[i]->getIdString() + ";" +
-                  String("%this = ") + getIdString() + ";" + mOnExitCommand;
+                  String("%this = ") + getIdString() + ";" + mOnExitViewCmd;
                Con::evaluate(command.c_str());
             }
 

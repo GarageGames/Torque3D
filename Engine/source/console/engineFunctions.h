@@ -67,18 +67,9 @@ struct EngineFunctionDefaultArguments
    /// @warn This is @b NOT the size of the memory block returned by getArgs() and also
    ///   not the number of elements it contains.
    U32 mNumDefaultArgs;
-   
-   /// Return a pointer to the variable-sized array of default argument values.
-   ///
-   /// @warn The arguments must be stored @b IMMEDIATELY after #mNumDefaultArgs.
-   /// @warn This is a @b FULL frame and not just the default arguments, i.e. it starts with the
-   ///   first argument that the function takes and ends with the last argument it takes.
-   /// @warn If the compiler's #pragma pack is buggy, the elements in this structure are allowed
-   ///   to be 4-byte aligned rather than byte-aligned as they should be.
-   const U8* getArgs() const
-   {
-      return ( const U8* ) &( mNumDefaultArgs ) + sizeof( mNumDefaultArgs );
-   }
+
+   U32* mOffsets;
+   U8* mFirst;
 };
 
 
@@ -94,22 +85,21 @@ struct EngineFunctionDefaultArguments
 template< typename T >
 struct _EngineFunctionDefaultArguments {};
 
-template<typename ...ArgTs>
-struct _EngineFunctionDefaultArguments< void(ArgTs...) > : public EngineFunctionDefaultArguments
+template<typename R, typename ...ArgTs>
+struct _EngineFunctionDefaultArguments< R(ArgTs...) > : public EngineFunctionDefaultArguments
 {
    template<typename T> using DefVST = typename EngineTypeTraits<T>::DefaultArgumentValueStoreType;
-   fixed_tuple<DefVST<ArgTs>  ...> mFixedArgs;
-   std::tuple<DefVST<ArgTs>  ...> mArgs;
+   using SelfType = _EngineFunctionDefaultArguments< R(ArgTs...) >;
+   fixed_tuple<DefVST<ArgTs>...> mArgs;
+
 private:
-   using SelfType = _EngineFunctionDefaultArguments< void(ArgTs...) >;
-   
    template<size_t ...> struct Seq {};
    template<size_t N, size_t ...S> struct Gens : Gens<N-1, N-1, S...> {};
    
    template<size_t ...I> struct Gens<0, I...>{ typedef Seq<I...> type; };
    
    template<typename ...TailTs, size_t ...I>
-   static void copyHelper(std::tuple<DefVST<ArgTs> ...> &args, std::tuple<DefVST<TailTs> ...> &defaultArgs, Seq<I...>)  {
+   static void copyHelper(std::tuple<DefVST<ArgTs> ...> &args, std::tuple<DefVST<TailTs> ...> &defaultArgs, Seq<I...>) {
       std::tie(std::get<I + (sizeof...(ArgTs) - sizeof...(TailTs))>(args)...) = defaultArgs;
    }
    
@@ -117,26 +107,43 @@ private:
    template<typename ...TailTs>
    struct DodgyVCHelper
    {
-      using type = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), decltype(mArgs)>::type;
+      using type = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), std::tuple<DefVST<ArgTs>...>>::type;
    };
 
    template<typename ...TailTs> using MaybeSelfEnabled = typename DodgyVCHelper<TailTs...>::type;
 #else
-   template<typename ...TailTs> using MaybeSelfEnabled = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), decltype(mArgs)>::type;
+   template<typename ...TailTs> using MaybeSelfEnabled = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), std::tuple<DefVST<ArgTs>...>>::type;
 #endif
    
    template<typename ...TailTs> static MaybeSelfEnabled<TailTs...> tailInit(TailTs ...tail) {
       std::tuple<DefVST<ArgTs>...> argsT;
       std::tuple<DefVST<TailTs>...> tailT = std::make_tuple(tail...);
-      SelfType::copyHelper<TailTs...>(argsT, tailT, typename Gens<sizeof...(TailTs)>::type());
+      SelfType::template copyHelper<TailTs...>(argsT, tailT, typename Gens<sizeof...(TailTs)>::type());
       return argsT;
    };
+
+   template<size_t I = 0>
+   typename std::enable_if<I == sizeof...(ArgTs)>::type initOffsetsHelper()
+   { }
+
+   template<size_t I = 0>
+   typename std::enable_if < I < sizeof...(ArgTs)>::type initOffsetsHelper()
+   {
+      mOffsets[I] = fixed_tuple_offset<I>(mArgs);
+      initOffsetsHelper<I + 1>();
+   }
    
 public:
    template<typename ...TailTs> _EngineFunctionDefaultArguments(TailTs ...tail)
-   : EngineFunctionDefaultArguments({sizeof...(TailTs)}), mArgs(SelfType::tailInit(tail...))
+   : EngineFunctionDefaultArguments()
    {
-      fixed_tuple_mutator<void(DefVST<ArgTs>...), void(DefVST<ArgTs>...)>::copy(mArgs, mFixedArgs);
+      std::tuple<DefVST<ArgTs>...> tmpTup = SelfType::tailInit(tail...);
+      fixed_tuple_mutator<void(DefVST<ArgTs>...), void(DefVST<ArgTs>...)>::copy(tmpTup, mArgs);
+
+      mNumDefaultArgs = sizeof...(TailTs);
+      mOffsets = new U32[sizeof...(ArgTs)];
+      initOffsetsHelper();
+      mFirst = (U8*)& mArgs;
    }
 };
 

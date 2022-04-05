@@ -67,13 +67,13 @@ void GuiScriptNotifyCtrl::initPersistFields()
 {
    // Callbacks Group
    addGroup("Callbacks");
-   addField("onChildAdded", TypeBool, Offset( mOnChildAdded, GuiScriptNotifyCtrl ), "Enables/disables onChildAdded callback" );
-   addField("onChildRemoved", TypeBool, Offset( mOnChildRemoved, GuiScriptNotifyCtrl ), "Enables/disables onChildRemoved callback" );
-   addField("onChildResized", TypeBool, Offset( mOnChildResized, GuiScriptNotifyCtrl ), "Enables/disables onChildResized callback" );
-   addField("onParentResized", TypeBool, Offset( mOnParentResized, GuiScriptNotifyCtrl ), "Enables/disables onParentResized callback" );
-   addField("onResize", TypeBool, Offset( mOnResize, GuiScriptNotifyCtrl ), "Enables/disables onResize callback" );
-   addField("onLoseFirstResponder", TypeBool, Offset( mOnLoseFirstResponder, GuiScriptNotifyCtrl ), "Enables/disables onLoseFirstResponder callback" );
-   addField("onGainFirstResponder", TypeBool, Offset( mOnGainFirstResponder, GuiScriptNotifyCtrl ), "Enables/disables onGainFirstResponder callback" );
+   addField("notifyOnChildAdded", TypeBool, Offset( mOnChildAdded, GuiScriptNotifyCtrl ), "Enables/disables onChildAdded callback" );
+   addField("notifyOnChildRemoved", TypeBool, Offset( mOnChildRemoved, GuiScriptNotifyCtrl ), "Enables/disables onChildRemoved callback" );
+   addField("notifyOnChildResized", TypeBool, Offset( mOnChildResized, GuiScriptNotifyCtrl ), "Enables/disables onChildResized callback" );
+   addField("notifyOnParentResized", TypeBool, Offset( mOnParentResized, GuiScriptNotifyCtrl ), "Enables/disables onParentResized callback" );
+   addField("notifyOnResize", TypeBool, Offset( mOnResize, GuiScriptNotifyCtrl ), "Enables/disables onResize callback" );
+   addField("notifyOnLoseFirstResponder", TypeBool, Offset( mOnLoseFirstResponder, GuiScriptNotifyCtrl ), "Enables/disables onLoseFirstResponder callback" );
+   addField("notifyOnGainFirstResponder", TypeBool, Offset( mOnGainFirstResponder, GuiScriptNotifyCtrl ), "Enables/disables onGainFirstResponder callback" );
    endGroup("Callbacks");
 
    Parent::initPersistFields();

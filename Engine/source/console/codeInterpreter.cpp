@@ -2079,7 +2079,7 @@ OPCodeReturn CodeInterpreter::op_callfunc(U32 &ip)
          mNSEntry = Namespace::global()->lookup(fnName);
 
       StringStackWrapper args(mCallArgc, mCallArgv);
-      cRetRes = CInterface::GetCInterface().CallFunction(fnNamespace, fnName, args.argv, args.argc, &cFunctionRes);
+      cRetRes = CInterface::CallFunction(fnNamespace, fnName, args.argv + 1, args.argc - 1, &cFunctionRes);
    }
    else if (callType == FuncCallExprNode::MethodCall)
    {
@@ -2112,7 +2112,7 @@ OPCodeReturn CodeInterpreter::op_callfunc(U32 &ip)
          mNSEntry = NULL;
 
       StringStackWrapper args(mCallArgc, mCallArgv);
-      cRetRes = CInterface::GetCInterface().CallMethod(gEvalState.thisObject, fnName, args.argv, args.argc, &cFunctionRes);
+      cRetRes = CInterface::CallMethod(gEvalState.thisObject, fnName, args.argv + 2, args.argc - 2, &cFunctionRes);
    }
    else // it's a ParentCall
    {
@@ -2178,14 +2178,15 @@ OPCodeReturn CodeInterpreter::op_callfunc(U32 &ip)
 
    // ConsoleFunctionType is for any function defined by script.
    // Any 'callback' type is an engine function that is exposed to script.
-   if (mNSEntry->mType == Namespace::Entry::ConsoleFunctionType
-      || cFunctionRes)
+   if (cFunctionRes || mNSEntry->mType == Namespace::Entry::ConsoleFunctionType)
    {
+      ConsoleValue retVal;
       ConsoleValueRef ret;
       if (cFunctionRes)
       {
-         StringStackConsoleWrapper retVal(1, &cRetRes);
-         ret = retVal.argv[0];
+         retVal.init();
+         ret.value = &retVal;
+         retVal.setStackStringValue(cRetRes);
       }
       else if (mNSEntry->mFunctionOffset)
       {
