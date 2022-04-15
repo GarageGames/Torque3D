@@ -66,6 +66,7 @@ addEngineSrcDir('T3D/sfx');
 addEngineSrcDir('T3D/gameBase');
 addEngineSrcDir('T3D/turret');
 addEngineSrcDir('T3D/assets');
+addEngineSrcDir('T3D/components');
 
 global $TORQUE_HIFI_NET;
 global $TORQUE_EXTENDED_MOVE;

@@ -1228,8 +1228,11 @@ void TSShapeLoader::install()
    shape->mRadius = (shape->mBounds.maxExtents - shape->center).len();
    shape->tubeRadius = shape->mRadius;
 
-   shape->init();
-   shape->finalizeEditable();
+   if (TSShape::smInitOnRead)
+   {
+      shape->init();
+      shape->finalizeEditable();
+   }
 }
 
 void TSShapeLoader::computeBounds(Box3F& bounds)

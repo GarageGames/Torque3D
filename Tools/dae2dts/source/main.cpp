@@ -122,6 +122,10 @@ S32 TorqueMain( S32 argc, const char **argv )
    {
       Con::errorf( "Error: no DAE file specified.\n" );
       printUsage();
+
+      // Clean everything up.
+      StandardMainLoop::shutdown();
+
       return -1;
    }
 
@@ -152,65 +156,69 @@ S32 TorqueMain( S32 argc, const char **argv )
    if ( verbose )
       Con::printf( "Reading dae file...\n" );
 
+   TSShape::smInitOnRead = false;
+
    // Attempt to load the DAE file
-   Resource<TSShape> shape = ResourceManager::get().load( srcPath );
-   if ( !shape )
    {
-      Con::errorf( "Failed to convert DAE file: %s\n", srcPath.getFullPath() );
-      failed = 1;
-   }
-   else
-   {
-      if ( compatMode && !shape->canWriteOldFormat() )
+      Resource<TSShape> shape = ResourceManager::get().load( srcPath );
+      if ( !shape )
       {
-         Con::errorf( "Warning: Attempting to save to DTS v24 but the shape "
-                      "contains v26 features. Resulting DTS file may not be valid." );
+         Con::errorf( "Failed to convert DAE file: %s\n", srcPath.getFullPath() );
+         failed = 1;
       }
-
-      FileStream outStream;
-
-      if ( saveDSQ )
+      else
       {
-         Torque::Path dsqPath( destPath );
-         dsqPath.setExtension( "dsq" );
-
-         for ( S32 i = 0; i < shape->sequences.size(); i++ )
+         if ( compatMode && !shape->canWriteOldFormat() )
          {
-            const String& seqName = shape->getName( shape->sequences[i].nameIndex );
-            if ( verbose )
-               Con::printf( "Writing DSQ file for sequence '%s'...\n", seqName.c_str() );
+            Con::errorf( "Warning: Attempting to save to DTS v24 but the shape "
+                        "contains v26 features. Resulting DTS file may not be valid." );
+         }
 
-            dsqPath.setFileName( destPath.getFileName() + "_" + seqName );
+         FileStream outStream;
 
-            if ( outStream.open( dsqPath, Torque::FS::File::Write ) )
+         if ( saveDSQ )
+         {
+            Torque::Path dsqPath( destPath );
+            dsqPath.setExtension( "dsq" );
+
+            for ( S32 i = 0; i < shape->sequences.size(); i++ )
             {
-               shape->exportSequence( &outStream, shape->sequences[i], compatMode );
+               const String& seqName = shape->getName( shape->sequences[i].nameIndex );
+               if ( verbose )
+                  Con::printf( "Writing DSQ file for sequence '%s'...\n", seqName.c_str() );
+
+               dsqPath.setFileName( destPath.getFileName() + "_" + seqName );
+
+               if ( outStream.open( dsqPath, Torque::FS::File::Write ) )
+               {
+                  shape->exportSequence( &outStream, shape->sequences[i], compatMode );
+                  outStream.close();
+               }
+               else
+               {
+                  Con::errorf( "Failed to save sequence to %s\n", dsqPath.getFullPath().c_str() );
+                  failed = 1;
+               }
+            }
+         }
+         if ( saveDTS )
+         {
+            if ( verbose )
+               Con::printf( "Writing DTS file...\n" );
+
+            if ( outStream.open( destPath, Torque::FS::File::Write ) )
+            {
+               if ( saveDSQ )
+                  shape->sequences.setSize(0);
+
+               shape->write( &outStream, compatMode );
                outStream.close();
             }
             else
             {
-               Con::errorf( "Failed to save sequence to %s\n", dsqPath.getFullPath().c_str() );
+               Con::errorf( "Failed to save shape to %s\n", destPath.getFullPath().c_str() );
                failed = 1;
             }
-         }
-      }
-      if ( saveDTS )
-      {
-         if ( verbose )
-            Con::printf( "Writing DTS file...\n" );
-
-         if ( outStream.open( destPath, Torque::FS::File::Write ) )
-         {
-            if ( saveDSQ )
-               shape->sequences.setSize(0);
-
-            shape->write( &outStream, compatMode );
-            outStream.close();
-         }
-         else
-         {
-            Con::errorf( "Failed to save shape to %s\n", destPath.getFullPath().c_str() );
-            failed = 1;
          }
       }
    }
