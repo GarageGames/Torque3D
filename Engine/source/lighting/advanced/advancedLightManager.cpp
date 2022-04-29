@@ -657,7 +657,7 @@ GFXVertexBufferHandle<AdvancedLightManager::LightVertex> AdvancedLightManager::g
       for (S32 i=1; i<numPoints + 1; i++)
       {
          S32 imod = (i - 1) % numPoints;
-         mConeGeometry[i].point = Point3F(circlePoints[imod].x,circlePoints[imod].y, -1.0f);
+         mConeGeometry[i].point = Point3F(circlePoints[imod].x*1.1,circlePoints[imod].y*1.1, -1.0f);
          mConeGeometry[i].color = ColorI::WHITE;
       }
       mConeGeometry.unlock();
