@@ -1,0 +1,117 @@
+<PlayerObject
+    scale="1 1 1"
+    class="PlayerObject"
+    canSave="true"
+    canSaveDynamicFields="true"
+    position="0 0 0"
+    rotation="0 -0 -0"
+    LocalPosition="0 0 0"
+    LocalRotation="1 0 0 0"
+    lifetimeMS="0"
+    gameObject="Core_GameObjects:PlayerObject">
+    <MeshComponent
+        componentType="Render"
+        friendlyName="Mesh Component"
+        description="Causes the object to render a non-animating 3d shape using the file provided."
+        networked="true"
+        enabled="true"
+        internalName="MeshComponent" />
+    <ShapeCollisionComponent
+        componentType="Collision"
+        friendlyName="Shape Collision"
+        description="A stub component class that physics components should inherit from."
+        networked="false"
+        enabled="true"
+        internalName="CollisionComponent"
+        CollisionType="Collision Mesh"
+        LineOfSightType="Collision Mesh"
+        DecalType="Collision Mesh"
+        CollisionMeshPrefix="Collision"
+        BlockCollisions="true" />
+    <AnimationComponent
+        componentType="Render"
+        friendlyName="Animation(Component)"
+        description="Allows a rendered mesh to be animated"
+        networked="true"
+        enabled="true"
+        internalName="AnimationComponent" />
+    <PlayerControllerComponent
+        componentType="Physics"
+        friendlyName="Player Controller"
+        description="A general-purpose physics player controller."
+        networked="false"
+        enabled="true"
+        internalName="PhysicsComponent"
+        inputVelocity="0 0 0"
+        useDirectMoveInput="0 -3.37028e+15 0" />
+    <StateMachineComponent
+        componentType="Game"
+        friendlyName="State Machine"
+        description="A generic state machine."
+        networked="false"
+        enabled="true"
+        internalName="StateMachineComponent" />
+    <CameraComponent
+        friendlyName="Camera(Component)"
+        networked="true"
+        enabled="true"
+        internalName="CameraComponent"
+        FOV="80"
+        MinFOV="5"
+        MaxFOV="175"
+        ScreenAspect="1065353216 1065353216"
+        positionOffset="0 0 0"
+        rotationOffset="0 -0 -0"
+        useParentTransform="true" />
+    <CameraOrbiterComponent
+        networked="false"
+        enabled="true"
+        internalName="CameraOrbiterComponent"
+        orbitDistance="8"
+        rotation="0 0 0"
+        maxPitchAngle="70"
+        minPitchAngle="-10" />
+    <ControlObjectComponent
+        componentType="Game"
+        friendlyName="Control Object"
+        description="Allows owner entity to be controlled by a client."
+        networked="false"
+        enabled="true"
+        internalName="ControlObjectComponent"
+        clientOwner="0" />
+    <SoundComponent
+        componentType="Sound"
+        friendlyName="Sound(Component)"
+        description="Stores up to 4 sounds for playback."
+        networked="true"
+        enabled="true"
+        internalName="SoundComponent">
+        <SoundComponent.MPreviewSounds>
+            <MPreviewSound
+                MPreviewSound="false" />
+            <MPreviewSound
+                MPreviewSound="false" />
+            <MPreviewSound
+                MPreviewSound="false" />
+            <MPreviewSound
+                MPreviewSound="false" />
+        </SoundComponent.MPreviewSounds>
+        <SoundComponent.Plays>
+            <Play
+                Play="false" />
+            <Play
+                Play="false" />
+            <Play
+                Play="false" />
+            <Play
+                Play="false" />
+        </SoundComponent.Plays>
+    </SoundComponent>
+    <InteractComponent
+        componentType="Game"
+        friendlyName="Interact"
+        description="Allows owner entity interact."
+        networked="false"
+        enabled="true"
+        internalName="InteractComponent" />
+</PlayerObject>
