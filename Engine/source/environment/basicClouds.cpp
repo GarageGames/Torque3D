@@ -97,6 +97,8 @@ BasicClouds::BasicClouds()
    mTexOffset[0].set( 0.5f, 0.5f );
    mTexOffset[1].set( 0.5f, 0.5f );
    mTexOffset[2].set( 0.5f, 0.5f );
+
+   mBehindSkybox = false;
 }
 
 IMPLEMENT_CO_NETOBJECT_V1( BasicClouds );
@@ -168,6 +170,9 @@ void BasicClouds::initPersistFields()
 {
    addGroup( "BasicClouds" );
 
+	 addField( "behindSkybox", TypeBool, Offset( mBehindSkybox, BasicClouds ),
+		"Controls order of clouds and skybox - Use with transparent skyboxes." );
+
       addArray( "Layers", TEX_COUNT );
 
          addField( "layerEnabled", TypeBool, Offset( mLayerEnabled, BasicClouds ), TEX_COUNT,
@@ -225,7 +230,9 @@ U32 BasicClouds::packUpdate( NetConnection *conn, U32 mask, BitStream *stream )
       
       stream->write( mHeight[i] );
    }
-   
+      stream->writeFlag( mBehindSkybox );
+
+
    return retMask;
 }
 
@@ -246,6 +253,7 @@ void BasicClouds::unpackUpdate( NetConnection *conn, BitStream *stream )
 
       stream->read( &mHeight[i] );
    }
+      mBehindSkybox = stream->readFlag();
 
    if ( isProperlyAdded() )
    {
@@ -264,6 +272,7 @@ void BasicClouds::prepRenderImage( SceneRenderState *state )
    PROFILE_SCOPE( BasicClouds_prepRenderImage );
 
    bool isEnabled = false;
+
    for ( U32 i = 0; i < TEX_COUNT; i++ )
    {
       if ( mLayerEnabled[i] )
@@ -281,8 +290,16 @@ void BasicClouds::prepRenderImage( SceneRenderState *state )
    ObjectRenderInst *ri = state->getRenderPass()->allocInst< ObjectRenderInst >();
    ri->renderDelegate.bind( this, &BasicClouds::renderObject );
    ri->type = RenderPassManager::RIT_Sky;
-   ri->defaultKey = 0;
-   ri->defaultKey2 = 0;
+
+   // if any layers are marked as behind the skybox, they all are.  Can't render them out seperately.
+   if ( mBehindSkybox ) {
+      ri->defaultKey = 10;
+      ri->defaultKey2 = 1;
+   } else {
+      ri->defaultKey = 0;
+      ri->defaultKey2 = 0;
+   }
+
    state->getRenderPass()->addInst( ri );
 }
 
