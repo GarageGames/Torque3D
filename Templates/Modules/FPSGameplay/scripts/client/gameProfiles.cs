@@ -85,7 +85,7 @@ singleton GuiControlProfile ("ChatHudScrollProfile")
    opaque = false;
    borderThickness = 0;
    borderColor = "0 255 0";
-   bitmap = "data/UI/art/scrollBar";
+   bitmap = "data/FPSGameplay/art/gui/scrollBar";
    hasBitmapArray = true;
 };
 
@@ -98,7 +98,7 @@ singleton GuiControlProfile ("HudScrollProfile")
    opaque = false;
    border = true;
    borderColor = "0 255 0";
-   bitmap = "data/UI/art/scrollBar";
+   bitmap = "data/FPSGameplay/art/gui/scrollBar";
    hasBitmapArray = true;
 };
 
@@ -113,7 +113,7 @@ singleton GuiControlProfile ("HudTextProfile")
 
 singleton GuiControlProfile ("ChatHudBorderProfile")
 {
-   bitmap = "data/UI/art/chatHudBorderArray";
+   bitmap = "data/FPSGameplay/art/gui/chatHudBorderArray";
    hasBitmapArray = true;
    opaque = false;
 };
