@@ -1,6 +1,0 @@
-for /R %%a IN (*.cs) do IF EXIST "%%a.dso" del "%%a.dso"
-for /R %%a IN (*.cs) do IF EXIST "%%a.edso" del "%%a.edso"
-for /R %%a IN (*.gui) do IF EXIST "%%a.dso" del "%%a.dso"
-for /R %%a IN (*.gui) do IF EXIST "%%a.edso" del "%%a.edso"
-for /R %%a IN (*.ts) do IF EXIST "%%a.dso" del "%%a.dso"
-for /R %%a IN (*.ts) do IF EXIST "%%a.edso" del "%%a.edso"
