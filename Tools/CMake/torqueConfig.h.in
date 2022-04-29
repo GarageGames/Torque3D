@@ -195,17 +195,3 @@
 #else
 #  define TORQUE_INSTANCE_EXCLUSION   "TorqueTest"
 #endif
-
-// Someday, it might make sense to do some pragma magic here so we error
-// on inconsistent flags.
-
-// The Xbox360 has it's own profiling tools, the Torque Profiler should not be used
-#ifdef TORQUE_OS_XENON
-#  ifdef TORQUE_ENABLE_PROFILER
-#     undef TORQUE_ENABLE_PROFILER
-#  endif
-#
-#  ifdef TORQUE_ENABLE_PROFILE_PATH
-#     undef TORQUE_ENABLE_PROFILE_PATH
-#endif
-#endif
