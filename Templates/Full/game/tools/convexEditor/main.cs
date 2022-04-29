@@ -28,16 +28,20 @@ function initializeConvexEditor()
    exec( "./convexEditorGui.gui" );
    exec( "./convexEditorToolbar.ed.gui" );
    exec( "./convexEditorGui.cs" );
-   
+   exec( "./convexEditorSidebarGui.gui" );
+   exec( "./materials.cs" );
+
    ConvexEditorGui.setVisible( false );  
    ConvexEditorOptionsWindow.setVisible( false );  
    ConvexEditorTreeWindow.setVisible( false ); 
    ConvexEditorToolbar.setVisible( false );
+   ConvexEditorOptionssWindow.setVisible( false );
    
    EditorGui.add( ConvexEditorGui );
    EditorGui.add( ConvexEditorOptionsWindow );
    EditorGui.add( ConvexEditorTreeWindow );
    EditorGui.add( ConvexEditorToolbar );
+   EditorGui.add( ConvexEditorOptionssWindow );
       
    new ScriptObject( ConvexEditorPlugin )
    {
@@ -98,6 +102,7 @@ function ConvexEditorPlugin::onActivated( %this )
    EditorGui.bringToFront( ConvexEditorGui );
    ConvexEditorGui.setVisible( true );
    ConvexEditorToolbar.setVisible( true );
+   ConvexEditorOptionssWindow.setVisible( true );
    ConvexEditorGui.makeFirstResponder( true ); 
    %this.map.push();   
    
@@ -132,6 +137,7 @@ function ConvexEditorPlugin::onDeactivated( %this )
    ConvexEditorGui.setVisible( false );
    ConvexEditorOptionsWindow.setVisible( false );
    ConvexEditorTreeWindow.setVisible( false );
+   ConvexEditorOptionssWindow.setVisible( false );
    ConvexEditorToolbar.setVisible( false );
    %this.map.pop();
    
@@ -189,7 +195,7 @@ function ConvexEditorPlugin::onSaveMission( %this, %missionFile )
 {
    if( ConvexEditorGui.isDirty )
    {
-      getRootScene().save( %missionFile );
+      getScene(0).save( %missionFile );
       ConvexEditorGui.isDirty = false;
    }
 }
@@ -201,7 +207,7 @@ function ConvexEditorPlugin::onSaveMission( %this, %missionFile )
 function ConvexEditorPlugin::initSettings( %this )
 {
    EditorSettings.beginGroup( "ConvexEditor", true );
-   EditorSettings.setDefaultValue(  "MaterialName",         "Grid512_OrangeLines_Mat" );
+   EditorSettings.setDefaultValue(  "MaterialName",         "Grid_512_Orange" );
    EditorSettings.endGroup();
 }
 

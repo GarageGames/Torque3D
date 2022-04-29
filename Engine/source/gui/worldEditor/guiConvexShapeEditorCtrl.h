@@ -116,6 +116,25 @@ public:
 
    SceneObject* createPolyhedralObject(const char* className, SceneObject* geometryProvider);
    ConvexShape* createConvexShapeFrom(SceneObject* polyObject);
+   Point2F getSelectedFaceUVOffset();
+   Point2F getSelectedFaceUVScale();
+   const char* getSelectedFaceMaterial();
+   bool getSelectedFaceHorzFlip();
+   bool getSelectedFaceVertFlip();
+   float getSelectedFaceZRot();
+
+   void setSelectedFaceUVOffset(Point2F offset);
+   void setSelectedFaceUVScale(Point2F offset);
+   void setSelectedFaceMaterial(const char* materialName);
+   void setSelectedFaceHorzFlip(bool flipped);
+   void setSelectedFaceVertFlip(bool flipped);
+   void setSelectedFaceZRot(float degrees);
+   void toggleGridSnapping();
+   void setGridSnapSize(float gridSize);
+
+   void updateShape();
+
+   float getGridSnapSize() { return mGridPlaneSize; }
    /// Interface with Tools.
    /// @{ 
 
@@ -158,6 +177,20 @@ protected:
 
    U32 mSavedGizmoFlags;
 
+   Vector<SimObjectPtr<ConvexShape>> mSelectedBrushes;
+   struct selectedFace
+   {
+      SimObjectPtr<ConvexShape> mOwnerBrush;
+      U32 faceId;
+   };
+   Vector<selectedFace> mSelectedFaces;
+
+   struct selectedVert
+   {
+      SimObjectPtr<ConvexShape> mOwnerBrush;
+      U32 vertId;
+   };
+   Vector<selectedVert>  mSelectedVerts;
    /// The selected ConvexShape.
    SimObjectPtr<ConvexShape> mConvexSEL;      
 
@@ -182,6 +215,8 @@ protected:
    bool mMouseDown;
    bool mHasCopied;
    RayInfo mLastRayInfo;
+
+   bool mGridSnap;
 
    Gui3DMouseEvent mMouseDownEvent;
 

@@ -42,6 +42,7 @@
 #include "T3D/physics/physicsBody.h"
 #include "T3D/physics/physicsCollision.h"
 #include "console/engineAPI.h"
+#include "core/strings/stringUnit.h"
 
 IMPLEMENT_CO_NETOBJECT_V1( ConvexShape );
 
@@ -206,6 +207,12 @@ bool ConvexShape::protectedSetSurface( void *object, const char *index, const ch
 	Point3F pos;
 	//MatrixF mat;
 
+   U32 matID;
+   Point2F offset;
+   Point2F scale;
+   F32 rot = 0;
+   bool horz = true, vert = true;
+
 	/*
    dSscanf( data, "%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g", 
       &mat[0], &mat[1], &mat[2], &mat[3], 
@@ -214,23 +221,59 @@ bool ConvexShape::protectedSetSurface( void *object, const char *index, const ch
       &mat[12], &mat[13], &mat[14], &mat[15] );
 	*/
 
-	dSscanf( data, "%g %g %g %g %g %g %g", &quat.x, &quat.y, &quat.z, &quat.w, &pos.x, &pos.y, &pos.z );
+   String t = data;
+   S32 len = t.length();
+
+	dSscanf( data, "%g %g %g %g %g %g %g %i %g %g %g %g %f", &quat.x, &quat.y, &quat.z, &quat.w, &pos.x, &pos.y, &pos.z,
+      &matID, &offset.x, &offset.y, &scale.x, &scale.y, &rot);
 
 	MatrixF surface;
 	quat.setMatrix( &surface );
 	surface.setPosition( pos );
 
-   shape->mSurfaces.push_back( surface );   
+   shape->mSurfaces.push_back( surface );  
+
+   surfaceUV surfUV;
+   if (StringUnit::getUnitCount(data, " ") > 7)
+   {
+      surfUV.matID = matID;
+      surfUV.offset = offset;
+      surfUV.scale = scale;
+      surfUV.zRot = rot;
+      surfUV.horzFlip = horz;
+      surfUV.vertFlip = vert;
+   }
+   else
+   {
+      surfUV.matID = 0;
+      surfUV.offset = Point2F(0,0);
+      surfUV.scale = Point2F(1, 1);
+      surfUV.zRot = 0;
+      surfUV.horzFlip = false;
+      surfUV.vertFlip = false;
+   }
+
+   shape->mSurfaceUVs.push_back(surfUV);
 
    return false;
 }
 
+bool ConvexShape::protectedSetSurfaceTexture(void *object, const char *index, const char *data)
+{
+   ConvexShape *shape = static_cast< ConvexShape* >(object);
+
+   surfaceMaterial surface;
+
+   surface.materialName = data;
+
+   shape->mSurfaceTextures.push_back(surface);
+
+   return false;
+}
 
 ConvexShape::ConvexShape()
  : mMaterialName( "Grid512_OrangeLines_Mat" ),
    mMaterialInst( NULL ),
-   mVertCount( 0 ),
-   mPrimCount( 0 ),
    mPhysicsRep( NULL ),
    mNormalLength( 0.3f )
 {   
@@ -240,12 +283,22 @@ ConvexShape::ConvexShape()
                 StaticShapeObjectType;    
 
    mConvexList = new Convex;
+
+   mSurfaceBuffers.clear();
+   mSurfaceUVs.clear();
+   mSurfaceTextures.clear();
 }
 
 ConvexShape::~ConvexShape()
 {
    if ( mMaterialInst )
       SAFE_DELETE( mMaterialInst );
+
+   for(U32 i=0; i<mSurfaceTextures.size(); i++)
+   {
+      if (mSurfaceTextures[i].materialInst)
+	      SAFE_DELETE(mSurfaceTextures[i].materialInst);
+   }
 
    delete mConvexList;
    mConvexList = NULL;
@@ -262,6 +315,9 @@ void ConvexShape::initPersistFields()
    addGroup( "Internal" );
 
       addProtectedField( "surface", TypeRealString, NULL, &protectedSetSurface, &defaultProtectedGetFn, 
+         "Do not modify, for internal use.", AbstractClassRep::FIELD_HideInInspectors );
+
+	  addProtectedField( "surfaceTexture", TypeRealString, NULL, &protectedSetSurfaceTexture, &defaultProtectedGetFn, 
          "Do not modify, for internal use.", AbstractClassRep::FIELD_HideInInspectors );
 
    endGroup( "Internal" );
@@ -334,7 +390,15 @@ bool ConvexShape::onAdd()
          surf.setColumn( 0, cubeTangents[i] );
          surf.setColumn( 1, cubeBinormals[i] );
          surf.setColumn( 2, cubeNormals[i] );
-         surf.setPosition( cubeNormals[i] * 0.5f );         
+         surf.setPosition( cubeNormals[i] * 0.5f );   
+
+         mSurfaceUVs.increment();
+         mSurfaceUVs[i].offset = Point2F(0, 0);
+         mSurfaceUVs[i].scale = Point2F(1, 1);
+         mSurfaceUVs[i].zRot = 0;
+         mSurfaceUVs[i].horzFlip = false;
+         mSurfaceUVs[i].vertFlip = false;
+         mSurfaceUVs[i].matID = 0;
       }
    }
 
@@ -344,6 +408,20 @@ bool ConvexShape::onAdd()
    _updateGeometry( true );
 
    addToScene();
+
+   PlaneF p = PlaneF(Point3F(0, 0, 0), Point3F(0, 0, 1));
+
+   Point3F a = Point3F(0, 0, 1);
+   Point3F b = Point3F(1, 0, -1);
+   Point3F c = Point3F(-1, 0, -1);
+
+   Vector<Point3F> points;
+   points.push_back(a);
+   points.push_back(b);
+   points.push_back(c);
+
+   Point3F vertices[64];
+   p.clipPolygon(points.address(), points.size(), vertices);
 
    return true;
 }
@@ -374,6 +452,20 @@ void ConvexShape::writeFields( Stream &stream, U32 tabStop )
        count = smMaxSurfaces;
    }
 
+   for (U32 i = 0; i < mSurfaceTextures.size(); i++)
+   {
+      stream.writeTabs(tabStop);
+
+      char buffer[1024];
+      dMemset(buffer, 0, 1024);
+
+      const char* tex = mSurfaceTextures[i].materialName.c_str();
+
+      dSprintf(buffer, 1024, "surfaceTexture = \"%s\";", mSurfaceTextures[i].materialName.c_str());
+
+      stream.writeLine((const U8*)buffer);
+   }
+
    for ( U32 i = 0; i < count; i++ )
    {      
       const MatrixF &mat = mSurfaces[i];
@@ -386,8 +478,10 @@ void ConvexShape::writeFields( Stream &stream, U32 tabStop )
       char buffer[1024];
       dMemset( buffer, 0, 1024 );      
       
-      dSprintf( buffer, 1024, "surface = \"%g %g %g %g %g %g %g\";", 
-         quat.x, quat.y, quat.z, quat.w, pos.x, pos.y, pos.z );      
+      dSprintf( buffer, 1024, "surface = \"%g %g %g %g %g %g %g %i %g %g %g %g %g %i %i\";", 
+         quat.x, quat.y, quat.z, quat.w, pos.x, pos.y, pos.z, mSurfaceUVs[i].matID,
+         mSurfaceUVs[i].offset.x, mSurfaceUVs[i].offset.y, mSurfaceUVs[i].scale.x, 
+         mSurfaceUVs[i].scale.y, mSurfaceUVs[i].zRot, mSurfaceUVs[i].horzFlip, mSurfaceUVs[i].vertFlip);
 
       stream.writeLine( (const U8*)buffer );
    }
@@ -396,6 +490,9 @@ void ConvexShape::writeFields( Stream &stream, U32 tabStop )
 bool ConvexShape::writeField( StringTableEntry fieldname, const char *value )
 {   
    if ( fieldname == StringTable->insert("surface") )
+      return false;
+
+   if ( fieldname == StringTable->insert("surfaceTexture") )
       return false;
 
    return Parent::writeField( fieldname, value );
@@ -440,8 +537,26 @@ U32 ConvexShape::packUpdate( NetConnection *conn, U32 mask, BitStream *stream )
 		 Point3F pos( mSurfaces[i].getPosition() );
 
          mathWrite( *stream, quat );
-         mathWrite( *stream, pos );                    
+         mathWrite( *stream, pos );   
+
+         mathWrite(*stream, mSurfaceUVs[i].offset);
+         mathWrite(*stream, mSurfaceUVs[i].scale);
+
+         stream->writeFlag(mSurfaceUVs[i].horzFlip);
+         stream->writeFlag(mSurfaceUVs[i].vertFlip);
+
+         stream->writeInt(mSurfaceUVs[i].matID, 16);
       }
+
+	  const U32 surfaceTex = mSurfaceTextures.size();
+
+	  stream->writeInt( surfaceTex, 32 );
+	  //next check for any texture coord or scale mods
+	  for(U32 i=0; i < surfaceTex; i++)
+     {
+        String a = mSurfaceTextures[i].materialName;
+			stream->write( mSurfaceTextures[i].materialName );
+	  }
    }
 
    return retMask;
@@ -464,10 +579,8 @@ void ConvexShape::unpackUpdate( NetConnection *conn, BitStream *stream )
    {
       stream->read( &mMaterialName );      
 
-      if ( isProperlyAdded() )
-         _updateMaterial();
-
       mSurfaces.clear();
+      mSurfaceUVs.clear();
 
       const U32 surfCount = stream->readInt( 32 );
       for ( S32 i = 0; i < surfCount; i++ )
@@ -483,7 +596,32 @@ void ConvexShape::unpackUpdate( NetConnection *conn, BitStream *stream )
 
          quat.setMatrix( &mat );
          mat.setPosition( pos );
+
+         mSurfaceUVs.increment();
+
+         mathRead(*stream, &mSurfaceUVs[i].offset);
+         mathRead(*stream, &mSurfaceUVs[i].scale);
+
+         mSurfaceUVs[i].horzFlip = stream->readFlag();
+         mSurfaceUVs[i].vertFlip = stream->readFlag();
+
+         mSurfaceUVs[i].matID = stream->readInt(16);
       }
+
+	  //now fetch our text coord mods to store into the geometry data
+      mSurfaceTextures.clear();
+	  const U32 surfaceTex = stream->readInt( 32 );
+
+	  //next check for any texture coord or scale mods
+	  for(U32 i=0; i < surfaceTex; i++)
+     {
+        mSurfaceTextures.increment();
+
+		  stream->read( &mSurfaceTextures[i].materialName );
+	  }
+
+     if (isProperlyAdded())
+        _updateMaterial();
 
       if ( isProperlyAdded() )
          _updateGeometry( true );
@@ -492,86 +630,89 @@ void ConvexShape::unpackUpdate( NetConnection *conn, BitStream *stream )
 
 void ConvexShape::prepRenderImage( SceneRenderState *state )
 {   
-   if ( state->isDiffusePass() )
+   for (U32 i = 0; i < mSurfaceBuffers.size(); i++)
    {
-      ObjectRenderInst *ri2 = state->getRenderPass()->allocInst<ObjectRenderInst>();
-      ri2->renderDelegate.bind( this, &ConvexShape::_renderDebug );
-      ri2->type = RenderPassManager::RIT_Editor;
-      state->getRenderPass()->addInst( ri2 );
-   }
-   
-   if ( mVertexBuffer.isNull() || !state)
-      return;
+      if (mSurfaceBuffers[i].mPrimitiveBuffer.isNull())
+         continue;
 
-   // If we don't have a material instance after the override then 
-   // we can skip rendering all together.
-   BaseMatInstance *matInst = state->getOverrideMaterial( mMaterialInst ? mMaterialInst : MATMGR->getWarningMatInstance() );
-   if ( !matInst )
-      return;
+      // If we don't have a material instance after the override then 
+      // we can skip rendering all together.
+      BaseMatInstance *matInst;
+      if (i == 0)
+      {
+         matInst = state->getOverrideMaterial(mMaterialInst ? mMaterialInst : MATMGR->getWarningMatInstance());
+      }
+      else
+      {
+         matInst = state->getOverrideMaterial(mSurfaceTextures[i - 1].materialInst ? mSurfaceTextures[i - 1].materialInst : MATMGR->getWarningMatInstance());
+      }
 
-   // Get a handy pointer to our RenderPassmanager
-   RenderPassManager *renderPass = state->getRenderPass();
+      if (!matInst)
+         continue;
 
-   // Allocate an MeshRenderInst so that we can submit it to the RenderPassManager
-   MeshRenderInst *ri = renderPass->allocInst<MeshRenderInst>();
+      // Get a handy pointer to our RenderPassmanager
+      RenderPassManager *renderPass = state->getRenderPass();
 
-   // Set our RenderInst as a standard mesh render
-   ri->type = RenderPassManager::RIT_Mesh;
+      // Allocate an MeshRenderInst so that we can submit it to the RenderPassManager
+      MeshRenderInst *ri = renderPass->allocInst<MeshRenderInst>();
 
-   // Calculate our sorting point
-   if ( state )
-   {
-      // Calculate our sort point manually.
-      const Box3F& rBox = getRenderWorldBox();
-      ri->sortDistSq = rBox.getSqDistanceToPoint( state->getCameraPosition() );      
-   } 
-   else 
-      ri->sortDistSq = 0.0f;
+      // Set our RenderInst as a standard mesh render
+      ri->type = RenderPassManager::RIT_Mesh;
 
-   // Set up our transforms
-   MatrixF objectToWorld = getRenderTransform();
-   objectToWorld.scale( getScale() );
+      // Calculate our sorting point
+      if (state)
+      {
+         // Calculate our sort point manually.
+         const Box3F& rBox = getRenderWorldBox();
+         ri->sortDistSq = rBox.getSqDistanceToPoint(state->getCameraPosition());
+      }
+      else
+         ri->sortDistSq = 0.0f;
 
-   ri->objectToWorld = renderPass->allocUniqueXform( objectToWorld );
-   ri->worldToCamera = renderPass->allocSharedXform(RenderPassManager::View);
-   ri->projection    = renderPass->allocSharedXform(RenderPassManager::Projection);
+      // Set up our transforms
+      MatrixF objectToWorld = getRenderTransform();
+      objectToWorld.scale(getScale());
 
-	// If we need lights then set them up.
-   if ( matInst->isForwardLit() )
-   {
-      LightQuery query;
-      query.init( getWorldSphere() );
-		query.getLights( ri->lights, 8 );
-   }
+      ri->objectToWorld = renderPass->allocUniqueXform(objectToWorld);
+      ri->worldToCamera = renderPass->allocSharedXform(RenderPassManager::View);
+      ri->projection = renderPass->allocSharedXform(RenderPassManager::Projection);
 
-   // Make sure we have an up-to-date backbuffer in case
-   // our Material would like to make use of it
-   // NOTICE: SFXBB is removed and refraction is disabled!
-   //ri->backBuffTex = GFX->getSfxBackBuffer();
+      // If we need lights then set them up.
+      if (matInst->isForwardLit())
+      {
+         LightQuery query;
+         query.init(getWorldSphere());
+         query.getLights(ri->lights, 8);
+      }
 
-   // Set our Material
-   ri->matInst = matInst;
-   if ( matInst->getMaterial()->isTranslucent() )
-   {
-      ri->translucentSort = true;
-      ri->type = RenderPassManager::RIT_Translucent;
-   }
+      // Make sure we have an up-to-date backbuffer in case
+      // our Material would like to make use of it
+      // NOTICE: SFXBB is removed and refraction is disabled!
+      //ri->backBuffTex = GFX->getSfxBackBuffer();
 
-   // Set up our vertex buffer and primitive buffer
-   ri->vertBuff = &mVertexBuffer;
-   ri->primBuff = &mPrimitiveBuffer;
+      // Set our Material
+      ri->matInst = matInst;
+      if (matInst->getMaterial()->isTranslucent())
+      {
+         ri->translucentSort = true;
+         ri->type = RenderPassManager::RIT_Translucent;
+      }
 
-   ri->prim = renderPass->allocPrim();
-   ri->prim->type = GFXTriangleList;
-   ri->prim->minIndex = 0;
-   ri->prim->startIndex = 0;
-   ri->prim->numPrimitives = mPrimCount;
-   ri->prim->startVertex = 0;
-   ri->prim->numVertices = mVertCount;
+      // Set up our vertex buffer and primitive buffer
+      ri->vertBuff = &mSurfaceBuffers[i].mVertexBuffer;
+      ri->primBuff = &mSurfaceBuffers[i].mPrimitiveBuffer;
 
-   // We sort by the material then vertex buffer.
-   ri->defaultKey = matInst->getStateHint();
-   ri->defaultKey2 = (uintptr_t)ri->vertBuff; // Not 64bit safe!
+      ri->prim = renderPass->allocPrim();
+      ri->prim->type = GFXTriangleList;
+      ri->prim->minIndex = 0;
+      ri->prim->startIndex = 0;
+      ri->prim->numPrimitives = mSurfaceBuffers[i].mPrimCount;
+      ri->prim->startVertex = 0;
+      ri->prim->numVertices = mSurfaceBuffers[i].mVertCount;
+
+      // We sort by the material then vertex buffer.
+      ri->defaultKey = matInst->getStateHint();
+      ri->defaultKey2 = (U32)ri->vertBuff; // Not 64bit safe!
 
    // Submit our RenderInst to the RenderPassManager
    state->getRenderPass()->addInst( ri );
@@ -791,10 +932,21 @@ bool ConvexShape::castRay( const Point3F &start, const Point3F &end, RayInfo *in
    F32 t;
    F32 tmin = F32_MAX;
    S32 hitFace = -1;
-   Point3F pnt;
+   Point3F hitPnt, pnt;
    VectorF rayDir( end - start );
    rayDir.normalizeSafe();
-   
+
+   if ( false )
+   {
+      PlaneF plane( Point3F(0,0,0), Point3F(0,0,1) );
+      Point3F sp( 0,0,-1 );
+      Point3F ep( 0,0,1 );
+
+      F32 t = plane.intersect( sp, ep );
+      Point3F hitPnt;
+      hitPnt.interpolate( sp, ep, t );
+   }
+
    for ( S32 i = 0; i < planeCount; i++ )
    {
       // Don't hit the back-side of planes.
@@ -1037,8 +1189,33 @@ void ConvexShape::getSurfaceLineList( S32 surfId, Vector< Point3F > &lineList )
 
 void ConvexShape::_updateMaterial()
 {   
+   //update our custom surface materials
+   for (U32 i = 0; i<mSurfaceTextures.size(); i++)
+   {
+      //If we already have the material inst and it hasn't changed, skip
+      if (mSurfaceTextures[i].materialInst && mSurfaceTextures[i].materialName.equal(mSurfaceTextures[i].materialInst->getMaterial()->getName(), String::NoCase))
+         continue;
+
+      Material *material;
+
+      if (!Sim::findObject(mSurfaceTextures[i].materialName, material))
+         //bail
+         continue;
+
+      mSurfaceTextures[i].materialInst = material->createMatInstance();
+
+      FeatureSet features = MATMGR->getDefaultFeatures();
+
+      mSurfaceTextures[i].materialInst->init(features, getGFXVertexFormat<VertexType>());
+
+      if (!mSurfaceTextures[i].materialInst->isValid())
+      {
+         SAFE_DELETE(mSurfaceTextures[i].materialInst);
+      }
+   }
+
    // If the material name matches then don't bother updating it.
-   if ( mMaterialInst && mMaterialName.equal( mMaterialInst->getMaterial()->getName(), String::NoCase ) )
+   if (mMaterialInst && mMaterialName.equal(mMaterialInst->getMaterial()->getName(), String::NoCase))
       return;
 
    SAFE_DELETE( mMaterialInst );
@@ -1074,11 +1251,46 @@ void ConvexShape::_updateGeometry( bool updateCollision )
    for ( S32 i = 0; i < mSurfaces.size(); i++ )   
       mPlanes.push_back( PlaneF( mSurfaces[i].getPosition(), mSurfaces[i].getUpVector() ) );
 
-	Vector< Point3F > tangents;
-	for ( S32 i = 0; i < mSurfaces.size(); i++ )
-		tangents.push_back( mSurfaces[i].getRightVector() );
-   
-   mGeometry.generate( mPlanes, tangents );
+   Vector< Point3F > tangents;
+   for (S32 i = 0; i < mSurfaces.size(); i++)
+      tangents.push_back(mSurfaces[i].getRightVector());
+
+   //prepping the texture info
+   Vector<Point2F> texOffset;
+   Vector<Point2F> texScale;
+   Vector<bool> horzFlip;
+   Vector<bool> vertFlip;
+   //step in here, and add new surfaceTextures if we don't match the count of surfaces, we use
+   //msurfaces as the counter, because we need to match it.
+   if (mSurfaceUVs.size() > mSurfaces.size())
+   {
+      for (U32 x = mSurfaceUVs.size(); x > mSurfaces.size(); x--)
+         mSurfaceUVs.pop_front();
+   }
+   else if (mSurfaceUVs.size() < mSurfaces.size())
+   {
+      for (U32 x = mSurfaceUVs.size(); x <= mSurfaces.size(); x++)
+      {
+         mSurfaceUVs.increment();
+         mSurfaceUVs[x].offset = Point2F(0, 0);
+         mSurfaceUVs[x].scale = Point2F(1, 1);
+         mSurfaceUVs[x].zRot = 0;
+         mSurfaceUVs[x].horzFlip = false;
+         mSurfaceUVs[x].vertFlip = false;
+         mSurfaceUVs[x].matID = 0;
+      }
+   }
+
+   for (S32 i = 0; i < mSurfaceUVs.size(); i++)
+   {
+      //add our offsets/scales for passing to the geometry now
+      texOffset.push_back(mSurfaceUVs[i].offset);
+      texScale.push_back(mSurfaceUVs[i].scale);
+      horzFlip.push_back(mSurfaceUVs[i].horzFlip);
+      vertFlip.push_back(mSurfaceUVs[i].vertFlip);
+   }
+
+   mGeometry.generate(mPlanes, tangents, mSurfaceTextures, texOffset, texScale, horzFlip, vertFlip);
 
    AssertFatal( mGeometry.faces.size() <= mSurfaces.size(), "Got more faces than planes?" );
 
@@ -1098,10 +1310,21 @@ void ConvexShape::_updateGeometry( bool updateCollision )
    // Update bounding box.   
    updateBounds( false );
 
-	mVertexBuffer = NULL;
-	mPrimitiveBuffer = NULL;
-	mVertCount = 0;
-	mPrimCount = 0;
+   mSurfaceBuffers.clear();
+
+   //set up buffers based on how many materials we have, but we always have at least one for our default mat
+   mSurfaceBuffers.increment();
+   mSurfaceBuffers[0].mVertexBuffer = NULL;
+   mSurfaceBuffers[0].mVertCount = 0;
+   mSurfaceBuffers[0].mPrimCount = 0;
+
+   for (U32 i = 0; i < mSurfaceTextures.size(); i++)
+   {
+      mSurfaceBuffers.increment();
+      mSurfaceBuffers[i+1].mVertexBuffer = NULL;
+      mSurfaceBuffers[i + 1].mVertCount = 0;
+      mSurfaceBuffers[i + 1].mPrimCount = 0;
+   }
 
    if ( updateCollision )
       _updateCollision();
@@ -1113,59 +1336,81 @@ void ConvexShape::_updateGeometry( bool updateCollision )
    if ( faceList.empty() )   
       return;
 
+   //We do this in 2 parts. First, going through and building the buffers for all faces with the default material(matID -1)
+   //After that, we then through and build buffers for all faces sharing materials. This means we can have a single buffer,
+   //or one for each face of the brush, depending on how it's textured
 
 	// Get total vert and prim count.
 
 	for ( S32 i = 0; i < faceList.size(); i++ )	
 	{
-		U32 count = faceList[i].triangles.size();
-		mPrimCount += count;
-		mVertCount += count * 3;		
+      U32 count = faceList[i].triangles.size();
+
+      S32 matID = mSurfaceUVs[i].matID;
+
+      mSurfaceBuffers[mSurfaceUVs[i].matID].mPrimCount += count;
+      mSurfaceBuffers[mSurfaceUVs[i].matID].mVertCount += count * 3;
 	}
 
-	// Allocate VB and copy in data.
-
-	mVertexBuffer.set( GFX, mVertCount, GFXBufferTypeStatic );
-	VertexType *pVert = mVertexBuffer.lock();
-
-	for ( S32 i = 0; i < faceList.size(); i++ )
-	{
-		const ConvexShape::Face &face = faceList[i];
-		const Vector< U32 > &facePntMap = face.points;
-		const Vector< ConvexShape::Triangle > &triangles = face.triangles;
-		const ColorI &faceColor = sgConvexFaceColors[ i % sgConvexFaceColorCount ];
-
-		for ( S32 j = 0; j < triangles.size(); j++ )
-		{
-			for ( S32 k = 0; k < 3; k++ )
-			{
-				pVert->normal = face.normal;
-				pVert->tangent = face.tangent;
-				pVert->color = faceColor;			
-				pVert->point = pointList[ facePntMap[ triangles[j][k] ] ];
-				pVert->texCoord = face.texcoords[ triangles[j][k] ];
-
-				pVert++;
-			}
-		}		
-	}	
-
-	mVertexBuffer.unlock();
-
-	// Allocate PB
-
-   mPrimitiveBuffer.set( GFX, mPrimCount * 3, mPrimCount, GFXBufferTypeStatic );
-
-   U16 *pIndex;
-   mPrimitiveBuffer.lock( &pIndex );
-
-   for ( U16 i = 0; i < mPrimCount * 3; i++ )
+   //
+   for (U32 i = 0; i < mSurfaceBuffers.size(); i++)
    {
-      *pIndex = i;
-      pIndex++;
-   }
+      if (mSurfaceBuffers[i].mVertCount > 0)
+      {
+         U32 primCount = mSurfaceBuffers[i].mPrimCount;
+         U32 vertCount = mSurfaceBuffers[i].mVertCount;
 
-   mPrimitiveBuffer.unlock();
+         mSurfaceBuffers[i].mVertexBuffer.set(GFX, mSurfaceBuffers[i].mVertCount, GFXBufferTypeStatic);
+         VertexType *pVert = mSurfaceBuffers[i].mVertexBuffer.lock();
+
+         U32 vc = 0;
+
+         for (S32 f = 0; f < faceList.size(); f++)
+         {
+            if (mSurfaceUVs[f].matID == i)
+            {
+               const ConvexShape::Face &face = faceList[f];
+               const Vector< U32 > &facePntMap = face.points;
+               const Vector< ConvexShape::Triangle > &triangles = face.triangles;
+               const ColorI &faceColor = sgConvexFaceColors[f % sgConvexFaceColorCount];
+
+               const Point3F binormal = mCross(face.normal, face.tangent);
+
+               for (S32 j = 0; j < triangles.size(); j++)
+               {
+                  for (S32 k = 0; k < 3; k++)
+                  {
+                     pVert->normal = face.normal;
+                     pVert->tangent = face.tangent;
+                     pVert->color = faceColor;
+                     pVert->point = pointList[facePntMap[triangles[j][k]]];
+                     pVert->texCoord = face.texcoords[triangles[j][k]];
+
+                     pVert++;
+                     vc++;
+                  }
+               }
+            }
+         }
+
+         mSurfaceBuffers[i].mVertexBuffer.unlock();
+
+         // Allocate PB
+
+         mSurfaceBuffers[i].mPrimitiveBuffer.set(GFX, mSurfaceBuffers[i].mPrimCount * 3, mSurfaceBuffers[i].mPrimCount, GFXBufferTypeStatic);
+
+         U16 *pIndex;
+         mSurfaceBuffers[i].mPrimitiveBuffer.lock(&pIndex);
+
+         for (U16 p = 0; p < mSurfaceBuffers[i].mPrimCount * 3; p++)
+         {
+            *pIndex = p;
+            pIndex++;
+         }
+
+         mSurfaceBuffers[i].mPrimitiveBuffer.unlock();
+      }
+   }
 }
 
 void ConvexShape::_updateCollision()
@@ -1488,7 +1733,7 @@ void ConvexShape::getSurfaceTriangles( S32 surfId, Vector< Point3F > *outPoints,
          objToWorld.mulP( (*outPoints)[i] );      
    }
 }
-void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vector< Point3F > &tangents )
+void ConvexShape::Geometry::generate(const Vector< PlaneF > &planes, const Vector< Point3F > &tangents, const Vector< surfaceMaterial > surfaceTextures, const Vector< Point2F > texOffset, const Vector< Point2F > texScale, const Vector< bool > horzFlip, const Vector< bool > vertFlip)
 {
    PROFILE_SCOPE( Geometry_generate );
 
@@ -1759,7 +2004,26 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
 			F32 x = planex.distToPlane( points[ newFace.points[ j ] ] );
 			F32 y = planey.distToPlane( points[ newFace.points[ j ] ] );
 
-			newFace.texcoords[j].set( -x, -y );
+			if (!texOffset.empty())
+	         {
+	            x += texOffset[i].x;
+	            y += texOffset[i].y;
+	         }
+	
+	         //now scale
+	         if (!texScale.empty() && !texScale[i].isZero())
+	         {
+	            x *= (texScale[i].x);
+	            y *= (texScale[i].y);
+	         }
+	
+	         if (horzFlip.size() > 0 && horzFlip[i])
+	            x *= -1;
+	
+	         if (vertFlip.size() > 0 && vertFlip[i])
+	            y *= -1;
+	
+	         newFace.texcoords[j].set(-x, -y);
 		}
 
       // Data verification tests.
