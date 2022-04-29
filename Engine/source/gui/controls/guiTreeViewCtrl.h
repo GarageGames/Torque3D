@@ -356,6 +356,11 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       /// Current filter that determines which items in the tree are displayed and which are hidden.
       String mFilterText;
 
+      /// If true, all items are filtered. If false, then children of items that successfully pass filter are not filtered
+      bool mDoFilterChildren;
+
+      Vector<U32> mItemFilterExceptionList;
+
       /// If true, a trace of actions taken by the control is logged to the console.  Can
       /// be turned on with the setDebug() script method.
       bool mDebug;
@@ -431,7 +436,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
 
       void _deleteItem(Item* item);
 
-      void _buildItem(Item* item, U32 tabLevel, bool bForceFullUpdate = false);
+      void _buildItem(Item* item, U32 tabLevel, bool bForceFullUpdate = false, bool skipFlter = false);
 
       Item* _findItemByAmbiguousId( S32 itemOrObjectId, bool buildVirtual = true );
 
@@ -568,6 +573,9 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       /// Set the pattern by which to filter items in the tree.  Only items in the tree whose text
       /// matches this pattern are displayed.
       void setFilterText( const String& text );
+
+      void setFilterChildren(bool doFilter) { mDoFilterChildren = doFilter; }
+      void setItemFilterException(U32 item, bool isExempt);
 
       /// Clear the current item filtering pattern.
       void clearFilterText() { setFilterText( String::EmptyString ); }

@@ -32,9 +32,13 @@ function initializeMaterialEditor()
    // Load Properties Window
    exec("~/materialEditor/gui/guiMaterialPropertiesWindow.ed.gui");
    
+   //Material Instance viewer
+   exec("~/materialEditor/gui/materialInstancesView.ed.gui");
+   
    // Load Client Scripts.
    exec("./scripts/materialEditor.ed.cs");
    exec("./scripts/materialEditorUndo.ed.cs");
+   exec("./scripts/materialInstanceView.ed.cs");
    //exec("./gui/profiles.ed.cs");
    
    MaterialEditorPreviewWindow.setVisible( false );

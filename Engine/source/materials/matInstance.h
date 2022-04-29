@@ -44,7 +44,7 @@ class ShaderFeature;
 class MatInstanceParameterHandle;
 class MatInstParameters;
 class ProcessedMaterial;
-
+class GuiTreeViewCtrl;
 
 ///
 class MatInstance : public BaseMatInstance
@@ -86,6 +86,7 @@ public:
    virtual const FeatureSet& getFeatures() const;
    virtual const FeatureSet& getRequestedFeatures() const { return mFeatureList; }
    virtual void dumpShaderInfo() const;
+   virtual void getShaderInfo(GuiTreeViewCtrl* tree, U32 item) const;
    
 
    ProcessedMaterial *getProcessedMaterial() const { return mProcessedMaterial; }

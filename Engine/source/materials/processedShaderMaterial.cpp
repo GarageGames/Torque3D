@@ -44,7 +44,7 @@
 // We need to include customMaterialDefinition for ShaderConstHandles::init
 #include "materials/customMaterialDefinition.h"
 
-
+#include "gui/controls/guiTreeViewCtrl.h"
 #include "ts/tsShape.h"
 
 ///
@@ -1419,5 +1419,28 @@ void ProcessedShaderMaterial::dumpMaterialInfo()
          Con::printf( "  [%i] [NULL shader]", i );
       else
          Con::printf( "  [%i] %s", i, shader->describeSelf().c_str() );
+   }
+}
+
+void ProcessedShaderMaterial::getMaterialInfo(GuiTreeViewCtrl* tree, U32 item)
+{
+   for (U32 i = 0; i < getNumPasses(); i++)
+   {
+      const ShaderRenderPassData* passData = _getRPD(i);
+
+      if (passData == NULL)
+         continue;
+
+      char passStr[64];
+      dSprintf(passStr, 64, "Pass Number: %i", i);
+
+      U32 passItem = tree->insertItem(item, passStr);
+
+      const GFXShader * shader = passData->shader;
+
+      if (shader == NULL)
+         tree->insertItem(passItem, "[NULL shader]");
+      else
+         tree->insertItem(passItem, shader->describeSelf().c_str());
    }
 }

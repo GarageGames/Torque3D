@@ -37,6 +37,8 @@
 #include "core/util/safeDelete.h"
 #include "ts/tsShape.h"
 
+#include "gui/controls/guiTreeViewCtrl.h"
+
 class MatInstParameters;
 
 class MatInstanceParameterHandle : public MaterialParameterHandle
@@ -590,4 +592,36 @@ void MatInstance::dumpShaderInfo() const
    }
 
    mProcessedMaterial->dumpMaterialInfo();
+}
+
+void MatInstance::getShaderInfo(GuiTreeViewCtrl* tree, U32 item) const
+{
+   if (mMaterial == NULL)
+   {
+      Con::errorf("Trying to get Material information on an invalid MatInstance");
+      return;
+   }
+
+   if (mProcessedMaterial == NULL)
+   {
+      Con::printf("  [no processed material!]");
+      return;
+   }
+
+   const FeatureSet features = mProcessedMaterial->getFeatures();
+
+   String featureDesc = "";
+   for (U32 i = 0; i < features.getCount(); i++)
+   {
+      const FeatureType& ft = features.getAt(i);
+
+      featureDesc += ft.getName();
+
+      if(i+1 < features.getCount())
+         featureDesc += ", ";
+   }
+
+   U32 newItem = tree->insertItem(item, featureDesc);
+
+   mProcessedMaterial->getMaterialInfo(tree, newItem);
 }
