@@ -106,10 +106,16 @@ void TSPartInstance::breakShape(TSShapeInstance * shape, S32 subShape, Vector<TS
    // update bounds (and get rid of empty parts)
    for (S32 i=0; i<partList.size(); i++)
    {
-      if (partList[i]->mMeshObjects.size())
+      if (partList[i]->mMeshObjects.size()){
          partList[i]->updateBounds();
-      else
-      {
+         // Remove any parts parts with invalid box
+         Box3F box = partList[i]->getBounds();
+         if(!box.isValidBox() ){
+            Con::warnf("TSPartInstance::breakShape - part created with invalid object box. Removing from list.");
+            partList.erase(i);
+            i--;
+         }
+      }else{
          partList.erase(i);
          i--;
       }
