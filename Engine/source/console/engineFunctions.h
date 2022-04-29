@@ -113,7 +113,11 @@ private:
       std::tie(std::get<I + (sizeof...(ArgTs) - sizeof...(TailTs))>(args)...) = defaultArgs;
    }
    
+<<<<<<< HEAD
+#ifdef _MSC_VER == 1910
+=======
 #if defined(_MSC_VER) && (_MSC_VER >= 1910)
+>>>>>>> 48fa0c19688bbe3d01406a79f63c8de10b349201
    template<typename ...TailTs>
    struct DodgyVCHelper
    {
