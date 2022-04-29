@@ -23,6 +23,6 @@
 singleton TSShapeConstructor(TP_TurretDAE)
 {
    baseShape = "./TP_Turret.DAE";
-   lodType = "TrailingNumber";
+   lodType = "SingleSize";
    loadLights = "0";
 };
