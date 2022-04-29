@@ -47,6 +47,10 @@
 #include "materials/materialFeatureData.h"
 #endif
 
+#ifndef CUSTOMSHADERFEATURE_H
+#include "shadergen/customShaderFeature.h"
+#endif
+
 /// Base class used by shaderGen to be API agnostic.  Subclasses implement the various methods
 /// in an API specific way.
 class ShaderGenPrinter
@@ -151,10 +155,11 @@ public:
                         F32 *pixVersion,
                         const GFXVertexFormat *vertexFormat,
                         const char* cacheName,
-                        Vector<GFXShaderMacro> &macros );
+                        Vector<GFXShaderMacro> &macros,
+						Vector<CustomShaderFeatureData*> &customFeatureData);
 
    // Returns a shader that implements the features listed by dat.
-   GFXShader* getShader( const MaterialFeatureData &dat, const GFXVertexFormat *vertexFormat, const Vector<GFXShaderMacro> *macros, const Vector<String> &samplers );
+   GFXShader* getShader( const MaterialFeatureData &dat, Vector<CustomShaderFeatureData*> &customFeatureData, const GFXVertexFormat *vertexFormat, const Vector<GFXShaderMacro> *macros, const Vector<String> &samplers );
 
    // This will delete all of the procedural shaders that we have.  Used to regenerate shaders when
    // the ShaderFeatures have changed (due to lighting system change, or new plugin)
@@ -175,6 +180,8 @@ protected:
    const GFXVertexFormat *mVertexFormat;
    
    Vector< ShaderComponent *> mComponents;
+
+   Vector< CustomShaderFeatureData* > mCustomFeaturesData;
 
    AutoPtr<ShaderGenPrinter> mPrinter;
    AutoPtr<ShaderGenComponentFactory> mComponentFactory;

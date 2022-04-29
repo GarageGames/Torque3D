@@ -39,6 +39,10 @@
 #include "materials/matStateHint.h"
 #endif
 
+#ifndef CUSTOMSHADERBINDINGDATA_H
+#include "materials/customShaderBindingData.h"
+#endif
+
 class ShaderFeature;
 class MaterialParameters;
 class MaterialParameterHandle;
@@ -80,6 +84,8 @@ public:
    U32 mNumTexReg;
 
    MaterialFeatureData mFeatureData;
+
+   Vector<CustomShaderFeatureData*> mCustomShaderFeatureData;
 
    bool mGlow;
 
@@ -144,6 +150,9 @@ public:
    
    /// Sets the node transforms for HW Skinning
    virtual void setNodeTransforms(const MatrixF *address, const U32 numTransforms, const U32 pass) = 0;
+
+   /// Sets any custom shader data
+   virtual void setCustomShaderData(Vector<CustomShaderBindingData> &shaderData, const U32 pass) = 0;
    
    /// Sets the scene info like lights for the given pass.
    virtual void setSceneInfo(SceneRenderState *, const SceneData& sgData, U32 pass) = 0;

@@ -51,6 +51,8 @@
 #include "materials/shaderData.h"
 #include "gfx/sim/cubemapData.h"
 
+#include "materials/customShaderBindingData.h"
+
 const MatInstanceHookType DeferredMatInstanceHook::Type( "Deferred" );
 const String RenderDeferredMgr::BufferName("deferred");
 const RenderInstType RenderDeferredMgr::RIT_Deferred("Deferred");
@@ -430,6 +432,12 @@ void RenderDeferredMgr::render( SceneRenderState *state )
             {
                mat->setNodeTransforms(passRI->mNodeTransforms, passRI->mNodeTransformCount);
             }
+
+			   //push along any overriden fields that are instance-specific as well
+			   if (passRI->mCustomShaderData.size() > 0)
+			   {
+				   mat->setCustomShaderData(passRI->mCustomShaderData);
+			   }
 
             // If we're instanced then don't render yet.
             if ( mat->isInstanced() )

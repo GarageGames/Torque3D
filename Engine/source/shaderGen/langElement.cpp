@@ -112,6 +112,7 @@ Var::Var( const char *inName, const char *inType )
    sampler = false;
    texCoordNum = 0;
    constSortPos = cspUninit;
+   constNum = 0;
    arraySize = 1;
    texture = false;
    rank = 0;

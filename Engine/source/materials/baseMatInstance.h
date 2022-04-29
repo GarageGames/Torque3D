@@ -49,6 +49,13 @@
 #ifndef _MATSTATEHINT_H_
 #include "materials/matStateHint.h"
 #endif
+#ifndef _GFXDEVICE_H_
+#include "gfx/gfxDevice.h"
+#endif
+
+#ifndef CUSTOMSHADERBINDINGDATA_H
+#include "materials/customShaderBindingData.h"
+#endif
 
 struct RenderPassData;
 class GFXVertexBufferHandleBase;
@@ -154,6 +161,9 @@ public:
 
    /// Sets node transforms for the current stage. Used for hardware skinning.
    virtual void setNodeTransforms( const MatrixF *address, const U32 numTransforms ) = 0;
+
+   /// Sets custom shader data
+   virtual void setCustomShaderData(Vector<CustomShaderBindingData> &shaderData) = 0;
 
    /// This initializes various material scene state settings and
    /// should be called after setupPass() within the pass loop.

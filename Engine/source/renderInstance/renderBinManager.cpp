@@ -172,6 +172,11 @@ void RenderBinManager::setupSGData( MeshRenderInst *ri, SceneData &data )
    data.lightmap     = ri->lightmap;
    data.visibility   = ri->visibility;
    data.materialHint = ri->materialHint;
+   data.customShaderData.clear();
+   for (U32 i = 0; i < ri->mCustomShaderData.size(); i++)
+   {
+      data.customShaderData.push_back(&ri->mCustomShaderData[i]);
+   }
 }
 
 DefineEngineMethod( RenderBinManager, getBinType, const char*, (),,

@@ -66,6 +66,7 @@ public:
    virtual bool setupPass(SceneRenderState *, const SceneData &sgData );
    virtual void setTransforms(const MatrixSet &matrixSet, SceneRenderState *state);
    virtual void setNodeTransforms(const MatrixF *address, const U32 numTransforms);
+   virtual void setCustomShaderData(Vector<CustomShaderBindingData> &shaderData);
    virtual void setSceneInfo(SceneRenderState *, const SceneData& sgData);
    virtual void setTextureStages(SceneRenderState * state, const SceneData &sgData );
    virtual void setBuffers(GFXVertexBufferHandleBase* vertBuffer, GFXPrimitiveBufferHandle* primBuffer);

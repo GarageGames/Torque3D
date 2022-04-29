@@ -41,6 +41,9 @@
    #include "console/dynamicTypes.h"
 #endif
 
+#ifndef CUSTOMSHADERFEATURE_H
+#include "shaderGen/customShaderFeature.h"
+#endif
 
 class CubemapData;
 class SFXTrack;
@@ -49,7 +52,7 @@ class FeatureSet;
 class FeatureType;
 class MaterialSoundProfile;
 class MaterialPhysicsProfile;
-
+class CustomShaderFeatureData;
 
 /// The basic material definition.
 class Material : public BaseMaterialDefinition
@@ -343,6 +346,8 @@ public:
    F32 mDirectSoundOcclusion;       ///< Amount of volume occlusion on direct sounds.
    F32 mReverbSoundOcclusion;       ///< Amount of volume occlusion on reverb sounds.
 
+   Vector<CustomShaderFeatureData*> mCustomShaderFeatures;
+
    ///@}
    
    String mMapTo; // map Material to this texture name
@@ -379,6 +384,9 @@ public:
    virtual void onRemove();
    virtual void inspectPostApply();
    virtual bool writeField( StringTableEntry fieldname, const char *value );
+
+   static bool protectedSetCustomShaderFeature(void *object, const char *index, const char *data);
+   static bool protectedSetCustomShaderFeatureUniforms(void *object, const char *index, const char *data);
 
    //
    // ConsoleObject interface

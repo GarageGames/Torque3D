@@ -207,6 +207,8 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
 
    coreRI->materialHint = rdata.getMaterialHint();
 
+   coreRI->mCustomShaderData = rdata.getCustomShaderBinding();
+
    coreRI->visibility = meshVisibility;  
    coreRI->cubemap = rdata.getCubemap();
 

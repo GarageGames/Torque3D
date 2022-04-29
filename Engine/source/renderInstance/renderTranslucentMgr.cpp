@@ -249,6 +249,12 @@ void RenderTranslucentMgr::render( SceneRenderState *state )
                   mat->setNodeTransforms(passRI->mNodeTransforms, passRI->mNodeTransformCount);
                }
 
+			   //push along any overriden fields that are instance-specific as well
+			   if (passRI->mCustomShaderData.size() > 0)
+			   {
+				   mat->setCustomShaderData(passRI->mCustomShaderData);
+			   }
+
                // If we're instanced then don't render yet.
                if ( mat->isInstanced() )
                {

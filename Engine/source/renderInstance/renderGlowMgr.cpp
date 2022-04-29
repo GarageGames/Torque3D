@@ -251,6 +251,12 @@ void RenderGlowMgr::render( SceneRenderState *state )
                glowMat->setNodeTransforms(passRI->mNodeTransforms, passRI->mNodeTransformCount);
             }
 
+			//push along any overriden fields that are instance-specific as well
+			if (passRI->mCustomShaderData.size() > 0)
+			{
+				mat->setCustomShaderData(passRI->mCustomShaderData);
+			}
+
             glowMat->setSceneInfo(state, sgData);
             glowMat->setBuffers(passRI->vertBuff, passRI->primBuff);
 
