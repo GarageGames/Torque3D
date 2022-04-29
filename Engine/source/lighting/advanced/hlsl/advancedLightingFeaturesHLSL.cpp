@@ -30,6 +30,7 @@
 #include "renderInstance/renderDeferredMgr.h"
 #include "materials/processedMaterial.h"
 #include "materials/materialFeatureTypes.h"
+#include "terrain/terrFeatureTypes.h"
 
 
 void DeferredRTLightingFeatHLSL::processPixMacros( Vector<GFXShaderMacro> &macros, 
@@ -132,6 +133,8 @@ void DeferredRTLightingFeatHLSL::processPix( Vector<ShaderComponent*> &component
    lightBufferTex->uniform = true;
    lightBufferTex->texture = true;
    lightBufferTex->constNum = lightInfoBuffer->constNum;
+   if (fd.features.hasFeature(MFT_TerrainDetailMap))
+      lightInfoBuffer->constNum = 6;
 
    // Declare the RTLighting variables in this feature, they will either be assigned
    // in this feature, or in the tonemap/lightmap feature
