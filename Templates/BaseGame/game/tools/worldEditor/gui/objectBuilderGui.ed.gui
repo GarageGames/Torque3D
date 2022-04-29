@@ -1024,20 +1024,21 @@ function StaticShapeData::create(%data)
 
 function MissionMarkerData::create(%block)
 {
-   switch$(%block)
+   if(%block $= "SpawnSphereMarker")
    {
-      case "WayPointMarker":
-         %obj = new WayPoint() {
-            dataBlock = %block;
-            parentGroup = EWCreatorWindow.objectGroup;
-         };
-         return(%obj);
-      case "SpawnSphereMarker":
-         %obj = new SpawnSphere() {
-            datablock = %block;
-            parentGroup = EWCreatorWindow.objectGroup;
-         };
-         return(%obj);
+      %obj = new SpawnSphere() {
+         datablock = %block;
+         parentGroup = EWCreatorWindow.objectGroup;
+      };
+      return(%obj);
+   }
+   else
+   {
+      %obj = new WayPoint() {
+         dataBlock = %block;
+         parentGroup = EWCreatorWindow.objectGroup;
+      };    
+      return(%obj);
    }
 
    return(-1);
