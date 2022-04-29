@@ -117,9 +117,13 @@ public:
    ConditionerFeature* getConditioner() const { return mConditioner; }
    void getShaderMacros( Vector<GFXShaderMacro> *outMacros );
 
+   typedef Map<String, NamedTexTarget*> TargetMap;
+
+   static TargetMap getTargetMap() {
+      return smTargets;
+   }
+
 protected:
-   
-   typedef Map<String,NamedTexTarget*> TargetMap;
 
    ///
    static TargetMap smTargets;

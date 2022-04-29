@@ -146,3 +146,15 @@ void NamedTexTarget::getShaderMacros( Vector<GFXShaderMacro> *outMacros )
       outMacros->push_back( macro );
    }
 }
+
+DefineEngineFunction(getNamedTargetList, String, (), , "")
+{
+   String targetList = "";
+   NamedTexTarget::TargetMap targets = NamedTexTarget::getTargetMap();
+   for (NamedTexTarget::TargetMap::Iterator iter = targets.begin(); iter != targets.end(); iter++)
+   {
+      targetList += iter->value->getName() + " ";
+   }
+
+   return targetList;
+}
