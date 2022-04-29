@@ -106,7 +106,7 @@ class Solution
 		{
 		    echo( "Solution::generate() - no project refs found for solution: " . $this->name . "\n" );
 		    
-		    continue;
+		    return;
 		}
 		
 		// 
