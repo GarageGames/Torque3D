@@ -78,12 +78,18 @@ public:
    static void initPersistFields();
    virtual void copyTo(SimObject* object);
 
+   void                    setAnimationFile(const char* pScriptFile);
+   inline StringTableEntry getAnimationFile(void) const { return mFileName; };
+
    /// Declare Console Object.
    DECLARE_CONOBJECT(ShapeAnimationAsset);
 
 protected:
    virtual void            initializeAsset(void);
    virtual void            onAssetRefresh(void);
+
+   static bool setAnimationFile(void *obj, const char *index, const char *data) { static_cast<ShapeAnimationAsset*>(obj)->setAnimationFile(data); return false; }
+   static const char* getAnimationFile(void* obj, const char* data) { return static_cast<ShapeAnimationAsset*>(obj)->getAnimationFile(); }
 
 public:
    StringTableEntry getAnimationFilename() { return mFileName; }
@@ -101,6 +107,8 @@ public:
    bool isBlend() { return mIsBlend; }
 
    S32 getBlendFrame() { return mBlendFrame; }
+
+   S32 getAnimationCount();
 };
 
 DefineConsoleType(TypeShapeAnimationAssetPtr, ShapeAnimationAsset)

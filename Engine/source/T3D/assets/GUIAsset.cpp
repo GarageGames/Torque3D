@@ -92,8 +92,8 @@ ConsoleSetType(TypeGUIAssetPtr)
 
 GUIAsset::GUIAsset()
 {
-   mScriptFilePath = StringTable->EmptyString();
-   mGUIFilePath = StringTable->EmptyString();
+   mScriptFile = StringTable->EmptyString();
+   mGUIFile = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
@@ -113,8 +113,11 @@ void GUIAsset::initPersistFields()
    // Call parent.
    Parent::initPersistFields();
 
-   addField("scriptFilePath", TypeString, Offset(mScriptFilePath, GUIAsset), "Path to the script file for the gui");
-   addField("GUIFilePath", TypeString, Offset(mGUIFilePath, GUIAsset), "Path to the gui file");
+   addProtectedField("scriptFile", TypeAssetLooseFilePath, Offset(mScriptFile, GUIAsset),
+      &setScriptFile, &getScriptFile, "Path to the script file for the gui");
+
+   addProtectedField("GUIFile", TypeAssetLooseFilePath, Offset(mGUIFile, GUIAsset),
+      &setScriptFile, &getScriptFile, "Path to the gui file");
 }
 
 //------------------------------------------------------------------------------
@@ -127,20 +130,66 @@ void GUIAsset::copyTo(SimObject* object)
 
 void GUIAsset::initializeAsset()
 {
-   if (Platform::isFile(mGUIFilePath))
-      Con::executeFile(mGUIFilePath, false, false);
+   mGUIFile = expandAssetFilePath(mGUIFile);
 
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
+   if (Platform::isFile(mGUIFile))
+      Con::executeFile(mGUIFile, false, false);
+
+   mScriptFile = expandAssetFilePath(mScriptFile);
+
+   if (Platform::isFile(mScriptFile))
+      Con::executeFile(mScriptFile, false, false);
 }
 
 void GUIAsset::onAssetRefresh()
 {
-   if (Platform::isFile(mGUIFilePath))
-      Con::executeFile(mGUIFilePath, false, false);
+   mGUIFile = expandAssetFilePath(mGUIFile);
 
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
+   if (Platform::isFile(mGUIFile))
+      Con::executeFile(mGUIFile, false, false);
+
+   mScriptFile = expandAssetFilePath(mScriptFile);
+
+   if (Platform::isFile(mScriptFile))
+      Con::executeFile(mScriptFile, false, false);
+}
+
+void GUIAsset::setGUIFile(const char* pScriptFile)
+{
+   // Sanity!
+   AssertFatal(pScriptFile != NULL, "Cannot use a NULL gui file.");
+
+   // Fetch image file.
+   pScriptFile = StringTable->insert(pScriptFile);
+
+   // Ignore no change,
+   if (pScriptFile == mGUIFile)
+      return;
+
+   // Update.
+   mGUIFile = getOwned() ? expandAssetFilePath(pScriptFile) : StringTable->insert(pScriptFile);
+
+   // Refresh the asset.
+   refreshAsset();
+}
+
+void GUIAsset::setScriptFile(const char* pScriptFile)
+{
+   // Sanity!
+   AssertFatal(pScriptFile != NULL, "Cannot use a NULL script file.");
+
+   // Fetch image file.
+   pScriptFile = StringTable->insert(pScriptFile);
+
+   // Ignore no change,
+   if (pScriptFile == mScriptFile)
+      return;
+
+   // Update.
+   mScriptFile = getOwned() ? expandAssetFilePath(pScriptFile) : StringTable->insert(pScriptFile);
+
+   // Refresh the asset.
+   refreshAsset();
 }
 
 //-----------------------------------------------------------------------------

@@ -86,16 +86,13 @@ ConsoleSetType(TypeShapeAssetPtr)
 
 ShapeAsset::ShapeAsset()
 {
+   mFileName = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
 
 ShapeAsset::~ShapeAsset()
 {
-   // If the asset manager does not own the asset then we own the
-   // asset definition so delete it.
-   if (!getOwned())
-      delete mpAssetDefinition;
 }
 
 //-----------------------------------------------------------------------------
@@ -105,7 +102,8 @@ void ShapeAsset::initPersistFields()
    // Call parent.
    Parent::initPersistFields();
 
-   addField("fileName", TypeFilename, Offset(mFileName, ShapeAsset), "Path to the shape file we want to render");
+   addProtectedField("fileName", TypeAssetLooseFilePath, Offset(mFileName, ShapeAsset),
+      &setShapeFile, &getShapeFile, "Path to the shape file we want to render");
 }
 
 void ShapeAsset::setDataField(StringTableEntry slotName, const char *array, const char *value)
@@ -127,8 +125,42 @@ void ShapeAsset::initializeAsset()
    // Call parent.
    Parent::initializeAsset();
 
-   if (dStrcmp(mFileName, "") == 0)
+   if (mFileName == StringTable->EmptyString())
       return;
+
+   ResourceManager::get().getChangedSignal().notify(this, &ShapeAsset::_onResourceChanged);
+
+   //Ensure our path is expando'd if it isn't already
+   if (!Platform::isFullPath(mFileName))
+      mFileName = getOwned() ? expandAssetFilePath(mFileName) : mFileName;
+
+   loadShape();
+}
+
+void ShapeAsset::setShapeFile(const char* pShapeFile)
+{
+   // Sanity!
+   AssertFatal(pShapeFile != NULL, "Cannot use a NULL shape file.");
+
+   // Fetch image file.
+   pShapeFile = StringTable->insert(pShapeFile);
+
+   // Ignore no change,
+   if (pShapeFile == mFileName)
+      return;
+
+   mFileName = pShapeFile;
+
+   // Refresh the asset.
+   refreshAsset();
+}
+
+void ShapeAsset::_onResourceChanged(const Torque::Path &path)
+{
+   if (path != Torque::Path(mFileName) )
+      return;
+
+   refreshAsset();
 
    loadShape();
 }
@@ -152,12 +184,12 @@ bool ShapeAsset::loadShape()
 
          if (assetType == StringTable->insert("MaterialAsset"))
          {
-            mMaterialAssetIds.push_back(assetDependenciesItr->value);
+            mMaterialAssetIds.push_front(assetDependenciesItr->value);
 
             //Force the asset to become initialized if it hasn't been already
             AssetPtr<MaterialAsset> matAsset = assetDependenciesItr->value;
 
-            mMaterialAssets.push_back(matAsset);
+            mMaterialAssets.push_front(matAsset);
          }
          else if (assetType == StringTable->insert("ShapeAnimationAsset"))
          {
@@ -227,6 +259,8 @@ bool ShapeAsset::loadShape()
       }
    }
 
+   onShapeChanged.trigger(this);
+
    return true;
 }
 
@@ -240,8 +274,12 @@ void ShapeAsset::copyTo(SimObject* object)
 
 void ShapeAsset::onAssetRefresh(void)
 {
-   if (dStrcmp(mFileName, "") == 0)
+   if (mFileName == StringTable->EmptyString())
       return;
+
+   // Update.
+   if(!Platform::isFullPath(mFileName))
+      mFileName = getOwned() ? expandAssetFilePath(mFileName) : mFileName;
 
    loadShape();
 }

@@ -748,6 +748,9 @@ class SimObject: public ConsoleObject, public TamlCallbacks
       /// Performs a safe delayed delete of the object using a sim event.
       void safeDeleteObject();
 
+      /// Special-case deletion behaviors, largely intended for cleanup in particular cases where it wouldn't happen automatically(like cleanup of associated files)
+      virtual void handleDeleteAction() {}
+
       /// @}
 
       /// @name Accessors

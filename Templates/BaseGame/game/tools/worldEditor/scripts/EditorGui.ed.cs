@@ -1596,6 +1596,8 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
    {
       %popup.item[ 0 ] = "Delete" TAB "" TAB "EditorMenuEditDelete();";
       %popup.item[ 1 ] = "Group" TAB "" TAB "EWorldEditor.addSimGroup( true );";
+      %popup.item[ 2 ] = "-";
+      %popup.item[ 1 ] = "Make select a Sub-Level" TAB "" TAB "MakeSelectionASublevel();";
    }
    else
    {
@@ -1726,7 +1728,7 @@ function EditorTree::isValidDragTarget( %this, %id, %obj )
    if( %obj.name $= "CameraBookmarks" )
       return EWorldEditor.areAllSelectedObjectsOfType( "CameraBookmark" );
    else
-      return ( %obj.getClassName() $= "SimGroup" );
+      return ( %obj.getClassName() $= "SimGroup" || %obj.isMemberOfClass("Scene"));
 }
 
 function EditorTree::onBeginReparenting( %this )

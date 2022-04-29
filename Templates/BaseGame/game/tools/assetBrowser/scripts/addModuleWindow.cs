@@ -57,6 +57,18 @@ function AssetBrowser_addModuleWindow::CreateNewModule(%this)
          Extension = "asset.taml";
          Recurse = true;
       };
+      
+      //Autoload the usual suspects
+      new AutoloadAssets()
+      {
+         AssetType = "ComponentAsset";
+         Recurse = true;
+      };
+      new AutoloadAssets()
+      {
+         AssetType = "GUIAsset";
+         Recurse = true;
+      };
    };
    
    TAMLWrite(%newModule, %moduleDefinitionFilePath); 

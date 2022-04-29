@@ -44,6 +44,7 @@ class LevelAsset : public AssetBase
 {
    typedef AssetBase Parent;
 
+   StringTableEntry        mLevelName;
    StringTableEntry        mLevelFile;
    StringTableEntry        mPreviewImage;
 
@@ -61,8 +62,20 @@ public:
    /// Declare Console Object.
    DECLARE_CONOBJECT(LevelAsset);
 
+   void                    setLevelFile(const char* pImageFile);
+   inline StringTableEntry getLevelFile(void) const { return mLevelFile; };
+   void                    setImageFile(const char* pImageFile);
+   inline StringTableEntry getImageFile(void) const { return mPreviewImage; };
+
+   SimObjectId load();
+
 protected:
-   virtual void            initializeAsset(void) {}
+   static bool setLevelFile(void *obj, const char *index, const char *data) { static_cast<LevelAsset*>(obj)->setLevelFile(data); return false; }
+   static const char* getLevelFile(void* obj, const char* data) { return static_cast<LevelAsset*>(obj)->getLevelFile(); }
+   static bool setPreviewImageFile(void *obj, const char *index, const char *data) { static_cast<LevelAsset*>(obj)->setImageFile(data); return false; }
+   static const char* getPreviewImageFile(void* obj, const char* data) { return static_cast<LevelAsset*>(obj)->getImageFile(); }
+
+   virtual void            initializeAsset(void);
    virtual void            onAssetRefresh(void) {}
 };
 

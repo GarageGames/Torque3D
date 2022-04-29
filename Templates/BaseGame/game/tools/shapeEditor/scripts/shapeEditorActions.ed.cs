@@ -319,7 +319,7 @@ function ShapeEditor::doAddSequence( %this, %seqName, %from, %start, %end )
 
 function ActionAddSequence::doit( %this )
 {
-   if(ShapeEditorPlugin.selectedAssetId $= "")
+   if(ShapeEditorPlugin.selectedAssetDef $= "")
    {
       // If adding this sequence from an existing sequence, make a backup copy of
       // the existing sequence first, so we can edit the start/end frames later
@@ -346,8 +346,20 @@ function ActionAddSequence::doit( %this )
       %assetDef = AssetDatabase.acquireAsset(%this.seqName);
       %moduleName = getWord(getToken(%this.seqName, ":", 0),0);
       
+      //If we have <rootpose> or ambient, we'll want to ignore them for our idx values when embedding animation dependencies to our shape asset
+      %idxOffset = 0;
+      
+      if(ShapeEdSequenceList.findTextIndex("<rootpose>\t\t\t\t") != -1)
+         %idxOffset++;
+         
+      if(ShapeEdSequenceList.findTextIndex("ambient\t\t\t\t") != -1)
+         %idxOffset++;
+         
       //TODO, properly ignore <rootpose> and ambient entries for our idx values, but only if they're there!
-      %idx = ShapeEdSequenceList.rowCount() - 2;
+      %idx = ShapeEdSequenceList.rowCount() - %idxOffset;
+      
+      //We adjust due to the list "header" row as well
+      %idx -= 1;
       
       %animSet = "ShapeEditorPlugin.selectedAssetDef.animationSequence"@%idx@"=\"@Asset="@%moduleName@":"@%assetDef.assetName@"\";";
       eval(%animSet);

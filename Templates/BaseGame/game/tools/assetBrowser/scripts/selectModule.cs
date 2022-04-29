@@ -1,6 +1,19 @@
-function AssetBrowser_selectModule::onWake(%this)
+function AssetBrowser_SelectModule::onWake(%this)
 {
    AssetBrowser_SelectModuleWindow-->ModuleList.refresh();
+}
+
+function AssetBrowser_SelectModule::moduleSelected(%this)
+{
+   Canvas.popDialog(AssetBrowser_SelectModule);
+   
+   %module = AssetBrowser_SelectModuleWindow-->ModuleList.getText();
+   echo("Module Selected: " @ %module);
+   
+   if(%this.callback !$= "")
+      eval(%this.callback @ "(" @ %module @ ");");
+   else
+      error("AssetBrowser_SelectModule - Invalid callback");
 }
 
 function SelectModule_NewAssetModuleBtn::onClick(%this)

@@ -11,4 +11,9 @@
            canSaveDynamicFields="true"
            Extension="asset.taml"
            Recurse="true" />
+	<AutoloadAssets
+	   canSave="true"
+	   canSaveDynamicFields="true"
+	   AssetType="ComponentAsset"
+	   Recurse="true" />
 </ModuleDefinition>

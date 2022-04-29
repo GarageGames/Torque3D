@@ -77,9 +77,15 @@ public:
 
    AssetDefinition* getAssetDefinition() { return mpAssetDefinition; }
 
+   void                    setScriptFile(const char* pScriptFile);
+   inline StringTableEntry getScriptFile(void) const { return mScriptFile; };
+
 protected:
    virtual void            initializeAsset(void);
    virtual void            onAssetRefresh(void);
+
+   static bool setScriptFile(void *obj, const char *index, const char *data) { static_cast<ComponentAsset*>(obj)->setScriptFile(data); return false; }
+   static const char* getScriptFile(void* obj, const char* data) { return static_cast<ComponentAsset*>(obj)->getScriptFile(); }
 };
 
 DefineConsoleType(TypeComponentAssetPtr, ComponentAsset)

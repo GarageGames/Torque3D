@@ -91,7 +91,7 @@ ConsoleSetType(TypeScriptAssetPtr)
 
 ScriptAsset::ScriptAsset() : AssetBase(), mIsServerSide(true)
 {
-   mScriptFilePath = StringTable->EmptyString();
+   mScriptFile = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
@@ -111,9 +111,8 @@ void ScriptAsset::initPersistFields()
    // Call parent.
    Parent::initPersistFields();
 
-   addField("scriptFilePath", TypeString, Offset(mScriptFilePath, ScriptAsset), "Path to the script file.");
-   addField("isServerSide", TypeBool, Offset(mIsServerSide, ScriptAsset), "Is this script file to be run on the server side?");
-
+   addProtectedField("scriptFile", TypeAssetLooseFilePath, Offset(mScriptFile, ScriptAsset),
+      &setScriptFile, &getScriptFile, "Path to the script file.");
 }
 
 //------------------------------------------------------------------------------
@@ -124,14 +123,41 @@ void ScriptAsset::copyTo(SimObject* object)
    Parent::copyTo(object);
 }
 
-void ScriptAsset::initializeAsset()
+void ScriptAsset::setScriptFile(const char* pScriptFile)
 {
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
+   // Sanity!
+   AssertFatal(pScriptFile != NULL, "Cannot use a NULL script file.");
+
+   // Fetch image file.
+   pScriptFile = StringTable->insert(pScriptFile);
+
+   // Ignore no change,
+   if (pScriptFile == mScriptFile)
+      return;
+
+   // Update.
+   mScriptFile = getOwned() ? expandAssetFilePath(pScriptFile) : StringTable->insert(pScriptFile);
+
+   // Refresh the asset.
+   refreshAsset();
 }
 
-void ScriptAsset::onAssetRefresh()
+bool ScriptAsset::execScript()
 {
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
+   if (Platform::isFile(mScriptFile))
+   {
+      return Con::executeFile(mScriptFile, false, false);
+   }
+   else
+   {
+      Con::errorf("ScriptAsset:execScript() - Script asset must have a valid file to exec");
+      return false;
+   }
+}
+
+DefineEngineMethod(ScriptAsset, execScript, bool, (), ,
+   "Executes the script file.\n"
+   "@return The bool result of calling exec")
+{
+   return object->execScript();
 }

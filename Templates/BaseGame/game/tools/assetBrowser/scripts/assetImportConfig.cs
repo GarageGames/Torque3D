@@ -8,7 +8,9 @@ function ImportAssetConfigList::onSelect( %this, %id, %text )
    
    ImportAssetWindow.activeImportConfigIndex = %id;
    ImportAssetWindow.activeImportConfig = ImportAssetWindow.importConfigsList.getKey(%id);
-   ImportAssetWindow.refresh();
+   //ImportAssetWindow.refresh();
+   
+   AssetBrowser.reloadImportingFiles();
 }
 
 function ImportAssetOptionsWindow::findMissingFile(%this, %assetItem)
@@ -26,6 +28,7 @@ function ImportAssetOptionsWindow::findMissingFile(%this, %assetItem)
       ChangePath     = true;
       OverwritePrompt = true;
       forceRelativePath = false;
+      fileName="";
       //MultipleFiles = true;
    };
 
@@ -43,6 +46,23 @@ function ImportAssetOptionsWindow::findMissingFile(%this, %assetItem)
       return;
       
    %assetItem.filePath = %fullPath;
+   %assetItem.assetName = fileBase(%assetItem.filePath);
+   
+   if(%assetItem.assetType $= "Image")
+   {
+      //See if we have anything important to update for our material parent(if we have one)
+      %treeItem = ImportAssetTree.findItemByObjectId(%assetItem);
+      %parentItem = ImportAssetTree.getParentItem(%treeItem);
+      
+      if(%parentItem != 0)
+      {
+         %parentAssetItem = ImportAssetTree.getItemObject(%parentItem);
+         if(%parentAssetItem.assetType $= "Material")
+         {
+            AssetBrowser.prepareImportMaterialAsset(%parentAssetItem);              
+         }
+      }
+   }
    
    ImportAssetWindow.refresh();
 }
@@ -128,6 +148,7 @@ function ImportAssetOptionsWindow::editImportSettings(%this, %assetItem)
       ImportOptionsList.addField("PopulateMaterialMaps", "Populate Material Maps", "bool", "", "1", "", %optionsObj);
       ImportOptionsList.addField("UseDiffuseSuffixOnOriginImg", "Use Diffuse Suffix for Origin Image", "bool", "", "1", "", %optionsObj);
       ImportOptionsList.addField("UseExistingMaterials", "Use Existing Materials", "bool", "", "1", "", %optionsObj);
+      ImportOptionsList.addField("IgnoreMaterials", "Ignore Importing Materials that fit these naming convention.", "command", "", "1", "", %optionsObj);
       ImportOptionsList.endGroup();
    }
    else if(%assetType $= "Sound")
@@ -145,35 +166,13 @@ function ImportAssetOptionsWindow::editImportSettings(%this, %assetItem)
 
 function ImportAssetOptionsWindow::deleteImportingAsset(%this, %assetItem)
 {
-   %assetIndex = AssetBrowser.importAssetNewListArray.getIndexFromKey(%assetItem);
-   AssetBrowser.importAssetNewListArray.erase(%assetIndex);
+   %item = ImportAssetTree.findItemByObjectId(%assetItem);
    
-   //check if we have any child assets and remove them as well
-   for(%i=0; %i < AssetBrowser.importAssetNewListArray.count(); %i++)
-   {
-      %asset = AssetBrowser.importAssetNewListArray.getKey(%i);  
-      if(%asset.ParentAssetItem == %assetItem)
-      {
-         AssetBrowser.importAssetNewListArray.erase(%i);
-         %i--;
-      }
-   }
-   
-   %assetIndex = AssetBrowser.importAssetFinalListArray.getIndexFromKey(%assetItem);
-   AssetBrowser.importAssetFinalListArray.erase(%assetIndex);
-   
-   //check if we have any child assets and remove them as well
-   for(%i=0; %i < AssetBrowser.importAssetFinalListArray.count(); %i++)
-   {
-      %asset = AssetBrowser.importAssetFinalListArray.getKey(%i);  
-      if(%asset.ParentAssetItem == %assetItem)
-      {
-         AssetBrowser.importAssetFinalListArray.erase(%i);
-         %i--;
-      }
-   }
-   
-   ImportAssetWindow.refresh();
+   ImportAssetTree.removeAllChildren(%item);
+   ImportAssetTree.removeItem(%item);
+
+   schedule(10, 0, "refreshImportAssetWindow");
+   //ImportAssetWindow.refresh();
    ImportAssetOptionsWindow.setVisible(0);
 }
 
@@ -302,6 +301,7 @@ function ImportAssetConfigEditorWindow::addNewConfig(%this)
    
    //Materials
    %optionsObj.ImportMaterials = true;
+   %optionsObj.IgnoreMaterials = "";
    %optionsObj.CreateComposites = true;
    %optionsObj.UseDiffuseSuffixOnOriginImg = true;
    %optionsObj.UseExistingMaterials = true;
@@ -398,6 +398,7 @@ function ImportAssetConfigEditorWindow::saveAssetOptionsConfig(%this)
             
             %xmlDoc.pushNewElement("Materials");
                %xmlDoc.setAttribute("ImportMaterials", %configObj.ImportMaterials);
+               %xmlDoc.setAttribute("IgnoreMaterials", %configObj.IgnoreMaterials);
                %xmlDoc.setAttribute("CreateComposites", %configObj.CreateComposites);
                %xmlDoc.setAttribute("UseDiffuseSuffixOnOriginImg", %configObj.UseDiffuseSuffixOnOriginImg);
                %xmlDoc.setAttribute("UseExistingMaterials", %configObj.UseExistingMaterials);
