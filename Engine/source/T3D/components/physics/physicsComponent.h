@@ -2,9 +2,10 @@
 // Torque Game Engine
 // Copyright (C) GarageGames.com, Inc.
 //-----------------------------------------------------------------------------
+#pragma once
+#ifndef PHYSICS_COMPONENT_H
+#define PHYSICS_COMPONENT_H
 
-#ifndef _PHYSICSBEHAVIOR_H_
-#define _PHYSICSBEHAVIOR_H_
 #include "T3D/components/component.h"
 
 #ifndef __RESOURCE_H__
@@ -59,13 +60,17 @@ protected:
    VectorF mGravity;
    VectorF mVelocity;
    F32     mDrag;
-   F32		mMass;
+   F32	  mMass;
 
    F32		mGravityMod;
 
    S32 csmAtRestTimer;
    F32 sAtRestVelocity;      // Min speed after collisio
 
+   PhysicsBody*   mPhysicsRep;
+   PhysicsWorld*  mPhysicsWorld;
+
+   Convex*        mConvexList;
 public:
    enum MaskBits {
       PositionMask = Parent::NextFreeMask << 0,
@@ -79,7 +84,7 @@ public:
    {
       Move move;                    ///< Last move from server
       F32 dt;                       ///< Last interpolation time
-      // Interpolation data
+                                    // Interpolation data
       Point3F pos;
       Point3F posVec;
       QuatF rot[2];
@@ -91,7 +96,10 @@ public:
    };
 
    StateDelta mDelta;
+
    S32 mPredictionCount;            ///< Number of ticks to predict
+
+   ContainerQueryInfo mLastContainerInfo;
 
 public:
    PhysicsComponent();
@@ -100,36 +108,49 @@ public:
 
    static void initPersistFields();
 
-   virtual void interpolateTick(F32 dt);
-   virtual void updatePos(const U32 /*mask*/, const F32 dt){}
-   virtual void _updatePhysics();
-   virtual PhysicsBody *getPhysicsRep();
+   //Components
+   virtual void onComponentAdd();
+   virtual void onComponentRemove();
 
+   //Setup
+   void prepCollision();
+   virtual void _updatePhysics();
+   virtual void buildConvex(const Box3F& box, Convex* convex);
+
+   //Update
+   virtual void interpolateTick(F32 dt);
+   virtual void updatePos(const F32 dt);
+
+   virtual void updateForces();
+   void updateContainer();
+
+   //Physics Collision Conveinence Hooks
+   virtual bool updateCollision(F32 dt, Rigid& ns, CollisionList &cList) { return false; }
+   virtual bool resolveContacts(Rigid& ns, CollisionList& cList, F32 dt) { return false; }
+   virtual bool resolveCollision(const Point3F& p, const Point3F &normal) { return false; }
+   
+   //Networking
    virtual U32 packUpdate(NetConnection *con, U32 mask, BitStream *stream);
    virtual void unpackUpdate(NetConnection *con, BitStream *stream);
 
-   virtual void onComponentAdd();
-
-   void updateContainer();
-
+   //Events
    virtual void updateVelocity(const F32 dt);
-   virtual Point3F getVelocity() { return mVelocity; }
-   virtual void getOriginVector(const Point3F &p, Point3F* r);
-   virtual void getVelocity(const Point3F& r, Point3F* v);
+   
    virtual void setVelocity(const VectorF& vel);
    virtual void setTransform(const MatrixF& mat);
    virtual void setPosition(const Point3F& pos);
    void setRenderPosition(const Point3F& pos, F32 dt);
 
    virtual void applyImpulse(const Point3F&, const VectorF& vec);
-   virtual F32 getZeroImpulse(const Point3F& r, const Point3F& normal);
-   virtual void accumulateForce(F32 dt, Point3F force);
 
-   //Rigid Body Collision Conveinence Hooks
-   virtual bool updateCollision(F32 dt, Rigid& ns, CollisionList &cList) { return false; }
-   virtual bool resolveContacts(Rigid& ns, CollisionList& cList, F32 dt) { return false; }
-   //virtual bool resolveCollision(Rigid&  ns, CollisionList& cList) { return false; }
-   virtual bool resolveCollision(const Point3F& p, const Point3F &normal) { return false; }
+   //Gets
+   F32 getMass() { return mMass; }
+   virtual PhysicsBody *getPhysicsRep();
+   virtual Point3F getVelocity() { return mVelocity; }
+   virtual void getOriginVector(const Point3F &p, Point3F* r);
+   virtual void getVelocity(const Point3F& r, Point3F* v);
+   virtual F32 getZeroImpulse(const Point3F& r, const Point3F& normal);
+   
 };
 
 #endif // _COMPONENT_H_

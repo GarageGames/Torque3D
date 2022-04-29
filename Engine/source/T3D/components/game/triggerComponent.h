@@ -13,8 +13,8 @@
 #include "T3D/entity.h"
 #endif
 
-#ifndef _COLLISION_INTERFACES_H_
-#include "T3D/components/collision/collisionInterfaces.h"
+#ifndef COLLISION_COMPONENT_H
+#include "T3D/components/collision/collisionComponent.h"
 #endif
 
 //////////////////////////////////////////////////////////////////////////

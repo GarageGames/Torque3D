@@ -116,6 +116,8 @@ public:
    virtual void findContact(SceneObject **contactObject, VectorF *contactNormal, Vector<SceneObject*> *outOverlapObjects) const;
    virtual void moveKinematicTo(const MatrixF &xfm);
 
+   virtual bool isValid() { return mActor != nullptr; }
+
 };
 
 #endif // _T3D_PHYSICS_BTBODY_H_

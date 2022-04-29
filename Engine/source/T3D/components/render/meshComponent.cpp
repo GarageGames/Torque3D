@@ -45,21 +45,10 @@
 #include "core/strings/findMatch.h"
 #include "T3D/components/render/meshComponent_ScriptBinding.h"
 
-ImplementEnumType(BatchingMode,
-   "Type of mesh data available in a shape.\n"
-   "@ingroup gameObjects")
-{
-   MeshComponent::Individual, "Individual", "This mesh is rendered indivudally, wthout batching or instancing."
-},
-   { MeshComponent::StaticBatch, "Static Batching", "Statically batches this mesh together with others to reduce drawcalls." },
-   //{ MeshComponent::DynamicBatch, "Dynamic Batching", "Dynamical batches this mesh together with others to reduce drawcalls each frame." },
-  // { MeshComponent::Instanced, "Instanced", "This mesh is rendered as an instance, reducing draw overhead with others that share the same mesh and material." },
-      EndImplementEnumType;
-
 //////////////////////////////////////////////////////////////////////////
 // Constructor/Destructor
 //////////////////////////////////////////////////////////////////////////
-MeshComponent::MeshComponent() : Component(), mShape(nullptr), mRenderMode(Individual)
+MeshComponent::MeshComponent() : Component(), mShape(nullptr)
 {
    mFriendlyName = "Mesh Component";
    mComponentType = "Render";
@@ -75,8 +64,6 @@ MeshComponent::MeshComponent() : Component(), mShape(nullptr), mRenderMode(Indiv
    mMeshAssetId = StringTable->EmptyString();
 
    mInterfaceData = new MeshRenderSystemInterface();
-
-   mRenderMode = Individual;
 }
 
 MeshComponent::~MeshComponent()
@@ -134,14 +121,9 @@ void MeshComponent::initPersistFields()
 {
    Parent::initPersistFields();
 
-   addGroup("Rendering");
-   addField("BatchingMode", TypeBatchingMode, Offset(mRenderMode, MeshComponent),
-      "The mode of batching this shape should be rendered with.");
-   endGroup("Rendering");
-
    //create a hook to our internal variables
    addGroup("Model");
-   addProtectedField("MeshAsset", TypeShapeAssetPtr, Offset(mShapeAsset, MeshComponent), &_setMesh, &defaultProtectedGetFn,
+   addProtectedField("MeshAsset", TypeShapeAssetPtr, Offset(mShapeAsset, MeshComponent), &_setMesh, &defaultProtectedGetFn, &writeShape,
       "The asset Id used for the mesh.", AbstractClassRep::FieldFlags::FIELD_ComponentInspectors);
    endGroup("Model");
 }
@@ -182,12 +164,19 @@ bool MeshComponent::setMeshAsset(const char* assetName)
       return false;
    }
 
+   mMeshAsset->onShapeChanged.notify(this, &MeshComponent::_shapeAssetUpdated);
+
    mShapeName = mMeshAssetId;
    mShapeAsset = mShapeName;
    updateShape(); //make sure we force the update to resize the owner bounds
    setMaskBits(ShapeMask);
 
    return true;
+}
+
+void MeshComponent::_shapeAssetUpdated(ShapeAsset* asset)
+{
+   updateShape();
 }
 
 void MeshComponent::updateShape()
@@ -197,7 +186,6 @@ void MeshComponent::updateShape()
 
    //if ((mShapeName && mShapeName[0] != '\0') || (mShapeAsset && mShapeAsset[0] != '\0'))
    if ((mShapeName && mShapeName[0] != '\0') || (mMeshAssetId && mMeshAssetId[0] != '\0'))
-
    {
       if (mMeshAsset == NULL)
          return;
@@ -210,7 +198,7 @@ void MeshComponent::updateShape()
       setupShape();
 
       //Do this on both the server and client
-      S32 materialCount = mMeshAsset->getShape()->materialList->getMaterialNameList().size();
+      S32 materialCount = mMeshAsset->getShape()->materialList->getMaterialNameList().size(); //mMeshAsset->getMaterialCount();
 
       if (isServerObject())
       {
@@ -234,13 +222,21 @@ void MeshComponent::updateShape()
 
          for (U32 i = 0; i < materialCount; i++)
          {
-            String materialname = mMeshAsset->getShape()->materialList->getMaterialName(i);
-            if (materialname == String("ShapeBounds"))
-               continue;
+            StringTableEntry materialname = StringTable->insert(mMeshAsset->getShape()->materialList->getMaterialName(i).c_str());
 
-            dSprintf(matFieldName, 128, "MaterialSlot%d", i);
+            //Iterate through our assetList to find the compliant entry in our matList
+            for (U32 m = 0; m < mMeshAsset->getMaterialCount(); m++)
+            {
+               AssetPtr<MaterialAsset> matAsset = mMeshAsset->getMaterialAsset(m);
 
-            addComponentField(matFieldName, "A material used in the shape file", "Material", materialname, "");
+               if (matAsset->getMaterialDefinitionName() == materialname)
+               {
+                  dSprintf(matFieldName, 128, "MaterialSlot%d", i);
+
+                  addComponentField(matFieldName, "A material used in the shape file", "Material", matAsset->getAssetId(), "");
+                  break;
+               }
+            }
          }
 
          if (materialCount > 0)
@@ -272,27 +268,6 @@ void MeshComponent::updateShape()
             mOwner->getSceneManager()->notifyObjectDirty(mOwner);
       }
 
-      if (isClientObject() && mInterfaceData)
-      {
-         if (mRenderMode == StaticBatch)
-         {
-            mInterfaceData->mStatic = true;
-
-            OptimizedPolyList geom;
-            MatrixF transform = mInterfaceData->mTransform;
-            mInterfaceData->mGeometry.setTransform(&transform, mInterfaceData->mScale);
-            mInterfaceData->mGeometry.setObject(mOwner);
-
-            mInterfaceData->mShapeInstance->buildPolyList(&mInterfaceData->mGeometry, 0);
-         }
-         else
-         {
-            mInterfaceData->mStatic = false;
-         }
-
-         MeshRenderSystem::rebuildBuffers();
-      }
-
       //finally, notify that our shape was changed
       onShapeInstanceChanged.trigger(this);
    }
@@ -305,6 +280,8 @@ void MeshComponent::setupShape()
 
 void MeshComponent::_onResourceChanged( const Torque::Path &path )
 {
+   /*bool srv = isServerObject();
+
    if (mInterfaceData == nullptr)
       return;
 
@@ -316,7 +293,7 @@ void MeshComponent::_onResourceChanged( const Torque::Path &path )
       return;
 
    updateShape();
-   setMaskBits(ShapeMask);
+   setMaskBits(ShapeMask);*/
 }
 
 void MeshComponent::inspectPostApply()
@@ -343,8 +320,6 @@ U32 MeshComponent::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    if (stream->writeFlag(mask & ShapeMask))
    {
       stream->writeString(mShapeName);
-
-      stream->writeInt(mRenderMode, 8);
    }
 
    if (stream->writeFlag( mask & MaterialMask ))
@@ -373,7 +348,6 @@ void MeshComponent::unpackUpdate(NetConnection *con, BitStream *stream)
    {
       mShapeName = stream->readSTString();
 
-      mRenderMode = (RenderMode)stream->readInt(8);
       setMeshAsset(mShapeName);
       updateShape();
    }
@@ -460,20 +434,26 @@ void MeshComponent::updateMaterials()
    TSMaterialList* pMatList = mInterfaceData->mShapeInstance->getMaterialList();
    pMatList->setTextureLookupPath(getShapeResource().getPath().getPath());
 
+   bool found = false;
    const Vector<String> &materialNames = pMatList->getMaterialNameList();
    for ( S32 i = 0; i < materialNames.size(); i++ )
    {
+      if (found)
+         break;
+
       for(U32 m=0; m < mChangingMaterials.size(); m++)
       {
          if(mChangingMaterials[m].slot == i)
          {
             //Fetch the actual material asset
             pMatList->renameMaterial( i, mChangingMaterials[m].matAsset->getMaterialDefinitionName());
+            found = true;
+            break;
          }
       }
-
-      mChangingMaterials.clear();
    }
+
+   mChangingMaterials.clear();
 
    // Initialize the material instances
    mInterfaceData->mShapeInstance->initMaterialList();
@@ -481,7 +461,7 @@ void MeshComponent::updateMaterials()
 
 MatrixF MeshComponent::getNodeTransform(S32 nodeIdx)
 {
-   if (mInterfaceData != nullptr && mMeshAsset->getShape())
+   if (mInterfaceData != nullptr && !mMeshAsset.isNull() && mMeshAsset->isAssetValid() && mMeshAsset->getShape())
    {
       S32 nodeCount = getShape()->nodes.size();
 
@@ -589,7 +569,6 @@ void MeshComponent::onDynamicModified(const char* slotName, const char* newValue
 
 void MeshComponent::changeMaterial(U32 slot, MaterialAsset* newMat)
 {
-   
    char fieldName[512];
 
    //update our respective field

@@ -128,6 +128,8 @@ public:
    ///
    virtual void moveKinematicTo(const MatrixF &xfm) = 0;
 
+   virtual bool isValid() = 0;
+
 };
 
 

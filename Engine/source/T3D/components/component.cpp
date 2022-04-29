@@ -456,7 +456,7 @@ void Component::checkComponentFieldModified(const char* slotName, const char* ne
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
-void Component::addComponentField(const char *fieldName, const char *desc, const char *type, const char *defaultValue /* = NULL */, const char *userData /* = NULL */, /*const char* dependency /* = NULL *//*,*/ bool hidden /* = false */)
+void Component::addComponentField(const char *fieldName, const char *desc, const char *type, const char *defaultValue /* = NULL */, const char *userData /* = NULL */, /*const char* dependency /* = NULL *//*,*/ bool hidden /* = false */, const char* customLabel /* = ""*/)
 {
    StringTableEntry stFieldName = StringTable->insert(fieldName);
 
@@ -467,6 +467,12 @@ void Component::addComponentField(const char *fieldName, const char *desc, const
    }
 
    ComponentField field;
+
+   if (customLabel != "")
+      field.mFieldLabel = customLabel;
+   else
+      field.mFieldLabel = stFieldName;
+
    field.mFieldName = stFieldName;
 
    //find the field type

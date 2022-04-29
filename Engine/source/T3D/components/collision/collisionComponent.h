@@ -19,190 +19,188 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+#pragma once
 
 #ifndef COLLISION_COMPONENT_H
 #define COLLISION_COMPONENT_H
 
-#ifndef __RESOURCE_H__
-#include "core/resource.h"
+#ifndef COMPONENT_H
+#include "T3D/components/component.h"
 #endif
-#ifndef _TSSHAPE_H_
-#include "ts/tsShape.h"
+
+#ifndef _CONVEX_H_
+#include "collision/convex.h"
 #endif
-#ifndef _SCENERENDERSTATE_H_
-#include "scene/sceneRenderState.h"
+#ifndef _COLLISION_H_
+#include "collision/collision.h"
 #endif
-#ifndef _MBOX_H_
-#include "math/mBox.h"
+#ifndef _EARLYOUTPOLYLIST_H_
+#include "collision/earlyOutPolyList.h"
 #endif
-#ifndef ENTITY_H
-#include "T3D/entity.h"
+#ifndef _SIM_H_
+#include "console/sim.h"
 #endif
-#ifndef CORE_INTERFACES_H
-#include "T3D/components/coreInterfaces.h"
-#endif
-#ifndef COLLISION_INTERFACES_H
-#include "T3D/components/collision/collisionInterfaces.h"
-#endif
-#ifndef RENDER_COMPONENT_INTERFACE_H
-#include "T3D/components/render/renderComponentInterface.h"
-#endif
-#ifndef PHYSICS_COMPONENT_INTERFACE_H
-#include "T3D/components/physics/physicsComponentInterface.h"
+#ifndef _SCENECONTAINER_H_
+#include "scene/sceneContainer.h"
 #endif
 #ifndef _T3D_PHYSICSCOMMON_H_
 #include "T3D/physics/physicsCommon.h"
+#endif
+#ifndef PHYSICS_COMPONENT_H
+#include "T3D/components/physics/physicsComponent.h"
 #endif
 #ifndef _T3D_PHYSICS_PHYSICSWORLD_H_
 #include "T3D/physics/physicsWorld.h"
 #endif
 
-class TSShapeInstance;
-class SceneRenderState;
-class CollisionComponent;
-class PhysicsBody;
-class PhysicsWorld;
+struct CollisionContactInfo
+{
+   bool contacted, move;
+   SceneObject *contactObject;
+   VectorF  idealContactNormal;
+   VectorF  contactNormal;
+   Point3F  contactPoint;
+   F32	   contactTime;
+   S32	   contactTimer;
+   BaseMatInstance *contactMaterial;
 
-class CollisionComponent : public Component,
-   public CollisionInterface,
-   public CastRayInterface
+   Vector<SceneObject*> overlapObjects;
+
+   void clear()
+   {
+      contacted=move=false; 
+      contactObject = NULL; 
+      contactNormal.set(0,0,0);
+      contactTime = 0.f;
+      contactTimer = 0;
+      idealContactNormal.set(0, 0, 1);
+      contactMaterial = NULL;
+      overlapObjects.clear();
+   }
+
+   CollisionContactInfo() { clear(); }
+
+};
+
+class CollisionComponent : public Component
 {
    typedef Component Parent;
+
 public:
-   enum MeshType
+	// CollisionTimeout
+	// This struct lets us track our collisions and estimate when they've have timed out and we'll need to act on it.
+	struct CollisionTimeout 
    {
-      None = 0,            ///< No mesh
-      Bounds = 1,          ///< Bounding box of the shape
-      CollisionMesh = 2,   ///< Specifically designated collision meshes
-      VisibleMesh = 3      ///< Rendered mesh polygons
+      CollisionTimeout* next;
+      SceneObject* object;
+      U32 objectNumber;
+      SimTime expireTime;
+      VectorF vector;
    };
 
+   Signal< void( SceneObject* ) > onCollisionSignal;
+   Signal< void( SceneObject* ) > onContactSignal;
+
+protected:
    PhysicsWorld* mPhysicsWorld;
    PhysicsBody* mPhysicsRep;
 
-protected:
-   MeshType mCollisionType;
-   MeshType mDecalType;
-   MeshType mLOSType;
+   CollisionTimeout* mTimeoutList;
+   static CollisionTimeout* sFreeTimeoutList;
 
-   Vector<S32> mCollisionDetails;
-   Vector<S32> mLOSDetails;
+   CollisionList mCollisionList;
+   Vector<CollisionComponent*> mCollisionNotifyList;
 
-   StringTableEntry colisionMeshPrefix;
+   CollisionContactInfo mContactInfo;
 
-   RenderComponentInterface* mOwnerRenderInterface;
+   U32 CollisionMoveMask;
 
-   PhysicsComponentInterface* mOwnerPhysicsInterface;
+   bool mBlockColliding;
 
-   //only really relevent for the collision mesh type
-   //if we note an animation component is added, we flag as being animated.
-   //This way, if we're using collision meshes, we can set it up to update their transforms
-   //as needed
-   bool mAnimated;
+   bool mCollisionInited;
 
-   enum
-   {
-      ColliderMask = Parent::NextFreeMask,
-   };
+   void handleCollisionNotifyList();
+
+   void queueCollision( SceneObject *obj, const VectorF &vec);
+
+	/// checkEarlyOut
+	/// This function lets you trying and early out of any expensive collision checks by using simple extruded poly boxes representing our objects
+	/// If it returns true, we know we won't hit with the given parameters and can successfully early out. If it returns false, our test case collided
+	/// and we should do the full collision sim.
+	bool checkEarlyOut(Point3F start, VectorF velocity, F32 time, Box3F objectBox, Point3F objectScale, 
+														Box3F collisionBox, U32 collisionMask, CollisionWorkingList &colWorkingList);
 
 public:
    CollisionComponent();
    virtual ~CollisionComponent();
+
    DECLARE_CONOBJECT(CollisionComponent);
 
-   virtual U32 packUpdate(NetConnection *con, U32 mask, BitStream *stream);
-   virtual void unpackUpdate(NetConnection *con, BitStream *stream);
+   //Setup
+   virtual void prepCollision() {};
 
-   virtual void componentAddedToOwner(Component *comp);
-   virtual void componentRemovedFromOwner(Component *comp);
-   virtual void ownerTransformSet(MatrixF *mat);
-   void targetShapeChanged(RenderComponentInterface* instanceInterface);
+   /// checkCollisions
+   // This is our main function for checking if a collision is happening based on the start point, velocity and time
+   // We do the bulk of the collision checking in here
+   //virtual bool checkCollisions( const F32 travelTime, Point3F *velocity, Point3F start )=0;
 
-   virtual void onComponentRemove();
-   virtual void onComponentAdd();
+   CollisionList *getCollisionList() { return &mCollisionList; }
 
-   virtual void checkDependencies();
+   void clearCollisionList() { mCollisionList.clear(); }
 
-   static void initPersistFields();
+   void clearCollisionNotifyList() { mCollisionNotifyList.clear(); }
 
-   void inspectPostApply();
+   Collision *getCollision(S32 col);
 
-   virtual void processTick();
+   CollisionContactInfo* getContactInfo() { return &mContactInfo; }
 
-   void prepCollision();
+	enum PublicConstants { 
+      CollisionTimeoutValue = 250
+   };
 
-   PhysicsCollision* buildColShapes();
+   bool doesBlockColliding() { return mBlockColliding; }
 
-   void updatePhysics();
+   /// handleCollisionList
+   /// This basically takes in a CollisionList and calls handleCollision for each.
+   void handleCollisionList(CollisionList &collisionList, VectorF velocity);
 
-   virtual bool castRay(const Point3F &start, const Point3F &end, RayInfo* info);
+   /// handleCollision
+   /// This will take a collision and queue the collision info for the object so that in knows about the collision.
+   void handleCollision(Collision &col, VectorF velocity);
 
-   virtual bool buildPolyList(PolyListContext context, AbstractPolyList* polyList, const Box3F &box, const SphereF &sphere){ return false; }
+   virtual bool checkCollisions(const F32 travelTime, Point3F *velocity, Point3F start);
+   virtual bool updateCollisions(F32 time, VectorF vector, VectorF velocity);
+   virtual void updateWorkingCollisionSet(const U32 mask);
 
-   virtual PhysicsCollision* getCollisionData();
+   //
+   bool buildConvexOpcode(TSShapeInstance* sI, S32 dl, const Box3F &bounds, Convex *c, Convex *list);
+   bool buildMeshOpcode(TSMesh *mesh, const MatrixF &meshToObjectMat, const Box3F &bounds, Convex *convex, Convex *list);
 
-   //Utility functions, mostly for script
-   Point3F getContactNormal() { return mContactInfo.contactNormal; }
-   bool hasContact()
-   {
-      if (mContactInfo.contactObject)
-         return true;
-      else
-         return false;
-   }
-   S32 getCollisionCount()
-   {
-      return mCollisionList.getCount();
-   }
+   bool castRayOpcode(S32 dl, const Point3F & startPos, const Point3F & endPos, RayInfo *info);
+   bool castRayMeshOpcode(TSMesh *mesh, const Point3F &s, const Point3F &e, RayInfo *info, TSMaterialList *materials);
 
-   Point3F getCollisionNormal(S32 collisionIndex)
-   {
-      if (collisionIndex < 0 || mCollisionList.getCount() < collisionIndex)
-         return Point3F::Zero;
-
-      return mCollisionList[collisionIndex].normal;
+   virtual PhysicsCollision* getCollisionData() {
+      return nullptr;
    }
 
-   F32 getCollisionAngle(S32 collisionIndex, Point3F upVector)
+   virtual PhysicsBody *getPhysicsRep()
    {
-      if (collisionIndex < 0 || mCollisionList.getCount() < collisionIndex)
-         return 0.0f;
-
-      return mRadToDeg(mAcos(mDot(mCollisionList[collisionIndex].normal, upVector)));
+      return mPhysicsRep;
    }
 
-   S32 getBestCollision(Point3F upVector)
-   {
-      S32 bestCollision = -1;
+   void buildConvex(const Box3F& box, Convex* convex) {}
+   bool buildPolyList(PolyListContext context, AbstractPolyList* polyList, const Box3F &box, const SphereF &sphere) { return false; }
 
-      F32 bestAngle = 360.f;
-      S32 count = mCollisionList.getCount();
-      for (U32 i = 0; i < count; ++i)
-      {
-         F32 angle = mRadToDeg(mAcos(mDot(mCollisionList[i].normal, upVector)));
+   //
+   Point3F getContactNormal();
+   bool hasContact();
+   S32 getCollisionCount();
+   Point3F getCollisionNormal(S32 collisionIndex);
+   F32 getCollisionAngle(S32 collisionIndex, Point3F upVector);
+   S32 getBestCollision(Point3F upVector);
+   F32 getBestCollisionAngle(VectorF upVector);
 
-         if (angle < bestAngle)
-         {
-            bestCollision = i;
-            bestAngle = angle;
-         }
-      }
-
-      return bestCollision;
-   }
-
-   F32 getBestCollisionAngle(VectorF upVector)
-   {
-      S32 bestCol = getBestCollision(upVector);
-
-      if (bestCol == -1)
-         return 0;
-
-      return getCollisionAngle(bestCol, upVector);
-   }
+   Signal< void(PhysicsCollision* collision) > onCollisionChanged;
 };
 
-typedef CollisionComponent::MeshType CollisionMeshMeshType;
-DefineEnumType(CollisionMeshMeshType);
-
-#endif // COLLISION_COMPONENT_H
+#endif

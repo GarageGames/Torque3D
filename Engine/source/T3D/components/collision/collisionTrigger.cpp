@@ -480,7 +480,7 @@ void CollisionTrigger::processTick(const Move* move)
          }
       }
 
-      if (!mTickCommand.isEmpty())
+      if (!mTickCommand.isEmpty() && mObjects.size() != 0)
          Con::evaluate(mTickCommand.c_str());
 
       //if (mObjects.size() != 0)

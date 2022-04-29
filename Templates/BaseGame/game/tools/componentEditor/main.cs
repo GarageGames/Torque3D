@@ -22,7 +22,14 @@
 
 //Scripts
 exec("./scripts/componentEditor.ed.cs");
+exec("./scripts/stateMachineEditor.ed.cs");
 exec("./scripts/superToolTipDlg.ed.cs");
 
 //gui
 exec("./gui/superToolTipDlg.ed.gui");
+exec("./gui/stateMachineDlg.ed.gui");
+
+//field types
+exec("./interface/materialFieldType.cs");
+exec("./interface/typeMaskFieldType.cs");
+exec("./interface/stateMachineField.cs");

@@ -92,13 +92,13 @@ void SoundComponent::onComponentAdd()
 {
    Parent::onComponentAdd();
 
-   Con::printf("We were added to an entity! SoundComponent reporting in for owner entity %i", mOwner->getId());
+   //Con::printf("We were added to an entity! SoundComponent reporting in for owner entity %i", mOwner->getId());
 }
 
 //This is called when the component has been removed from an entity
 void SoundComponent::onComponentRemove()
 {
-   Con::printf("We were removed from our entity! SoundComponent signing off for owner entity %i", mOwner->getId());
+   //Con::printf("We were removed from our entity! SoundComponent signing off for owner entity %i", mOwner->getId());
    Parent::onComponentRemove();
 }
 
@@ -113,14 +113,14 @@ void SoundComponent::componentAddedToOwner(Component *comp)
          playAudio(slotNum, mSoundFile[slotNum]);
       }
    }
-   Con::printf("Our owner entity has a new component being added! SoundComponent welcomes component %i of type %s", comp->getId(), comp->getClassRep()->getNameSpace());
+   //Con::printf("Our owner entity has a new component being added! SoundComponent welcomes component %i of type %s", comp->getId(), comp->getClassRep()->getNameSpace());
 }
 
 //This is called any time a component is removed from an entity. Every component current owned by the entity is informed of the event.
 //This allows cleanup and dependency management.
 void SoundComponent::componentRemovedFromOwner(Component *comp)
 {
-   Con::printf("Our owner entity has a removed a component! SoundComponent waves farewell to component %i of type %s", comp->getId(), comp->getClassRep()->getNameSpace());
+   //Con::printf("Our owner entity has a removed a component! SoundComponent waves farewell to component %i of type %s", comp->getId(), comp->getClassRep()->getNameSpace());
 }
 
 //Regular init persist fields function to set up static fields.
